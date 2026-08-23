@@ -36,8 +36,6 @@ export const sigmoidNeuronExercise: Exercise = {
       "        return 1 / (1 + np.exp(-z))\n\n" +
       "    fire(w, b, x):\n" +
       "        z = sum of (w * x) + b      # (w * x).sum() + b\n" +
-      "        return sigmoid(z) as a plain float   # wrap in float(...)\n\n" +
-      "If you prefer w.T @ x, note it gives a (1, 1) array; float(...) " +
-      "unwraps it.",
+      "        return sigmoid(z) as a plain float   # wrap in float(...)",
   ],
 };

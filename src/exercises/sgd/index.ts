@@ -7,17 +7,36 @@ export const sgdExercise: Exercise = {
   id: "sgd",
   title: "Stochastic gradient descent",
   prompt: [
-    "You are going to implement learning itself. The course hands you a " +
-      "gradient function (course.numerical_gradient, computed by finite " +
-      "differences: slow, but correct), and you write the two parts of " +
-      "descent: sgd_step, which moves every parameter one step downhill on " +
-      "one mini-batch, and sgd, the loop that visits the whole dataset in " +
-      "random mini-batches, epoch after epoch.",
-    "Two contracts matter. First, sgd_step must return new lists of new " +
-      "arrays and leave its inputs untouched. Second, sgd must draw its " +
-      "mini-batches in exactly the order given in the skeleton docstring " +
-      "(one permutation per epoch, then consecutive slices), because the " +
-      "tests reproduce that order to check your result to six decimal places.",
+    "The module ended with one rule: new parameter = old parameter - " +
+      "eta * slope. eta is the learning rate, the η from the module's " +
+      "sliders: the small number you choose that sets the step size. This " +
+      "exercise is that rule as code, in the two functions waiting in the " +
+      "editor.",
+    "sgd_step(weights, biases, X, Y, eta) takes one step of descent on " +
+      "one mini-batch: X holds that batch's inputs as columns and Y the " +
+      "right answers in matching columns, the packing the module just " +
+      "showed. Call course.gradient(weights, biases, X, Y) to get the " +
+      "slopes: it takes the same inputs as quadratic_cost, and where " +
+      "quadratic_cost returns the score, gradient returns (nabla_w, " +
+      "nabla_b), one slope array per parameter array, nabla_w[0] shaped " +
+      "like weights[0] and so on. Apply the rule to every weight and " +
+      "bias, and return (new_weights, new_biases), built as new lists of " +
+      "new arrays with the inputs untouched (the tests check).",
+    "sgd(weights, biases, X, Y, eta, epochs, batch_size, rng) loops it " +
+      "into training. Careful: here X and Y are the same packing but hold " +
+      "the whole dataset, and cutting them into mini-batches is your job. " +
+      "Repeat epochs times: shuffle the column order, cut it into " +
+      "mini-batches, call your sgd_step on each, feeding each result into " +
+      "the next call. Return the final (weights, biases). That is all " +
+      "training is.",
+    "The shuffling is prescribed, because the tests replay your run and " +
+      "compare to six decimal places. Each epoch, idx = rng.permutation(n) " +
+      "deals the sample numbers 0 to n-1 into a random order (n = 6 might " +
+      "give [3, 0, 5, 1, 4, 2]); the mini-batches are the consecutive " +
+      "slices idx[0:batch_size], idx[batch_size:2*batch_size], and so on. " +
+      "To pull those samples out, use one new piece of NumPy: an array of " +
+      "indices works anywhere a single index does, so X[:, batch] is the " +
+      "matrix of just those columns. Use the rng for nothing else.",
     "A satisfying experiment once sgd_step works: let it repair Module 1's " +
       "slider network from its starting position, the one the module scored " +
       "by hand at cost 0.0875. Append this below your code, then press " +
@@ -34,31 +53,41 @@ export const sgdExercise: Exercise = {
         "              [0., 0., 1., 1.]])\n" +
         "Y = np.array([[0., 1., 1., 0.]])             # the contrarian's answers\n" +
         "\n" +
-        'print("cost before:", quadratic_loss(weights, biases, X, Y))\n' +
+        'print("cost before:", quadratic_cost(weights, biases, X, Y))\n' +
         "for _ in range(100):\n" +
         "    weights, biases = sgd_step(weights, biases, X, Y, 2.0)\n" +
-        'print("cost after: ", quadratic_loss(weights, biases, X, Y))\n' +
+        'print("cost after: ", quadratic_cost(weights, biases, X, Y))\n' +
         'print("the four answers:", feedforward(weights, biases, X))',
     },
     "The cost falls from 0.08758 to about 0.026, and the four answers lean " +
       "toward 0, 1, 1, 0. Your code just did what your hands did with the " +
       "sliders.",
+    "The 2.0 is a learning rate, found by trying. Now make it misbehave: " +
+      "edit the eta in the block you appended and run again. At 20.0 the " +
+      "very first step throws the cost up to 0.165, nearly double where it " +
+      "started, and it bounces for a dozen steps before settling, yet by " +
+      "step 100 it lands near 0.002, lower than 2.0 managed (print the " +
+      "cost inside the loop to watch the ride). Bigger steps gamble, and " +
+      "here the gamble pays. At 200.0 it does not: the cost jams near " +
+      "0.250 and never comes back. And notice the bowl's numbers do not " +
+      "carry over: there, 0.5 already overshot; here 20.0 survives, " +
+      "because this landscape is far flatter (you measured its slopes at " +
+      "around 0.04). Every landscape has its own safe range.",
   ],
   skeleton,
   tests,
   solution,
   hints: [
-    "For sgd_step: numerical_gradient wants a function of (weights, biases) " +
-      "only, but quadratic_loss also needs X and Y. Wrap it: define an " +
-      "inner function (or lambda) that closes over this batch's X and Y. " +
-      "Then the update is one list comprehension per parameter list: " +
-      "each new parameter is param - eta * gradient. For sgd: two nested " +
+    "For sgd_step: one call to gradient(weights, biases, X, Y) gives " +
+      "(nabla_w, nabla_b). Then the update is one list comprehension per " +
+      "parameter list, with zip pairing each parameter with its slope " +
+      "(the same zip that walked weights and biases in feedforward): " +
+      "each new parameter is param - eta * slope. For sgd: two nested " +
       "loops, epochs outside, batches inside, reassigning weights and " +
       "biases with each sgd_step so progress carries forward.",
     "The structure, in pseudocode:\n\n" +
       "    sgd_step(weights, biases, X, Y, eta):\n" +
-      "        loss_fn = (ws, bs) -> quadratic_loss(ws, bs, X, Y)\n" +
-      "        nabla_w, nabla_b = numerical_gradient(loss_fn, weights, biases)\n" +
+      "        nabla_w, nabla_b = gradient(weights, biases, X, Y)\n" +
       "        new_weights = [w - eta * nw  for each w, nw pair]\n" +
       "        new_biases  = [b - eta * nb  for each b, nb pair]\n" +
       "        return new_weights, new_biases\n\n" +

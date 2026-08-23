@@ -33,7 +33,7 @@ def feedforward(weights, biases, x):
     return a
 
 
-def quadratic_loss(weights, biases, X, Y):
+def quadratic_cost(weights, biases, X, Y):
     """Mean quadratic cost over a batch: 0.5 * sum((a - y)^2) / m.
 
     X is (n_in, m), Y is (n_out, m). Returns a float.
@@ -43,15 +43,36 @@ def quadratic_loss(weights, biases, X, Y):
     return 0.5 * float(((out - Y) ** 2).sum()) / m
 
 
-def numerical_gradient(loss_fn, weights, biases, eps=1e-5):
+# Old name for quadratic_cost, kept so learner code saved before the
+# rename keeps running. New material must say "cost", never "loss".
+quadratic_loss = quadratic_cost
+
+
+def gradient(weights, biases, X, Y, eps=1e-5):
+    """Slopes of the quadratic cost on the batch (X, Y), one per parameter.
+
+    Takes the same inputs as quadratic_cost and returns (nabla_w,
+    nabla_b): lists of arrays shaped like weights and biases, where each
+    entry is that parameter's slope. Measured numerically, the hand way:
+    nudge the parameter by eps, rescore the batch, divide (two cost
+    evaluations per parameter; Module 5 replaces this with
+    backpropagation).
+    """
+    def cost_fn(ws, bs):
+        return quadratic_cost(ws, bs, X, Y)
+
+    return numerical_gradient(cost_fn, weights, biases, eps)
+
+
+def numerical_gradient(cost_fn, weights, biases, eps=1e-5):
     """Estimate gradients by central finite differences.
 
-    loss_fn(weights, biases) must return a float. Returns (nabla_w,
+    cost_fn(weights, biases) must return a float. Returns (nabla_w,
     nabla_b): lists of arrays with the same shapes as weights and biases,
-    where each entry is the estimated partial derivative of the loss with
+    where each entry is the estimated partial derivative of the cost with
     respect to that parameter.
 
-    This is the expensive way to get gradients: two loss evaluations (two
+    This is the expensive way to get gradients: two cost evaluations (two
     full forward passes) per parameter. Module 5 replaces it with
     backpropagation.
     """
@@ -63,9 +84,9 @@ def numerical_gradient(loss_fn, weights, biases, eps=1e-5):
             i = it.multi_index
             original = p[i]
             p[i] = original + eps
-            up = loss_fn(weights, biases)
+            up = cost_fn(weights, biases)
             p[i] = original - eps
-            down = loss_fn(weights, biases)
+            down = cost_fn(weights, biases)
             p[i] = original
             g[i] = (up - down) / (2 * eps)
         return g

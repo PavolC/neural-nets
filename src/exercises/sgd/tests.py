@@ -1,5 +1,5 @@
 # Tests for the SGD exercise. All fixtures are hardcoded literals computed
-# with course.numerical_gradient (eps=1e-5), so results are deterministic.
+# with course.gradient (eps=1e-5), so results are deterministic.
 # Failure messages are teaching content (see CLAUDE.md).
 
 import numpy as np
@@ -67,11 +67,10 @@ def test_step_values():
     expected_b1 = np.array([[-0.1056129477]])
     assert np.allclose(new_w[1], expected_w1, atol=1e-6), (
         f"wrong updated weights: expected\n{expected_w1}\ngot\n{new_w[1]}\n"
-        "The update is new_w = w - eta * gradient, where the gradient "
-        "comes from numerical_gradient(loss_fn, weights, biases) and "
-        "loss_fn(ws, bs) must return quadratic_loss(ws, bs, X, Y) for "
-        "this batch. A plus instead of a minus walks uphill; a missing "
-        "eta takes a full-size step."
+        "The update is new_w = w - eta * slope, where the slopes come "
+        "from course.gradient(weights, biases, X, Y) on this batch. "
+        "A plus instead of a minus walks uphill; a missing eta takes a "
+        "full-size step."
     )
     assert np.allclose(new_b[1], expected_b1, atol=1e-6), (
         f"wrong updated bias: expected {expected_b1}, got {new_b[1]}. "
@@ -80,14 +79,14 @@ def test_step_values():
 
 
 def test_step_goes_downhill():
-    """a step reduces the loss on its own batch"""
-    from course import quadratic_loss
+    """a step reduces the cost on its own batch"""
+    from course import quadratic_cost
     weights, biases, X, Y = _fixture_net()
-    before = quadratic_loss(weights, biases, X, Y)
+    before = quadratic_cost(weights, biases, X, Y)
     new_w, new_b = sgd_step(weights, biases, X, Y, 0.5)
-    after = quadratic_loss(new_w, new_b, X, Y)
+    after = quadratic_cost(new_w, new_b, X, Y)
     assert after < before, (
-        f"the loss went from {before:.6f} to {after:.6f}: uphill. "
+        f"the cost went from {before:.6f} to {after:.6f}: uphill. "
         "Gradient descent subtracts the gradient. If you added it, every "
         "step makes things worse."
     )
@@ -95,16 +94,16 @@ def test_step_goes_downhill():
 
 def test_sgd_final_values():
     """the full loop follows the prescribed batch order"""
-    from course import quadratic_loss
+    from course import quadratic_cost
     weights, biases, X, Y = _fixture_net()
-    initial_loss = quadratic_loss(weights, biases, X, Y)
+    initial_cost = quadratic_cost(weights, biases, X, Y)
     final_w, final_b = sgd(weights, biases, X, Y, 2.0, 3, 2,
                            np.random.default_rng(0))
-    final_loss = quadratic_loss(final_w, final_b, X, Y)
+    final_cost = quadratic_cost(final_w, final_b, X, Y)
     expected_w1 = np.array([[0.6497401933, -0.5159356158, 0.1556485109]])
-    assert final_loss < initial_loss, (
-        f"after 3 epochs the loss should have decreased, but it is "
-        f"{final_loss:.6f}. Check that sgd actually applies sgd_step to "
+    assert final_cost < initial_cost, (
+        f"after 3 epochs the cost should have decreased, but it is "
+        f"{final_cost:.6f}. Check that sgd actually applies sgd_step to "
         "every mini-batch and carries the updated parameters forward "
         "between batches and between epochs."
     )

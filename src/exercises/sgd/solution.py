@@ -2,15 +2,12 @@
 # github.com/mnielsen/neural-networks-and-deep-learning).
 
 import numpy as np
-from course import quadratic_loss, numerical_gradient
+from course import quadratic_cost, gradient
 
 
 def sgd_step(weights, biases, X, Y, eta):
     """One gradient descent step on the batch (X, Y)."""
-    def loss_fn(ws, bs):
-        return quadratic_loss(ws, bs, X, Y)
-
-    nabla_w, nabla_b = numerical_gradient(loss_fn, weights, biases)
+    nabla_w, nabla_b = gradient(weights, biases, X, Y)
     new_weights = [w - eta * nw for w, nw in zip(weights, nabla_w)]
     new_biases = [b - eta * nb for b, nb in zip(biases, nabla_b)]
     return new_weights, new_biases
