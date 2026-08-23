@@ -126,6 +126,47 @@ button:disabled {
   margin-bottom: 0.5rem;
 }
 
+.exercise-tip {
+  font-size: 0.88rem;
+  font-family: system-ui, sans-serif;
+  color: var(--muted);
+  margin: -0.4rem 0 0.7rem;
+}
+
+.output-panel {
+  margin: 0.8rem 0;
+}
+
+.output-panel h3 {
+  font-size: 0.85rem;
+  font-family: system-ui, sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted);
+  margin: 0 0 0.3rem;
+}
+
+.output-panel pre {
+  background: #1e1e1c;
+  color: #e6e6e0;
+  border-radius: 6px;
+  padding: 0.75rem;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  min-height: 2.4em;
+  margin: 0 0 0.4rem;
+  white-space: pre-wrap;
+}
+
+.tests-viewer {
+  margin-top: 1rem;
+}
+
+.tests-viewer pre {
+  max-height: 420px;
+  overflow: auto;
+}
+
 .test-results {
   margin: 1rem 0;
 }
@@ -329,6 +370,54 @@ button:disabled {
   height: 12px;
   background: linear-gradient(90deg, #e8dbbf, #2a9f65);
   border-radius: 3px;
+}
+
+/* Sigmoid vs hard threshold (Module 1) */
+.slider-row-wide {
+  flex: 1;
+  min-width: 260px;
+}
+
+.step-curve {
+  stroke: #c8a24a;
+  stroke-width: 2.5;
+}
+
+.step-jump {
+  stroke-dasharray: 4 3;
+  stroke-width: 1.6;
+}
+
+.sigmoid-curve {
+  fill: none;
+  stroke: var(--acc);
+  stroke-width: 2.5;
+}
+
+.z-marker {
+  stroke: var(--muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.dot-step {
+  fill: #c8a24a;
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.dot-sigmoid {
+  fill: var(--acc);
+  stroke: #fff;
+  stroke-width: 1.5;
+}
+
+.swatch-step {
+  fill: #c8a24a;
+}
+
+.swatch-sigmoid {
+  fill: var(--acc);
 }
 
 /* Static concert-neuron plot in Module 1 */

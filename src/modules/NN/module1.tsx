@@ -3,6 +3,7 @@ import { Eq, M } from "../../components/Math";
 import { ExercisePage } from "../../components/ExercisePage";
 import { sigmoidNeuronExercise } from "../../exercises/sigmoid-neuron";
 import { SeparatingLine } from "./interactives/SeparatingLine";
+import { SigmoidVsStep } from "./interactives/SigmoidVsStep";
 import { XorNetwork } from "./interactives/XorNetwork";
 import { scale } from "./interactives/utils";
 
@@ -92,25 +93,39 @@ export function Module1() {
 
       <p>
         So far you picked the weights and read off the verdicts. Learning runs the
-        other way around: you are handed inputs whose correct answers are already
-        known (these known examples are the two "classes" of dots below, green and
-        gold), and you must find weights that make the neuron's verdict match every
-        one. In the picture, that job is: place the line so all green ends up on one
-        side and all gold on the other. The interactive below lets you do it with
-        your hands, and this is the part to internalize: dragging the line IS
-        choosing <M tex="w_1, w_2, b" />. The readout under the chart shows, live,
-        which three numbers your line corresponds to. Start on the OR dataset (green
-        means "at least one input is 1"), then try AND (green means "both are 1").
-        Both should take you a few seconds.
+        other way around: you are handed situations whose correct answers are
+        already known, and you must find weights that make the neuron's verdict
+        match every one of them. In the picture, that job is: place the line so
+        that every go situation lands on one side and every stay situation on the
+        other.
+      </p>
+      <p>
+        Whose answers, though? Let's manufacture the smallest learning tasks
+        possible, staying in the concert world: <M tex="x_1" /> is the weather,{" "}
+        <M tex="x_2" /> is the friend, each 0 or 1, so there are only four possible
+        situations and a complete dataset fits in one picture. Four dots: green
+        where the right answer is go, gold where it is stay (in the jargon, the two
+        groups are called classes). Now imagine two people with different going-out
+        rules. The easygoing one goes if at least one of the two things is good;
+        that rule is called OR. The picky one goes only when both are good; that is
+        AND. In the interactive below you play each person's neuron in turn: pick
+        their dataset, then place the line so it reproduces their rule on all four
+        dots. And this is the part to internalize: dragging the line IS choosing{" "}
+        <M tex="w_1, w_2, b" />; the readout under the chart shows, live, which
+        three numbers your line corresponds to. OR and AND should each take you a
+        few seconds.
       </p>
       <Figure caption="Drag the two round handles to place the line. OR and AND fall in seconds. Then switch to XOR and keep trying: no single straight cut ever puts both green points on one side and both gold points on the other.">
         <SeparatingLine />
       </Figure>
 
       <p>
-        Then there is XOR, the third dataset. XOR ("exclusive or") is a tiny rule:
-        output 1 when the two inputs differ, 0 when they agree. The whole task is four
-        points:
+        The third dataset belongs to the contrarian. They go out exactly when one
+        thing is good but not both: good weather alone, sure; friend in bad weather,
+        sure, someone has to keep them company; both good at once, mysteriously, no.
+        That rule is called XOR ("exclusive or"): answer 1 when the two inputs
+        differ, 0 when they agree. As a personality it is admittedly contrived; its
+        fame comes from what it does to neurons. The whole task is four dots:
       </p>
       <table className="truth-table">
         <thead>
@@ -141,8 +156,15 @@ export function Module1() {
         will mean nudging weights a little and checking whether the answers improve.
         A perceptron fights that: its output is a hard 0 or 1, so a tiny nudge
         usually changes nothing at all, until suddenly it flips everything. What we
-        want is a neuron whose output moves smoothly as its evidence moves. So we
-        pass <M tex="z" /> through the sigmoid function:
+        want is a neuron whose output moves smoothly as its evidence moves. See the
+        difference for yourself; both curves below answer the same question, "what
+        does the neuron output at each level of evidence z":
+      </p>
+      <Figure caption="Slide z slowly through the middle. The perceptron's answer ignores every nudge and then flips all at once; the sigmoid answers every nudge with a small, usable change. Learning by nudging needs the second kind.">
+        <SigmoidVsStep />
+      </Figure>
+      <p>
+        The smooth curve has a name and a formula, the sigmoid function:
       </p>
       <Eq
         tex="\sigma(z) = \frac{1}{1 + e^{-z}}"
@@ -150,7 +172,7 @@ export function Module1() {
       />
       <p>
         A sigmoid neuron outputs <M tex="\sigma(w \cdot x + b)" />: not a verdict but
-        a confidence, like 0.93 or 0.02. It still draws the same line through the
+        a confidence, like the 0.93 or 0.02 you just watched. It still draws the same line through the
         plane, but near the line it hedges, and that hedging is what makes gradual
         learning possible. Every neuron in this course from here on is a sigmoid
         neuron.
@@ -160,7 +182,7 @@ export function Module1() {
         Now the stacking. If one neuron is one line, use three neurons. Wire them
         like this:
       </p>
-      <Figure caption="The smallest network that can beat XOR. Every arrow carries a weight, every neuron adds its own bias and applies sigmoid. h1 and h2 are called the hidden layer: neither input nor final output.">
+      <Figure caption="The smallest network that can beat XOR. Each green-bordered circle is one neuron; a column of them is called a layer. The gray circles are just the two input numbers. Every arrow carries a weight (six arrows, six weights), and each of the three neurons adds its own bias: nine numbers in total.">
         <TinyNetDiagram />
       </Figure>
       <p>
@@ -170,7 +192,11 @@ export function Module1() {
         draws its own line through the picture. The only novelty is the output
         neuron's wiring: its two inputs are not <M tex="x_1" /> and <M tex="x_2" />{" "}
         but the outputs of <M tex="h_1" /> and <M tex="h_2" />. It never sees the
-        original point at all; it only hears the two reports.
+        original point at all; it only hears the two reports. Now count what there
+        is to choose: <M tex="h_1" /> has two weights and a bias, <M tex="h_2" />{" "}
+        has two weights and a bias, and the output neuron has two weights (one per
+        report it listens to) and a bias. Three neurons, three numbers each: nine
+        numbers, and they are this network's entire personality.
       </p>
       <p>
         Here is one way to set the nine numbers, in words first. Make{" "}
@@ -202,15 +228,20 @@ export function Module1() {
         </tbody>
       </table>
       <p>
-        The playground below is this exact network with all nine numbers on sliders.
-        How to read it: the shading is the output neuron's verdict for every possible
-        input at once, green for class 1, sand for class 0. The solid purple line is
-        where <M tex="h_1" />'s own evidence crosses zero; the dashed teal line is{" "}
-        <M tex="h_2" />'s. Each slider group is labeled with its line. Two
-        suggestions: press "Show a solution" first and then break it, one slider at a
-        time, to feel what each number does. Then start over and rebuild it. Getting
-        all four points right by hand is genuinely fiddly, and that is foreshadowing:
-        Module 3 is about making the computer do the fiddling.
+        The playground below is this exact network with all nine numbers on sliders,
+        and the four dots are the contrarian's dataset from above, the same four
+        weather-and-friend situations no single line could split. How to read it:
+        the shading is the output neuron's verdict for every possible input at once,
+        green for go, sand for stay. The solid purple line is where{" "}
+        <M tex="h_1" />'s own evidence crosses zero; the dashed teal line is{" "}
+        <M tex="h_2" />'s. Each slider group is labeled with its line. Press "Show a
+        solution" and it sets exactly the numbers from the table: <M tex="h_1" />,
+        the solid purple line, becomes the at-least-one detector, and{" "}
+        <M tex="h_2" />, the dashed teal line, the both detector. Break the solution
+        one slider at a time to feel what each number does, then start over and
+        rebuild it. Getting all four dots right by hand is genuinely fiddly, and
+        that is foreshadowing: Module 3 is about making the computer do the
+        fiddling.
       </p>
       <Figure caption="The 2-2-1 network on its four XOR points. Move any slider and watch that neuron's line, and the output's shading, respond.">
         <XorNetwork />
@@ -326,7 +357,7 @@ function TinyNetDiagram() {
     ["x1", "h1"], ["x1", "h2"], ["x2", "h1"], ["x2", "h2"], ["h1", "out"], ["h2", "out"],
   ];
   return (
-    <svg viewBox="0 0 430 220" className="tiny-net" role="img"
+    <svg viewBox="-50 0 490 232" className="tiny-net" role="img"
          aria-label="Diagram: inputs x1 and x2 feed hidden neurons h1 and h2, which feed one output neuron">
       <defs>
         <marker id="tn-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7"
@@ -360,8 +391,11 @@ function TinyNetDiagram() {
         </g>
       ))}
       <text x={60} y={205} textAnchor="middle" className="tiny-net-caption">inputs</text>
+      <text x={60} y={219} textAnchor="middle" className="tiny-net-caption">(just numbers, not neurons)</text>
       <text x={210} y={205} textAnchor="middle" className="tiny-net-caption">hidden layer</text>
-      <text x={360} y={205} textAnchor="middle" className="tiny-net-caption">output</text>
+      <text x={210} y={219} textAnchor="middle" className="tiny-net-caption">(2 neurons)</text>
+      <text x={360} y={205} textAnchor="middle" className="tiny-net-caption">output layer</text>
+      <text x={360} y={219} textAnchor="middle" className="tiny-net-caption">(1 neuron)</text>
     </svg>
   );
 }

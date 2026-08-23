@@ -13,17 +13,17 @@ const DATASETS: Record<
   OR: {
     points: [[0, 0], [0, 1], [1, 0], [1, 1]],
     labels: [0, 1, 1, 1],
-    rule: "green when at least one input is 1",
+    rule: "the easygoing rule: go (green) when at least one input is 1",
   },
   AND: {
     points: [[0, 0], [0, 1], [1, 0], [1, 1]],
     labels: [0, 0, 0, 1],
-    rule: "green only when both inputs are 1",
+    rule: "the picky rule: go (green) only when both inputs are 1",
   },
   XOR: {
     points: [[0, 0], [1, 1], [0, 1], [1, 0]],
     labels: [0, 0, 1, 1],
-    rule: "green when the inputs differ",
+    rule: "the contrarian rule: go (green) when the inputs differ",
   },
 };
 

@@ -21,7 +21,14 @@ let currentId = 0;
 
 const post = (msg: WorkerResponse) => self.postMessage(msg);
 const status = (text: string) => post({ type: "status", id: currentId, text });
-const log = (text: string) => post({ type: "log", id: currentId, text });
+
+// Until the runtime finishes booting, stdout is loader noise; afterwards it
+// is the user's own print() output.
+let bootDone = false;
+const logStdout = (text: string) =>
+  post({ type: "log", id: currentId, source: bootDone ? "stdout" : "runtime", text });
+const logRuntime = (text: string) =>
+  post({ type: "log", id: currentId, source: "runtime", text });
 
 // Minimal typing for the parts of the Pyodide API we use.
 interface Pyodide {
@@ -40,15 +47,15 @@ function getPyodide(): Promise<Pyodide> {
       const mod = await import(/* @vite-ignore */ `${PYODIDE_BASE_URL}pyodide.mjs`);
       const pyodide: Pyodide = await mod.loadPyodide({
         indexURL: PYODIDE_BASE_URL,
-        stdout: (text: string) => log(text),
-        stderr: (text: string) => log(text),
+        stdout: (text: string) => logStdout(text),
+        stderr: (text: string) => logStdout(text),
       });
       status("Loading NumPy...");
       await pyodide.loadPackage("numpy");
       const version = await pyodide.runPythonAsync(
         "import sys, numpy; f'Python {sys.version.split()[0]}, NumPy {numpy.__version__}'",
       );
-      log(`Pyodide ${PYODIDE_VERSION} ready (${version})`);
+      logRuntime(`Pyodide ${PYODIDE_VERSION} ready (${version})`);
       // Shared course Python: data loader, reference network, helpers
       // (registered as the `course` module so exercises can import from it),
       // and the exercise test harness.
@@ -63,6 +70,7 @@ exec(compile(_course_src, "course_helpers.py", "exec"), _course.__dict__)
 sys.modules["course"] = _course
 `);
       await pyodide.runPythonAsync(harnessSource);
+      bootDone = true;
       return pyodide;
     })();
     pyodidePromise.catch(() => {
@@ -88,7 +96,7 @@ async function fetchDataset(pyodide: Pyodide, dataUrl: string): Promise<void> {
     bytes = new Uint8Array(await new Response(stream).arrayBuffer());
   }
   pyodide.FS.writeFile("/mnist_subset.bin", bytes);
-  log(`MNIST subset loaded (${(bytes.byteLength / 1e6).toFixed(1)} MB decompressed)`);
+  logRuntime(`MNIST subset loaded (${(bytes.byteLength / 1e6).toFixed(1)} MB decompressed)`);
 }
 
 async function train(msg: Extract<WorkerRequest, { type: "train" }>): Promise<void> {

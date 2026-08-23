@@ -50,7 +50,9 @@ export interface TestRunResult {
 
 export type WorkerResponse =
   | { type: "status"; id: number; text: string }
-  | { type: "log"; id: number; text: string }
+  // source "stdout" is the user's own prints; "runtime" is loader noise
+  // (Pyodide boot, package downloads, dataset fetches).
+  | { type: "log"; id: number; source: "runtime" | "stdout"; text: string }
   | ({ type: "epoch"; id: number } & EpochMetrics)
   | { type: "trainDone"; id: number; result: TrainResult }
   | { type: "testsDone"; id: number; result: TestRunResult }

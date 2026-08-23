@@ -41,6 +41,21 @@ def _format_error(exc):
     return {"message": message, "line": line}
 
 
+def run_scratch(learner_code):
+    """Execute the learner's code alone, no tests: for printing and playing.
+
+    Anything printed streams to the UI's output panel via the worker's
+    stdout handler. Returns JSON: {"error": null | {"message", "line"}}.
+    """
+    scratch = types.ModuleType("scratch")
+    scratch.__file__ = LEARNER_FILENAME
+    try:
+        exec(compile(learner_code, LEARNER_FILENAME, "exec"), scratch.__dict__)
+    except Exception as exc:
+        return json.dumps({"error": _format_error(exc)})
+    return json.dumps({"error": None})
+
+
 def run_exercise(learner_code, tests_code):
     results = {"setup_error": None, "tests": [], "passed": False}
 
