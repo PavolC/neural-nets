@@ -4,17 +4,47 @@ import { scale } from "./utils";
 // Module 1 interactive (a): drag a line and try to separate two classes of
 // points. AND and OR are separable; XOR is not, which is the point.
 
-type DatasetId = "XOR" | "OR" | "AND";
+type DatasetId = "OR" | "AND" | "XOR";
 
-const DATASETS: Record<DatasetId, { points: [number, number][]; labels: number[] }> = {
-  XOR: { points: [[0, 0], [1, 1], [0, 1], [1, 0]], labels: [0, 0, 1, 1] },
-  OR: { points: [[0, 0], [0, 1], [1, 0], [1, 1]], labels: [0, 1, 1, 1] },
-  AND: { points: [[0, 0], [0, 1], [1, 0], [1, 1]], labels: [0, 0, 0, 1] },
+const DATASETS: Record<
+  DatasetId,
+  { points: [number, number][]; labels: number[]; rule: string }
+> = {
+  OR: {
+    points: [[0, 0], [0, 1], [1, 0], [1, 1]],
+    labels: [0, 1, 1, 1],
+    rule: "green when at least one input is 1",
+  },
+  AND: {
+    points: [[0, 0], [0, 1], [1, 0], [1, 1]],
+    labels: [0, 0, 0, 1],
+    rule: "green only when both inputs are 1",
+  },
+  XOR: {
+    points: [[0, 0], [1, 1], [0, 1], [1, 0]],
+    labels: [0, 0, 1, 1],
+    rule: "green when the inputs differ",
+  },
 };
 
 const W = 360;
 const H = 320;
 const DOMAIN = [-0.45, 1.45];
+
+// The dragged line, expressed as the neuron it corresponds to: the points
+// with w1*x1 + w2*x2 + b = 0 are exactly the line through the two handles.
+// Normalized so the weights have length 1 (any rescaling is the same line).
+function lineAsNeuron(h1: [number, number], h2: [number, number]): string {
+  const dx = h2[0] - h1[0];
+  const dy = h2[1] - h1[1];
+  const len = Math.hypot(dx, dy) || 1;
+  const w1 = -dy / len;
+  const w2 = dx / len;
+  const b = (dy * h1[0] - dx * h1[1]) / len;
+  const term = (v: number, name: string) =>
+    `${v < 0 ? "− " : "+ "}${Math.abs(v).toFixed(2)}${name}`;
+  return `${w1.toFixed(2)}·x₁ ${term(w2, "·x₂")} ${term(b, "")}`;
+}
 
 const toPx = (v: number) => scale(v, DOMAIN[0], DOMAIN[1], 30, W - 10);
 const toPy = (v: number) => scale(v, DOMAIN[0], DOMAIN[1], H - 30, 10);
@@ -22,7 +52,7 @@ const fromPx = (px: number) => scale(px, 30, W - 10, DOMAIN[0], DOMAIN[1]);
 const fromPy = (py: number) => scale(py, H - 30, 10, DOMAIN[0], DOMAIN[1]);
 
 export function SeparatingLine() {
-  const [dataset, setDataset] = useState<DatasetId>("XOR");
+  const [dataset, setDataset] = useState<DatasetId>("OR");
   // The line is defined by two draggable handles.
   const [handles, setHandles] = useState<[number, number][]>([[-0.2, 0.8], [1.2, 0.4]]);
   const dragging = useRef<number | null>(null);
@@ -79,6 +109,13 @@ export function SeparatingLine() {
             : `${correct} of ${points.length} separated. Drag the line handles.`}
         </span>
       </div>
+      <p className="dataset-rule">
+        {dataset}: {DATASETS[dataset].rule}.
+      </p>
+      <p className="line-equation">
+        Your line, written as a neuron: <code>z = {lineAsNeuron(h1, h2)}</code>
+        {"  "}(zero exactly on the line)
+      </p>
       <svg
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}

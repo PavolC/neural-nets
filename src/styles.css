@@ -18,11 +18,12 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: Georgia, "Times New Roman", serif;
-  line-height: 1.55;
+  font-size: 19px;
+  line-height: 1.6;
 }
 
 .app {
-  max-width: 720px;
+  max-width: 920px;
   margin: 0 auto;
   padding: 2.5rem 1.25rem 4rem;
 }
@@ -269,6 +270,129 @@ button:disabled {
   margin-top: 0.5rem;
 }
 
+.truth-table {
+  border-collapse: collapse;
+  margin: 0.8rem auto;
+  font-size: 0.9rem;
+  font-family: system-ui, sans-serif;
+}
+
+.truth-table th,
+.truth-table td {
+  border: 1px solid var(--rule);
+  padding: 0.3rem 0.9rem;
+  text-align: center;
+}
+
+.truth-table th {
+  background: #f4f4f0;
+  font-weight: 600;
+}
+
+.dataset-rule {
+  font-size: 0.85rem;
+  font-family: system-ui, sans-serif;
+  color: var(--muted);
+  margin: 0 0 0.2rem;
+}
+
+.line-equation {
+  font-size: 0.85rem;
+  font-family: system-ui, sans-serif;
+  color: var(--muted);
+  margin: 0 0 0.4rem;
+  min-height: 1.5em; /* numbers change while dragging; keep the chart still */
+}
+
+.line-equation code {
+  color: var(--ink);
+}
+
+/* Swatches tying each slider group to its line in the XOR playground */
+.line-swatch {
+  display: inline-block;
+  width: 22px;
+  height: 0;
+  margin-right: 0.45em;
+  vertical-align: middle;
+}
+
+.line-swatch-h1 {
+  border-top: 2.5px solid #6a51a3;
+}
+
+.line-swatch-h2 {
+  border-top: 2.5px dashed #1b7a99;
+}
+
+.line-swatch-out {
+  height: 12px;
+  background: linear-gradient(90deg, #e8dbbf, #2a9f65);
+  border-radius: 3px;
+}
+
+/* Static concert-neuron plot in Module 1 */
+.concert-plot {
+  display: block;
+  width: min(420px, 100%);
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+}
+
+.concert-go-zone {
+  fill: #2a9f65;
+  opacity: 0.13;
+}
+
+.concert-label {
+  font-family: system-ui, sans-serif;
+  font-size: 12.5px;
+  fill: var(--muted);
+}
+
+/* Static 2-2-1 wiring diagram in Module 1 */
+.tiny-net {
+  display: block;
+  width: min(430px, 100%);
+  margin: 0 auto;
+}
+
+.tiny-net-edge {
+  stroke: var(--muted);
+  stroke-width: 1.4;
+}
+
+.tiny-net-arrowhead {
+  fill: var(--muted);
+}
+
+.tiny-net-input {
+  fill: #e8e8e2;
+  stroke: var(--muted);
+  stroke-width: 1.2;
+}
+
+.tiny-net-neuron {
+  fill: #fff;
+  stroke: var(--accent);
+  stroke-width: 1.8;
+}
+
+.tiny-net-label {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 17px;
+  fill: var(--ink);
+}
+
+.tiny-net-caption {
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  fill: var(--muted);
+}
+
 /* ---------- interactives ---------- */
 
 .interactive {
@@ -300,9 +424,25 @@ button:disabled {
   margin: 0.4rem 0 0;
 }
 
+/* Inside a controls row, a status always occupies its own full-width line,
+   so its text changing length never re-wraps the buttons or the content
+   below them mid-interaction. */
+.interactive-controls .interactive-status,
+.interactive-controls .demo-status {
+  flex-basis: 100%;
+  min-height: 1.6em;
+  margin: 0;
+}
+
 .status-good {
   color: var(--acc);
   font-weight: 600;
+}
+
+/* For status text that changes while the user interacts: reserve two lines
+   so growing or shrinking messages never push other elements around. */
+.status-fixed {
+  min-height: 2.9em;
 }
 
 .chip {
@@ -367,6 +507,14 @@ button:disabled {
   flex-wrap: wrap;
 }
 
+/* Fixed-basis columns: whether the sliders sit beside or below the plane
+   depends only on the window width, never on content, so nothing jumps
+   while a slider is being dragged. */
+.xor-plane {
+  flex: 0 0 320px;
+  max-width: 320px;
+}
+
 .xor-plane-stack {
   position: relative;
   width: 320px;
@@ -397,8 +545,7 @@ button:disabled {
 }
 
 .xor-sliders {
-  flex: 1;
-  min-width: 260px;
+  flex: 1 1 320px;
 }
 
 .xor-sliders fieldset {
@@ -431,11 +578,13 @@ button:disabled {
 
 .slider-row input {
   flex: 1;
+  min-width: 0; /* let range inputs shrink instead of overflowing the box */
   accent-color: var(--accent);
 }
 
 .slider-row code {
-  width: 3em;
+  width: 3.5em;
+  flex-shrink: 0;
   text-align: right;
 }
 
@@ -628,6 +777,7 @@ button:disabled {
   display: flex;
   gap: 0.9rem;
   align-items: flex-start;
+  min-height: 100px; /* text changes between runs; keep the block stable */
 }
 
 .digit-detail p {

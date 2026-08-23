@@ -25,14 +25,18 @@ export function Module3() {
       </p>
       <Eq
         tex="C(w, b) = \frac{1}{2n} \sum_x \lVert y(x) - a(x) \rVert^2"
-        gloss="For each training input x, take the gap between the desired output y(x) and the network's actual output a(x), square it, and average over all n examples; the half just makes later math tidier."
+        gloss="For each training input x, compare the desired output y(x) with the network's actual output a(x): the double bars squared mean take the gap in every output entry, square each gap, and add them up. Average that over all n examples; the half just makes later math tidier."
       />
       <p>
         Every choice of weights and biases gets one number: lower is better. That turns
-        learning into a search problem, and a strange one: the search space has one
-        dimension per parameter, thousands of them. The trick that makes it tractable
-        is the gradient <M tex="\nabla C" />, the vector of slopes that says, for each
-        parameter, which way the cost rises. Step the other way:
+        learning into a search problem, and a strange one: there are thousands of knobs
+        to turn at once. The way in is a question you can ask of each knob separately:
+        if I nudge this one parameter up a tiny bit, does the cost go up or down, and
+        how steeply? That steepness is the parameter's slope, the same idea as the m
+        in y = mx + c, just measured at the point where you currently stand. The full
+        list of slopes, one per parameter, is called the gradient and written{" "}
+        <M tex="\nabla C" />. It points the way the cost rises fastest, so to descend,
+        step every parameter the other way:
       </p>
       <Eq
         tex="w \leftarrow w - \eta \, \nabla C"

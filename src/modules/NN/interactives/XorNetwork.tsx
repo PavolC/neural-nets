@@ -32,11 +32,21 @@ function netOutput(params: Params, x1: number, x2: number): number {
   return sigmoid(params.v1 * h1 + params.v2 * h2 + params.c);
 }
 
-const SLIDER_GROUPS: { title: string; keys: (keyof Params)[] }[] = [
-  { title: "Hidden neuron 1", keys: ["w11", "w12", "b1"] },
-  { title: "Hidden neuron 2", keys: ["w21", "w22", "b2"] },
-  { title: "Output neuron", keys: ["v1", "v2", "c"] },
+const SLIDER_GROUPS: {
+  title: string;
+  swatch: "h1" | "h2" | "out";
+  keys: (keyof Params)[];
+}[] = [
+  { title: "Hidden neuron 1", swatch: "h1", keys: ["w11", "w12", "b1"] },
+  { title: "Hidden neuron 2", swatch: "h2", keys: ["w21", "w22", "b2"] },
+  { title: "Output neuron", swatch: "out", keys: ["v1", "v2", "c"] },
 ];
+
+const SWATCH_HINT = {
+  h1: "the solid purple line",
+  h2: "the dashed teal line",
+  out: "the shading",
+};
 
 const LABELS: Record<keyof Params, string> = {
   w11: "weight from x1", w12: "weight from x2", b1: "bias",
@@ -125,7 +135,7 @@ export function XorNetwork() {
               ))}
             </svg>
           </div>
-          <p className={`interactive-status ${solved ? "status-good" : ""}`}>
+          <p className={`interactive-status status-fixed ${solved ? "status-good" : ""}`}>
             {solved
               ? "All four points right: two straight cuts, combined, bent the boundary."
               : `${corners.filter((c) => c.ok).length} of 4 points right.`}
@@ -141,7 +151,10 @@ export function XorNetwork() {
         <div className="xor-sliders">
           {SLIDER_GROUPS.map((group) => (
             <fieldset key={group.title}>
-              <legend>{group.title}</legend>
+              <legend>
+                <span className={`line-swatch line-swatch-${group.swatch}`} />
+                {group.title} ({SWATCH_HINT[group.swatch]})
+              </legend>
               {group.keys.map((key) => (
                 <label key={key} className="slider-row">
                   <span>{LABELS[key]}</span>

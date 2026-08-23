@@ -17,10 +17,22 @@ export function Module2() {
       />
 
       <p>
-        Module 1 computed one neuron at a time. A layer of them, all reading the same
-        inputs, is one matrix multiplication. Stack each neuron's weights as a row of a
-        matrix <M tex="W" />, stack the biases into a vector <M tex="b" />, and the
-        whole layer is:
+        Module 1 built one neuron: multiply each input by a weight, add everything,
+        add the bias, squash. A layer is just several neurons doing that to the same
+        inputs at the same time. Nothing new happens in a layer; the same
+        multiply-and-add happens several times, once per neuron. Because that pattern
+        is so common, math has a compact notation for it. Stack each neuron's weights
+        as one row of a grid of numbers (a matrix), and the rule for multiplying a
+        matrix by a column is exactly: take each row, run its multiply-and-add against
+        the column, write the answers top to bottom. A two-neuron example:
+      </p>
+      <Eq
+        tex="\begin{bmatrix} 1 & 2 \\ 3 & 4 \end{bmatrix} \begin{bmatrix} 5 \\ 6 \end{bmatrix} = \begin{bmatrix} 1 \cdot 5 + 2 \cdot 6 \\ 3 \cdot 5 + 4 \cdot 6 \end{bmatrix} = \begin{bmatrix} 17 \\ 39 \end{bmatrix}"
+        gloss="Each row of the matrix is one neuron's weights; multiplying by the input column runs every neuron's multiply-and-add in one go. In NumPy this is the @ operator."
+      />
+      <p>
+        Call the matrix <M tex="W" />, stack the biases into a column <M tex="b" />,
+        and a whole layer of neurons becomes one line:
       </p>
       <Eq
         tex="a' = \sigma(W a + b)"

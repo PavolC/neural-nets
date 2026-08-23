@@ -103,7 +103,7 @@ export function Descent1D() {
           ) : null,
         )}
       </svg>
-      <p className="interactive-status">
+      <p className="interactive-status status-fixed">
         {diverged
           ? "Diverged: each step overshoots the bottom by more than it descends. Lower η and reset."
           : eta > 0.5

@@ -12,12 +12,14 @@ export const sigmoidNeuronExercise: Exercise = {
       "it into the range 0 to 1, smoothly. You will use it in every network " +
       "from here on. Write it with np.exp so it works on whole arrays at " +
       "once, not just single numbers.",
-    "Then fire(w, b, x): one neuron. It multiplies each input in x by the " +
-      "matching weight in w, sums everything, adds the bias b, and passes " +
-      "the result through your sigmoid. Both w and x are column vectors of " +
-      "shape (n, 1); the output is a plain float. This exercise is small on " +
-      "purpose: it is also your first trip through the editor, the tests, " +
-      "and the hints, so you know the workflow before the real climbing starts.",
+    "Then fire(w, b, x): one neuron, exactly the concert decision from the " +
+      "prose. It multiplies each input in x by the matching weight in w, " +
+      "sums everything, adds the bias b, and passes the result through your " +
+      "sigmoid. Both w and x are columns of numbers, shape (n, 1), like in " +
+      "the NumPy notes above; the output is a plain float, so wrap it in " +
+      "float(...). This exercise is small on purpose: it is also your first " +
+      "trip through the editor, the tests, and the hints, so you know the " +
+      "workflow before the real climbing starts.",
   ],
   skeleton,
   tests,
