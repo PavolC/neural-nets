@@ -31,3 +31,21 @@ export function divergingColor(value: number, max: number): string {
 export function scale(v: number, d0: number, d1: number, r0: number, r1: number): number {
   return r0 + ((v - d0) / (d1 - d0)) * (r1 - r0);
 }
+
+/** Draw one 28x28 MNIST digit (dark ink on white) onto a canvas. */
+export function drawMnistDigit(
+  canvas: HTMLCanvasElement,
+  images: Uint8Array,
+  index: number,
+): void {
+  const ctx = canvas.getContext("2d")!;
+  const img = ctx.createImageData(28, 28);
+  for (let i = 0; i < 784; i++) {
+    const v = 255 - images[index * 784 + i];
+    img.data[i * 4] = v;
+    img.data[i * 4 + 1] = v;
+    img.data[i * 4 + 2] = v;
+    img.data[i * 4 + 3] = 255;
+  }
+  ctx.putImageData(img, 0, 0);
+}

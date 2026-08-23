@@ -83,6 +83,43 @@ no accounts, no backend, no analytics.
   `json.loads(_args_json)`, may stream progress with `_js_report(json_string)`, and
   must evaluate to a JSON string. First-party snippets only.
 
+## Module authoring playbook (learned from the primary learner, follow it)
+
+The primary learner has high-school algebra, Python but no NumPy before Module 1,
+and no vectors, dot products, matrices, or calculus. Modules 1-2 were rewritten to
+this floor after direct feedback; every later module must be written to it too.
+
+- **Numbers before notation.** Compute a concrete example by hand first, then name
+  the operation and its shorthand. The dot product appeared only after multiplying
+  and adding by hand; matrix-times-column only after doing multiply-and-add twice;
+  gradients only after nudge-one-knob-and-measure. Define every symbol at first
+  use (the norm bars, e, argmax-as-"most confident").
+- **One continuous world.** The running story is the concert decision: x1 weather,
+  x2 friend, go/stay, green/gold dots, and the three personalities (easygoing OR,
+  picky AND, contrarian XOR). New material connects explicitly to prior artifacts
+  (the truth table, the 2-2-1 network, the 11,935-number tally) instead of opening
+  fresh abstractions.
+- **Draw every conceptual jump.** Never ask the reader to imagine a picture; put
+  the figure in the page (the concert plot, the 2-2-1 wiring diagram, the
+  sigmoid-vs-step slider, the pixels-are-numbers digit). Before any interactive,
+  the prose gives a how-to-read key (what the shading, lines, and colors mean);
+  captions state counts and label what is and is not a neuron.
+- **Tally explicitly.** Count parameters and costs in the text: nine numbers in the
+  XOR net, 11,935 in 784-15-10, two cost evaluations per parameter per step. The
+  tallies are load-bearing for motivation (why Module 3, why Module 5).
+- **Succeed before failing.** The learner solves OR and AND before meeting XOR;
+  "press Show a solution, break it one slider at a time, then rebuild" is a valid
+  on-ramp for a fiddly interactive.
+- **Interactives must not jump.** Fixed-basis flex columns (wrap depends on window
+  width, never content), reserved heights for changing status text (.status-fixed),
+  statuses on their own full-width line inside control rows, range inputs allowed
+  to shrink (min-width: 0). Live readouts tie manipulation to meaning (the dragged
+  line shows its w1, w2, b).
+- **Exercises are visible.** The Output panel shows everything printed (worker logs
+  are tagged runtime vs stdout); "Run my code" executes the editor without tests;
+  the test code is viewable in a collapsible; prompts include a concrete
+  "Run my code" experiment that ties back to an earlier module's numbers.
+
 ## Content voice rules
 
 - Prose beats are short (150-400 words), one idea each, written to sit beside an

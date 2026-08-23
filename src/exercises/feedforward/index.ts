@@ -17,6 +17,14 @@ export const feedforwardExercise: Exercise = {
       "Keep every activation a column vector of shape (n, 1); the tests " +
       "check shapes first because almost every bug here is a shape bug. " +
       "You wrote sigmoid in Module 1, so it is provided: from course import sigmoid.",
+    "A satisfying way to play before (or after) the tests: rebuild Module 1's " +
+      "XOR solution with your own function. Set " +
+      "weights = [np.array([[6., 6.], [6., 6.]]), np.array([[8., -8.]])] and " +
+      "biases = [np.array([[-3.], [-9.]]), np.array([[-4.]])], then " +
+      "print(feedforward(weights, biases, np.array([[1.], [0.]]))) and use " +
+      "Run my code. You should see roughly 0.96: the contrarian says go for " +
+      "good weather alone, exactly as Module 1's table promised. Try all four " +
+      "corners.",
   ],
   skeleton,
   tests,

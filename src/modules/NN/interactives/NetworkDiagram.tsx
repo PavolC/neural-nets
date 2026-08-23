@@ -8,7 +8,7 @@ import {
 import { sendRequest } from "../../../runtime/workerClient";
 import { loadCode, loadCompleted, subscribeProgress } from "../../../state/progress";
 import { feedforwardExercise } from "../../../exercises/feedforward";
-import { divergingColor } from "./utils";
+import { divergingColor, drawMnistDigit } from "./utils";
 
 // Module 2 interactive: a 784-15-10 network, rendered compactly. Hovering a
 // hidden neuron shows its 784 incoming weights as a 28x28 image patch.
@@ -51,19 +51,6 @@ for _row in _a["digits"]:
     })
 json.dumps(_results)
 `;
-
-function drawDigit(canvas: HTMLCanvasElement, images: Uint8Array, index: number): void {
-  const ctx = canvas.getContext("2d")!;
-  const img = ctx.createImageData(28, 28);
-  for (let i = 0; i < 784; i++) {
-    const v = 255 - images[index * 784 + i];
-    img.data[i * 4] = v;
-    img.data[i * 4 + 1] = v;
-    img.data[i * 4 + 2] = v;
-    img.data[i * 4 + 3] = 255;
-  }
-  ctx.putImageData(img, 0, 0);
-}
 
 function drawPatch(canvas: HTMLCanvasElement, row: number[]): void {
   const ctx = canvas.getContext("2d")!;
@@ -109,11 +96,11 @@ export function NetworkDiagram() {
 
   useEffect(() => {
     if (!mnist) return;
-    digitRefs.current.forEach((canvas, i) => canvas && drawDigit(canvas, mnist.images, i));
+    digitRefs.current.forEach((canvas, i) => canvas && drawMnistDigit(canvas, mnist.images, i));
   }, [mnist]);
 
   useEffect(() => {
-    if (mnist && bigDigitRef.current) drawDigit(bigDigitRef.current, mnist.images, selected);
+    if (mnist && bigDigitRef.current) drawMnistDigit(bigDigitRef.current, mnist.images, selected);
   }, [mnist, selected]);
 
   useEffect(() => {
