@@ -1130,3 +1130,311 @@ footer {
 footer a {
   color: inherit;
 }
+
+/* ---------- Module 4: backpropagation ---------- */
+
+/* The chain-ripple diagram (static, in module4.tsx). */
+.chain-ripple {
+  width: 100%;
+  height: auto;
+  display: block;
+  font-family: system-ui, sans-serif;
+}
+
+.ripple-box {
+  fill: #f4f7f5;
+  stroke: var(--accent);
+  stroke-width: 1.2;
+}
+
+.ripple-title {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+.ripple-value {
+  font-size: 13px;
+  fill: var(--muted);
+}
+
+.ripple-arrow {
+  stroke: var(--ink);
+  stroke-width: 1.4;
+}
+
+.ripple-head {
+  fill: var(--ink);
+}
+
+.ripple-factor {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--loss);
+}
+
+.ripple-why {
+  font-size: 12px;
+  fill: var(--muted);
+}
+
+.ripple-product {
+  font-size: 15px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+/* The step-through visualization. */
+.bp-step-count {
+  font-family: system-ui, sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* Fixed-height card so the equation and gloss changing per step never
+   shifts the diagram below (interactives must not jump). */
+.bp-eqcard {
+  min-height: 12.5em;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 0.4rem 0.9rem 0.5rem;
+  background: #f9faf9;
+  margin-bottom: 0.6rem;
+}
+
+.bp-eqcard .eq {
+  margin: 0.2rem 0 0;
+}
+
+.bp-eqcard .eq-gloss {
+  margin-bottom: 0;
+}
+
+.bp-step-title {
+  margin: 0.2rem 0 0;
+  font-family: system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.bp-stepper svg {
+  font-family: system-ui, sans-serif;
+}
+
+.bp-name {
+  font-size: 14px;
+  fill: var(--muted);
+}
+
+.bp-input {
+  fill: #f0f0ee;
+  stroke: #9a9a9a;
+  stroke-width: 1.5;
+}
+
+.bp-neuron {
+  stroke: var(--accent);
+  stroke-width: 2;
+  cursor: pointer;
+}
+
+.bp-neuron-group {
+  cursor: pointer;
+}
+
+.bp-node-selected {
+  stroke-width: 4;
+  stroke: var(--ink);
+}
+
+.bp-avalue {
+  font-size: 15px;
+  fill: var(--ink);
+  pointer-events: none;
+}
+
+.bp-avalue-dark {
+  fill: #fff;
+}
+
+.bp-bias {
+  font-size: 12.5px;
+  fill: var(--muted);
+  pointer-events: none;
+}
+
+.bp-delta {
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--loss);
+  pointer-events: none;
+}
+
+.bp-cost {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--loss);
+}
+
+.bp-edge-hit {
+  stroke: transparent;
+  stroke-width: 16;
+  cursor: pointer;
+}
+
+.bp-edge-halo {
+  stroke: var(--ink);
+  stroke-width: 7;
+  opacity: 0.35;
+  stroke-linecap: round;
+}
+
+.bp-wlabel {
+  font-size: 12.5px;
+  fill: var(--ink);
+  paint-order: stroke;
+  stroke: var(--bg);
+  stroke-width: 3;
+  pointer-events: none;
+}
+
+.bp-lower {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-top: 0.4rem;
+}
+
+.bp-table {
+  border-collapse: collapse;
+  font-family: system-ui, sans-serif;
+  font-size: 0.85rem;
+  flex: 0 0 auto;
+}
+
+.bp-table th,
+.bp-table td {
+  border: 1px solid var(--rule);
+  padding: 0.25rem 0.7rem;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  min-width: 5.5em;
+}
+
+.bp-table th:first-child,
+.bp-table td:first-child {
+  text-align: left;
+  min-width: 3em;
+}
+
+.bp-table th {
+  background: #f4f4f0;
+  font-weight: 600;
+}
+
+.bp-delta-cell {
+  color: var(--loss);
+  font-weight: 600;
+}
+
+.bp-cost-row {
+  text-align: left !important;
+  color: var(--muted);
+}
+
+.bp-param {
+  flex: 1 1 260px;
+  min-width: 0;
+  min-height: 7em;
+  border: 1px dashed var(--rule);
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  font-family: system-ui, sans-serif;
+  font-size: 0.88rem;
+}
+
+.bp-param-hint {
+  margin: 0.3rem 0;
+  color: var(--muted);
+}
+
+.bp-param-name {
+  margin: 0.1rem 0 0.4rem;
+  font-weight: 600;
+}
+
+.bp-param-slope {
+  margin: 0.4rem 0 0.1rem;
+  color: var(--loss);
+  min-height: 1.5em;
+}
+
+/* The delta-prediction quiz. */
+.quiz-question {
+  border-top: 1px solid var(--rule);
+  padding: 0.7rem 0.2rem 0.5rem;
+}
+
+.quiz-setup,
+.quiz-prompt {
+  font-size: 0.98rem;
+  margin: 0.3rem 0;
+}
+
+.quiz-prompt {
+  font-weight: 600;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.5rem 0;
+}
+
+.quiz-option {
+  font: inherit;
+  font-size: 0.92rem;
+  text-align: left;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.quiz-option:disabled {
+  cursor: default;
+}
+
+.quiz-option:not(:disabled):hover {
+  border-color: var(--accent);
+}
+
+.quiz-correct {
+  border-color: var(--acc);
+  background: #eef6f1;
+  color: var(--ink);
+}
+
+.quiz-wrong {
+  border-color: var(--loss);
+  background: #faeeed;
+  color: var(--ink);
+}
+
+.quiz-dimmed {
+  opacity: 0.55;
+}
+
+.quiz-explain {
+  font-size: 0.92rem;
+  font-family: system-ui, sans-serif;
+  color: var(--ink);
+  background: #f6f6f2;
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  margin: 0.3rem 0 0.2rem;
+}
