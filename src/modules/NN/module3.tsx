@@ -20,23 +20,34 @@ export function Module3() {
 
       <p>
         So far the weights were given. Learning means finding them, and the first step
-        is admitting you need a score. The quadratic cost measures how wrong the
-        network is across the training set:
+        is admitting you need a score. Go back to Module 1's slider network, in the
+        position the sliders start at, before you fixed it. On the four corners of the
+        contrarian's truth table it answers 0.247, 0.462, 0.462 and 0.247; the right
+        answers are 0, 1, 1, 0. Score it the obvious way. Take each gap between right
+        answer and output: -0.247, 0.538, 0.538, -0.247. Square each gap, so a miss in
+        either direction counts against you: 0.061, 0.289, 0.289, 0.061. Add them up
+        (0.700) and divide by twice the number of examples (8) to get 0.0875. One
+        number for the whole network: that recipe is called the quadratic cost, and
+        its shorthand is:
       </p>
       <Eq
         tex="C(w, b) = \frac{1}{2n} \sum_x \lVert y(x) - a(x) \rVert^2"
         gloss="For each training input x, compare the desired output y(x) with the network's actual output a(x): the double bars squared mean take the gap in every output entry, square each gap, and add them up. Average that over all n examples; the half just makes later math tidier."
       />
       <p>
-        Every choice of weights and biases gets one number: lower is better. That turns
-        learning into a search problem, and a strange one: there are thousands of knobs
-        to turn at once. The way in is a question you can ask of each knob separately:
-        if I nudge this one parameter up a tiny bit, does the cost go up or down, and
-        how steeply? That steepness is the parameter's slope, the same idea as the m
-        in y = mx + c, just measured at the point where you currently stand. The full
-        list of slopes, one per parameter, is called the gradient and written{" "}
+        Every setting of the nine knobs gets one number this way; lower is better, and
+        a perfect contrarian would score zero. Learning is now a search problem: find
+        the knob settings with the smallest cost. The way in is a question you can ask
+        of each knob separately: if I nudge this one knob a tiny bit, does the cost go
+        up or down, and how steeply? Try it on the starting network. Keeping two more
+        decimals, its cost is 0.08758. Move the output neuron's bias from -2.00 to
+        -1.99 and rescore everything: 0.08714. The change divided by the nudge,
+        (0.08714 - 0.08758) / 0.01, is about -0.044. That is this knob's slope, the
+        same m as in y = mx + c, just measured at the point where you currently stand,
+        and its minus sign says: push this knob up and the cost falls. The full list
+        of slopes, one per knob, is called the gradient and written{" "}
         <M tex="\nabla C" />. It points the way the cost rises fastest, so to descend,
-        step every parameter the other way:
+        step every knob the other way:
       </p>
       <Eq
         tex="w \leftarrow w - \eta \, \nabla C"
@@ -74,22 +85,25 @@ export function Module3() {
       </Figure>
 
       <p>
-        Time to implement it. You write the update step and the epoch loop; the course
-        supplies the gradient, computed numerically by nudging every parameter and
-        measuring the cost twice. It is honest and correct, and you are about to
-        discover its price.
+        Time to implement it. You write the update step and the loop that feeds it:
+        shuffle the dataset, walk it in mini-batches, repeat (one full pass through
+        the dataset is called an epoch). The course supplies the gradient, computed
+        exactly the way you did it by hand above: nudge a parameter, measure the cost
+        twice, divide. It is honest and correct, and you are about to discover its
+        price.
       </p>
 
       <ExercisePage exercise={sgdExercise} />
 
       <p>
-        Your sgd is real: point it at a toy dataset and it learns. But watch the clock,
-        and count. Estimating the gradient numerically costs two cost evaluations per
-        parameter per step, and each cost evaluation is a full forward pass over the
-        batch. Seventeen parameters make that bill merely annoying. The MNIST network
-        you will train in Module 5 has 23,860, and there the bill is fatal. What we
-        need is a way to get every partial derivative from roughly one pass, and that
-        is exactly what backpropagation is.
+        Your sgd is real. The panel below points it at a concert-shaped dataset, forty
+        noisy copies of the contrarian's four corners, and it learns the rule. But
+        watch the clock, and count. Estimating the gradient numerically costs two cost
+        evaluations per parameter per step, and each cost evaluation is a full forward
+        pass over the batch. The tiny network below has 33 parameters, so the bill is
+        merely annoying. The digit reader from Module 2 has 11,935, and there the bill
+        is fatal. What we need is a way to get every partial derivative from roughly
+        one pass, and that is exactly what backpropagation is.
       </p>
       <SgdLivePanel />
 

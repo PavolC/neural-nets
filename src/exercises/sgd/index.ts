@@ -18,6 +18,19 @@ export const sgdExercise: Exercise = {
       "mini-batches in exactly the order given in the skeleton docstring " +
       "(one permutation per epoch, then consecutive slices), because the " +
       "tests reproduce that order to check your result to six decimal places.",
+    "A satisfying experiment once sgd_step works: let it repair Module 1's " +
+      "slider network from its starting position, the one the module scored " +
+      "by hand at cost 0.0875. Set " +
+      "weights = [np.array([[2., 2.], [2., 2.]]), np.array([[4., -4.]])], " +
+      "biases = [np.array([[-1.], [-3.]]), np.array([[-2.]])], " +
+      "X = np.array([[0., 1., 0., 1.], [0., 0., 1., 1.]]) and " +
+      "Y = np.array([[0., 1., 1., 0.]]) (the contrarian's truth table as " +
+      "columns). Print quadratic_loss(weights, biases, X, Y), apply " +
+      "sgd_step 100 times with eta = 2.0, print the loss again, and press " +
+      "Run my code: it falls from 0.08758 to about 0.026, and " +
+      "from course import feedforward lets you print the four outputs and " +
+      "watch them lean toward 0, 1, 1, 0. Your code just did what your " +
+      "hands did with the sliders.",
   ],
   skeleton,
   tests,

@@ -92,6 +92,7 @@ export function Descent1D() {
         <path d={curve} className="curve" />
         <line x1={36} y1={H1 - 30} x2={W1 - 12} y2={H1 - 30} className="axis-line" />
         <text x={W1 - 16} y={H1 - 10} className="chart-tick" textAnchor="end">w</text>
+        <text x={40} y={18} className="chart-tick">cost</text>
         {trail.map((tw, i) =>
           Math.abs(tw) <= DOM ? (
             <circle

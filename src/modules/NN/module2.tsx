@@ -44,12 +44,14 @@ export function Module2() {
         gloss="The next layer's activations a' come from multiplying the weight matrix by the current activations a, adding the biases, and squashing every entry with sigmoid."
       />
       <p>
-        Now apply that line layer after layer. The output column of one layer
-        becomes the input column of the next; that is Module 1's "the output neuron
-        only hears the reports," now with clean bookkeeping. Running the rule from
-        the input column all the way to the output column is called feedforward, and
-        it is the entire forward story of a neural network. The rest of this course
-        is about choosing what goes inside <M tex="W" /> and <M tex="b" />.
+        A network is just that rule repeated. Each layer takes the previous layer's
+        output column as its input, computes <M tex="\sigma(Wa + b)" /> with its own{" "}
+        <M tex="W" /> and <M tex="b" />, and passes the result on. (Same idea as
+        Module 1, where the output neuron read <M tex="h_1" />'s and{" "}
+        <M tex="h_2" />'s reports instead of the raw inputs.) Running an input
+        through every layer in order is called feedforward, and it is everything a
+        network does when it answers. The rest of the course is about finding good
+        numbers to put in the <M tex="W" />'s and <M tex="b" />'s.
       </p>
 
       <p>

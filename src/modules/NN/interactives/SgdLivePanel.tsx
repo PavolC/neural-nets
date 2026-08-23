@@ -121,8 +121,9 @@ export function SgdLivePanel() {
         <button onClick={run} disabled={running}>
           {running ? "Training..." : result ? "Train again" : "Train a tiny network with your sgd"}
         </button>
-        {status && <span className="demo-status">{status}</span>}
-        {error && <span className="demo-status demo-status-error">{error}</span>}
+        <span className={error ? "demo-status demo-status-error" : "demo-status"}>
+          {error ?? status}
+        </span>
       </div>
       {losses.length > 0 && (
         <svg viewBox="0 0 440 120" className="interactive-svg sparkline">
@@ -141,9 +142,10 @@ export function SgdLivePanel() {
           of the toy points classified correctly, in {result.seconds.toFixed(1)} seconds.
           The bill: {result.steps} steps, and every step estimated {result.params} partial
           derivatives by nudging each parameter twice, which cost{" "}
-          {result.forward_passes.toLocaleString()} forward passes in total. This network
-          has {result.params} parameters; the MNIST network from the demo has 23,860.
-          That is why Module 5 exists.
+          {result.forward_passes.toLocaleString()} forward passes in total. This tiny
+          network has {result.params} parameters; the digit reader from Module 2 has
+          11,935, roughly 360 times this bill on every single step. That is why
+          Module 5 exists.
         </p>
       )}
     </div>
