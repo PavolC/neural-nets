@@ -20,17 +20,29 @@ export const sgdExercise: Exercise = {
       "tests reproduce that order to check your result to six decimal places.",
     "A satisfying experiment once sgd_step works: let it repair Module 1's " +
       "slider network from its starting position, the one the module scored " +
-      "by hand at cost 0.0875. Set " +
-      "weights = [np.array([[2., 2.], [2., 2.]]), np.array([[4., -4.]])], " +
-      "biases = [np.array([[-1.], [-3.]]), np.array([[-2.]])], " +
-      "X = np.array([[0., 1., 0., 1.], [0., 0., 1., 1.]]) and " +
-      "Y = np.array([[0., 1., 1., 0.]]) (the contrarian's truth table as " +
-      "columns). Print quadratic_loss(weights, biases, X, Y), apply " +
-      "sgd_step 100 times with eta = 2.0, print the loss again, and press " +
-      "Run my code: it falls from 0.08758 to about 0.026, and " +
-      "from course import feedforward lets you print the four outputs and " +
-      "watch them lean toward 0, 1, 1, 0. Your code just did what your " +
-      "hands did with the sliders.",
+      "by hand at cost 0.0875. Append this below your code, then press " +
+      "Run my code:",
+    {
+      code:
+        "from course import feedforward\n" +
+        "\n" +
+        "weights = [np.array([[2., 2.], [2., 2.]]),   # the sliders' start position\n" +
+        "           np.array([[4., -4.]])]\n" +
+        "biases = [np.array([[-1.], [-3.]]),\n" +
+        "          np.array([[-2.]])]\n" +
+        "X = np.array([[0., 1., 0., 1.],              # the four corners, as columns\n" +
+        "              [0., 0., 1., 1.]])\n" +
+        "Y = np.array([[0., 1., 1., 0.]])             # the contrarian's answers\n" +
+        "\n" +
+        'print("cost before:", quadratic_loss(weights, biases, X, Y))\n' +
+        "for _ in range(100):\n" +
+        "    weights, biases = sgd_step(weights, biases, X, Y, 2.0)\n" +
+        'print("cost after: ", quadratic_loss(weights, biases, X, Y))\n' +
+        'print("the four answers:", feedforward(weights, biases, X))',
+    },
+    "The cost falls from 0.08758 to about 0.026, and the four answers lean " +
+      "toward 0, 1, 1, 0. Your code just did what your hands did with the " +
+      "sliders.",
   ],
   skeleton,
   tests,

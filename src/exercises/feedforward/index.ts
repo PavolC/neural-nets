@@ -7,24 +7,45 @@ export const feedforwardExercise: Exercise = {
   id: "feedforward",
   title: "Feedforward",
   prompt: [
-    "A network computes its output one layer at a time. The input x is the " +
-      "activation of the first layer. Each later layer takes the previous " +
-      "layer's activation a and produces a new one: sigmoid(w @ a + b), " +
-      "where w is that layer's weight matrix and b its bias vector. The " +
-      "activation of the last layer is the network's output.",
-    "Your job: implement feedforward(weights, biases, x). The lists weights " +
-      "and biases hold one entry per layer, in order from input to output. " +
-      "Keep every activation a column vector of shape (n, 1); the tests " +
-      "check shapes first because almost every bug here is a shape bug. " +
-      "You wrote sigmoid in Module 1, so it is provided: from course import sigmoid.",
+    "One idea carries this whole exercise: the 2D matrix W is nothing new. " +
+      "It is several neurons' weight lists, stacked, one row per neuron. " +
+      "And computing a neuron is still what it always was: multiply each " +
+      "input by its weight, add it all up. W @ x does exactly that for " +
+      "every row at once. Run it:",
+    {
+      code:
+        "x = np.array([[1.], [0.]])      # 2 inputs, as a column\n" +
+        "W = np.array([[6., 2.],         # row 0: neuron A's two weights\n" +
+        "              [1., 5.]])        # row 1: neuron B's two weights\n" +
+        "b = np.array([[0.5], [-1.]])    # one bias per neuron\n" +
+        "\n" +
+        "print(W @ x)                    # each row multiplied-and-added against x\n" +
+        "print(W @ x + b)                # -> a column: one number per neuron",
+    },
+    "So sigmoid(w @ a + b) computes one whole layer: column in, column out. " +
+      "A network has several layers, which is why your two arguments are " +
+      "lists: one weight matrix and one bias column per layer, in step " +
+      "(weights[0] and biases[0] describe the same layer). feedforward is: " +
+      "start with a = x; for each pair from zip(weights, biases), replace a " +
+      "with sigmoid(w @ a + b); return the final a. Looping over the few " +
+      "layers is fine; the loop the module banned was over the neurons " +
+      "inside a layer, and @ already does those.",
+    "Keep every activation a column, shape (n, 1); the tests check that " +
+      "first. sigmoid is provided: from course import sigmoid.",
     "A satisfying way to play before (or after) the tests: rebuild Module 1's " +
-      "XOR solution with your own function. Set " +
-      "weights = [np.array([[6., 6.], [6., 6.]]), np.array([[8., -8.]])] and " +
-      "biases = [np.array([[-3.], [-9.]]), np.array([[-4.]])], then " +
-      "print(feedforward(weights, biases, np.array([[1.], [0.]]))) and use " +
-      "Run my code. You should see roughly 0.96: the contrarian says go for " +
-      "good weather alone, exactly as Module 1's table promised. Try all four " +
-      "corners.",
+      "XOR solution with your own function, and ask it about the corners. " +
+      "Append this below your code, then press Run my code:",
+    {
+      code:
+        "weights = [np.array([[6., 6.], [6., 6.]]),   # h1 and h2, stacked\n" +
+        "           np.array([[8., -8.]])]            # the output neuron\n" +
+        "biases = [np.array([[-3.], [-9.]]),\n" +
+        "          np.array([[-4.]])]\n" +
+        "\n" +
+        "print(feedforward(weights, biases, np.array([[1.], [0.]])))",
+    },
+    "You should see roughly 0.96: the contrarian says go for good weather " +
+      "alone, exactly as Module 1's table promised. Try all four corners.",
   ],
   skeleton,
   tests,

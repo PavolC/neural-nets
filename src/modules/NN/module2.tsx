@@ -68,10 +68,16 @@ export function Module2() {
         list-of-shapes), and it marks a flat array: three numbers in a bare line
         that is neither a row nor a column. Flat arrays make matrix arithmetic
         misbehave silently, so the course rule is simple: build columns, and if a
-        shape ever prints with a trailing comma, treat it as a bug. With columns
-        everywhere, <M tex="Wa" /> is <M tex="(m, 1)" />, the biases are{" "}
-        <M tex="(m, 1)" />, and everything adds up cleanly. Here is the whole
-        contract as a picture:
+        shape ever prints with a trailing comma, treat it as a bug. One warning,
+        because everyone trips here once: the shape names the receiving layer
+        first. Data may flow from 2 inputs to 1 neuron, but that layer's matrix is{" "}
+        <M tex="(1, 2)" />: rows first, and the rows belong to the layer being
+        computed. The payoff is that multiplication just works, by the rule that
+        the inner numbers must touch: <M tex="(1, 2)" /> times <M tex="(2, 1)" />{" "}
+        works because 2 meets 2, and the outer numbers, <M tex="(1, 1)" />, are
+        the answer's shape. With columns everywhere, <M tex="Wa" /> is{" "}
+        <M tex="(m, 1)" />, the biases are <M tex="(m, 1)" />, and everything adds
+        up cleanly. Here is the whole contract as a picture:
       </p>
       <Figure caption="How the shapes lock together. Teal is the input side: W is n wide because a is n tall, one weight per input, and the two must match or the multiply is impossible. Purple is the neuron side: W has m rows, so Wa, b, and a' are all m tall, one entry per neuron. The shaded strip shows one neuron's whole story: its row of W, times all of a, plus its own bias entry, becomes its entry of a'. For Module 2's hidden layer, m = 15 and n = 784.">
         <ShapesDiagram />
@@ -80,7 +86,10 @@ export function Module2() {
         Why matrices instead of a Python loop over neurons? The loop runs in the
         interpreter, one neuron at a time; the matrix product hands the whole layer
         to fast numerical code in one call. The same discipline that keeps shapes
-        honest makes the code hundreds of times faster.
+        honest makes the code hundreds of times faster. (To be precise about what
+        got banned: looping over the hundreds of neurons inside a layer. Looping
+        over the two or three layers of a network is normal, and you are about to
+        write exactly that loop.)
       </p>
 
       <p>
@@ -98,36 +107,55 @@ export function Module2() {
       </Figure>
 
       <p>
-        What about the output? Use ten output neurons, one per digit. Each one's
-        activation is its confidence, exactly like the sigmoid outputs you watched
-        in Module 1, and the network's answer is simply whichever of the ten is most
-        confident. So the whole machine is: a 784-tall input column, a hidden layer
-        (15 neurons here), and a 10-neuron output layer. Count the numbers the way
-        we counted Module 1's nine: the hidden <M tex="W" /> is 15 rows of 784
-        weights plus 15 biases, and the output layer is 10 rows of 15 plus 10
-        biases. That is 11,935 numbers, and finding good values by hand-fiddling
-        sliders is out of the question, which is why Module 3 exists.
+        What about the other end? Give the network ten output neurons, one per
+        digit, each answering its own yes-or-no question: is this a 0? is this a 1?
+        and so on up to 9. Each answer is an ordinary sigmoid confidence between 0
+        and 1, exactly like the outputs you watched in Module 1, and the network's
+        final verdict is simply the question that got the most confident yes.
       </p>
 
       <p>
-        The network below has already been trained (86% test accuracy; you will
-        beat it later). Its weights are not code; they are 11,935 learned numbers,
-        and you can look at them. Each hidden neuron has 784 incoming weights, one
-        per pixel, so reshape its row of <M tex="W" /> back into 28-by-28 and you
-        get a picture of what that neuron looks for: red pixels push it up when
-        inked, blue pull it down. Hover the hidden neurons and browse.
+        Between the 784 inputs and the 10 outputs sits one hidden layer, and its
+        size is a genuine choice, the first you get to make as a network designer.
+        Nothing about the problem dictates it: more hidden neurons means more
+        little pattern-detectors, which usually means more accuracy and always
+        means slower training; fewer means the opposite. The network on this page
+        uses 15 because 15 circles fit in a diagram and train in seconds (the
+        classic setup you will train in Module 5 uses 30). So how many numbers do
+        15 hidden neurons leave us to choose? Count layer by layer, the way we
+        counted Module 1's nine:
+      </p>
+      <Eq
+        tex="\underbrace{15 \times 784}_{\text{hidden } W} + \underbrace{15}_{\text{hidden } b} + \underbrace{10 \times 15}_{\text{output } W} + \underbrace{10}_{\text{output } b} = 11{,}760 + 15 + 150 + 10 = 11{,}935"
+        gloss="The hidden layer's W has one row per neuron (15) and one column per input (784), plus one bias per neuron; the output layer reads the 15 hidden activations the same way. Nearly twelve thousand knobs: slider-fiddling is over, which is why Module 3 exists."
+      />
+
+      <p>
+        The network below has already been trained for you (86% test accuracy; you
+        will beat it later), so you can study what learned numbers actually look
+        like. Focus on a single hidden neuron. It works like every neuron so far:
+        784 weights, one per pixel, and its evidence rises when ink lands on pixels
+        where its weight is positive, falls when ink lands where its weight is
+        negative. (You have met a negative weight before: the output neuron's{" "}
+        <M tex="-8" /> in the XOR network, the veto.) Now use the fact that each of
+        the 784 weights belongs to one specific pixel: draw the weights themselves
+        as a 28-by-28 image, each weight on its own pixel's square, red where it is
+        positive (ink here excites the neuron), blue where it is negative (ink here
+        suppresses it), pale where it is near zero (this neuron ignores that
+        pixel). The result is literally a picture of what the neuron looks for.
+        Hover the hidden neurons below and browse: you will see strokes, arcs, and
+        blobs, because those are the shapes that tell digits apart.
       </p>
       <Figure caption="A 784-15-10 network. Edge colors show the sign and strength of hidden-to-output weights. Hover a hidden neuron (middle column) to see its incoming weights as a 28x28 patch. The digit panel below the diagram unlocks when your feedforward passes the tests.">
         <NetworkDiagram />
       </Figure>
 
       <p>
-        Now implement feedforward yourself. Your function receives the lists
-        weights and biases (one entry per layer, input side first) and an input
-        column, and returns the output column. When the tests pass, go back up to
-        the diagram: the button there runs your code on real digits with the
-        trained weights, and every activation it lights up will have been computed
-        by the function you are about to write.
+        Now implement feedforward yourself; the exercise below spells out the plan
+        and the two NumPy tools it needs. When the tests pass, come back up to the
+        diagram: the button there runs your code on real digits with the trained
+        weights, and every activation it lights up will have been computed by your
+        function.
       </p>
 
       <ExercisePage exercise={feedforwardExercise} />

@@ -145,9 +145,23 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
         Exercise: {exercise.title}
         {completed && <span className="badge-done" title="All tests passed">passed</span>}
       </h2>
-      {exercise.prompt.map((para, i) => (
-        <p key={i}>{para}</p>
-      ))}
+      {exercise.prompt.map((part, i) =>
+        typeof part === "string" ? (
+          <p key={i}>{part}</p>
+        ) : (
+          <PlaySnippet
+            key={i}
+            code={part.code}
+            onAppend={() => {
+              const editor = editorRef.current;
+              if (!editor) return;
+              const doc = editor.getDoc();
+              editor.setDoc(`${doc.replace(/\s+$/, "")}\n\n\n${part.code}\n`);
+              saveCode(exercise.id, editor.getDoc());
+            }}
+          />
+        ),
+      )}
 
       <CodeEditor
         initialDoc={initialDoc}
@@ -233,6 +247,29 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
         )}
       </div>
     </section>
+  );
+}
+
+function PlaySnippet({ code, onAppend }: { code: string; onAppend: () => void }) {
+  const [copied, setCopied] = useState(false);
+  const copy = () => {
+    navigator.clipboard?.writeText(code).then(() => {
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    });
+  };
+  return (
+    <div className="play-snippet">
+      <pre>{code}</pre>
+      <div className="play-snippet-buttons">
+        <button className="button-secondary" onClick={copy}>
+          {copied ? "Copied" : "Copy"}
+        </button>
+        <button className="button-secondary" onClick={onAppend}>
+          Append to my code
+        </button>
+      </div>
+    </div>
   );
 }
 

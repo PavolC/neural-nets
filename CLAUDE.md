@@ -118,7 +118,46 @@ this floor after direct feedback; every later module must be written to it too.
 - **Exercises are visible.** The Output panel shows everything printed (worker logs
   are tagged runtime vs stdout); "Run my code" executes the editor without tests;
   the test code is viewable in a collapsible; prompts include a concrete
-  "Run my code" experiment that ties back to an earlier module's numbers.
+  "Run my code" experiment that ties back to an earlier module's numbers,
+  shipped as a code block with Copy and Append-to-my-code buttons (a prompt
+  entry of `{ code: "..." }`), never as code woven into a prose sentence.
+- **Notation down to the punctuation.** Anything that could read as a typo is
+  notation to explain at first use: the trailing comma in shape `(n,)`, the bare
+  dot in `1.`, the `@` operator, slice colons. Python and NumPy idioms count as
+  much as math symbols do. Also flag order reversals explicitly: weight shapes
+  name the receiving layer first, so data flowing 2 -> 1 gives a (1, 2) matrix;
+  teach the check "the inner numbers must touch" ((1, 2) @ (2, 1) -> (1, 1)).
+- **No unexplained constants.** Every number in the prose is either derived in
+  front of the reader, quoted from an earlier module, or explicitly labeled a
+  free design choice with its trade-off (hidden layer size: more detectors vs
+  slower training). An unexplained "15" or an unestablished "the nine numbers"
+  is a bug.
+- **Arithmetic goes in display math.** Any tally with more than two terms becomes
+  an Eq with `\underbrace` labels (the 11,935 parameter count), never a prose
+  sentence of times-and-plus.
+- **One inference per sentence.** "Reshape its row and you get a picture, red
+  pushes it up" compressed three steps and lost the learner. Unpack chains:
+  each weight belongs to one pixel; therefore the weights can be drawn as an
+  image; and the colors mean excite / suppress / ignore.
+- **Say the implicit connections.** If the course knows a fact the learner will
+  wonder about, state it where they will wonder: the XOR playground's dots ARE
+  the contrarian's dataset; "Show a solution" sets exactly the table's numbers,
+  with h1 as the at-least-one detector.
+- **Mind vocabulary collisions.** "Line" means the decision boundary in this
+  course; never reuse it for an equation or a row of code. Prefer short
+  sentences over connective-heavy ones; wordiness reads as weirdness.
+- **Assume weeks pass between modules.** Never lean on a bare name from an
+  earlier module (fire, the contrarian, the nine numbers) as a load-bearing
+  reference; either restate the thing in a few plain words or drop the
+  callback entirely. Callbacks are seasoning, not structure.
+- Housekeeping: learners paste rendered math as doubled text ("x1x1", "WW").
+  That is a copy artifact of KaTeX's accessibility markup, not a rendering bug;
+  do not chase it.
+- **Skeleton docstrings freeze into saved code.** The editor persists the
+  learner's copy, so improving a skeleton never reaches anyone who already
+  opened the exercise. Anything essential to understanding the contract must
+  (also) live in the prompt, which always renders current; the skeleton
+  docstring is a convenience copy, not the canonical explanation.
 
 ## Content voice rules
 
