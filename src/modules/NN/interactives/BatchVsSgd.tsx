@@ -95,6 +95,8 @@ export function BatchVsSgd() {
           />
         ))}
         <circle cx={px(0)} cy={py(0)} r={3} className="minimum-dot" />
+        <text x={W - 14} y={H - 4} className="chart-tick" textAnchor="end">w₁</text>
+        <text x={6} y={56} className="chart-tick">w₂</text>
         <polyline
           points={batchTrail.map(([a, b]) => `${px(a).toFixed(1)},${py(b).toFixed(1)}`).join(" ")}
           className="traj traj-batch"
