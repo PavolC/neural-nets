@@ -57,7 +57,8 @@ no accounts, no backend, no analytics.
   `src/runtime/pyodideWorker.ts` (`PYODIDE_VERSION`). Do not bump without re-verifying
   the training-time envelope from Milestone 0.
 - **React: 19.2.8**, **Vite: 8.2.2**, **CodeMirror: 6.0.2**,
-  **@codemirror/lang-python: 6.2.1** (all pinned exactly in `package.json`).
+  **@codemirror/lang-python: 6.2.1**, **KaTeX: 0.18.4** (all pinned exactly in
+  `package.json`).
 
 ## Decisions
 
@@ -70,7 +71,17 @@ no accounts, no backend, no analytics.
   provided via `from course import ...` (defined in `src/python/course_helpers.py`),
   so skeletons never contain prior solutions. Test functions are named `test_*`, run
   in definition order, and fail by raising `AssertionError` with a teaching message;
-  the first docstring line is the test's display title.
+  the first docstring line is the test's display title. Test fixtures are hardcoded
+  literals (never regenerated at test time from random streams), so results cannot
+  drift between NumPy versions.
+- **Pretrained weights are gzipped JSON** (`pretrained_weights.json.gz`), not npz:
+  the Module 2 diagram reads the weights in JS (weight-image patches, edge colors)
+  and Python reads the same file for the payoff run, and JS has no npz parser.
+  Regenerate with `tools/pretrain_weights.py` (needs NumPy).
+- **Interactive Python snippets** (payoff runs, live toy training) go through the
+  worker's `runPython` request: the snippet reads input via
+  `json.loads(_args_json)`, may stream progress with `_js_report(json_string)`, and
+  must evaluate to a JSON string. First-party snippets only.
 
 ## Content voice rules
 
@@ -95,7 +106,7 @@ no accounts, no backend, no analytics.
 /src/components/     shared UI: CodeEditor (CodeMirror), ExercisePage
 /src/state/          localStorage progress persistence (gn:v1: key prefix)
 /src/m0/             Milestone 0 training demo UI
-/public/data/        mnist_subset.bin.gz, pretrained_weights.npz
+/public/data/        mnist_subset.bin.gz, pretrained_weights.json.gz
 /tools/              build-time scripts (MNIST preprocessing, weight pretraining)
 ```
 

@@ -141,10 +141,21 @@ async function runTests(msg: Extract<WorkerRequest, { type: "runTests" }>): Prom
   post({ type: "testsDone", id: msg.id, result: JSON.parse(resultJson) });
 }
 
+async function runPython(msg: Extract<WorkerRequest, { type: "runPython" }>): Promise<void> {
+  const pyodide = await getPyodide();
+  pyodide.globals.set("_args_json", JSON.stringify(msg.args ?? null));
+  pyodide.globals.set("_js_report", (payloadJson: string) =>
+    post({ type: "report", id: msg.id, payload: JSON.parse(payloadJson) }),
+  );
+  const resultJson = (await pyodide.runPythonAsync(msg.code)) as string;
+  post({ type: "pythonDone", id: msg.id, result: JSON.parse(resultJson) });
+}
+
 self.onmessage = (event: MessageEvent<WorkerRequest>) => {
   const msg = event.data;
   currentId = msg.id;
-  const job = msg.type === "train" ? train(msg) : runTests(msg);
+  const job =
+    msg.type === "train" ? train(msg) : msg.type === "runTests" ? runTests(msg) : runPython(msg);
   job.catch((err) =>
     post({
       type: "error",

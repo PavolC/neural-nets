@@ -9,6 +9,16 @@ page never freezes.
 
 ## Status
 
+**Milestone 2 (Modules 1-3) is complete.** The course spine is live: Module 1 (neurons,
+sigmoid, why XOR needs a hidden layer) with a draggable separating-line playground and
+a 2-2-1 XOR network on sliders; Module 2 (feedforward) with a live 784-15-10 network
+diagram, hoverable weight-image patches, and a payoff panel where the learner's own
+feedforward classifies real MNIST digits with pretrained weights; Module 3 (gradient
+descent) with 1D/2D descent playgrounds, a batch-vs-SGD race, an SGD exercise, and a
+live toy-network training run that quantifies the cost of numerical gradients. Math is
+rendered with KaTeX, each equation glossed in plain language. Modules unlock in order
+as their exercises pass; navigation back is always free.
+
 **Milestone 1 (exercise pipeline) is complete.** The app has a working exercise loop:
 a CodeMirror editor pre-filled with skeleton Python, a Run tests button that executes
 the learner's code against a deterministic NumPy test suite inside Pyodide, per-test
@@ -49,6 +59,9 @@ subset. Requires network access, pure Python stdlib only:
 ```
 python3 tools/make_mnist_subset.py
 ```
+
+`public/data/pretrained_weights.json.gz` (the Module 2 payoff network) is also
+committed; regenerate with `python3 tools/pretrain_weights.py` (needs NumPy).
 
 ## Repo layout
 

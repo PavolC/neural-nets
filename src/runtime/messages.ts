@@ -12,7 +12,11 @@ export interface TrainParams {
 
 export type WorkerRequest =
   | ({ type: "train"; id: number; dataUrl: string } & TrainParams)
-  | { type: "runTests"; id: number; learnerCode: string; testsCode: string };
+  | { type: "runTests"; id: number; learnerCode: string; testsCode: string }
+  // First-party Python snippets from interactives. The snippet reads its
+  // input by json.loads(_args_json), may stream progress via
+  // _js_report(json_string), and must evaluate to a JSON string.
+  | { type: "runPython"; id: number; code: string; args?: unknown };
 
 export interface EpochMetrics {
   epoch: number;
@@ -50,4 +54,6 @@ export type WorkerResponse =
   | ({ type: "epoch"; id: number } & EpochMetrics)
   | { type: "trainDone"; id: number; result: TrainResult }
   | { type: "testsDone"; id: number; result: TestRunResult }
+  | { type: "report"; id: number; payload: unknown }
+  | { type: "pythonDone"; id: number; result: unknown }
   | { type: "error"; id: number; message: string };

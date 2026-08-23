@@ -14,7 +14,7 @@ let worker: Worker | null = null;
 const handlers = new Map<number, Handler>();
 let nextId = 1;
 
-const FINAL_TYPES = new Set(["trainDone", "testsDone", "error"]);
+const FINAL_TYPES = new Set(["trainDone", "testsDone", "pythonDone", "error"]);
 
 function ensureWorker(): Worker {
   if (!worker) {

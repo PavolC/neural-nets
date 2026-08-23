@@ -212,6 +212,437 @@ button:disabled {
   font-size: 0.9rem;
 }
 
+/* ---------- module pages ---------- */
+
+.module h2 {
+  font-size: 1.5rem;
+}
+
+.after-this,
+.recap {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.2rem 1.1rem 0.8rem;
+  margin: 1.2rem 0;
+  background: #fbfbf7;
+}
+
+.after-this h3,
+.recap h3 {
+  font-size: 0.95rem;
+  margin: 0.8rem 0 0.4rem;
+}
+
+.after-this li,
+.recap li {
+  font-size: 0.95rem;
+  margin-bottom: 0.3rem;
+}
+
+.go-deeper {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.eq {
+  margin: 1.2rem 0;
+  overflow-x: auto;
+}
+
+.eq-gloss {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-style: italic;
+  margin: 0.3rem auto 0;
+  max-width: 85%;
+  text-align: center;
+}
+
+.module-figure {
+  margin: 1.5rem 0;
+}
+
+.module-figure figcaption {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
+/* ---------- interactives ---------- */
+
+.interactive {
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 0.8rem;
+  background: #fff;
+}
+
+.interactive-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  touch-action: none;
+}
+
+.interactive-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.interactive-status {
+  font-size: 0.88rem;
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  margin: 0.4rem 0 0;
+}
+
+.status-good {
+  color: var(--acc);
+  font-weight: 600;
+}
+
+.chip {
+  padding: 0.2rem 0.7rem;
+  font-size: 0.85rem;
+  border-radius: 999px;
+}
+
+.chip-active {
+  background: var(--accent);
+  color: #fff;
+}
+
+.axis-guides line {
+  stroke: var(--rule);
+  stroke-dasharray: 3 3;
+}
+
+.axis-guides text,
+.chart-tick {
+  font-family: system-ui, sans-serif;
+  font-size: 11px;
+  fill: var(--muted);
+}
+
+.axis-line {
+  stroke: var(--rule);
+}
+
+.sep-line {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.sep-handle {
+  fill: #fff;
+  stroke: var(--ink);
+  stroke-width: 2;
+  cursor: grab;
+}
+
+.pt-class0 {
+  fill: #c8a24a;
+}
+
+.pt-class1 {
+  fill: var(--acc);
+}
+
+.pt-wrong {
+  fill: none;
+  stroke: var(--loss);
+  stroke-width: 2;
+  stroke-dasharray: 3 2;
+}
+
+/* XOR network */
+
+.xor-net {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.xor-plane-stack {
+  position: relative;
+  width: 320px;
+  height: 320px;
+}
+
+.xor-plane-stack canvas {
+  image-rendering: pixelated;
+  border: 1px solid var(--rule);
+}
+
+.xor-plane-stack svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.hidden-line-1 {
+  stroke: #6a51a3;
+  stroke-width: 0.8;
+}
+
+.hidden-line-2 {
+  stroke: #1b7a99;
+  stroke-width: 0.8;
+  stroke-dasharray: 2 1.2;
+}
+
+.xor-sliders {
+  flex: 1;
+  min-width: 260px;
+}
+
+.xor-sliders fieldset {
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  padding: 0.3rem 0.7rem 0.5rem;
+}
+
+.xor-sliders legend {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  padding: 0 0.3rem;
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.82rem;
+  font-family: system-ui, sans-serif;
+  color: var(--muted);
+  margin: 0.15rem 0;
+}
+
+.slider-row span {
+  width: 7.5em;
+}
+
+.slider-row input {
+  flex: 1;
+  accent-color: var(--accent);
+}
+
+.slider-row code {
+  width: 3em;
+  text-align: right;
+}
+
+.xor-readout {
+  font-family: system-ui, sans-serif;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.xor-corner {
+  margin-right: 0.9rem;
+}
+
+/* descent playgrounds */
+
+.curve {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5;
+}
+
+.ball {
+  fill: var(--accent);
+}
+
+.ball-sgd {
+  fill: #d17a22;
+}
+
+.ball-trail {
+  fill: var(--accent);
+  opacity: 0.35;
+}
+
+.contour {
+  fill: none;
+  stroke: var(--rule);
+}
+
+.minimum-dot {
+  fill: var(--muted);
+}
+
+.traj {
+  fill: none;
+  stroke-width: 1.6;
+}
+
+.traj-batch {
+  stroke: var(--acc);
+}
+
+.traj-sgd {
+  stroke: #d17a22;
+}
+
+.swatch-batch {
+  fill: var(--acc);
+}
+
+.swatch-sgd {
+  fill: #d17a22;
+}
+
+.sparkline {
+  max-width: 440px;
+}
+
+/* network diagram */
+
+.netdiag {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.netdiag-svg {
+  flex: 1.4;
+  min-width: 300px;
+  height: auto;
+}
+
+.netdiag-side {
+  flex: 1;
+  min-width: 200px;
+}
+
+.netdiag-input {
+  fill: #e8e8e2;
+  stroke: var(--muted);
+}
+
+.netdiag-label {
+  font-family: system-ui, sans-serif;
+  font-size: 11px;
+  fill: var(--muted);
+}
+
+.netdiag-edge {
+  stroke: var(--rule);
+  stroke-width: 0.7;
+}
+
+.netdiag-neuron {
+  stroke: var(--muted);
+  stroke-width: 1;
+  cursor: pointer;
+}
+
+.neuron-hover {
+  stroke: var(--accent);
+  stroke-width: 2.5;
+}
+
+.neuron-pred {
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+
+.patch-panel p,
+.patch-hint {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.patch-canvas {
+  width: 140px;
+  height: 140px;
+  image-rendering: pixelated;
+  border: 1px solid var(--rule);
+}
+
+.payoff {
+  margin-top: 1rem;
+  border-top: 1px dashed var(--rule);
+  padding-top: 0.8rem;
+}
+
+.payoff-locked {
+  font-size: 0.9rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.digit-strip {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin: 0.6rem 0;
+}
+
+.digit-thumb {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.3rem;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  color: var(--ink);
+}
+
+.digit-thumb canvas {
+  width: 42px;
+  height: 42px;
+  image-rendering: pixelated;
+}
+
+.digit-selected {
+  border-color: var(--accent);
+  outline: 2px solid var(--accent);
+}
+
+.pred-ok {
+  color: var(--acc);
+  font-weight: 700;
+  font-family: system-ui, sans-serif;
+  font-size: 0.85rem;
+}
+
+.pred-bad {
+  color: var(--loss);
+  font-weight: 700;
+  font-family: system-ui, sans-serif;
+  font-size: 0.85rem;
+}
+
+.digit-detail {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+}
+
+.digit-detail p {
+  font-size: 0.92rem;
+  margin: 0;
+}
+
+.digit-big {
+  width: 84px;
+  height: 84px;
+  image-rendering: pixelated;
+  border: 1px solid var(--rule);
+  flex-shrink: 0;
+}
+
 .demo-controls {
   display: flex;
   align-items: center;

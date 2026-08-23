@@ -53,10 +53,25 @@ export function loadCompleted(exerciseId: string): boolean {
 
 export function saveCompleted(exerciseId: string): void {
   set(`done:${exerciseId}`, "1");
+  emitProgress();
+}
+
+// Completion drives module gating in the nav, so interested components can
+// subscribe to changes.
+const PROGRESS_EVENT = "gn:progress";
+
+function emitProgress(): void {
+  window.dispatchEvent(new CustomEvent(PROGRESS_EVENT));
+}
+
+export function subscribeProgress(fn: () => void): () => void {
+  window.addEventListener(PROGRESS_EVENT, fn);
+  return () => window.removeEventListener(PROGRESS_EVENT, fn);
 }
 
 export function resetExercise(exerciseId: string): void {
   remove(`code:${exerciseId}`);
   remove(`reveal:${exerciseId}`);
   remove(`done:${exerciseId}`);
+  emitProgress();
 }

@@ -1,17 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TrainingDemo } from "./m0/TrainingDemo";
-import { ExercisePage } from "./components/ExercisePage";
-import { feedforwardExercise } from "./exercises/feedforward";
+import { MODULES, isModuleUnlocked } from "./modules/NN";
+import { subscribeProgress } from "./state/progress";
 
-const TABS = [
-  { id: "exercise", label: "Exercise: feedforward" },
-  { id: "m0", label: "Training demo" },
-] as const;
-
-type TabId = (typeof TABS)[number]["id"];
+const DEMO_TAB = "demo";
 
 export default function App() {
-  const [tab, setTab] = useState<TabId>("exercise");
+  const [tab, setTab] = useState<string>(MODULES[0].id);
+  // Gating depends on exercise completion; re-render when it changes.
+  const [, setProgressTick] = useState(0);
+  useEffect(() => subscribeProgress(() => setProgressTick((t) => t + 1)), []);
 
   return (
     <div className="app">
@@ -23,23 +21,37 @@ export default function App() {
           browser.
         </p>
         <nav className="tabs">
-          {TABS.map((t) => (
-            <button
-              key={t.id}
-              className={`tab ${tab === t.id ? "tab-active" : ""}`}
-              onClick={() => setTab(t.id)}
-            >
-              {t.label}
-            </button>
-          ))}
+          {MODULES.map((m, i) => {
+            const unlocked = isModuleUnlocked(i);
+            return (
+              <button
+                key={m.id}
+                className={`tab ${tab === m.id ? "tab-active" : ""}`}
+                disabled={!unlocked}
+                title={unlocked ? undefined : "Pass the previous module's exercise to unlock"}
+                onClick={() => setTab(m.id)}
+              >
+                {unlocked ? m.navLabel : `🔒 ${m.navLabel}`}
+              </button>
+            );
+          })}
+          <button
+            className={`tab ${tab === DEMO_TAB ? "tab-active" : ""}`}
+            onClick={() => setTab(DEMO_TAB)}
+          >
+            Training demo
+          </button>
         </nav>
       </header>
       <main>
-        {/* Both stay mounted so switching tabs never loses editor or chart state. */}
-        <div hidden={tab !== "exercise"}>
-          <ExercisePage exercise={feedforwardExercise} />
-        </div>
-        <div hidden={tab !== "m0"}>
+        {/* Everything stays mounted so tab switches never lose editor or
+            visualization state. */}
+        {MODULES.map((m) => (
+          <div key={m.id} hidden={tab !== m.id}>
+            <m.Component />
+          </div>
+        ))}
+        <div hidden={tab !== DEMO_TAB}>
           <TrainingDemo />
         </div>
       </main>
