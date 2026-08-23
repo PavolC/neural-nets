@@ -1,0 +1,165 @@
+:root {
+  --ink: #1a1a1a;
+  --muted: #5a5a5a;
+  --accent: #0b6e4f;
+  --loss: #b3423a;
+  --acc: #0b6e4f;
+  --rule: #e2e2e2;
+  --bg: #fdfdfb;
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  line-height: 1.55;
+}
+
+.app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+}
+
+h1 {
+  font-size: 2rem;
+  margin: 0 0 0.25rem;
+}
+
+h2 {
+  font-size: 1.3rem;
+  margin: 2rem 0 0.5rem;
+}
+
+.tagline {
+  color: var(--muted);
+  margin-top: 0;
+}
+
+button {
+  font: inherit;
+  font-size: 1rem;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--accent);
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.demo-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  margin: 1rem 0 0.5rem;
+}
+
+.demo-params {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.demo-status {
+  font-size: 0.95rem;
+  color: var(--muted);
+  min-height: 1.4em;
+}
+
+.demo-status-error {
+  color: var(--loss);
+}
+
+.demo-result {
+  font-size: 1.05rem;
+}
+
+.metrics-chart {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: #fff;
+}
+
+.chart-grid {
+  stroke: var(--rule);
+  stroke-width: 1;
+}
+
+.chart-tick,
+.chart-axis-label {
+  font-family: system-ui, sans-serif;
+  font-size: 11px;
+  fill: var(--muted);
+}
+
+.chart-tick-loss {
+  fill: var(--loss);
+}
+
+.chart-tick-acc {
+  fill: var(--acc);
+}
+
+.chart-line {
+  fill: none;
+  stroke-width: 2;
+}
+
+.chart-line-loss {
+  stroke: var(--loss);
+}
+
+.chart-line-acc {
+  stroke: var(--acc);
+}
+
+.chart-swatch-loss {
+  fill: var(--loss);
+}
+
+.chart-swatch-acc {
+  fill: var(--acc);
+}
+
+.chart-dot-acc {
+  fill: var(--acc);
+}
+
+.demo-log {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+}
+
+.demo-log pre {
+  background: #f4f4f0;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 0.75rem;
+  overflow-x: auto;
+  font-size: 0.8rem;
+}
+
+footer {
+  margin-top: 3rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+footer a {
+  color: inherit;
+}
