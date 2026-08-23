@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Exercise } from "../exercises/types";
 import type { TestRunResult, WorkerResponse } from "../runtime/messages";
 import { sendRequest, terminateWorker } from "../runtime/workerClient";
@@ -38,6 +38,21 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
   const [ranOnce, setRanOnce] = useState(false);
   const [reveal, setReveal] = useState(() => loadRevealStage(exercise.id));
   const [completed, setCompleted] = useState(() => loadCompleted(exercise.id));
+  const [fullscreen, setFullscreen] = useState(false);
+
+  // Fullscreen: Escape exits, and the page behind must not scroll.
+  useEffect(() => {
+    if (!fullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setFullscreen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
+  }, [fullscreen]);
 
   const initialDoc = loadCode(exercise.id) ?? exercise.skeleton;
 
@@ -163,55 +178,65 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
         ),
       )}
 
-      <CodeEditor
-        initialDoc={initialDoc}
-        onChange={(doc) => saveCode(exercise.id, doc)}
-        handleRef={editorRef}
-      />
+      <div className={fullscreen ? "workbench workbench-fullscreen" : "workbench"}>
+        <CodeEditor
+          initialDoc={initialDoc}
+          onChange={(doc) => saveCode(exercise.id, doc)}
+          handleRef={editorRef}
+        />
 
-      <p className="exercise-tip">
-        Two ways to run. "Run my code" just executes what is in the editor, so you can
-        call your functions, print(...) values, and experiment. "Run tests" checks
-        your work. Either way, everything you print appears in the Output panel below.
-      </p>
+        <p className="exercise-tip">
+          Two ways to run. "Run my code" just executes what is in the editor, so you
+          can call your functions, print(...) values, and experiment. "Run tests"
+          checks your work. Everything you print appears in the Output panel below.
+          The editor is resizable (drag its bottom edge); Tab indents, and Escape
+          then Tab moves keyboard focus out.
+        </p>
 
-      <div className="exercise-controls">
-        <button onClick={runTests} disabled={running}>
-          {running ? "Running..." : "Run tests"}
-        </button>
-        <button className="button-secondary" onClick={runScratch} disabled={running}>
-          Run my code
-        </button>
-        {running && (
-          <button className="button-secondary" onClick={terminateWorker}>
-            Stop
+        <div className="exercise-controls">
+          <button onClick={runTests} disabled={running}>
+            {running ? "Running..." : "Run tests"}
           </button>
-        )}
-        <button className="button-secondary" onClick={resetToSkeleton} disabled={running}>
-          Reset to skeleton
-        </button>
-      </div>
-      {status && <p className="demo-status">{status}</p>}
-      {error && <p className="demo-status demo-status-error">Something went wrong: {error}</p>}
-
-      {ranOnce && !running && (
-        <div className="output-panel">
-          <h3>Output</h3>
-          <pre>
-            {output.length
-              ? output.join("\n")
-              : "(your code printed nothing; add print(...) anywhere to inspect values)"}
-          </pre>
-          {scratchError && (
-            <p className="demo-status demo-status-error">
-              Your code stopped with {scratchError.message}
-              {scratchError.line !== null && ` (line ${scratchError.line})`}.
-            </p>
+          <button className="button-secondary" onClick={runScratch} disabled={running}>
+            Run my code
+          </button>
+          {running && (
+            <button className="button-secondary" onClick={terminateWorker}>
+              Stop
+            </button>
           )}
+          <button className="button-secondary" onClick={resetToSkeleton} disabled={running}>
+            Reset to skeleton
+          </button>
+          <button
+            className="button-secondary workbench-expand"
+            onClick={() => setFullscreen((f) => !f)}
+          >
+            {fullscreen ? "Exit fullscreen (Esc)" : "Fullscreen"}
+          </button>
         </div>
-      )}
+        {status && <p className="demo-status">{status}</p>}
+        {error && <p className="demo-status demo-status-error">Something went wrong: {error}</p>}
 
-      {result && <TestResults result={result} />}
+        {ranOnce && !running && (
+          <div className="output-panel">
+            <h3>Output</h3>
+            <pre>
+              {output.length
+                ? output.join("\n")
+                : "(your code printed nothing; add print(...) anywhere to inspect values)"}
+            </pre>
+            {scratchError && (
+              <p className="demo-status demo-status-error">
+                Your code stopped with {scratchError.message}
+                {scratchError.line !== null && ` (line ${scratchError.line})`}.
+              </p>
+            )}
+          </div>
+        )}
+
+        {result && <TestResults result={result} />}
+      </div>
 
       <details className="demo-log tests-viewer">
         <summary>See exactly what the tests check (the test code)</summary>

@@ -46,11 +46,31 @@ export default function App() {
       <main>
         {/* Everything stays mounted so tab switches never lose editor or
             visualization state. */}
-        {MODULES.map((m) => (
-          <div key={m.id} hidden={tab !== m.id}>
-            <m.Component />
-          </div>
-        ))}
+        {MODULES.map((m, i) => {
+          const next = MODULES[i + 1];
+          const nextUnlocked = next !== undefined && isModuleUnlocked(i + 1);
+          return (
+            <div key={m.id} hidden={tab !== m.id}>
+              <m.Component />
+              {next && (
+                <div className="next-module">
+                  <button
+                    disabled={!nextUnlocked}
+                    title={nextUnlocked ? undefined : "Pass this module's exercise first"}
+                    onClick={() => {
+                      setTab(next.id);
+                      window.scrollTo(0, 0);
+                    }}
+                  >
+                    {nextUnlocked
+                      ? `Continue to ${next.navLabel} →`
+                      : `🔒 Pass this module's exercise to continue to ${next.navLabel}`}
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })}
         <div hidden={tab !== DEMO_TAB}>
           <TrainingDemo />
         </div>

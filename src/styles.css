@@ -13,12 +13,17 @@
   box-sizing: border-box;
 }
 
+html {
+  /* On html (not body) so that rem-based sizes share the same base and the
+     UI chrome scales with the prose. */
+  font-size: 19px;
+}
+
 body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
   font-family: Georgia, "Times New Roman", serif;
-  font-size: 19px;
   line-height: 1.6;
 }
 
@@ -79,7 +84,7 @@ button:disabled {
   border-radius: 0;
   padding: 0.4rem 0.2rem;
   margin-right: 0.8rem;
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 .tab-active {
@@ -107,15 +112,50 @@ button:disabled {
   overflow: hidden;
   margin: 1rem 0;
   font-size: 0.85rem;
+  height: 430px;
+  min-height: 140px;
+  resize: vertical; /* drag the bottom edge */
 }
 
 .code-editor .cm-editor {
-  max-height: 480px;
+  height: 100%;
 }
 
 .code-editor .cm-editor.cm-focused {
   outline: 2px solid var(--accent);
   outline-offset: -1px;
+}
+
+/* Fullscreen workbench: editor + run controls + output + results */
+.workbench-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: var(--bg);
+  padding: 1rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.workbench-fullscreen .code-editor {
+  flex: 1 0 45vh;
+  height: auto;
+  resize: none;
+  margin: 0 0 0.6rem;
+}
+
+.workbench-fullscreen .exercise-tip {
+  display: none;
+}
+
+.workbench-fullscreen .output-panel pre {
+  max-height: 24vh;
+  overflow: auto;
+}
+
+.workbench-expand {
+  margin-left: auto;
 }
 
 .exercise-controls {
@@ -1117,6 +1157,14 @@ button:disabled {
   padding: 0.75rem;
   overflow-x: auto;
   font-size: 0.8rem;
+}
+
+.next-module {
+  margin-top: 2rem;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: flex-end;
 }
 
 footer {

@@ -1,5 +1,8 @@
 import { useEffect, useRef } from "react";
 import { basicSetup, EditorView } from "codemirror";
+import { keymap } from "@codemirror/view";
+import { indentWithTab } from "@codemirror/commands";
+import { indentUnit } from "@codemirror/language";
 import { python } from "@codemirror/lang-python";
 
 export interface CodeEditorHandle {
@@ -29,6 +32,10 @@ export function CodeEditor({
       extensions: [
         basicSetup,
         python(),
+        indentUnit.of("    "), // Python convention: 4 spaces
+        // Tab indents (Shift-Tab dedents). CodeMirror leaves this off by
+        // default for keyboard accessibility; Escape then Tab moves focus.
+        keymap.of([indentWithTab]),
         EditorView.updateListener.of((update) => {
           if (update.docChanged) onChangeRef.current(update.state.doc.toString());
         }),
