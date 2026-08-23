@@ -1449,7 +1449,9 @@ footer a {
   padding: 0.4rem 0.7rem;
   border: 1px solid var(--rule);
   border-radius: 6px;
+  /* the global button rule is accent-on-white-text; undo both halves */
   background: #fff;
+  color: var(--ink);
   cursor: pointer;
 }
 
