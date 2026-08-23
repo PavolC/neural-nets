@@ -9,6 +9,14 @@ page never freezes.
 
 ## Status
 
+**Milestone 1 (exercise pipeline) is complete.** The app has a working exercise loop:
+a CodeMirror editor pre-filled with skeleton Python, a Run tests button that executes
+the learner's code against a deterministic NumPy test suite inside Pyodide, per-test
+pass/fail results whose failure messages teach (shapes, layer order, common
+misconceptions), a three-stage hint reveal (conceptual nudge, pseudocode, full
+solution), and localStorage persistence of code, hints, and completion. Module 2's
+feedforward exercise is the first working example.
+
 **Milestone 0 (feasibility spike) is complete.** The app loads Pyodide + NumPy in a Web
 Worker, loads a bundled MNIST subset (5,000 training / 1,000 test images), trains a
 784-30-10 sigmoid network with a reference implementation, and streams per-epoch loss and

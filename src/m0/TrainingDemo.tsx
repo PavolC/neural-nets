@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { MetricsChart } from "./MetricsChart";
-import type { EpochMetrics, TrainRequest, TrainResult, WorkerMessage } from "./messages";
+import type { EpochMetrics, TrainResult, WorkerResponse } from "../runtime/messages";
+import { sendRequest, terminateWorker } from "../runtime/workerClient";
 
 // Milestone 0 defaults: 784-30-10 sigmoid net, quadratic cost, plain SGD.
-// Target: about 90% test accuracy in under 30 seconds of in-browser training.
+// Measured envelope: about 4.5s for 30 epochs, 88.6% test accuracy (README).
 const TRAIN_PARAMS = {
   epochs: 30,
   hidden: 30,
@@ -15,61 +16,52 @@ const TRAIN_PARAMS = {
 type Phase = "idle" | "running" | "done" | "error";
 
 export function TrainingDemo() {
-  const workerRef = useRef<Worker | null>(null);
   const [phase, setPhase] = useState<Phase>("idle");
   const [status, setStatus] = useState("Ready. Training runs entirely in your browser.");
   const [log, setLog] = useState<string[]>([]);
   const [points, setPoints] = useState<EpochMetrics[]>([]);
   const [result, setResult] = useState<TrainResult | null>(null);
 
-  useEffect(() => () => workerRef.current?.terminate(), []);
-
   const start = () => {
     setPhase("running");
     setPoints([]);
     setResult(null);
     setLog([]);
-    if (!workerRef.current) {
-      workerRef.current = new Worker(new URL("./pyodideWorker.ts", import.meta.url), {
-        type: "module",
-      });
-      workerRef.current.onmessage = (event: MessageEvent<WorkerMessage>) => {
-        const msg = event.data;
-        switch (msg.type) {
-          case "status":
-            setStatus(msg.text);
-            break;
-          case "log":
-            setLog((prev) => [...prev.slice(-49), msg.text]);
-            break;
-          case "epoch":
-            setPoints((prev) => [...prev, msg]);
-            setStatus(
-              `Training: epoch ${msg.epoch}/${msg.epochs}, ` +
-                `loss ${msg.loss.toFixed(4)}, test accuracy ${(msg.accuracy * 100).toFixed(1)}%, ` +
-                `${msg.elapsed.toFixed(1)}s elapsed`,
-            );
-            break;
-          case "done":
-            setResult(msg.result);
-            setPhase("done");
-            setStatus("Done.");
-            break;
-          case "error":
-            setPhase("error");
-            setStatus(`Something went wrong: ${msg.message}`);
-            break;
-        }
-      };
-    }
     // Resolve against the page URL on the main thread: inside the worker,
     // relative URLs would resolve against the worker script's location.
     const dataUrl = new URL(
       `${import.meta.env.BASE_URL}data/mnist_subset.bin.gz`,
       window.location.href,
     ).href;
-    const req: TrainRequest = { type: "train", dataUrl, ...TRAIN_PARAMS };
-    workerRef.current.postMessage(req);
+    sendRequest({ type: "train", dataUrl, ...TRAIN_PARAMS }, (msg: WorkerResponse) => {
+      switch (msg.type) {
+        case "status":
+          setStatus(msg.text);
+          break;
+        case "log":
+          setLog((prev) => [...prev.slice(-49), msg.text]);
+          break;
+        case "epoch":
+          setPoints((prev) => [...prev, msg]);
+          setStatus(
+            `Training: epoch ${msg.epoch}/${msg.epochs}, ` +
+              `loss ${msg.loss.toFixed(4)}, test accuracy ${(msg.accuracy * 100).toFixed(1)}%, ` +
+              `${msg.elapsed.toFixed(1)}s elapsed`,
+          );
+          break;
+        case "trainDone":
+          setResult(msg.result);
+          setPhase("done");
+          setStatus("Done.");
+          break;
+        case "error":
+          setPhase("error");
+          setStatus(`Something went wrong: ${msg.message}`);
+          break;
+        default:
+          break;
+      }
+    });
   };
 
   return (
@@ -85,6 +77,11 @@ export function TrainingDemo() {
         <button onClick={start} disabled={phase === "running"}>
           {phase === "running" ? "Training..." : phase === "idle" ? "Load Python and train" : "Train again"}
         </button>
+        {phase === "running" && (
+          <button className="button-secondary" onClick={terminateWorker}>
+            Stop
+          </button>
+        )}
         <span className="demo-params">
           {TRAIN_PARAMS.epochs} epochs, mini-batch {TRAIN_PARAMS.miniBatchSize}, learning
           rate {TRAIN_PARAMS.eta}, seed {TRAIN_PARAMS.seed}

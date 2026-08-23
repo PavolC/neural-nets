@@ -58,6 +58,160 @@ button:disabled {
   cursor: default;
 }
 
+.button-secondary {
+  background: transparent;
+  color: var(--accent);
+}
+
+.tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.tab {
+  background: transparent;
+  color: var(--muted);
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: 0.4rem 0.2rem;
+  margin-right: 0.8rem;
+  font-size: 0.95rem;
+}
+
+.tab-active {
+  color: var(--ink);
+  border-bottom-color: var(--accent);
+}
+
+.badge-done {
+  display: inline-block;
+  margin-left: 0.6rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: var(--acc);
+  color: #fff;
+  font-size: 0.7rem;
+  font-family: system-ui, sans-serif;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.code-editor {
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+}
+
+.code-editor .cm-editor {
+  max-height: 480px;
+}
+
+.code-editor .cm-editor.cm-focused {
+  outline: 2px solid var(--accent);
+  outline-offset: -1px;
+}
+
+.exercise-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem;
+}
+
+.test-results {
+  margin: 1rem 0;
+}
+
+.test-summary {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.test-summary-pass {
+  color: var(--acc);
+  font-weight: bold;
+}
+
+.test-result {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+  font-size: 0.9rem;
+}
+
+.test-result p {
+  margin: 0.3rem 0 0;
+  white-space: pre-wrap;
+  color: var(--muted);
+}
+
+.test-pass {
+  border-left: 3px solid var(--acc);
+}
+
+.test-fail {
+  border-left: 3px solid var(--loss);
+}
+
+.test-mark {
+  font-family: system-ui, sans-serif;
+  font-weight: bold;
+}
+
+.test-pass .test-mark {
+  color: var(--acc);
+}
+
+.test-fail .test-mark {
+  color: var(--loss);
+}
+
+.hints {
+  margin-top: 1.5rem;
+}
+
+.hint {
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  padding: 0.2rem 1rem 0.8rem;
+  margin-bottom: 0.8rem;
+  background: #fbfbf7;
+}
+
+.hint h3 {
+  font-size: 0.95rem;
+  margin: 0.8rem 0 0.4rem;
+}
+
+.hint p,
+.hint-pre {
+  font-size: 0.9rem;
+  margin: 0.4rem 0;
+}
+
+.hint-pre {
+  white-space: pre-wrap;
+  font-size: 0.8rem;
+  background: #f4f4f0;
+  border-radius: 6px;
+  padding: 0.7rem;
+  overflow-x: auto;
+}
+
+.button-hint {
+  font-size: 0.9rem;
+}
+
 .demo-controls {
   display: flex;
   align-items: center;

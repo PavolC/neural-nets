@@ -54,10 +54,23 @@ no accounts, no backend, no analytics.
 
 - **Pyodide: 314.0.5** (CPython 3.14), loaded from
   `https://cdn.jsdelivr.net/pyodide/v314.0.5/full/`. The version string lives in
-  `src/m0/pyodideWorker.ts` (`PYODIDE_VERSION`). Do not bump without re-verifying the
-  training-time envelope from Milestone 0.
-- **React: 19.2.8**, **Vite: 8.2.2** (pinned exactly in `package.json`).
-- **CodeMirror: 6.0.2** (to be added in Milestone 1; pin exactly when installed).
+  `src/runtime/pyodideWorker.ts` (`PYODIDE_VERSION`). Do not bump without re-verifying
+  the training-time envelope from Milestone 0.
+- **React: 19.2.8**, **Vite: 8.2.2**, **CodeMirror: 6.0.2**,
+  **@codemirror/lang-python: 6.2.1** (all pinned exactly in `package.json`).
+
+## Decisions
+
+- **Module content is authored in TSX, not MDX** (decided in Milestone 1): prose beats
+  are short and always interleaved with components, so MDX would add a dependency
+  without saving friction. Exercise prompts and hints live in each exercise's
+  `index.ts`.
+- **Exercise test contract**: tests import the learner's code via
+  `from submission import ...`; helpers the learner built in earlier modules are
+  provided via `from course import ...` (defined in `src/python/course_helpers.py`),
+  so skeletons never contain prior solutions. Test functions are named `test_*`, run
+  in definition order, and fail by raising `AssertionError` with a teaching message;
+  the first docstring line is the test's display title.
 
 ## Content voice rules
 
@@ -76,9 +89,12 @@ no accounts, no backend, no analytics.
 /CLAUDE.md           this file
 /src/                React app
 /src/modules/NN/     one folder per module: content, interactives/
-/src/exercises/      skeleton.py, tests.py, solution.py per exercise
-/src/python/         shared Python: harness, gradient checker, data loader
-/src/m0/             Milestone 0 feasibility spike (Pyodide worker + training demo)
+/src/exercises/      per exercise: skeleton.py, tests.py, solution.py, index.ts (prompt, hints)
+/src/python/         shared Python: harness, course helpers, gradient checker, data loader
+/src/runtime/        Pyodide Web Worker, message protocol, shared worker client
+/src/components/     shared UI: CodeEditor (CodeMirror), ExercisePage
+/src/state/          localStorage progress persistence (gn:v1: key prefix)
+/src/m0/             Milestone 0 training demo UI
 /public/data/        mnist_subset.bin.gz, pretrained_weights.npz
 /tools/              build-time scripts (MNIST preprocessing, weight pretraining)
 ```

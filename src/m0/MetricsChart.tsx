@@ -1,4 +1,4 @@
-import type { EpochMetrics } from "./messages";
+import type { EpochMetrics } from "../runtime/messages";
 
 // Live training chart: quadratic loss (left axis) and test accuracy (right
 // axis) per epoch. Plain SVG, no chart library (see design doc, section 3).
