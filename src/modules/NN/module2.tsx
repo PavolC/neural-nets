@@ -56,17 +56,31 @@ export function Module2() {
 
       <p>
         The shapes deserve one careful paragraph, because nearly every bug you will
-        write in this course is a shape bug. Look back at the worked example: two
-        neurons reading two inputs made a 2-by-2 matrix, one row per neuron, one
-        column per input. In general a layer of <M tex="m" /> neurons reading{" "}
-        <M tex="n" /> inputs has <M tex="W" /> of shape <M tex="(m, n)" />, and
-        activations are always columns: shape <M tex="(n, 1)" />, never a flat{" "}
-        <M tex="(n,)" />. Then <M tex="Wa" /> is <M tex="(m, 1)" />, the biases are{" "}
-        <M tex="(m, 1)" />, and everything adds up cleanly. Why matrices instead of
-        a Python loop over neurons? The loop runs in the interpreter, one neuron at
-        a time; the matrix product hands the whole layer to fast numerical code in
-        one call. The same discipline that keeps shapes honest makes the code
-        hundreds of times faster.
+        write in this course is a shape bug. NumPy describes every array by its
+        shape, written as a pair: <M tex="(m, n)" /> means <M tex="m" /> rows and{" "}
+        <M tex="n" /> columns. In the worked example, two neurons reading two
+        inputs made <M tex="W" /> of shape <M tex="(2, 2)" />; in general a layer
+        of <M tex="m" /> neurons reading <M tex="n" /> inputs has <M tex="W" /> of
+        shape <M tex="(m, n)" />, and activations are always columns, shape{" "}
+        <M tex="(n, 1)" />. NumPy also allows a third thing we deliberately avoid:
+        np.array([1.0, 2.0, 3.0]) has the odd-looking shape (3,), trailing comma and
+        all. That comma is real notation (Python's way of writing a one-item
+        list-of-shapes), and it marks a flat array: three numbers in a bare line
+        that is neither a row nor a column. Flat arrays make matrix arithmetic
+        misbehave silently, so the course rule is simple: build columns, and if a
+        shape ever prints with a trailing comma, treat it as a bug. With columns
+        everywhere, <M tex="Wa" /> is <M tex="(m, 1)" />, the biases are{" "}
+        <M tex="(m, 1)" />, and everything adds up cleanly. Here is the whole
+        contract as a picture:
+      </p>
+      <Figure caption="How the shapes lock together. Teal is the input side: W is n wide because a is n tall, one weight per input, and the two must match or the multiply is impossible. Purple is the neuron side: W has m rows, so Wa, b, and a' are all m tall, one entry per neuron. The shaded strip shows one neuron's whole story: its row of W, times all of a, plus its own bias entry, becomes its entry of a'. For Module 2's hidden layer, m = 15 and n = 784.">
+        <ShapesDiagram />
+      </Figure>
+      <p>
+        Why matrices instead of a Python loop over neurons? The loop runs in the
+        interpreter, one neuron at a time; the matrix product hands the whole layer
+        to fast numerical code in one call. The same discipline that keeps shapes
+        honest makes the code hundreds of times faster.
       </p>
 
       <p>
@@ -129,5 +143,54 @@ export function Module2() {
         href="http://neuralnetworksanddeeplearning.com/chap1.html"
       />
     </article>
+  );
+}
+
+// Static diagram: the shapes in a' = sigma(Wa + b), drawn as proportioned
+// rectangles. Teal marks the n dimension (inputs), purple the m dimension
+// (neurons); one row of W is shaded through to the a' entry it produces.
+function ShapesDiagram() {
+  const ROW_TOP = 107; // the shaded "neuron j" band
+  const ROW_H = 30;
+  return (
+    <svg viewBox="0 0 500 240" className="shapes-diagram" role="img"
+         aria-label="The shapes in a' = sigma(W a + b): W is m by n, a is n by 1, b and a' are m by 1">
+      {/* a' */}
+      <rect x={20} y={77} width={28} height={90} className="shape-m" />
+      <rect x={20} y={ROW_TOP} width={28} height={ROW_H} className="shape-row" />
+      <text x={34} y={70} textAnchor="middle" className="shape-name">a′</text>
+      <text x={34} y={215} textAnchor="middle" className="shape-dim dim-m">m tall</text>
+
+      <text x={66} y={128} className="shape-op">=</text>
+      <text x={92} y={128} className="shape-op">σ(</text>
+
+      {/* W */}
+      <rect x={150} y={77} width={170} height={90} className="shape-w" />
+      {[1, 2].map((k) => (
+        <line key={`h${k}`} x1={150} x2={320} y1={77 + k * 30} y2={77 + k * 30} className="shapes-grid" />
+      ))}
+      {[1, 2, 3].map((k) => (
+        <line key={`v${k}`} x1={150 + k * 42.5} x2={150 + k * 42.5} y1={77} y2={167} className="shapes-grid" />
+      ))}
+      <rect x={150} y={ROW_TOP} width={170} height={ROW_H} className="shape-row" />
+      <text x={235} y={70} textAnchor="middle" className="shape-name">W</text>
+      <text x={144} y={128} textAnchor="end" className="shape-dim dim-m">m</text>
+      <text x={235} y={215} textAnchor="middle" className="shape-dim dim-n">n wide</text>
+
+      {/* a */}
+      <rect x={336} y={44} width={28} height={156} className="shape-n" />
+      <text x={350} y={36} textAnchor="middle" className="shape-name">a</text>
+      <text x={350} y={215} textAnchor="middle" className="shape-dim dim-n">n tall</text>
+
+      <text x={386} y={128} className="shape-op">+</text>
+
+      {/* b */}
+      <rect x={406} y={77} width={28} height={90} className="shape-m" />
+      <rect x={406} y={ROW_TOP} width={28} height={ROW_H} className="shape-row" />
+      <text x={420} y={70} textAnchor="middle" className="shape-name">b</text>
+      <text x={420} y={215} textAnchor="middle" className="shape-dim dim-m">m tall</text>
+
+      <text x={448} y={128} className="shape-op">)</text>
+    </svg>
   );
 }

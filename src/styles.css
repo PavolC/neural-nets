@@ -742,6 +742,71 @@ button:disabled {
   max-width: 440px;
 }
 
+/* shapes diagram (Module 2) */
+.shapes-diagram {
+  display: block;
+  width: min(540px, 100%);
+  margin: 0 auto;
+}
+
+.shape-m {
+  fill: #6a51a3;
+  fill-opacity: 0.1;
+  stroke: #6a51a3;
+  stroke-width: 1.4;
+}
+
+.shape-n {
+  fill: #1b7a99;
+  fill-opacity: 0.1;
+  stroke: #1b7a99;
+  stroke-width: 1.4;
+}
+
+.shape-w {
+  fill: #6a51a3;
+  fill-opacity: 0.04;
+  stroke: var(--ink);
+  stroke-width: 1.4;
+}
+
+.shape-row {
+  fill: #6a51a3;
+  fill-opacity: 0.22;
+  stroke: none;
+}
+
+.shapes-grid {
+  stroke: var(--rule);
+  stroke-width: 0.8;
+}
+
+.shape-name {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 17px;
+  fill: var(--ink);
+}
+
+.shape-op {
+  font-family: Georgia, serif;
+  font-size: 20px;
+  fill: var(--ink);
+}
+
+.shape-dim {
+  font-family: system-ui, sans-serif;
+  font-size: 12.5px;
+}
+
+.dim-m {
+  fill: #6a51a3;
+}
+
+.dim-n {
+  fill: #1b7a99;
+}
+
 /* pixels-are-numbers (Module 2) */
 .pixels-row {
   display: flex;

@@ -261,10 +261,14 @@ w * x           # multiplies matching entries -> [[6.0], [0.0], [0.0]]
 (w * x).sum()   # adds every entry up -> 6.0  (that's the dot product!)
 np.exp(-2.0)    # e^(-2); given an array, it does every entry at once`}</pre>
       <p>
-        One convention to adopt now, because the whole course uses it: lists of
-        numbers are always columns, shape (n, 1), meaning n rows and 1 column. The
-        shape is the first thing the tests check, and the error messages will coach
-        you when it is off.
+        Two conventions to adopt now, because the whole course uses them. First,
+        lists of numbers are always columns, shape (n, 1), meaning n rows and 1
+        column; the shape is the first thing the tests check, and the error
+        messages will coach you when it is off. Second, write numbers with decimal
+        points: 6.0, or its lazy shorthand 6. (yes, a bare trailing dot). The dot
+        tells NumPy to store fractions; np.array([6, 2, 1]) would quietly build an
+        integer-only array, and weights, activations, and gradients are all
+        fractional.
       </p>
 
       <ExercisePage exercise={sigmoidNeuronExercise} />
