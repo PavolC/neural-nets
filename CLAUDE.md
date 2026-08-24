@@ -161,7 +161,12 @@ this floor after direct feedback; every later module must be written to it too.
   the learner reported it "over my head". The fix that worked: teach the one
   genuinely new concept in prose with concrete numbers, reach the interactive by
   the midpoint, and present the formal equations after it as "what you just
-  watched, written down". Notation is taught just-in-time, one symbol at the
+  watched, written down". Recap means instantiated: open by saying the job is
+  recognition, not derivation; write the equations with the interactive's
+  concrete layer numbers (general indices wait until the implementation loop
+  needs them); pair each equation with the number the learner already computed
+  (a receipts table); and give direction-of-use and sign-reading their own
+  explicit beat, since neither is visible in the symbols. Notation is taught just-in-time, one symbol at the
   moment it first appears (an equation gloss or a step card is a fine place),
   never as a several-notations dump paragraph.
 - **Log first, explain second.** For any multi-stage numeric process, show the

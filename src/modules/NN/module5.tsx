@@ -65,7 +65,7 @@ export function Module5() {
       </p>
       <Eq
         tex="\begin{aligned} \delta^L &= (a^L - y) \odot \sigma'(z^L) && \text{(BP1)} \\ \delta^l &= \big( (w^{l+1})^T \, \delta^{l+1} \big) \odot \sigma'(z^l) && \text{(BP2)} \\ \frac{\partial C}{\partial b^l} &= \delta^l && \text{(BP3)} \\ \frac{\partial C}{\partial w^l} &= \delta^l \, (a^{l-1})^T && \text{(BP4)} \end{aligned}"
-        gloss="Module 4's equations, unchanged: blame starts at the output as gap times steepness, flows backward through the transposed wires, and every slope reads off a blame. If any line feels foreign, the Module 4 stepper is the place to rebuild it before writing code."
+        gloss="Module 4's equations, with one upgrade: the layer letter l stands for each layer in turn (2 then 3 in this course's networks), which is exactly the loop you are about to write, and L names the last layer. Blame starts at the output as gap times steepness, flows backward through the transposed wires, and every slope reads off a blame; if any line feels foreign, the Module 4 stepper is the place to rebuild it."
       />
       <p>
         The translation to NumPy is nearly mechanical, because Module 4 already

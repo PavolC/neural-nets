@@ -371,36 +371,70 @@ export function Module4() {
 
       <SectionHeader id="m4-equations" title="The four equations" />
       <p>
-        Those six steps are the whole algorithm, at any network size. Written down,
-        they are the four equations of backpropagation, numbered BP1 to BP4 after
-        Nielsen's Chapter 2, whose framing this module adapts; every symbol in them
-        appeared on the cards you just stepped through. The numbering maps
-        straight onto the steps: BP1 ran at step 4, BP2 at step 5, and BP3 and
-        BP4 together at step 6. Two bookkeeping notes before
-        reading them: in the chain, blames wore neuron names (<M tex="\delta_A" />,{" "}
-        <M tex="\delta_B" />); in layer language, <M tex="\delta^2" /> is a whole
-        column of blames at once, one entry per neuron of layer 2, and{" "}
-        <M tex="L" /> names the last layer (3 in the stepper). And the input column
-        doubles as layer 1's activations, <M tex="a^1 = x" />: not neurons, just
-        the numbers the first layer of weights multiplies, which is what BP4 reads
-        when <M tex="l" /> is 2.
+        Those six steps are the whole algorithm, and nothing new arrives now: the
+        four equations below are facts you have already computed, written in
+        Module 2's matrix shorthand so that Module 5 can turn each one into a
+        single line of NumPy. The job here is recognition, not derivation. They
+        are numbered BP1 to BP4 after Nielsen's Chapter 2, whose framing this
+        module adapts, and they map onto the stepper: BP1 ran at step 4, BP2 at
+        step 5, BP3 and BP4 together at step 6. They are also written for the
+        stepper's own layers, 2 hidden and 3 output, no abstract layer letters.
+        Two bookkeeping notes: <M tex="\delta^2" /> is a whole column of blames,
+        one entry per neuron of layer 2 (the chain's blames wore neuron names
+        instead, <M tex="\delta_A" /> and <M tex="\delta_B" />); and the input
+        column doubles as layer 1's activations, <M tex="a^1 = x" />, which is
+        what BP4 reads at the hidden layer.
       </p>
       <Eq
-        tex="\delta^L = (a^L - y) \odot \sigma'(z^L) \tag{BP1}"
+        tex="\delta^3 = (a^3 - y) \odot \sigma'(z^3) \tag{BP1}"
         gloss="Blame starts at the output layer: the gap in each output entry, times that neuron's current steepness (the circled dot means multiply matching entries, NumPy's plain *, no adding). A saturated neuron has sigma-prime near zero and soaks up almost no blame, even when it is wrong."
       />
       <Eq
-        tex="\delta^l = \big( (w^{l+1})^T \, \delta^{l+1} \big) \odot \sigma'(z^l) \tag{BP2}"
-        gloss="Blame flows backward: each neuron of layer l collects blame along its outgoing wires and adds, then scales by its own steepness. The raised T (transpose) regroups Module 2's wire ledger by sender instead of receiver, so each row becomes one neuron's outgoing wires, exactly what collecting needs; the shapes agree by the inner-numbers-touch rule: in the stepper, (3, 1) times (1, 1) gives (3, 1), one collected blame per hidden neuron."
+        tex="\delta^2 = \big( (w^3)^T \, \delta^3 \big) \odot \sigma'(z^2) \tag{BP2}"
+        gloss="Blame flows backward: each hidden neuron collects blame along its outgoing wires and adds, then scales by its own steepness. The raised T (transpose) regroups Module 2's wire ledger by sender instead of receiver, so each row becomes one neuron's outgoing wires, exactly what collecting needs; the shapes agree by the inner-numbers-touch rule: (3, 1) times (1, 1) gives (3, 1), one collected blame per hidden neuron."
       />
       <Eq
-        tex="\frac{\partial C}{\partial b^l} = \delta^l \tag{BP3}"
-        gloss="The curly-d expression is read as one name, 'the slope of C per nudge of b', the number Module 3 measured with nudge-and-divide. Every bias's slope is exactly its neuron's blame, because a bias nudges its neuron's evidence one-for-one."
+        tex="\frac{\partial C}{\partial b^2} = \delta^2, \qquad \frac{\partial C}{\partial b^3} = \delta^3 \tag{BP3}"
+        gloss="The curly-d expression is read as one name, 'the slope of C per nudge of b', the number Module 3 measured with nudge-and-divide. Every bias's slope is exactly its neuron's blame: a bias's ramp factor is 1."
       />
       <Eq
-        tex="\frac{\partial C}{\partial w^l} = \delta^l \, (a^{l-1})^T \tag{BP4}"
-        gloss="Every weight's slope is the receiving neuron's blame times the activation the wire carried. The shapes tell the story: delta is (m, 1), the transposed activations are (1, n), and their product is (m, n), one slope per weight, in exactly the shape of w itself; the entry in row j, column k is delta-j times a-k."
+        tex="\frac{\partial C}{\partial w^2} = \delta^2 \, (a^1)^T, \qquad \frac{\partial C}{\partial w^3} = \delta^3 \, (a^2)^T \tag{BP4}"
+        gloss="Every weight's slope is the receiving neuron's blame times the activation its wire carried: entry factor times the delta at the junction, for all wires at once. The shapes tell the story: delta-2 is (3, 1), the transposed input column is (1, 2), and their product is (3, 2), one slope per weight, in exactly the shape of w2; the entry in row j, column k is delta-j times a-k."
       />
+      <p>
+        And each equation is a receipt for work already done:
+      </p>
+      <table className="truth-table">
+        <thead>
+          <tr>
+            <th>equation</th>
+            <th>in road words</th>
+            <th>you already computed it</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>BP1</td>
+            <td>the last stretch's price: own steepness × the gap</td>
+            <td><M tex="\delta_B = 0.2463 \times (-0.4391) = -0.1081" /></td>
+          </tr>
+          <tr>
+            <td>BP2</td>
+            <td>collect along outgoing wires, add, × own steepness</td>
+            <td><M tex="\delta_A = 0.2350 \times 2.0 \times (-0.1081) = -0.0508" /></td>
+          </tr>
+          <tr>
+            <td>BP3</td>
+            <td>a bias's ramp factor is 1</td>
+            <td><M tex="\text{slope for } b_2 = \delta_B" /></td>
+          </tr>
+          <tr>
+            <td>BP4</td>
+            <td>entry factor × the δ at the junction</td>
+            <td><M tex="\text{slope for } w_2 = 0.6225 \times (-0.1081) = -0.0673" /></td>
+          </tr>
+        </tbody>
+      </table>
       <p>
         Read the four as one machine. The forward pass computes and stores every{" "}
         <M tex="z" /> and <M tex="a" /> (you built this in Module 2). BP1 turns the
@@ -409,6 +443,18 @@ export function Module4() {
         BP3 and BP4 then read every slope directly off the blames and the stored
         activations: no equation in the list reruns the network, and none of them
         estimates anything.
+      </p>
+      <p>
+        Two reading habits, because Module 5's debugging leans on both.
+        Direction: the equations run right to left along the network, BP1 once
+        at the output, then BP2 once per remaining layer, each use producing the
+        layer to its left. A deeper network just uses BP2 more times; Nielsen
+        writes that repetition with a general layer letter where this page wrote
+        2 and 3, and in Module 5 it becomes a loop. Signs: a blame's sign is
+        advice, negative meaning raising this neuron's evidence would lower the
+        cost; the gap's sign says which side of its target an output sits on;
+        and a negative wire flips blame in transit, which you watched{" "}
+        <M tex="h_2" />'s wire do in the stepper.
       </p>
 
       <SectionHeader id="m4-quiz" title="Three predictions" />
