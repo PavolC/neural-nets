@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
 // Shared building blocks for module pages (conventions in CLAUDE.md):
@@ -14,6 +15,74 @@ export function AfterThis({ items }: { items: string[] }) {
         ))}
       </ul>
     </div>
+  );
+}
+
+/** An anchored section heading inside a module; the floating table of
+ * contents discovers these and tracks which one the reader is in. Ids must
+ * be unique across modules (prefix with the module: "m4-blame"). */
+export function SectionHeader({ id, title }: { id: string; title: string }) {
+  return (
+    <h3 id={id} className="module-section-title">
+      {title}
+    </h3>
+  );
+}
+
+/** Floating on-this-page navigation. Render once per module, anywhere inside
+ * the module's article: it discovers that article's SectionHeaders from the
+ * DOM, fixes itself to the right gutter on wide screens (hidden where there
+ * is no gutter), and highlights the section currently in view. Modules stay
+ * mounted but hidden on tab switches, which also hides their toc. */
+export function ModuleToc() {
+  const ref = useRef<HTMLElement>(null);
+  const [sections, setSections] = useState<{ id: string; title: string }[]>([]);
+  const [active, setActive] = useState<string | null>(null);
+
+  useEffect(() => {
+    const article = ref.current?.closest("article");
+    if (!article) return;
+    const headers = Array.from(
+      article.querySelectorAll<HTMLHeadingElement>(".module-section-title"),
+    );
+    setSections(headers.map((h) => ({ id: h.id, title: h.textContent ?? "" })));
+    const onScroll = () => {
+      let current: string | null = null;
+      for (const h of headers) {
+        if (h.offsetParent === null) continue; // module hidden by tab switch
+        if (h.getBoundingClientRect().top <= 140) current = h.id;
+      }
+      setActive(current);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("hashchange", onScroll);
+    onScroll();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("hashchange", onScroll);
+    };
+  }, []);
+
+  return (
+    <nav ref={ref} className="module-toc" aria-label="On this page">
+      <p className="module-toc-label">On this page</p>
+      <ul>
+        {sections.map((s) => (
+          <li key={s.id}>
+            <button
+              className={`module-toc-item ${active === s.id ? "module-toc-active" : ""}`}
+              onClick={() =>
+                document
+                  .getElementById(s.id)
+                  ?.scrollIntoView({ behavior: "smooth", block: "start" })
+              }
+            >
+              {s.title}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 

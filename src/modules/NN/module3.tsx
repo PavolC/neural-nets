@@ -1,4 +1,4 @@
-import { AfterThis, Aside, Figure, Recap } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { ExercisePage } from "../../components/ExercisePage";
 import { sgdExercise } from "../../exercises/sgd";
@@ -18,7 +18,9 @@ export function Module3() {
           "Implement mini-batch SGD and train a real (tiny) network with it.",
         ]}
       />
+      <ModuleToc />
 
+      <SectionHeader id="m3-cost" title="Scoring a network" />
       <p>
         So far the weights were given. Learning means finding them, and the first step
         is admitting you need a score. Here is a network to score: the little
@@ -63,6 +65,7 @@ export function Module3() {
         smallest cost. (The knobs, all the weights and biases together, get their
         proper name here: the network's parameters.)
       </p>
+      <SectionHeader id="m3-slope" title="The slope of one knob" />
       <p>
         The way in is a question you can ask of each knob separately: if I nudge this
         one knob a tiny bit, does the cost go up or down, and how steeply? Try it on
@@ -112,6 +115,7 @@ export function Module3() {
         tex="\nabla C = (\underbrace{-0.024,\; -0.024,\; -0.041}_{\text{h1's knobs}},\; \underbrace{0.017,\; 0.017,\; 0.041}_{\text{h2's knobs}},\; \underbrace{-0.035,\; -0.009,\; -0.044}_{\text{output's knobs}})"
         gloss="Nine slopes, three per neuron in the interactive's order: each neuron's two weights then its bias, h1 first, the output neuron last. The final entry is the -0.044 you measured on the output bias. A different setting of the knobs would give a different list: the gradient is a local reading, taken where you stand."
       />
+      <SectionHeader id="m3-descent" title="Walking downhill" />
       <p>
         Read the signs. Six slopes are negative: for those knobs the cost falls when
         the knob goes up, so they should be pushed up. Three are positive (the second
@@ -172,6 +176,7 @@ export function Module3() {
         <Descent2D />
       </Figure>
 
+      <SectionHeader id="m3-sgd" title="Mini-batches" />
       <p>
         One more idea and you can build it. Look at what one step of descent costs.
         Every slope needs the cost measured twice (once for each side of the nudge),
@@ -218,6 +223,7 @@ export function Module3() {
         <BatchVsSgd />
       </Figure>
 
+      <SectionHeader id="m3-code" title="Implement SGD" />
       <p>
         Time to implement it. First, meet the dataset as your code will receive it.
         One situation stands up as a column of numbers, exactly like the input
@@ -243,6 +249,7 @@ export function Module3() {
 
       <ExercisePage exercise={sgdExercise} />
 
+      <SectionHeader id="m3-bill" title="The bill" />
       <p>
         The panel below points your sgd at a concert-shaped dataset, forty noisy
         copies of the contrarian's four corners, and hands it a network with two

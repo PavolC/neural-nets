@@ -1,4 +1,4 @@
-import { AfterThis, Aside, Figure, Recap } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { BackpropStepper } from "./interactives/BackpropStepper";
 import { DeltaQuiz } from "./interactives/DeltaQuiz";
@@ -14,6 +14,7 @@ export function Module4() {
           "Predict where blame flows, and where it dies, before a visualization confirms you.",
         ]}
       />
+      <ModuleToc />
 
       <p>
         Module 3 ended with a bill and a factor it could not remove. Mini-batches
@@ -30,6 +31,7 @@ export function Module4() {
         four equations, and a quiz.
       </p>
 
+      <SectionHeader id="m4-chain" title="The two-neuron chain" />
       <p>
         Numbers first, sized for by-hand. Take the smallest network that has
         something hidden inside it: a chain of two neurons, call them A and B.
@@ -66,27 +68,34 @@ export function Module4() {
         which with a single example (<M tex="n = 1" />) reduces to{" "}
         <M tex="C = \tfrac12 (1 - 0.5609)^2 = 0.0964" />. Now ask Module 3's
         question about the farthest knob, <M tex="w_1" />, and answer it Module 3's
-        way. Nudge <M tex="w_1" /> from 1.00 to 1.01, rerun everything, and the
-        cost comes back lower: 0.0959. Slope: change over nudge,{" "}
+        way. Nudge <M tex="w_1" /> from 1.00 to 1.01 with the other three knobs
+        held still, rerun everything, and the cost comes back lower: 0.0959. Slope: change over nudge,{" "}
         <M tex="(0.0959 - 0.0964) / 0.01 \approx -0.050" />. Two cost measurements,
         one slope, same as always.
       </p>
 
+      <SectionHeader id="m4-log" title="The ripple, logged" />
       <p>
         This time, though, do not just read off the final cost. Rerun the nudge and
         log every value in between, next to its old one. Only five numbers sit
         between <M tex="w_1" /> and the cost, and each of them moved. The picture
-        below is that log. In every box: the value before and after the nudge, and
-        the change in parentheses. On every arrow: a factor, and the claim that
+        below is that log, and its boxes are not new places: it is the wiring
+        diagram above, unrolled into the numbers it makes. <M tex="z_1" /> and{" "}
+        <M tex="a_1" /> live inside neuron A (its total, then its squash),{" "}
+        <M tex="z_2" /> and <M tex="a_2" /> inside neuron B, the arrow between
+        the two is the wire, and the cost hangs off the end, outside the
+        network, keeping score. In every box: the value before and after the
+        nudge, and the change in parentheses. On every arrow: a factor, and the claim that
         each change is the previous change times that factor. Where the factors
         come from is next, one kind at a time; check each against the log as you
         go (the last digit drifts by one here and there, because the log is
         rounded to five decimals).
       </p>
-      <Figure caption="The nudge's whole path. w1 moves by +0.01, and the change ripples through z1, a1, z2, a2 into the cost, multiplied at every arrow by that arrow's local factor. The colors sort the factors into their three kinds. Purple: whatever the wiggling quantity is multiplied by (the input, the wire). Green: sigmoid's steepness where that neuron sits. Red: the gap between output and right answer. The product of all five factors is the slope of the cost for w1.">
+      <Figure caption="The nudge's whole path. w1 moves by +0.01, and the change ripples through z1, a1, z2, a2 into the cost, multiplied at every arrow by that arrow's local factor. The green bands mark which boxes live inside which neuron; the arrow crossing between bands is the wire. The factor colors sort the arrows into their three kinds. Purple: whatever the wiggling quantity is multiplied by (the input, the wire). Green: sigmoid's steepness where that neuron sits. Red: the gap between output and right answer. The product of all five factors is the slope of the cost for w1.">
         <ChainRippleDiagram />
       </Figure>
 
+      <SectionHeader id="m4-rates" title="Factors are posted rates" />
       <Aside>
         <p>
           You are paid in euros and support family in Mexico, and two currency
@@ -206,7 +215,7 @@ export function Module4() {
       </p>
       <Eq
         tex="1.0 \times 0.2350 \times 2.0 \times 0.2463 \times (-0.4391) = -0.0508"
-        gloss="The slope of the cost with respect to w1, computed with no reruns at all: the product of the local factors along the nudge's path."
+        gloss="w1's slope, computed with no reruns at all: how much the cost moves per unit of nudge to w1, every other knob held still, exactly Module 3's per-knob question."
       />
       <p>
         The nudge measurement said <M tex="-0.050" />, and the product says{" "}
@@ -219,17 +228,25 @@ export function Module4() {
         backpropagation needs.
       </p>
 
+      <SectionHeader id="m4-blame" title="Blame: price the road once" />
       <p>
-        That prices one knob. Training needs a slope for every knob, and the
+        That prices one knob, and notice how little of the price is the knob's
+        own. Of the five factors, only the first, the entry, is about{" "}
+        <M tex="w_1" />; the other four belong to the road, and they would
+        multiply any change passing through, whoever sent it. Calling −0.0508{" "}
+        <M tex="w_1" />'s slope names the question it answers, not who owns the
+        factors: nudge <M tex="w_1" /> alone and the cost moves by this per
+        unit. Training needs that question answered for every knob, and the
         chain has four: <M tex="w_1" />, <M tex="b_1" />, <M tex="w_2" />,{" "}
-        <M tex="b_2" /> (the digit reader has 11,935). Notice what pricing them
-        one by one would waste. Each knob enters the chain at some point, and
-        from that point on, its change rides the same booths as every other
-        change passing through; two knobs entering at the same point share their
-        entire road to the cost. The rest of backpropagation is exactly this
-        bookkeeping: price each stretch of road once, and let every knob reuse
-        the price.
+        <M tex="b_2" /> (the digit reader has 11,935). Each knob enters the road
+        somewhere, and two knobs entering at the same point share everything
+        from there to the cost. So the rest of backpropagation is bookkeeping
+        about exactly this ownership: price each stretch of road once, and let
+        every knob reuse the price.
       </p>
+      <Figure caption="The road with its on-ramps, in the log's visual language: the green bands are the two neurons again, and each knob's ramp joins the road at its neuron's z, the neuron's front door. On the way in, a nudge is multiplied by its private entry factor: its product partner, or 1 for a bias. Everything past the junction is shared, and a shared stretch has one price, the bracketed deltas, which the next paragraphs compute. A knob's slope is its entry factor times the delta where it joins. Notice w2 is in the picture twice: as the road's x 2.0 booth when something else's change passes through it, and as a knob on its own ramp when it is the thing being nudged. Which role a weight plays depends on what is wiggling: the partner rule again.">
+        <RoadDiagram />
+      </Figure>
       <p>
         Watch it with the two knobs that enter at neuron A. <M tex="w_1" />'s
         change enters at <M tex="z_1" />; so does <M tex="b_1" />'s. The only
@@ -281,8 +298,14 @@ export function Module4() {
         </tbody>
       </table>
       <p>
-        The total: one forward pass, one backward sweep of two blames, and all four
-        slopes. That is backpropagation, in miniature.
+        Now count what all four slopes cost. One forward pass, already paid,
+        posted every rate. One backward walk priced the two stretches:{" "}
+        <M tex="\delta_B" /> first, then <M tex="\delta_A" /> built from it.
+        After that, each knob's slope was a single multiplication, entry factor
+        times a <M tex="\delta" />. Forward pass, backward sweep of blames,
+        slopes read off: that three-step shape is the whole backpropagation
+        algorithm, run here on the smallest possible chain. Everything after
+        this point is the same three steps with more neurons in them.
       </p>
 
       <p>
@@ -296,10 +319,13 @@ export function Module4() {
         <M tex="4.0 \times (-0.10) + (-4.0) \times 0.08 = -0.72" />, and then it
         multiplies by its own sigmoid slope as always, say 0.15, giving{" "}
         <M tex="\delta = -0.108" />. Collect along each wire, add, multiply by your
-        own <M tex="\sigma'" />: that is the whole upgrade. (Rates along a chain
-        multiply; rates of parallel routes add.)
+        own <M tex="\sigma'" />: that is the whole upgrade.
       </p>
+      <Figure caption="Blame collection at a fork. The hidden neuron feeds two output neurons whose blames are already priced (the red numbers under them). Each red dashed arrow carries its receiver's blame back along the wire, multiplied by the wire's weight, the purple rule read backward. The arrivals add at the neuron, and its own steepness scales the sum: 0.15 x (-0.72) = -0.108, its delta.">
+        <ForkDiagram />
+      </Figure>
 
+      <SectionHeader id="m4-stepper" title="Watch it run on a network" />
       <p>
         Time to run the same story on a network instead of a chain. The one below
         is Module 1's contrarian network grown by one hidden neuron, 2-3-1 instead
@@ -318,6 +344,9 @@ export function Module4() {
         tex="\underbrace{3 \times 2}_{\text{hidden } w} + \underbrace{3}_{\text{hidden } b} + \underbrace{1 \times 3}_{\text{output } w} + \underbrace{1}_{\text{output } b} = 6 + 3 + 3 + 1 = 13"
         gloss="Thirteen knobs, so the backward pass must deliver thirteen slopes. The weights shown on the wires are a hand-picked starting point, not a trained network: training them is Module 5's job."
       />
+      <Figure caption="The network with every symbol placed. Layer-2 symbols are whole columns, one entry per neuron: z² holds the three evidences, a² the three confidences, δ² the three blames. w² and w³ are the wire ledgers, one entry per wire, each row one receiving neuron's incoming wires. The target and cost sit outside the network, keeping score.">
+        <NetworkAnatomyDiagram />
+      </Figure>
       <p>
         The input is fixed at one training example, good weather without the
         friend, where the contrarian's answer is go (<M tex="y = 1" />). How to
@@ -340,11 +369,14 @@ export function Module4() {
         <BackpropStepper />
       </Figure>
 
+      <SectionHeader id="m4-equations" title="The four equations" />
       <p>
         Those six steps are the whole algorithm, at any network size. Written down,
         they are the four equations of backpropagation, numbered BP1 to BP4 after
         Nielsen's Chapter 2, whose framing this module adapts; every symbol in them
-        appeared on the cards you just stepped through. Two bookkeeping notes before
+        appeared on the cards you just stepped through. The numbering maps
+        straight onto the steps: BP1 ran at step 4, BP2 at step 5, and BP3 and
+        BP4 together at step 6. Two bookkeeping notes before
         reading them: in the chain, blames wore neuron names (<M tex="\delta_A" />,{" "}
         <M tex="\delta_B" />); in layer language, <M tex="\delta^2" /> is a whole
         column of blames at once, one entry per neuron of layer 2, and{" "}
@@ -359,7 +391,7 @@ export function Module4() {
       />
       <Eq
         tex="\delta^l = \big( (w^{l+1})^T \, \delta^{l+1} \big) \odot \sigma'(z^l) \tag{BP2}"
-        gloss="Blame flows backward: each neuron of layer l collects blame along its outgoing wires and adds, then scales by its own steepness. The raised T (transpose) flips the matrix so the same wires read backward, and the shapes agree by Module 2's inner-numbers-touch rule: in the stepper, (3, 1) times (1, 1) gives (3, 1), one collected blame per hidden neuron."
+        gloss="Blame flows backward: each neuron of layer l collects blame along its outgoing wires and adds, then scales by its own steepness. The raised T (transpose) regroups Module 2's wire ledger by sender instead of receiver, so each row becomes one neuron's outgoing wires, exactly what collecting needs; the shapes agree by the inner-numbers-touch rule: in the stepper, (3, 1) times (1, 1) gives (3, 1), one collected blame per hidden neuron."
       />
       <Eq
         tex="\frac{\partial C}{\partial b^l} = \delta^l \tag{BP3}"
@@ -379,6 +411,7 @@ export function Module4() {
         estimates anything.
       </p>
 
+      <SectionHeader id="m4-quiz" title="Three predictions" />
       <p>
         Module 5 is where you implement all four equations, and the implementation
         goes better if you can already think in them. So before moving on, three
@@ -389,6 +422,7 @@ export function Module4() {
       </p>
       <DeltaQuiz />
 
+      <SectionHeader id="m4-bill" title="The bill, closed" />
       <p>
         The bill, one last time, at the digit reader's scale. Nudge-measured
         gradients pay two cost measurements per knob per step: 23,870 passes over
@@ -479,6 +513,249 @@ function CurrencyDiagram() {
       </defs>
       <text x={390} y={142} textAnchor="middle" className="ripple-product">
         through-rate: 2 × 3 = 6 pesos per euro, posted before any raise exists
+      </text>
+    </svg>
+  );
+}
+
+// Static diagram: the shared road from z1 to the cost with the four knobs as
+// on-ramps, and the two priced stretches (the deltas) bracketed above it.
+// Draws the blame section's whole idea: entry factors are private, the road
+// is shared, and a shared stretch has one price.
+function RoadDiagram() {
+  const stops = ["z₁", "a₁", "z₂", "a₂", "cost C"];
+  const roadFactors = [
+    { f: "× 0.235", kind: "sig" },
+    { f: "× 2.0", kind: "mult" },
+    { f: "× 0.246", kind: "sig" },
+    { f: "× −0.439", kind: "gap" },
+  ];
+  const BW = 74;
+  const GAP = 56;
+  const X0 = 44;
+  const ROAD_Y = 88; // road box top
+  const BH = 34;
+  const left = (i: number) => X0 + i * (BW + GAP);
+  const cx = (i: number) => left(i) + BW / 2;
+  const bracket = (x1: number, x2: number, y: number, label: string) => (
+    <g key={label}>
+      <path d={`M ${x1} ${y + 6} L ${x1} ${y} L ${x2} ${y} L ${x2} ${y + 6}`} className="road-delta" />
+      <text x={(x1 + x2) / 2} y={y - 6} textAnchor="middle" className="ripple-factor ripple-kind-gap">
+        {label}
+      </text>
+    </g>
+  );
+  // knobs: [label, pill center x, junction stop index, ramp offset, entry factor, factor note]
+  const knobs: [string, number, number, number, string, string][] = [
+    ["w₁", 40, 0, -12, "× 1.0", "the input"],
+    ["b₁", 124, 0, 12, "× 1", ""],
+    ["w₂", 300, 2, -12, "× 0.6225", "a₁"],
+    ["b₂", 384, 2, 12, "× 1", ""],
+  ];
+  return (
+    <svg viewBox="-80 0 780 258" className="chain-ripple"
+         style={{ width: "min(760px, 100%)", margin: "0 auto" }} role="img"
+         aria-label="The road from z1 through a1, z2, a2 to the cost, with knobs w1 and b1 entering at z1 and w2 and b2 entering at z2; delta-A prices the road from z1, delta-B from z2. Green bands group z1 and a1 inside neuron A and z2 and a2 inside neuron B.">
+      <defs>
+        <marker id="road-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6"
+                markerHeight="6" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" className="ripple-head" />
+        </marker>
+      </defs>
+      {bracket(left(0), left(4) + BW, 26, "δ_A = −0.0508: the road from z₁, priced")}
+      {bracket(left(2), left(4) + BW, 52, "δ_B = −0.1081: from z₂")}
+      {/* neuron ownership, matching the ripple log's bands */}
+      {[{ i: 0, label: "inside neuron A" }, { i: 2, label: "inside neuron B" }].map((band) => (
+        <g key={band.label}>
+          <rect x={left(band.i) - 6} y={ROAD_Y - 6} width={2 * BW + GAP + 12} height={BH + 12}
+                rx={9} className="ripple-neuron-band" />
+          <text x={left(band.i) + BW + GAP / 2} y={ROAD_Y - 12} textAnchor="middle"
+                className="ripple-band-label">
+            {band.label}
+          </text>
+        </g>
+      ))}
+      <text x={cx(4)} y={ROAD_Y + BH + 34} textAnchor="middle" className="ripple-why">
+        the scorekeeper
+      </text>
+      {stops.map((s, i) => (
+        <g key={s}>
+          <rect x={left(i)} y={ROAD_Y} width={BW} height={BH} rx={6} className="ripple-box" />
+          <text x={cx(i)} y={ROAD_Y + 22} textAnchor="middle" className="ripple-title">
+            {s}
+          </text>
+        </g>
+      ))}
+      {roadFactors.map((f, i) => (
+        <g key={i}>
+          <line x1={left(i) + BW + 2} y1={ROAD_Y + BH / 2} x2={left(i + 1) - 6} y2={ROAD_Y + BH / 2}
+                className="ripple-arrow" markerEnd="url(#road-head)" />
+          <text x={(left(i) + BW + left(i + 1)) / 2} y={ROAD_Y + BH + 16} textAnchor="middle"
+                className={`ripple-why ripple-kind-${f.kind}`}>
+            {f.f}
+          </text>
+        </g>
+      ))}
+      {knobs.map(([name, px, stop, off, factor, note]) => {
+        const tx = cx(stop) + off;
+        const midX = (px + tx) / 2;
+        const outside = off < 0; // left ramps label to the left, right ramps to the right
+        const anchor = outside ? "end" : "start";
+        const lx = outside ? midX - 8 : midX + 8;
+        return (
+          <g key={name}>
+            <rect x={px - 30} y={186} width={60} height={26} rx={13} className="ripple-box" />
+            <text x={px} y={203} textAnchor="middle" className="ripple-title">{name}</text>
+            <line x1={px} y1={186} x2={tx} y2={ROAD_Y + BH + 24} className="ripple-arrow"
+                  markerEnd="url(#road-head)" />
+            <text x={lx} y={162} textAnchor={anchor} className="ripple-factor ripple-kind-mult">
+              {factor}
+            </text>
+            {note && (
+              <text x={lx} y={176} textAnchor={anchor} className="ripple-why ripple-kind-mult">
+                ({note})
+              </text>
+            )}
+          </g>
+        );
+      })}
+      <text x={350} y={248} textAnchor="middle" className="ripple-product">
+        a knob's slope = its ramp's entry factor × the δ where it joins
+      </text>
+    </svg>
+  );
+}
+
+// Static anatomy chart of the stepper's 2-3-1 network: every symbol from the
+// layer notation placed on the picture, so the stepper's equation cards have
+// a map. Unicode superscripts stand in for the KaTeX forms.
+function NetworkAnatomyDiagram() {
+  const IN = [{ x: 110, y: 105 }, { x: 110, y: 195 }];
+  const HID = [{ x: 330, y: 65 }, { x: 330, y: 150 }, { x: 330, y: 235 }];
+  const OUT = { x: 550, y: 150 };
+  const R = 22;
+  const trim = (a: { x: number; y: number }, b: { x: number; y: number }) => {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const len = Math.hypot(dx, dy);
+    return { x1: a.x + (dx / len) * R, y1: a.y + (dy / len) * R, x2: b.x - (dx / len) * R, y2: b.y - (dy / len) * R };
+  };
+  const colLabels = (
+    x: number,
+    rows: string[],
+  ) => rows.map((t, i) => (
+    <text key={i} x={x} y={286 + i * 16} textAnchor="middle"
+          className={i === 0 ? "bp-name" : "ripple-why"}>
+      {t}
+    </text>
+  ));
+  return (
+    <svg viewBox="0 0 730 330" className="chain-net"
+         style={{ width: "min(730px, 100%)" }} role="img"
+         aria-label="The 2-3-1 network labeled: layer 1 is the input column a1 equals x; layer 2 has three neurons with columns z2, a2, delta2 and biases b2; layer 3 has one neuron with z3, a3, delta3 and bias b3; w2 and w3 are the wire ledgers; the target y and cost C sit outside the network">
+      <text x={110} y={22} textAnchor="middle" className="ripple-band-label">layer 1</text>
+      <text x={330} y={22} textAnchor="middle" className="ripple-band-label">layer 2</text>
+      <text x={550} y={22} textAnchor="middle" className="ripple-band-label">layer 3</text>
+
+      {HID.map((h, j) =>
+        IN.map((inp, k) => {
+          const t = trim(inp, h);
+          return <line key={`w2-${j}${k}`} {...t} className="tiny-net-edge" />;
+        }),
+      )}
+      {HID.map((h, k) => {
+        const t = trim(h, OUT);
+        return <line key={`w3-${k}`} {...t} className="tiny-net-edge" />;
+      })}
+      <text x={220} y={40} textAnchor="middle" className="ripple-factor ripple-kind-mult">
+        w², the wire ledger
+      </text>
+      <text x={220} y={55} textAnchor="middle" className="ripple-why ripple-kind-mult">
+        (3, 2): one entry per wire
+      </text>
+      <text x={440} y={40} textAnchor="middle" className="ripple-factor ripple-kind-mult">
+        w³
+      </text>
+      <text x={440} y={55} textAnchor="middle" className="ripple-why ripple-kind-mult">
+        (1, 3)
+      </text>
+
+      {IN.map((p, i) => (
+        <g key={`in${i}`}>
+          <circle cx={p.x} cy={p.y} r={R} className="tiny-net-input" />
+          <text x={p.x} y={p.y + 5} textAnchor="middle" className="tiny-net-label">
+            {i === 0 ? "x₁" : "x₂"}
+          </text>
+        </g>
+      ))}
+      {HID.map((p, i) => (
+        <g key={`h${i}`}>
+          <circle cx={p.x} cy={p.y} r={R} className="tiny-net-neuron" />
+          <text x={p.x} y={p.y + 5} textAnchor="middle" className="tiny-net-label">
+            {["h₁", "h₂", "h₃"][i]}
+          </text>
+        </g>
+      ))}
+      <circle cx={OUT.x} cy={OUT.y} r={R} className="tiny-net-neuron" />
+      <text x={OUT.x} y={OUT.y + 5} textAnchor="middle" className="tiny-net-label">out</text>
+
+      <line x1={OUT.x + R} y1={OUT.y} x2={618} y2={OUT.y} className="tiny-net-edge" />
+      <text x={626} y={144} className="bp-name">y = 1, the target</text>
+      <text x={626} y={164} className="bp-cost">C = ½ (y − a³)²</text>
+      <text x={626} y={182} className="ripple-why">the scorekeeper</text>
+
+      {colLabels(110, ["the input column", "a¹ = x, shape (2, 1)", "numbers, not neurons"])}
+      {colLabels(330, ["three neurons", "z², a², δ²: columns, (3, 1)", "biases b², (3, 1)"])}
+      {colLabels(550, ["one neuron", "z³, a³, δ³: (1, 1)", "bias b³, (1, 1)"])}
+    </svg>
+  );
+}
+
+// Static diagram: blame collecting at a fork. One hidden neuron feeds two
+// output neurons whose blames are already priced; blame flows backward along
+// each wire multiplied by the wire's weight, the arrivals add, and the
+// neuron's own steepness scales the sum. The upgrade BP2 generalizes.
+function ForkDiagram() {
+  return (
+    <svg viewBox="0 0 640 244" className="chain-net"
+         style={{ width: "min(640px, 100%)" }} role="img"
+         aria-label="A hidden neuron feeds two output neurons with blames −0.10 and +0.08 through wires of weight 4.0 and −4.0; blame flows backward along each wire multiplied by its weight, the arrivals −0.40 and −0.32 add to −0.72, and times the neuron's own steepness 0.15 gives δ = −0.108">
+      <defs>
+        <marker id="fork-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6"
+                markerHeight="6" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" className="fork-head" />
+        </marker>
+      </defs>
+
+      {/* wires, forward */}
+      <line x1={154} y1={107} x2={425} y2={57} className="tiny-net-edge" />
+      <line x1={154} y1={117} x2={425} y2={167} className="tiny-net-edge" />
+      <text x={290} y={79} textAnchor="middle" className="bp-wlabel">w = 4.0</text>
+      <text x={290} y={149} textAnchor="middle" className="bp-wlabel">w = −4.0</text>
+
+      {/* blame, backward */}
+      <line x1={420} y1={38} x2={168} y2={86} className="fork-blame" markerEnd="url(#fork-head)" />
+      <line x1={420} y1={186} x2={168} y2={138} className="fork-blame" markerEnd="url(#fork-head)" />
+      <text x={294} y={44} textAnchor="middle" className="bp-delta">−0.10 × 4.0 = −0.40</text>
+      <text x={294} y={200} textAnchor="middle" className="bp-delta">0.08 × (−4.0) = −0.32</text>
+
+      {/* the hidden neuron */}
+      <text x={130} y={70} textAnchor="middle" className="bp-name">a hidden neuron</text>
+      <circle cx={130} cy={112} r={26} className="tiny-net-neuron" />
+      <text x={130} y={117} textAnchor="middle" className="tiny-net-label">h</text>
+      <text x={130} y={162} textAnchor="middle" className="bp-delta">−0.40 − 0.32 = −0.72</text>
+      <text x={130} y={180} textAnchor="middle" className="bp-delta">× own σ′ 0.15 → δ = −0.108</text>
+
+      {/* the two receivers, blames already priced */}
+      <circle cx={450} cy={52} r={26} className="tiny-net-neuron" />
+      <text x={450} y={57} textAnchor="middle" className="tiny-net-label">out₁</text>
+      <text x={506} y={57} className="bp-delta">δ = −0.10</text>
+      <circle cx={450} cy={172} r={26} className="tiny-net-neuron" />
+      <text x={450} y={177} textAnchor="middle" className="tiny-net-label">out₂</text>
+      <text x={506} y={177} className="bp-delta">δ = +0.08</text>
+
+      <text x={320} y={234} textAnchor="middle" className="ripple-product">
+        rates along a chain multiply; rates of parallel routes add
       </text>
     </svg>
   );
@@ -636,9 +913,28 @@ function ChainRippleDiagram() {
   const X0 = 12;
   const Y0 = 44; // box top
   const BH = 62;
+  const bandLeft = (i: number) => X0 + i * (BW + GAP); // band spans boxes i, i+1
   return (
-    <svg viewBox="0 0 812 182" className="chain-ripple" role="img"
-         aria-label="A +0.01 nudge to w1 ripples through z1, a1, z2, a2 and the cost; each arrow multiplies the change by a local factor, and the product of all five factors is the slope, −0.0508">
+    <svg viewBox="0 0 812 212" className="chain-ripple" role="img"
+         aria-label="A +0.01 nudge to w1 ripples through z1, a1, z2, a2 and the cost; each arrow multiplies the change by a local factor, and the product of all five factors is the slope, −0.0508. Green bands group z1 and a1 inside neuron A and z2 and a2 inside neuron B.">
+      {/* which boxes live inside which neuron: the wiring diagram's circles,
+          unrolled */}
+      {[{ i: 1, label: "inside neuron A" }, { i: 3, label: "inside neuron B" }].map((band) => (
+        <g key={band.label}>
+          <rect x={bandLeft(band.i) - 6} y={Y0 - 6} width={2 * BW + GAP + 12} height={BH + 12}
+                rx={9} className="ripple-neuron-band" />
+          <text x={bandLeft(band.i) + BW + GAP / 2} y={Y0 + BH + 40} textAnchor="middle"
+                className="ripple-band-label">
+            {band.label}
+          </text>
+        </g>
+      ))}
+      <text x={X0 + BW / 2} y={Y0 + BH + 40} textAnchor="middle" className="ripple-why">
+        the knob you moved
+      </text>
+      <text x={X0 + 5 * (BW + GAP) + BW / 2} y={Y0 + BH + 40} textAnchor="middle" className="ripple-why">
+        the scorekeeper
+      </text>
       {boxes.map((b, i) => {
         const x = X0 + i * (BW + GAP);
         return (
@@ -680,7 +976,7 @@ function ChainRippleDiagram() {
           <path d="M 0 0 L 8 4 L 0 8 z" className="ripple-head" />
         </marker>
       </defs>
-      <text x={406} y={174} textAnchor="middle" className="ripple-product">
+      <text x={406} y={202} textAnchor="middle" className="ripple-product">
         slope for w₁ = 1.0 × 0.235 × 2.0 × 0.246 × (−0.439) = −0.0508
       </text>
     </svg>

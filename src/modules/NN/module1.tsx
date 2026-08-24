@@ -1,4 +1,4 @@
-import { AfterThis, Aside, Figure, Recap } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { ExercisePage } from "../../components/ExercisePage";
 import { sigmoidNeuronExercise } from "../../exercises/sigmoid-neuron";
@@ -18,6 +18,7 @@ export function Module1() {
           "See exactly where one neuron hits a wall, and how stacking neurons breaks through it.",
         ]}
       />
+      <ModuleToc />
 
       <p>
         Start with the problem this whole course is about. Computers are superb at
@@ -32,6 +33,7 @@ export function Module1() {
         smallest part.
       </p>
 
+      <SectionHeader id="m1-neuron" title="A neuron is a weighted decision" />
       <p>
         That smallest part is a neuron, and it is just a weighted decision. Suppose
         you are deciding whether to go to an outdoor concert, and three yes-or-no
@@ -59,6 +61,7 @@ export function Module1() {
         numbers, and learning will mean adjusting those numbers.
       </p>
 
+      <SectionHeader id="m1-line" title="A neuron is a line" />
       <p>
         Now a picture, and it comes straight out of numbers you can compute by hand.
         Stay with the concert, but keep only two facts so we can draw them: the
@@ -91,6 +94,7 @@ export function Module1() {
         course.
       </p>
 
+      <SectionHeader id="m1-learning" title="Learning: place the line" />
       <p>
         So far you picked the weights and read off the verdicts. Learning runs the
         other way around: you are handed situations whose correct answers are
@@ -140,6 +144,7 @@ export function Module1() {
         </p>
       </Aside>
 
+      <SectionHeader id="m1-xor" title="XOR, the wall" />
       <p>
         The third dataset belongs to the contrarian. They go out exactly when one
         thing is good but not both: good weather alone, sure; friend in bad weather,
@@ -172,6 +177,7 @@ export function Module1() {
         answer was not a smarter neuron. It was neurons feeding other neurons.
       </p>
 
+      <SectionHeader id="m1-sigmoid" title="The sigmoid upgrade" />
       <p>
         Before stacking them, one upgrade to the neuron itself. Learning, remember,
         will mean nudging weights a little and checking whether the answers improve.
@@ -201,6 +207,7 @@ export function Module1() {
         from here on is a sigmoid neuron.
       </p>
 
+      <SectionHeader id="m1-network" title="Three neurons beat XOR" />
       <p>
         Now the stacking. If one neuron is one line, use three neurons. Wire them
         like this:
@@ -219,7 +226,12 @@ export function Module1() {
         is to choose: <M tex="h_1" /> has two weights and a bias, <M tex="h_2" />{" "}
         has two weights and a bias, and the output neuron has two weights (one per
         report it listens to) and a bias. Three neurons, three numbers each: nine
-        numbers, and they are this network's entire personality.
+        numbers, and they are this network's entire personality. One bookkeeping
+        note: the diagram put each weight on a wire, while this count filed them
+        with neurons, and both are right, because a weight belongs to the pair:
+        one weight per wire into a neuron. The wire is where its multiplication
+        happens; the neuron is where the arrivals get added, together with the
+        one number that is truly the neuron's own, its bias.
       </p>
       <p>
         Here is one way to set the nine numbers, in words first. Make{" "}
@@ -268,6 +280,7 @@ export function Module1() {
         <XorNetwork />
       </Figure>
 
+      <SectionHeader id="m1-code" title="Build it in code" />
       <p>
         Time to build the neuron in code, using NumPy, the Python library for
         arrays of numbers. Everything in this exercise uses five ideas:

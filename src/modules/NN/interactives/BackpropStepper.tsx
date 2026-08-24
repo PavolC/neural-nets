@@ -59,7 +59,7 @@ const STEPS: Step[] = [
       `every one of the 13 knobs is about to be judged by how it moves this.`,
   },
   {
-    title: "BP1: blame starts at the output",
+    title: "Blame starts at the output",
     tex: "\\delta^3 = (a^3 - y) \\odot \\sigma'(z^3)",
     gloss: (t) =>
       `Gap ${fmt(t.a3[0] - 1)} times σ′(z³) = ${fmt(t.a3[0] * (1 - t.a3[0]))} gives ` +
@@ -67,7 +67,7 @@ const STEPS: Step[] = [
       `just one). Negative blame reads: raising this neuron's evidence would lower the cost.`,
   },
   {
-    title: "BP2: blame flows backward",
+    title: "Blame flows backward",
     tex: "\\delta^2 = \\big((w^3)^T \\delta^3\\big) \\odot \\sigma'(z^2)",
     gloss: (t) =>
       `Each hidden neuron receives δ³ scaled by its outgoing wire, then multiplies by its own σ′: ` +
@@ -75,7 +75,7 @@ const STEPS: Step[] = [
       `the same wires read backward. Watch h₂: its wire is negative, so blame arrives sign-flipped.`,
   },
   {
-    title: "BP3 and BP4: every slope, read off",
+    title: "Every slope, read off",
     tex: "\\frac{\\partial C}{\\partial b^l} = \\delta^l, \\qquad \\frac{\\partial C}{\\partial w^l} = \\delta^l (a^{l-1})^T",
     gloss: () =>
       "All 13 slopes at once (∂C/∂b is read as one name: the slope of C per nudge of b, Module 3's " +

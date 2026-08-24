@@ -1,4 +1,4 @@
-import { AfterThis, Figure, Recap } from "../../components/ModuleBits";
+import { AfterThis, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { ExercisePage } from "../../components/ExercisePage";
 import { backpropExercise } from "../../exercises/backprop";
@@ -15,7 +15,9 @@ export function Module5() {
           "Train the 784-30-10 digit reader end to end with your own code, and price what the old way would have cost.",
         ]}
       />
+      <ModuleToc />
 
+      <SectionHeader id="m5-plan" title="The deliverable" />
       <p>
         Module 4 worked out how to get every slope from one forward pass and one
         backward sweep of blame, exact instead of estimated, and wrote the method
@@ -34,6 +36,7 @@ export function Module5() {
         real.
       </p>
 
+      <SectionHeader id="m5-cost" title="One example at a time" />
       <p>
         One design decision before the code: backprop handles a single training
         example per call. Module 3's cost averaged over a batch of examples, and
@@ -56,6 +59,7 @@ export function Module5() {
         misses.
       </p>
 
+      <SectionHeader id="m5-lines" title="Four equations, four lines" />
       <p>
         Here are the four equations again, in the order the code meets them:
       </p>
@@ -103,6 +107,7 @@ export function Module5() {
         </tbody>
       </table>
 
+      <SectionHeader id="m5-receipts" title="Keep receipts" />
       <p>
         The one genuinely new implementation idea is bookkeeping: keep receipts.
         BP1 needs the output layer's <M tex="z" />, BP2 needs every earlier{" "}
@@ -129,8 +134,10 @@ export function Module5() {
         <ReceiptsDiagram />
       </Figure>
 
+      <SectionHeader id="m5-exercise" title="Write backprop" />
       <ExercisePage exercise={backpropExercise} />
 
+      <SectionHeader id="m5-train" title="The real training run" />
       <p>
         Now the run this course has been pointing at since Module 2. The network
         is 784-30-10: Module 2's diagram used 15 hidden neurons so the circles

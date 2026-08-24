@@ -1685,3 +1685,98 @@ footer a {
 .module-aside .module-figure {
   margin: 0.9rem 0 0.4rem;
 }
+
+/* Section headers inside modules, and the floating on-this-page nav. */
+.module-section-title {
+  font-size: 1.15rem;
+  margin: 2.6rem 0 0.6rem;
+  scroll-margin-top: 18px;
+}
+
+.module-toc {
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 18px;
+  width: 190px;
+  font-family: system-ui, sans-serif;
+}
+
+/* The toc lives in the right gutter beside the 920px column; below this
+   width there is no gutter, so it hides rather than overlap the prose. */
+@media (max-width: 1359px) {
+  .module-toc {
+    display: none;
+  }
+}
+
+.module-toc-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.4rem;
+}
+
+.module-toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid var(--rule);
+}
+
+.module-toc-item {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.35;
+  padding: 0.22rem 0 0.22rem 0.7rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.module-toc-item:hover {
+  color: var(--ink);
+}
+
+.module-toc-active {
+  color: var(--accent);
+  font-weight: 600;
+  box-shadow: inset 2px 0 0 var(--accent);
+}
+
+/* The road diagram's delta brackets (module 4). */
+.road-delta {
+  stroke: var(--loss);
+  stroke-width: 1.4;
+  fill: none;
+}
+
+/* Neuron-ownership bands on the ripple log: which boxes live inside which
+   neuron, tying the unrolled log back to the wiring diagram. */
+.ripple-neuron-band {
+  fill: rgba(11, 110, 79, 0.055);
+  stroke: rgba(11, 110, 79, 0.28);
+  stroke-width: 1;
+}
+
+.ripple-band-label {
+  font-size: 11.5px;
+  fill: var(--accent);
+}
+
+/* The fork diagram's backward blame arrows (module 4). */
+.fork-blame {
+  stroke: var(--loss);
+  stroke-width: 1.6;
+  stroke-dasharray: 5 4;
+  fill: none;
+}
+
+.fork-head {
+  fill: var(--loss);
+}

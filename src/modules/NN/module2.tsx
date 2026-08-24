@@ -1,4 +1,4 @@
-import { AfterThis, Aside, Figure, Recap } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { ExercisePage } from "../../components/ExercisePage";
 import { feedforwardExercise } from "../../exercises/feedforward";
@@ -16,7 +16,9 @@ export function Module2() {
           "Run your own feedforward on real MNIST digits and watch it read them.",
         ]}
       />
+      <ModuleToc />
 
+      <SectionHeader id="m2-layer" title="A layer is one formula" />
       <p>
         Module 1 ended with three neurons wired into a network, and one phrase did
         the heavy lifting: <M tex="h_1" /> and <M tex="h_2" /> both read the same two
@@ -54,6 +56,7 @@ export function Module2() {
         numbers to put in the <M tex="W" />'s and <M tex="b" />'s.
       </p>
 
+      <SectionHeader id="m2-shapes" title="Shape discipline" />
       <p>
         The shapes deserve slow reading, because nearly every bug you will
         write in this course is a shape bug. NumPy describes every array by its
@@ -70,7 +73,11 @@ export function Module2() {
         One warning on top of that, because everyone trips here once: the shape
         names the receiving layer first. Data may flow from 2 inputs to 1 neuron,
         but that layer's matrix is <M tex="(1, 2)" />: rows first, and the rows
-        belong to the layer being computed. The payoff is that multiplication just
+        belong to the layer being computed. Said with Module 1's anatomy,{" "}
+        <M tex="W" /> is the layer's wire ledger: the entry in row j, column k is
+        the weight on the wire from input k to neuron j, so a row collects one
+        neuron's incoming wires, and a column collects one input's outgoing
+        wires. The payoff is that multiplication just
         works, by the rule that the inner numbers must touch: <M tex="(1, 2)" />{" "}
         times <M tex="(2, 1)" /> works because 2 meets 2, and the outer numbers,{" "}
         <M tex="(1, 1)" />, are the answer's shape. With columns everywhere,{" "}
@@ -92,6 +99,7 @@ export function Module2() {
         </p>
       </Aside>
 
+      <SectionHeader id="m2-digits" title="A digit is 784 numbers" />
       <p>
         Time to leave four-dot toy worlds. The real task of this course is reading
         handwritten digits from MNIST, a classic collection of 70,000 of them
@@ -106,6 +114,7 @@ export function Module2() {
         <PixelsInteractive />
       </Figure>
 
+      <SectionHeader id="m2-design" title="The 784-15-10 design" />
       <p>
         What about the other end? Give the network ten output neurons, one per
         digit, each answering its own yes-or-no question: is this a 0? is this a 1?
@@ -147,12 +156,14 @@ export function Module2() {
         training will have arranged for the digit classes to finally be separable.
       </p>
 
+      <SectionHeader id="m2-weights" title="What learned weights look like" />
       <p>
         The network below has already been trained for you (86% test accuracy; the
         network you train in Module 5 does better), so you can study what learned
         numbers actually look
         like. Focus on a single hidden neuron. It works like every neuron so far:
-        784 weights, one per pixel, and its evidence rises when ink lands on pixels
+        784 incoming wires, one per pixel, each carrying its weight, and its
+        evidence rises when ink lands on pixels
         where its weight is positive, falls when ink lands where its weight is
         negative. (You have met a negative weight before: the output neuron's{" "}
         <M tex="-8" /> in the XOR network, the veto.) Now use the fact that each of
@@ -168,6 +179,7 @@ export function Module2() {
         <NetworkDiagram />
       </Figure>
 
+      <SectionHeader id="m2-code" title="Implement feedforward" />
       <p>
         Now implement feedforward yourself; the exercise below spells out the plan
         and the two NumPy tools it needs. When the tests pass, come back up to the

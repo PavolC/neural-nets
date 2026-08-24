@@ -143,6 +143,16 @@ this floor after direct feedback; every later module must be written to it too.
   wonder about, state it where they will wonder: the XOR playground's dots ARE
   the contrarian's dataset; "Show a solution" sets exactly the table's numbers,
   with h1 as the at-least-one detector.
+- **One anatomy, stated everywhere ownership comes up.** Weights live on wires
+  (exactly one per wire into a neuron: the wire is where the multiplication
+  happens); biases live in neurons (the adding, the bias, and the squash are
+  the neuron's own). The matrix W is the wire ledger: row = one neuron's
+  incoming wires, column = one input's outgoing wires, transpose = regroup by
+  sender. A weight plays two roles depending on what wiggles: booth for
+  changes passing through, knob when nudged itself. The learner asked "why is
+  the weight on the wire and not the neuron?"; any prose that files weights
+  with neurons (counts, matrix rows) must reconcile against this anatomy in
+  place.
 - **Mind vocabulary collisions.** "Line" means the decision boundary in this
   course; never reuse it for an equation or a row of code. Prefer short
   sentences over connective-heavy ones; wordiness reads as weirdness.
@@ -229,6 +239,12 @@ this floor after direct feedback; every later module must be written to it too.
   immediately after it.
 - Each module opens with "What you'll be able to do after this" (2-3 items) and closes
   with a recap and a "Go deeper" link to the corresponding Nielsen chapter.
+- Module bodies are broken into sections with <SectionHeader id title /> markers
+  (ids unique across modules, prefixed "m4-"), and each module mounts <ModuleToc />
+  once after its AfterThis block: a floating on-this-page nav in the right gutter
+  (self-hides on narrow screens) that discovers that module's headers from the DOM
+  and scrollspies them. Section titles are short noun phrases, 5-8 sections per
+  module.
 
 ### Register: plotted, narrator muted (adopted after Module 4; applies to all modules)
 
