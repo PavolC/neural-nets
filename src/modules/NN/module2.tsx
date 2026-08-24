@@ -37,7 +37,7 @@ export function Module2() {
       />
       <p>
         Call the matrix <M tex="W" />, stack the biases into a column{" "}
-        <M tex="b" />, and a whole layer of neurons becomes one line:
+        <M tex="b" />, and a whole layer of neurons becomes one formula:
       </p>
       <Eq
         tex="a' = \sigma(W a + b)"
@@ -55,7 +55,7 @@ export function Module2() {
       </p>
 
       <p>
-        The shapes deserve one careful paragraph, because nearly every bug you will
+        The shapes deserve slow reading, because nearly every bug you will
         write in this course is a shape bug. NumPy describes every array by its
         shape, written as a pair: <M tex="(m, n)" /> means <M tex="m" /> rows and{" "}
         <M tex="n" /> columns. In the worked example, two neurons reading two
@@ -64,16 +64,18 @@ export function Module2() {
         shape <M tex="(m, n)" />, and activations are always columns, shape{" "}
         <M tex="(n, 1)" />, never flat: Module 1's trailing-comma rule stands, and
         it matters more here, because a flat array in a matrix product misbehaves
-        silently instead of failing loudly. One warning,
-        because everyone trips here once: the shape names the receiving layer
-        first. Data may flow from 2 inputs to 1 neuron, but that layer's matrix is{" "}
-        <M tex="(1, 2)" />: rows first, and the rows belong to the layer being
-        computed. The payoff is that multiplication just works, by the rule that
-        the inner numbers must touch: <M tex="(1, 2)" /> times <M tex="(2, 1)" />{" "}
-        works because 2 meets 2, and the outer numbers, <M tex="(1, 1)" />, are
-        the answer's shape. With columns everywhere, <M tex="Wa" /> is{" "}
-        <M tex="(m, 1)" />, the biases are <M tex="(m, 1)" />, and everything adds
-        up cleanly. Here is the whole contract as a picture:
+        silently instead of failing loudly.
+      </p>
+      <p>
+        One warning on top of that, because everyone trips here once: the shape
+        names the receiving layer first. Data may flow from 2 inputs to 1 neuron,
+        but that layer's matrix is <M tex="(1, 2)" />: rows first, and the rows
+        belong to the layer being computed. The payoff is that multiplication just
+        works, by the rule that the inner numbers must touch: <M tex="(1, 2)" />{" "}
+        times <M tex="(2, 1)" /> works because 2 meets 2, and the outer numbers,{" "}
+        <M tex="(1, 1)" />, are the answer's shape. With columns everywhere,{" "}
+        <M tex="Wa" /> is <M tex="(m, 1)" />, the biases are <M tex="(m, 1)" />,
+        and everything adds up cleanly. Here is the whole contract as a picture:
       </p>
       <Figure caption="How the shapes lock together. Teal is the input side: W is n wide because a is n tall, one weight per input, and the two must match or the multiply is impossible. Purple is the neuron side: W has m rows, so Wa, b, and a' are all m tall, one entry per neuron. The shaded strip shows one neuron's whole story: its row of W, times all of a, plus its own bias entry, becomes its entry of a'. For Module 2's hidden layer, m = 15 and n = 784.">
         <ShapesDiagram />
@@ -134,10 +136,11 @@ export function Module2() {
         dots scattered through it, exactly like the four dots in the plane, and
         each hidden neuron still makes one straight cut through the space, yes on
         one side, no on the other; it just takes 784 weights to aim the cut. Then
-        the re-description move happens again: the hidden layer's 15 outputs are
-        themselves a list of 15 numbers, a new point in a new, much smaller space
-        (in Module 1, the hidden pair turned each input point into a new
-        two-number point; same move, bigger). The output layer's ten neurons never
+        comes the move Module 1's hidden pair made, turning each input point into
+        a new point built from its reports; the move deserves a name,
+        re-description, because it happens in every network: the hidden layer's 15
+        outputs are themselves a list of 15 numbers, a new point in a new, much
+        smaller space. The output layer's ten neurons never
         see pixels at all: they make their ten cuts in that 15-axis space, where
         training will have arranged for the digit classes to finally be separable.
       </p>
@@ -175,7 +178,7 @@ export function Module2() {
 
       <Recap
         items={[
-          "A layer is several neurons reading the same inputs; stack their weight rows into W and the layer is one line: a' = sigmoid(Wa + b).",
+          "A layer is several neurons reading the same inputs; stack their weight rows into W and the layer is one formula: a' = sigmoid(Wa + b).",
           "W has one row per neuron and one column per input, shape (m, n); activations stay columns, and one layer's output column is the next layer's input.",
           "A digit image is already numbers: a 28x28 grid of ink levels, unrolled into a (784, 1) column; ten output confidences, and the answer is the largest.",
           "Your feedforward plus trained weights already reads digits; learning the 11,935 numbers yourself is Modules 3 to 5.",

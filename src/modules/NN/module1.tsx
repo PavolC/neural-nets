@@ -47,7 +47,7 @@ export function Module1() {
       </p>
       <Eq
         tex="z = w_1 x_1 + w_2 x_2 + \cdots + w_n x_n + b"
-        gloss="Multiply each input by its weight, add all of it up, then add the bias; the bias is just the threshold in disguise, so that 'clears the threshold' becomes simply z > 0."
+        gloss="Multiply each input by its weight, add all of it up, then add the bias. The running total z is the neuron's evidence (the points for and against, netted), and the bias is just the threshold in disguise, so that 'clears the threshold' becomes simply z > 0."
       />
       <p>
         That multiply-each-pair-then-add-everything operation comes up so often that
@@ -249,8 +249,8 @@ export function Module1() {
       <p>
         The playground below is this exact network, all nine numbers on sliders,
         and the four dots are the contrarian's dataset from above, the same four
-        situations no single line could split. It is laid out as three sections,
-        one per stage of the pipeline, each with its own key. The one idea to
+        situations no single line could split. It is laid out as three phases,
+        matching the section titles inside it, each with its own key. The one idea to
         carry in: the combined verdict is phase 2 looked up at each point's
         reports, so the hidden sliders decide where inputs land, and the output
         sliders decide what landing there means. Press "Show a solution" (exactly
@@ -260,7 +260,7 @@ export function Module1() {
         it. Getting all four dots right by hand is fiddly; Module 3 is about
         making the computer do the fiddling.
       </p>
-      <Figure caption="The 2-2-1 network in three sections, one per stage: the hidden layer's cuts and report-tints in input space, with its six sliders; hidden space, where reports are coordinates and the output neuron cuts once, with its three; and the combined verdict, which is phase 2 looked up for every input.">
+      <Figure caption="The 2-2-1 network in three phases: the hidden layer's cuts and report-tints in input space, with its six sliders; hidden space, where reports are coordinates and the output neuron cuts once, with its three; and the combined verdict, which is phase 2 looked up for every input.">
         <XorNetwork />
       </Figure>
 
@@ -296,7 +296,7 @@ np.exp(-2.0)    # e^(-2); given an array, it does every entry at once`}</pre>
           "Learning means adjusting numbers until answers match examples, not writing rules.",
           "A neuron computes sigmoid(w . x + b): multiply each input by its weight, add, add the bias, squash smoothly into (0, 1).",
           "With two inputs, a neuron is a straight line on graph paper: that is why XOR, whose classes sit on crossing diagonals, defeats any single neuron.",
-          "Hidden neurons re-describe the input, and a straight cut in their re-description can look bent in the original space.",
+          "Hidden neurons turn each input into a pair of reports, and one straight cut among the reports can look bent back in the input picture.",
         ]}
         chapter="Chapter 1 (perceptrons and sigmoid neurons)"
         href="http://neuralnetworksanddeeplearning.com/chap1.html"
