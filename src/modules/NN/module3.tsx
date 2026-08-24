@@ -77,13 +77,21 @@ export function Module3() {
         smears the measurement over a stretch of hillside, while a smaller one reads
         the slope right under your feet. We used 0.01 to keep the numbers readable;
         the course's gradient helper, which you will meet in the exercise, nudges by
-        0.00001.)
+        0.00001. It also nudges to both sides, once down and once up, and reads the
+        slope between the two measurements, which centers the reading on the exact
+        spot where you stand; your version read between -2.00 and -1.99, so it sat a
+        half-nudge to one side. Either way, one slope costs two cost measurements.)
       </p>
       <p>
         Every knob answers this same question, and you can put it to all nine below.
         The curve is the real cost of this network as one chosen knob moves, the
         other eight frozen at their start values; the tilted segment through the
-        ball is the slope you would measure at that spot.
+        ball is the slope you would measure at that spot. Each knob still has the
+        geometric job Module 1 gave it: a hidden neuron's weights tilt its line, its
+        bias slides the line, and the output neuron's knobs re-blend the two
+        half-planes into the shaded go region. So each curve below is one of those
+        motions, scored: how the total mismatch between the shading and the four
+        dots changes as that one line tilts, slides, or re-blends.
       </p>
       <Figure caption="The cost along one knob at a time; the nine knobs are grouped by the neuron they belong to, as in Module 1's sliders. Pick a knob, drag its slider; the gray dot marks the start value from the prose, and switching knobs puts the previous one back. On the output neuron's bias at -2.00 the readout shows the 0.0876 and -0.044 you computed by hand. Try the output neuron's weight from h2: its curve is nearly level, a knob that barely matters right now.">
         <CostVsKnob />
@@ -117,14 +125,28 @@ export function Module3() {
         drops from 0.08758 to 0.0799. That is one step of gradient descent, and
         training a network is repeating it.
       </p>
+      <p>
+        Why repeat, instead of reading each knob's best value straight off its chart
+        above? Because every curve was drawn with the other eight knobs frozen. The
+        moment any knob moves, all the other curves are redrawn and their old bottoms
+        stop being true; each neuron's best setting depends on what the rest are
+        doing, as Module 1's playground made visible. Try the shortcut anyway: jump
+        all nine knobs to the bottoms of their current curves at once, and the cost
+        lands at 0.1665, nearly double the 0.0876 you started from, because all nine
+        jumps broke each other's assumptions. A slope is a compass, not a map: it
+        says which way is downhill from where you stand, nothing more. So descent
+        inches all the knobs forward together, re-measures everything, and inches
+        again.
+      </p>
 
       <p>
-        Play with this rule before you code it. Below is the simplest possible landscape:
-        not a network, just one made-up knob w whose cost is w times w, a single bowl.
-        Watch how the steps shrink by themselves as the ball nears the bottom. That is
-        the rule working: each step is the learning rate times the slope, and the
-        slope shrinks as the ground flattens. Then push the learning rate up and watch
-        the walk fall apart.
+        In the nine charts above, you turned the knobs yourself. Below, the rule does
+        the turning. The landscape is made up, one knob w whose cost is w times w,
+        and made up on purpose: it is far steeper than any of the nine real curves,
+        and it keeps rising forever, so the rule's failure modes have room to show.
+        Press Step and watch the walk. Each step is the learning rate times the
+        slope, so the steps shrink by themselves as the ball nears the flat bottom.
+        Then push the learning rate up and watch the same rule fall apart.
       </p>
       <Figure caption="Gradient descent on a bowl. Below roughly 0.5 the ball settles; above it the ball overshoots the bottom and bounces between the walls; past 1.0 each bounce is bigger than the last.">
         <Descent1D />
@@ -145,19 +167,33 @@ export function Module3() {
       </Figure>
 
       <p>
-        One more idea and you can build it. Look at what one score costs. Scoring the
-        XOR network meant feeding it 4 examples, the corners of the truth table.
-        Scoring the digit reader the same way means feeding it the whole digit
-        training set, and the standard one holds 50,000 images (Module 5 trains on a
-        slice of it). Every score is a full pass over every example, and the recipe
-        above wants fresh scores all the time: nudge a knob, rescore, for every knob,
-        on every step. The expensive part of learning is how many examples every
-        single score has to look at.
+        One more idea and you can build it. Look at what one step of descent costs.
+        Every slope needs the cost measured twice (once for each side of the nudge),
+        every cost measurement is a full pass over the dataset, and every example in
+        that pass is one complete trip through the network. For the XOR network that
+        multiplies out to nine knobs, times two rescores each, times four corners per
+        rescore: 72 trips per step, nothing. Now price the digit reader, whose
+        training set is the standard 50,000 images (Module 5 trains on a slice of
+        it):
       </p>
+      <Eq
+        tex="\underbrace{11{,}935}_{\text{knobs}} \times \underbrace{2}_{\text{rescores per slope}} \times \underbrace{50{,}000}_{\text{trips per rescore}} = 1{,}193{,}500{,}000 \text{ trips}"
+        gloss="About 1.2 billion complete runs of the network to move every knob once, and training takes thousands of such steps. Three factors multiply: knobs, rescores per knob, and examples per rescore. The last is the biggest and the easiest to attack."
+      />
       <p>
         Stochastic gradient descent saves exactly that expense ("stochastic" is just
         an older word for random). Do not score against all the examples: grab a small
         random handful of them, called a mini-batch, and score against the handful.
+        To be clear about what shrinks: nothing about the network. Every neuron and
+        every weight still runs on each example you do look at, and the scoring
+        recipe is unchanged; only the averaging gets shorter. With a mini-batch of
+        10, the digit reader's step bill becomes:
+      </p>
+      <Eq
+        tex="\underbrace{11{,}935}_{\text{knobs}} \times \underbrace{2}_{\text{rescores per slope}} \times \underbrace{10}_{\text{trips per rescore}} = 238{,}700 \text{ trips}"
+        gloss="Same first two factors: SGD does not touch the cost of measuring slopes, it only shrinks the crowd, and the step gets five thousand times cheaper. The 11,935 times 2 that remains is the factor backpropagation removes, in Modules 4 and 5."
+      />
+      <p>
         The handful's verdict about which way is downhill is only roughly right, but
         it costs a tiny fraction of a full pass. Take the slightly wrong step, grab a
         fresh handful, repeat. Each step is noisy, and you can afford vastly more of
