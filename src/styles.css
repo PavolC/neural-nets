@@ -74,6 +74,8 @@ button:disabled {
   gap: 0.5rem;
   margin-top: 1.25rem;
   border-bottom: 1px solid var(--rule);
+  overflow-x: auto;
+  scrollbar-width: thin;
 }
 
 .tab {
@@ -85,6 +87,8 @@ button:disabled {
   padding: 0.4rem 0.2rem;
   margin-right: 0.8rem;
   font-size: 1rem;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .tab-active {
@@ -385,6 +389,10 @@ button:disabled {
   margin: 0.8rem auto;
   font-size: 0.9rem;
   font-family: system-ui, sans-serif;
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 .truth-table th,
