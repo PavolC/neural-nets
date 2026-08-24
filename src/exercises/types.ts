@@ -10,6 +10,9 @@ export interface Exercise {
   skeleton: string;
   tests: string;
   solution: string;
+  /** A test whose pass deserves a prominent banner (Module 5's gradient
+   * check is the course's flagship correctness guarantee). */
+  flagship?: { test: string; note: string };
   /** Three-stage reveal: [conceptual nudge, pseudocode/structure]. Stage 3
    * is the full solution above. */
   hints: [string, string];

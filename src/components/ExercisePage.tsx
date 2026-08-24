@@ -235,7 +235,7 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
           </div>
         )}
 
-        {result && <TestResults result={result} />}
+        {result && <TestResults result={result} flagship={exercise.flagship} />}
       </div>
 
       <details className="demo-log tests-viewer">
@@ -298,7 +298,13 @@ function PlaySnippet({ code, onAppend }: { code: string; onAppend: () => void })
   );
 }
 
-function TestResults({ result }: { result: TestRunResult }) {
+function TestResults({
+  result,
+  flagship,
+}: {
+  result: TestRunResult;
+  flagship?: { test: string; note: string };
+}) {
   if (result.setup_error) {
     const { message, line } = result.setup_error;
     return (
@@ -317,6 +323,8 @@ function TestResults({ result }: { result: TestRunResult }) {
     );
   }
   const passedCount = result.tests.filter((t) => t.passed).length;
+  const flagshipPassed =
+    flagship && result.tests.some((t) => t.name === flagship.test && t.passed);
   return (
     <div className="test-results">
       <p className={result.passed ? "test-summary test-summary-pass" : "test-summary"}>
@@ -324,6 +332,7 @@ function TestResults({ result }: { result: TestRunResult }) {
           ? "All tests passed."
           : `${passedCount} of ${result.tests.length} tests passed.`}
       </p>
+      {flagshipPassed && <p className="flagship-banner">{flagship.note}</p>}
       {result.tests.map((t) => (
         <div key={t.name} className={`test-result ${t.passed ? "test-pass" : "test-fail"}`}>
           <span className="test-mark">{t.passed ? "✓" : "✗"}</span>

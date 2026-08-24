@@ -254,6 +254,18 @@ button:disabled {
   font-weight: bold;
 }
 
+/* Prominent success state for an exercise's flagship test (Module 5's
+   gradient check; see the design doc's exercise/test contract). */
+.flagship-banner {
+  border: 2px solid var(--acc);
+  border-radius: 8px;
+  background: #eef7f2;
+  color: var(--ink);
+  padding: 0.8rem 1rem;
+  margin: 0.6rem 0 0.8rem;
+  font-size: 0.95rem;
+}
+
 .test-result {
   display: flex;
   gap: 0.6rem;

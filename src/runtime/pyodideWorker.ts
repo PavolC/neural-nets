@@ -151,6 +151,7 @@ async function runTests(msg: Extract<WorkerRequest, { type: "runTests" }>): Prom
 
 async function runPython(msg: Extract<WorkerRequest, { type: "runPython" }>): Promise<void> {
   const pyodide = await getPyodide();
+  if (msg.dataUrl) await fetchDataset(pyodide, msg.dataUrl);
   pyodide.globals.set("_args_json", JSON.stringify(msg.args ?? null));
   pyodide.globals.set("_js_report", (payloadJson: string) =>
     post({ type: "report", id: msg.id, payload: JSON.parse(payloadJson) }),

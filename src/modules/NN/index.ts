@@ -4,6 +4,7 @@ import { Module1 } from "./module1";
 import { Module2 } from "./module2";
 import { Module3 } from "./module3";
 import { Module4 } from "./module4";
+import { Module5 } from "./module5";
 
 export interface ModuleDef {
   id: string;
@@ -20,6 +21,7 @@ export const MODULES: ModuleDef[] = [
   // Module 4 deliberately has no exercise (a quiz instead), so it gates
   // nothing beyond what Module 3's exercise already gates.
   { id: "m4", navLabel: "4 · Backprop", exerciseIds: [], Component: Module4 },
+  { id: "m5", navLabel: "5 · Training", exerciseIds: ["backprop"], Component: Module5 },
 ];
 
 /** A module unlocks when every exercise of every earlier module has passed.

@@ -15,8 +15,10 @@ export type WorkerRequest =
   | { type: "runTests"; id: number; learnerCode: string; testsCode: string }
   // First-party Python snippets from interactives. The snippet reads its
   // input by json.loads(_args_json), may stream progress via
-  // _js_report(json_string), and must evaluate to a JSON string.
-  | { type: "runPython"; id: number; code: string; args?: unknown };
+  // _js_report(json_string), and must evaluate to a JSON string. When
+  // dataUrl is set, the MNIST subset is fetched first and written to
+  // /mnist_subset.bin before the snippet runs.
+  | { type: "runPython"; id: number; code: string; args?: unknown; dataUrl?: string };
 
 export interface EpochMetrics {
   epoch: number;
