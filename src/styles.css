@@ -1617,3 +1617,24 @@ footer a {
   padding: 0.5rem 0.7rem;
   margin: 0.3rem 0 0.2rem;
 }
+
+/* The two-neuron chain wiring diagram (module 4). */
+.chain-net {
+  display: block;
+  width: min(580px, 100%);
+  margin: 0 auto;
+}
+
+/* The ripple diagram's factor kinds (module 4): purple = a multiplication
+   passing changes through, green = sigmoid steepness, red = the gap. */
+.ripple-kind-mult {
+  fill: #6a4fa3;
+}
+
+.ripple-kind-sig {
+  fill: var(--accent);
+}
+
+.ripple-kind-gap {
+  fill: var(--loss);
+}

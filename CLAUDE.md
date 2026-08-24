@@ -161,6 +161,13 @@ this floor after direct feedback; every later module must be written to it too.
   that amount") floats past this learner; prediction-against-a-log lands. Run
   checks in the multiplying direction (factor times change = next change), not
   the dividing direction.
+- **Teach kinds, not instances.** When several facts repeat one pattern (Module
+  4's five ripple factors), position-by-position derivations read as N separate
+  proofs and lose the learner even when each line checks out. Instead: name the
+  pattern once, framed in a concept already taught ("every factor is a slope,
+  Module 3's kind of number"), sort the instances into their few kinds, and give
+  each kind one plain-words why plus an extreme case (x = 0: the nudge dies
+  here). Color-code the kinds in the figure so the picture carries the grouping.
 - **Multi-factor arithmetic never sits inline.** Chains like 0.235 x 2.0 x
   (-0.108) inside a sentence are the densest thing on a page. Put them in
   display math with \underbrace labels naming each factor, or in a small table

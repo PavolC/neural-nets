@@ -33,16 +33,30 @@ export function Module4() {
       <p>
         Numbers first, sized for by-hand. Take the smallest network that has
         something hidden inside it: a chain of two neurons, call them A and B.
-        Neuron A reads a single input <M tex="x = 1.0" /> with weight{" "}
-        <M tex="w_1 = 1.0" /> and bias <M tex="b_1 = -0.5" />; its confidence is
-        the only input to neuron B (weight <M tex="w_2 = 2.0" />, bias{" "}
-        <M tex="b_2 = -1.0" />), whose confidence is the network's answer. The
-        right answer for this example is <M tex="y = 1" />. Run it forward, exactly
-        Module 2's arithmetic:
+        Neuron A reads the lone input; neuron B reads only A's report and gives
+        the network's answer. Here is the whole thing, every knob in view:
+      </p>
+      <Figure caption="The worked example, drawn like Module 1's diagrams: gray is the input (a number, not a neuron), each green circle is one sigmoid neuron. Four knobs in total: one weight on each of the two wires, one bias inside each neuron.">
+        <ChainNetDiagram />
+      </Figure>
+      <p>
+        Module 2 wrote a whole layer as <M tex="a' = \sigma(Wa + b)" />. Both of
+        this chain's layers are one neuron wide, so each symbol shrinks from a
+        column to a single number and keeps its usual name: a neuron totals its
+        evidence <M tex="z" /> (Module 1's multiply-and-add) and reports its
+        confidence <M tex="a = \sigma(z)" />. Subscripts number the position along
+        the chain: neuron A turns the input <M tex="x" /> into <M tex="z_1" /> and{" "}
+        <M tex="a_1" /> using its knobs <M tex="w_1" /> and <M tex="b_1" />, and
+        neuron B turns <M tex="a_1" /> into <M tex="z_2" /> and <M tex="a_2" />{" "}
+        using <M tex="w_2" /> and <M tex="b_2" />. One habit to unlearn: in
+        Module 1, <M tex="w_1" /> and <M tex="w_2" /> were two weights into the
+        same neuron, numbered by input; here each neuron has one weight, so the
+        subscript numbers the neuron instead. The right answer for this example is{" "}
+        <M tex="y = 1" />. Run it forward:
       </p>
       <Eq
         tex="\begin{aligned} z_1 &= 1.0 \times 1.0 - 0.5 = 0.5, & a_1 &= \sigma(0.5) = 0.6225, \\ z_2 &= 2.0 \times 0.6225 - 1.0 = 0.2449, & a_2 &= \sigma(0.2449) = 0.5609 \end{aligned}"
-        gloss="Each neuron does what every neuron has done since Module 1: multiply-and-add for its evidence z, sigmoid for its confidence a. Neuron B's input is neuron A's confidence."
+        gloss="Neuron A first, then neuron B, which reads A's confidence 0.6225 as its only input. Your sigmoid from Module 1 can confirm every entry."
       />
       <p>
         The answer should have been 1. Score it with Module 3's quadratic cost,
@@ -61,27 +75,46 @@ export function Module4() {
         between <M tex="w_1" /> and the cost, and each of them moved. The picture
         below is that log. In every box: the value before and after the nudge, and
         the change in parentheses. On every arrow: a factor, and the claim that
-        each change is the previous change times that factor. The next three
-        paragraphs say where each factor comes from; check each one against the log
-        as you go (the last digit drifts by one here and there, because the log is
+        each change is the previous change times that factor. Where the factors
+        come from is next, one kind at a time; check each against the log as you
+        go (the last digit drifts by one here and there, because the log is
         rounded to five decimals).
       </p>
-      <Figure caption="The nudge's whole path. w1 moves by +0.01, and the change ripples through z1, a1, z2, a2 into the cost, multiplied at every arrow by that arrow's local factor. The product of all five factors is the slope of the cost for w1.">
+      <Figure caption="The nudge's whole path. w1 moves by +0.01, and the change ripples through z1, a1, z2, a2 into the cost, multiplied at every arrow by that arrow's local factor. The colors group the factors by kind: purple factors are multiplications passing a change through scaled (the input, the wire), green are sigmoid's steepness where each neuron sits, red is the gap at the cost. The product of all five factors is the slope of the cost for w1.">
         <ChainRippleDiagram />
       </Figure>
 
       <p>
-        The first factor is the input. <M tex="z_1 = w_1 x + b_1" />, and{" "}
-        <M tex="x" /> is 1.0, so when <M tex="w_1" /> moves by 0.01,{" "}
-        <M tex="z_1" /> moves by <M tex="1.0 \times 0.01 = 0.0100" />. (Had the
-        input been 0.5, only half the nudge would have gotten through: the factor
-        is whatever the knob gets multiplied by.)
+        First, what kind of number a factor is, because it is not a new kind.
+        Every arrow answers the same question: when the number at my tail wiggles
+        a little, how much does the number at my head wiggle? That is a slope,
+        exactly the kind of number Module 3 measured (wiggle the input, watch the
+        output, divide). Module 3 measured one long slope, from a knob all the way
+        to the cost, by rerunning the whole network. The picture chops that long
+        trip into five short hops and gives each hop its own little slope. Five
+        factors, but only three kinds, and the picture colors them to match.
       </p>
       <p>
-        The second factor is sigmoid's own slope. When <M tex="z_1" /> moves a
-        little, <M tex="a_1" /> moves by however steep sigmoid is at that spot:
-        the responsiveness you watched in Module 1's slider, strong near the
-        middle, flat once the neuron is sure. That slope has a shorthand,{" "}
+        The purple factors sit where something gets multiplied. <M tex="z_1" /> is
+        a total, and <M tex="w_1" /> enters it multiplied by the input (that is
+        what <M tex="z_1 = w_1 x + b_1" /> says), so <M tex="w_1" />'s changes get
+        multiplied by the input too. Concretely: at <M tex="x = 1.0" />, nudging{" "}
+        <M tex="w_1" /> from 1.00 to 1.01 moves the product from 1.000 to 1.010,
+        the whole nudge; at <M tex="x = 0.5" /> the product would move half as
+        far; at <M tex="x = 0" />, not at all, and <M tex="w_1" /> would be a knob
+        that changes nothing. The wire from A to B is the same situation one hop
+        later: <M tex="a_1" /> enters <M tex="z_2" /> multiplied by{" "}
+        <M tex="w_2 = 2.0" />, so <M tex="a_1" />'s wiggle of 0.00235 lands on{" "}
+        <M tex="z_2" /> doubled: <M tex="2.0 \times 0.00235 = 0.00470" />, matching
+        the log. The rule for this kind: your changes are scaled by whatever you
+        are multiplied by.
+      </p>
+      <p>
+        The green factors are the two sigmoids, and their answer is Module 1's
+        slider. How much a neuron's confidence moves when its evidence moves
+        depends on where the neuron currently sits on the curve: eager on the
+        steep middle, nearly deaf out on the flat ends. The factor is the
+        steepness at that exact spot. Steepness has a shorthand,{" "}
         <M tex="\sigma'(z)" /> (the tick mark is read "prime" and means "the slope
         of"), and a convenient formula:
       </p>
@@ -91,37 +124,41 @@ export function Module4() {
       />
       <p>
         You do not have to take the formula on faith; it is checkable the Module 3
-        way (nudge <M tex="z" />, divide). At <M tex="z_1 = 0.5" /> it says{" "}
+        way (wiggle <M tex="z" />, divide). Neuron A sits at <M tex="z_1 = 0.5" />,
+        near the steep middle, so the formula gives a healthy{" "}
         <M tex="0.6225 \times 0.3775 = 0.235" />, and the log agrees:{" "}
         <M tex="0.235 \times 0.0100 = 0.00235" />, exactly <M tex="a_1" />'s
-        change.
+        change. Neuron B sits at <M tex="z_2 = 0.2449" />, also near the middle:
+        steepness <M tex="0.5609 \times 0.4391 = 0.246" />, and the log agrees
+        again, <M tex="0.246 \times 0.00470 = 0.00116" />. (Had either neuron been
+        far out on a flat end, its factor would be near zero, and the nudge would
+        die right there.)
       </p>
       <p>
-        The third factor is the wire. <M tex="z_2 = w_2 a_1 + b_2" />, so{" "}
-        <M tex="a_1" />'s change rides through multiplied by <M tex="w_2 = 2.0" />:
-        that predicts <M tex="2.0 \times 0.00235 = 0.00470" />, matching the log.
-        The fourth is sigmoid again, at neuron B's own evidence:{" "}
-        <M tex="\sigma'(0.2449) = 0.5609 \times 0.4391 = 0.246" />, predicting{" "}
-        <M tex="a_2" />'s change of 0.00115.
-      </p>
-      <p>
-        The fifth and last factor is the gap, and it arrives with a flip worth
-        noticing. Module 3 wrote gaps as right answer minus output; the slope comes
-        out the other way around, output minus right answer:{" "}
-        <M tex="a_2 - y = 0.5609 - 1 = -0.4391" />. The cost itself cannot tell the
-        two apart, since squaring erases the sign, but slopes keep their signs, and
-        this direction is the one every later formula uses. The rule, on the same
-        checkable terms as sigmoid's formula: the slope of{" "}
-        <M tex="\tfrac12(\text{gap})^2" /> is <M tex="a_2 - y" />, the gap itself.
-        (This is what the half in Module 3's cost was for: squaring puts a factor
-        of 2 into the slope, and the half cancels it, leaving the gap alone.)
+        The red factor belongs to the cost, and its size is the current miss.
+        Think about when a wiggle in the output matters. If the output already
+        sits on its target, wiggling it barely changes the squared miss; if the
+        output is badly wrong, the same wiggle moves the squared miss a lot. So
+        the factor is the gap itself, and it arrives with a flip worth noticing:
+        Module 3 wrote gaps as right answer minus output, but the slope comes out
+        the other way around, output minus right answer,{" "}
+        <M tex="a_2 - y = 0.5609 - 1 = -0.4391" />. The sign carries the
+        direction: this output sits below its target, so raising it closes the
+        miss and the cost falls, a negative factor. Squaring erases the sign, so
+        the cost itself cannot tell the two directions apart, but slopes can, and
+        output minus right answer is the convention every later formula uses.
+        (The half in Module 3's cost pays off here: squaring would put a factor
+        of 2 into this slope, and the half cancels it, leaving the gap alone.)
         Against the log: <M tex="-0.439 \times 0.00116 = -0.00051" />, the cost's
         change exactly.
       </p>
       <p>
-        Now stack the five predictions. Each change was the previous change times a
-        factor, so the final change is the original nudge times all five factors
-        multiplied together, and the slope is just those factors:
+        Now put the hops back together. The nudge to <M tex="w_1" /> becomes a
+        wiggle in <M tex="z_1" /> (× 1.0), which becomes a wiggle in{" "}
+        <M tex="a_1" /> (× 0.235), then in <M tex="z_2" /> (× 2.0), then in{" "}
+        <M tex="a_2" /> (× 0.246), then in the cost (× −0.439). Each hop
+        multiplies by its own little slope, so the whole trip multiplies by all
+        five:
       </p>
       <Eq
         tex="1.0 \times 0.2350 \times 2.0 \times 0.2463 \times (-0.4391) = -0.0508"
@@ -212,7 +249,9 @@ export function Module4() {
         layers 1, 2, 3 (inputs, hidden, output) and hang the layer number on each
         symbol as a superscript, so <M tex="a^2" /> is the hidden layer's column
         of activations, <M tex="w^2" /> the weight matrix into it, and{" "}
-        <M tex="\delta^2" /> its column of blames, one entry per neuron. The
+        <M tex="\delta^2" /> its column of blames, one entry per neuron. (The
+        chain's subscripts counted single neurons; superscripts count layers, and
+        each symbol is a whole column or matrix again.) The
         superscript is a label, never a power; nothing here is squared. Count the
         knobs, like the 11,935:
       </p>
@@ -320,6 +359,61 @@ export function Module4() {
   );
 }
 
+// Static wiring diagram of the two-neuron chain worked in the prose, in the
+// visual language of Module 1's TinyNetDiagram: gray input, green neurons,
+// every knob labeled in place.
+function ChainNetDiagram() {
+  const IN = { x: 70, y: 95 };
+  const A = { x: 230, y: 95 };
+  const B = { x: 390, y: 95 };
+  const R = 22;
+  const wire = (x1: number, x2: number, key: string) => (
+    <line
+      key={key}
+      x1={x1} y1={95} x2={x2} y2={95}
+      className="tiny-net-edge" markerEnd="url(#chain-arrow)"
+    />
+  );
+  return (
+    <svg viewBox="0 0 580 160" className="chain-net" role="img"
+         aria-label="A chain: input x feeds neuron A through weight w1, neuron A feeds neuron B through weight w2, and neuron B's confidence is the answer, compared against the target y = 1">
+      <defs>
+        <marker id="chain-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7"
+                markerHeight="7" orient="auto-start-reverse">
+          <path d="M 0 0 L 8 4 L 0 8 z" className="tiny-net-arrowhead" />
+        </marker>
+      </defs>
+      {wire(IN.x + R, A.x - R - 6, "xa")}
+      {wire(A.x + R, B.x - R - 6, "ab")}
+      {wire(B.x + R, 452, "bout")}
+      <text x={(IN.x + A.x) / 2} y={86} textAnchor="middle" className="bp-wlabel">
+        w₁ = 1.0
+      </text>
+      <text x={(A.x + B.x) / 2} y={86} textAnchor="middle" className="bp-wlabel">
+        w₂ = 2.0
+      </text>
+
+      <circle cx={IN.x} cy={IN.y} r={R} className="tiny-net-input" />
+      <text x={IN.x} y={IN.y + 5} textAnchor="middle" className="tiny-net-label">x</text>
+      <text x={IN.x} y={48} textAnchor="middle" className="tiny-net-caption">the input</text>
+      <text x={IN.x} y={140} textAnchor="middle" className="tiny-net-caption">= 1.0</text>
+
+      <circle cx={A.x} cy={A.y} r={R} className="tiny-net-neuron" />
+      <text x={A.x} y={A.y + 5} textAnchor="middle" className="tiny-net-label">A</text>
+      <text x={A.x} y={48} textAnchor="middle" className="tiny-net-caption">computes z₁, reports a₁</text>
+      <text x={A.x} y={140} textAnchor="middle" className="tiny-net-caption">b₁ = −0.5</text>
+
+      <circle cx={B.x} cy={B.y} r={R} className="tiny-net-neuron" />
+      <text x={B.x} y={B.y + 5} textAnchor="middle" className="tiny-net-label">B</text>
+      <text x={B.x} y={48} textAnchor="middle" className="tiny-net-caption">computes z₂, reports a₂</text>
+      <text x={B.x} y={140} textAnchor="middle" className="tiny-net-caption">b₂ = −1.0</text>
+
+      <text x={462} y={90} className="tiny-net-label">a₂, the answer</text>
+      <text x={462} y={112} className="tiny-net-caption">should be y = 1</text>
+    </svg>
+  );
+}
+
 // Static diagram: the logged ripple of the +0.01 nudge to w1 through the
 // two-neuron chain worked in the prose. Each box shows a quantity's value
 // before and after the nudge (change in parentheses); each arrow carries the
@@ -333,12 +427,15 @@ function ChainRippleDiagram() {
     { title: "a₂", value: "0.5609 → 0.5621", change: "(+0.00116)" },
     { title: "cost C", value: "0.09639 → 0.09589", change: "(−0.00051)" },
   ];
+  // kind groups the arrows for the prose's three explanations:
+  // mult = a multiplication passes the change through scaled,
+  // sig = sigmoid's steepness where the neuron sits, gap = the current miss.
   const factors = [
-    { f: "× 1.0", why: "the input x" },
-    { f: "× 0.235", why: "σ′ at z₁" },
-    { f: "× 2.0", why: "the wire w₂" },
-    { f: "× 0.246", why: "σ′ at z₂" },
-    { f: "× −0.439", why: "the gap" },
+    { f: "× 1.0", why: "the input x", kind: "mult" },
+    { f: "× 0.235", why: "σ′ at z₁", kind: "sig" },
+    { f: "× 2.0", why: "the wire w₂", kind: "mult" },
+    { f: "× 0.246", why: "σ′ at z₂", kind: "sig" },
+    { f: "× −0.439", why: "the gap", kind: "gap" },
   ];
   const BW = 110; // box width
   const GAP = 26; // arrow length between boxes
@@ -372,10 +469,12 @@ function ChainRippleDiagram() {
         return (
           <g key={i}>
             <line x1={x1 + 2} y1={y} x2={x2 - 6} y2={y} className="ripple-arrow" markerEnd="url(#ripple-head)" />
-            <text x={(x1 + x2) / 2} y={Y0 - 14} textAnchor="middle" className="ripple-factor">
+            <text x={(x1 + x2) / 2} y={Y0 - 14} textAnchor="middle"
+                  className={`ripple-factor ripple-kind-${f.kind}`}>
               {f.f}
             </text>
-            <text x={(x1 + x2) / 2} y={Y0 + BH + 22} textAnchor="middle" className="ripple-why">
+            <text x={(x1 + x2) / 2} y={Y0 + BH + 22} textAnchor="middle"
+                  className={`ripple-why ripple-kind-${f.kind}`}>
               {f.why}
             </text>
           </g>
