@@ -16,15 +16,15 @@ export function Module4() {
       />
 
       <p>
-        Module 3's method has a cost worth stating exactly. Each knob's slope came
-        from nudging that one knob and rerunning the whole network on the batch,
-        twice: two full runs per slope. On the toy network's 33 knobs that was
-        affordable. On the digit reader from Module 2, with its 11,935 weights and
-        biases, one training step costs 23,870 full runs, and almost all of that
-        work is redundant: each run recomputes every neuron in the network to answer
-        a question about a single knob. Backpropagation removes the redundancy. One
-        forward pass, plus one backward sweep of comparable price, produces every
-        slope, all 11,935 of them, exact rather than nudge-and-divide estimates.
+        Module 3 ended with a bill and a factor it could not remove. Mini-batches
+        shrank the crowd of examples, but every training step still pays 11,935
+        times 2: each knob's slope needs the cost measured twice (the both-sides
+        nudge), each measurement is a full pass over the mini-batch, and that is
+        23,870 passes per step. Almost all of the work is redundant: every pass
+        recomputes every neuron in the network to answer a question about a single
+        knob. Backpropagation removes the redundancy. One forward pass, plus one
+        backward sweep of comparable price, produces every slope, all 11,935 of
+        them, exact rather than nudge-and-divide estimates.
         This module explains how; Module 5 is where you implement it. There is no
         code here, just a worked example, a visualization you can step through, the
         four equations, and a quiz.
@@ -45,12 +45,14 @@ export function Module4() {
         gloss="Each neuron does what every neuron has done since Module 1: multiply-and-add for its evidence z, sigmoid for its confidence a. Neuron B's input is neuron A's confidence."
       />
       <p>
-        The answer should have been 1, so the cost (Module 3's quadratic score, on
-        this one example) is <M tex="C = \tfrac12 (1 - 0.5609)^2 = 0.0964" />. Now
-        ask Module 3's question about the farthest knob, <M tex="w_1" />, and answer
-        it Module 3's way. Nudge <M tex="w_1" /> from 1.00 to 1.01, rerun
-        everything, and the cost comes back lower: 0.0959. Slope: change over
-        nudge, about <M tex="-0.050" />. Two full runs, one slope, same as always.
+        The answer should have been 1. Score it with Module 3's quadratic cost,
+        which with a single example (<M tex="n = 1" />) reduces to{" "}
+        <M tex="C = \tfrac12 (1 - 0.5609)^2 = 0.0964" />. Now ask Module 3's
+        question about the farthest knob, <M tex="w_1" />, and answer it Module 3's
+        way. Nudge <M tex="w_1" /> from 1.00 to 1.01, rerun everything, and the
+        cost comes back lower: 0.0959. Slope: change over nudge,{" "}
+        <M tex="(0.0959 - 0.0964) / 0.01 \approx -0.050" />. Two cost measurements,
+        one slope, same as always.
       </p>
 
       <p>
@@ -100,13 +102,21 @@ export function Module4() {
         that predicts <M tex="2.0 \times 0.00235 = 0.00470" />, matching the log.
         The fourth is sigmoid again, at neuron B's own evidence:{" "}
         <M tex="\sigma'(0.2449) = 0.5609 \times 0.4391 = 0.246" />, predicting{" "}
-        <M tex="a_2" />'s change of 0.00115. The fifth and last factor is the gap.
-        The cost is half the gap squared, and its slope formula comes on the same
-        checkable terms as sigmoid's: the slope of <M tex="\tfrac12(\text{gap})^2" />{" "}
-        is the gap itself, here <M tex="a_2 - y = -0.4391" /> (this is what the half
-        in Module 3's cost was for: squaring puts a factor of 2 into the slope, and
-        the half cancels it, leaving only the gap). Against the log:{" "}
-        <M tex="-0.439 \times 0.00116 = -0.00051" />, the cost's change exactly.
+        <M tex="a_2" />'s change of 0.00115.
+      </p>
+      <p>
+        The fifth and last factor is the gap, and it arrives with a flip worth
+        noticing. Module 3 wrote gaps as right answer minus output; the slope comes
+        out the other way around, output minus right answer:{" "}
+        <M tex="a_2 - y = 0.5609 - 1 = -0.4391" />. The cost itself cannot tell the
+        two apart, since squaring erases the sign, but slopes keep their signs, and
+        this direction is the one every later formula uses. The rule, on the same
+        checkable terms as sigmoid's formula: the slope of{" "}
+        <M tex="\tfrac12(\text{gap})^2" /> is <M tex="a_2 - y" />, the gap itself.
+        (This is what the half in Module 3's cost was for: squaring puts a factor
+        of 2 into the slope, and the half cancels it, leaving the gap alone.)
+        Against the log: <M tex="-0.439 \times 0.00116 = -0.00051" />, the cost's
+        change exactly.
       </p>
       <p>
         Now stack the five predictions. Each change was the previous change times a
@@ -121,7 +131,8 @@ export function Module4() {
         The nudge measurement said <M tex="-0.050" />, and the product says{" "}
         <M tex="-0.0508" />. They agree, and the product is the exact one: the
         nudge method approximates, because it uses a small step where the true
-        slope wants a vanishingly small one. The multiply-the-local-slopes rule is
+        slope wants a vanishingly small one, the smearing Module 3's aside
+        described. The multiply-the-local-slopes rule is
         called the chain rule, and it is the only piece of mathematics
         backpropagation needs. The rest of the algorithm is arranging the
         multiplications so that no factor is ever computed twice.
@@ -235,11 +246,14 @@ export function Module4() {
         Those six steps are the whole algorithm, at any network size. Written down,
         they are the four equations of backpropagation, numbered BP1 to BP4 after
         Nielsen's Chapter 2, whose framing this module adapts; every symbol in them
-        appeared on the cards you just stepped through. One bookkeeping note before
+        appeared on the cards you just stepped through. Two bookkeeping notes before
         reading them: in the chain, blames wore neuron names (<M tex="\delta_A" />,{" "}
         <M tex="\delta_B" />); in layer language, <M tex="\delta^2" /> is a whole
         column of blames at once, one entry per neuron of layer 2, and{" "}
-        <M tex="L" /> names the last layer (3 in the stepper).
+        <M tex="L" /> names the last layer (3 in the stepper). And the input column
+        doubles as layer 1's activations, <M tex="a^1 = x" />: not neurons, just
+        the numbers the first layer of weights multiplies, which is what BP4 reads
+        when <M tex="l" /> is 2.
       </p>
       <Eq
         tex="\delta^L = (a^L - y) \odot \sigma'(z^L) \tag{BP1}"
@@ -278,11 +292,11 @@ export function Module4() {
       <DeltaQuiz />
 
       <p>
-        The tally, one last time, at the digit reader's scale. Module 3's method
-        needs two full network runs per knob per training step: 23,870 forward
-        passes to take one step downhill. The four equations need one forward pass,
+        The bill, one last time, at the digit reader's scale. Nudge-measured
+        gradients pay two cost measurements per knob per step: 23,870 passes over
+        the batch to walk downhill once. The four equations pay one forward pass,
         plus one backward sweep that touches each neuron and each weight about
-        once, roughly the price of a second forward pass. Two passes against
+        once, roughly the price of a second pass. Two passes against
         twenty-four thousand: about ten thousand times cheaper, and exact instead
         of estimated. That is why backpropagation, and not a faster computer, is
         what made neural networks trainable. In Module 5 you implement BP1 through
@@ -294,7 +308,7 @@ export function Module4() {
 
       <Recap
         items={[
-          "Backprop answers 'which way should each knob move' with one forward pass and one backward sweep of blame, instead of two full reruns per knob, and its answers are exact.",
+          "Backprop answers 'which way should each knob move' with one forward pass and one backward sweep of blame, instead of two cost measurements per knob, and its answers are exact.",
           "A nudge's effect on the cost is the product of the local factors along its path (the chain rule); a neuron's blame delta is the shared part of those products, computed once per neuron.",
           "The four equations: blame starts at the output as gap times sigma-prime (BP1), flows backward through the transposed wires (BP2), every bias's slope is its neuron's blame (BP3), and every weight's slope is blame times the activation its wire carried (BP4).",
           "A saturated neuron has sigma-prime near zero and soaks up almost no blame even when badly wrong: quadratic cost's weakness, and Module 7's opening problem.",

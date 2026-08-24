@@ -39,7 +39,7 @@ const STEPS: Step[] = [
     title: "Forward: the hidden layer",
     tex: "z^2 = w^2 x + b^2, \\qquad a^2 = \\sigma(z^2)",
     gloss: (t) =>
-      `Three multiply-adds at once (Module 2's one line), then sigmoid on each entry: ` +
+      `Three multiply-adds at once (Module 2's Wa + b), then sigmoid on each entry: ` +
       `h₁: z = ${fmt(t.z2[0])} → a = ${fmt(t.a2[0])}; ` +
       `h₂: z = ${fmt(t.z2[1])} → a = ${fmt(t.a2[1])}; ` +
       `h₃: z = ${fmt(t.z2[2])} → a = ${fmt(t.a2[2])}.`,
