@@ -306,6 +306,7 @@ export function BackpropStepper() {
       </svg>
 
       <div className="bp-lower">
+        <div className="bp-table-scroll">
         <table className="bp-table">
           <thead>
             <tr>
@@ -337,6 +338,7 @@ export function BackpropStepper() {
             </tr>
           </tbody>
         </table>
+        </div>
 
         <div className="bp-param">
           {sel === null || selValue === null ? (

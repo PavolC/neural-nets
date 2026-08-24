@@ -681,8 +681,11 @@ button:disabled {
 }
 
 .xor-chart {
+  /* Fixed basis (wrap depends on window width, never content); max-width
+     lets the chart scale down instead of clipping when the column is
+     narrower than the basis. */
   flex: 0 0 300px;
-  max-width: 300px;
+  max-width: 100%;
 }
 
 .xor-phase-controls {
@@ -781,6 +784,9 @@ button:disabled {
   border-radius: 6px;
   margin: 0 0 0.6rem;
   padding: 0.3rem 0.8rem 0.55rem;
+  /* Fieldsets default to min-inline-size: min-content, which blocks the
+     slider rows inside from shrinking on narrow screens. */
+  min-width: 0;
 }
 
 .xor-phase-controls legend {
@@ -798,6 +804,9 @@ button:disabled {
   font-family: system-ui, sans-serif;
   color: var(--muted);
   margin: 0.15rem 0;
+  /* As a flex item (e.g. inside .interactive-controls), allow the whole row
+     to shrink below the range input's intrinsic width on narrow screens. */
+  min-width: 0;
 }
 
 .slider-row span {
@@ -1460,11 +1469,18 @@ footer a {
   margin-top: 0.4rem;
 }
 
+/* The value table is wider than a phone screen (four columns with fixed
+   minimum widths); scroll it sideways instead of clipping. */
+.bp-table-scroll {
+  flex: 0 0 auto;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
 .bp-table {
   border-collapse: collapse;
   font-family: system-ui, sans-serif;
   font-size: 0.85rem;
-  flex: 0 0 auto;
 }
 
 .bp-table th,
