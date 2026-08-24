@@ -869,6 +869,35 @@ button:disabled {
   stroke: #d17a22;
 }
 
+/* The measured-slope segment in the cost-vs-knob chart. */
+.tangent {
+  stroke: #d17a22;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+}
+
+/* Knob picker in the cost-vs-knob chart: one row per neuron, with a
+   fixed-basis group label so the chips align across rows. */
+.knob-picker {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.4rem;
+}
+
+.knob-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.knob-group-label {
+  flex: 0 0 9.5em;
+  font-family: system-ui, sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
 .swatch-batch {
   fill: var(--acc);
 }

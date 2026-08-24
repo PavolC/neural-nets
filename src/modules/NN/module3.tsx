@@ -2,6 +2,7 @@ import { AfterThis, Figure, Recap } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { ExercisePage } from "../../components/ExercisePage";
 import { sgdExercise } from "../../exercises/sgd";
+import { CostVsKnob } from "./interactives/CostVsKnob";
 import { Descent1D, Descent2D } from "./interactives/DescentPlayground";
 import { BatchVsSgd } from "./interactives/BatchVsSgd";
 import { SgdLivePanel } from "./interactives/SgdLivePanel";
@@ -21,18 +22,29 @@ export function Module3() {
       <p>
         So far the weights were given. Learning means finding them, and the first step
         is admitting you need a score. Here is a network to score: the little
-        three-neuron network that beat XOR in Module 1 (two hidden neurons, one output
-        neuron, nine numbers in total), with its numbers set where that module's
-        sliders start: hidden weights all 2, hidden biases -1 and -3, output weights 4
-        and -4, output bias -2. Feed it the four corners of the contrarian's truth
-        table (your own feedforward from Module 2 can confirm this) and it answers
-        0.247, 0.462, 0.462, 0.247. The right answers are 0, 1, 1, 0. Score it the
-        obvious way: take each gap between right answer and output, square it so a
-        miss in either direction counts against you, and average over the corners:
+        three-neuron network that beat XOR in Module 1 (two hidden neurons h1 and h2,
+        one output neuron, nine numbers in total), with its numbers set where that
+        module's sliders start: hidden weights all 2, hidden biases -1 and -3, output
+        weights 4 and -4, output bias -2. Ask it about good weather alone, the corner
+        (1, 0), by running the two layers the way your feedforward from Module 2 does:
+      </p>
+      <Eq
+        tex="\begin{aligned} h_1 &= \sigma(2 \cdot 1 + 2 \cdot 0 - 1) = \sigma(1) = 0.731 \\ h_2 &= \sigma(2 \cdot 1 + 2 \cdot 0 - 3) = \sigma(-1) = 0.269 \\ \text{output} &= \sigma(4 \cdot 0.731 - 4 \cdot 0.269 - 2) = \sigma(-0.152) = 0.462 \end{aligned}"
+        gloss="sigma is the sigmoid from Module 1, and each line is one neuron doing the usual move: multiply each input by its weight, add everything up including the bias, squash. The two hidden neurons read the corner's inputs 1 and 0; the output neuron reads their confidences 0.731 and 0.269."
+      />
+      <p>
+        The right answer on (1, 0) is 1, and the network says 0.462: just under one
+        half, leaning stay when it should say go. The other corners run the same
+        way, and your own feedforward can confirm each one. (0, 1) also gives 0.462,
+        because both inputs carry the same weight 2. (0, 0) and (1, 1) each work out
+        to 0.247. So the four answers are 0.247, 0.462, 0.462, 0.247, against the
+        right answers 0, 1, 1, 0. Score it the obvious way: take each gap between
+        right answer and output, square it so a miss in either direction counts
+        against you, and average over the corners:
       </p>
       <Eq
         tex="C = \frac{\underbrace{(0 - 0.247)^2}_{(0,0)\text{, stay}} + \underbrace{(1 - 0.462)^2}_{(1,0)\text{, go}} + \underbrace{(1 - 0.462)^2}_{(0,1)\text{, go}} + \underbrace{(0 - 0.247)^2}_{(1,1)\text{, stay}}}{2 \times 4} = \frac{0.700}{8} \approx 0.0875"
-        gloss="One term per corner of the truth table: the squared gaps are 0.061, 0.289, 0.289 and 0.061, which sum to 0.700. The 4 below the line is the number of examples (an average, so a bigger dataset does not automatically score worse); the extra 2 is a convention that makes later math tidier."
+        gloss="One term per corner of the truth table: the squared gaps are 0.061, 0.289, 0.289 and 0.061, which sum to 0.700. The 4 below the line is the number of examples (an average, so a bigger dataset does not automatically score worse). The extra 2 is a bookkeeping choice with a delayed payoff: in Module 4 it will make the cost's slope work out to exactly the gap between right answer and output, with no stray factor of 2."
       />
       <p>
         One number for the whole network: 0.0875. Lower is better, and a perfect
@@ -41,7 +53,7 @@ export function Module3() {
       </p>
       <Eq
         tex="C(w, b) = \frac{1}{2n} \sum_x \lVert y(x) - a(x) \rVert^2"
-        gloss="For each training input x, compare the desired output y(x) with the network's actual output a(x): the double bars squared mean take the gap in every output entry, square each gap, and add them up. Average that over all n examples, with the same tidiness half as above."
+        gloss="For each training input x, compare the desired output y(x) with the network's actual output a(x): the double bars squared mean take the gap in every output entry, square each gap, and add them up. Average that over all n examples, with the same bookkeeping half as above."
       />
       <p>
         You scored one particular choice of the nine numbers. But nothing stops you
@@ -49,27 +61,62 @@ export function Module3() {
         score for that version of the network too. Learning is now a search problem:
         out of all possible settings of the nine knobs, find the one with the
         smallest cost. (The knobs, all the weights and biases together, get their
-        proper name here: the network's parameters.) The way in is a question you can ask of each knob
-        separately: if I nudge this one knob a tiny bit, does the cost go up or down,
-        and how steeply? Try it on the network just scored. Keeping two more decimals,
-        its cost is 0.08758. Nudge the output bias up by 0.01, from -2.00 to -1.99,
-        and rescore everything: 0.08714. Divide the change in cost by the size of the
+        proper name here: the network's parameters.)
+      </p>
+      <p>
+        The way in is a question you can ask of each knob separately: if I nudge this
+        one knob a tiny bit, does the cost go up or down, and how steeply? Try it on
+        the network just scored. Keeping two more decimals, its cost is 0.08758.
+        Nudge the output bias up by 0.01, from -2.00 to -1.99, and change nothing
+        else: the other eight numbers stay exactly where they are. Recompute the cost
+        over the four corners: 0.08714. Divide the change in cost by the size of the
         nudge: (0.08714 - 0.08758) / 0.01, about -0.044. That number is the knob's
-        slope, the same m as in
-        y = mx + c, measured at the point where you currently stand. Its minus sign
-        says the cost falls when this knob goes up. The nudge size is a free choice
-        with a trade-off: the ground curves, so a big nudge smears the measurement
-        over a stretch of hillside, while a smaller one reads the slope right under
-        your feet. We used 0.01 to keep the numbers readable; the course's gradient
-        helper, which you will meet in the exercise, nudges by 0.00001. The full list
-        of slopes, one per knob, is called the gradient and written{" "}
-        <M tex="\nabla C" />. It points the
-        way the cost rises fastest, so to descend, step every knob the other way:
+        slope, the same m as in y = mx + c, measured at the point where you currently
+        stand. Its minus sign says the cost falls when this knob goes up. (The nudge
+        size is a free choice with a trade-off: the ground curves, so a big nudge
+        smears the measurement over a stretch of hillside, while a smaller one reads
+        the slope right under your feet. We used 0.01 to keep the numbers readable;
+        the course's gradient helper, which you will meet in the exercise, nudges by
+        0.00001.)
+      </p>
+      <p>
+        Every knob answers this same question, and you can put it to all nine below.
+        The curve is the real cost of this network as one chosen knob moves, the
+        other eight frozen at their start values; the tilted segment through the
+        ball is the slope you would measure at that spot.
+      </p>
+      <Figure caption="The cost along one knob at a time; the nine knobs are grouped by the neuron they belong to, as in Module 1's sliders. Pick a knob, drag its slider; the gray dot marks the start value from the prose, and switching knobs puts the previous one back. On the output neuron's bias at -2.00 the readout shows the 0.0876 and -0.044 you computed by hand. Try the output neuron's weight from h2: its curve is nearly level, a knob that barely matters right now.">
+        <CostVsKnob />
+      </Figure>
+      <p>
+        Now repeat this for each of the nine knobs, always putting the previous knob
+        back before nudging the next. Nine measurements, nine slopes. That full list,
+        one slope per knob, is called the gradient and written <M tex="\nabla C" />.
+        For this network, at this exact setting of the knobs, it comes out as:
+      </p>
+      <Eq
+        tex="\nabla C = (\underbrace{-0.024,\; -0.024,\; -0.041}_{\text{h1's knobs}},\; \underbrace{0.017,\; 0.017,\; 0.041}_{\text{h2's knobs}},\; \underbrace{-0.035,\; -0.009,\; -0.044}_{\text{output's knobs}})"
+        gloss="Nine slopes, three per neuron in the interactive's order: each neuron's two weights then its bias, h1 first, the output neuron last. The final entry is the -0.044 you measured on the output bias. A different setting of the knobs would give a different list: the gradient is a local reading, taken where you stand."
+      />
+      <p>
+        Read the signs. Six slopes are negative: for those knobs the cost falls when
+        the knob goes up, so they should be pushed up. Three are positive (the second
+        hidden neuron's two weights and its bias): for those the cost falls when the
+        knob goes down. One formula handles both directions at once: subtract each
+        slope from its knob. Subtracting a negative slope pushes the knob up,
+        subtracting a positive one pushes it down; either way, downhill:
       </p>
       <Eq
         tex="w \leftarrow w - \eta \, \nabla C"
         gloss="Move every parameter a small step against its slope; the learning rate eta (a small positive number you choose) sets the step size. Eta is not the 0.01 nudge from a moment ago: the nudge is how you measure which way is downhill, eta is how far you then walk."
       />
+      <p>
+        Apply it once, with η = 1 to keep the arithmetic plain: every knob moves by
+        its own slope, the output bias from -2.00 up to -1.956, the second hidden
+        bias from -3.00 down to -3.041, and so on for all nine. Rescore: the cost
+        drops from 0.08758 to 0.0799. That is one step of gradient descent, and
+        training a network is repeating it.
+      </p>
 
       <p>
         Play with this rule before you code it. Below is the simplest possible landscape:

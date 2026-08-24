@@ -103,7 +103,9 @@ export function Module4() {
         <M tex="a_2" />'s change of 0.00115. The fifth and last factor is the gap.
         The cost is half the gap squared, and its slope formula comes on the same
         checkable terms as sigmoid's: the slope of <M tex="\tfrac12(\text{gap})^2" />{" "}
-        is the gap itself, here <M tex="a_2 - y = -0.4391" />. Against the log:{" "}
+        is the gap itself, here <M tex="a_2 - y = -0.4391" /> (this is what the half
+        in Module 3's cost was for: squaring puts a factor of 2 into the slope, and
+        the half cancels it, leaving only the gap). Against the log:{" "}
         <M tex="-0.439 \times 0.00116 = -0.00051" />, the cost's change exactly.
       </p>
       <p>
