@@ -194,10 +194,9 @@ export function Module3() {
         gloss="Same first two factors: SGD does not touch the cost of measuring slopes, it only shrinks the crowd, and the step gets five thousand times cheaper. The 11,935 times 2 that remains is the factor backpropagation removes, in Modules 4 and 5."
       />
       <p>
-        The handful's verdict about which way is downhill is only roughly right, but
-        it costs a tiny fraction of a full pass. Take the slightly wrong step, grab a
-        fresh handful, repeat. Each step is noisy, and you can afford vastly more of
-        them.
+        The handful's verdict about which way is downhill is only roughly right. Take
+        the slightly wrong step, grab a fresh handful, repeat. Each step is noisy,
+        and you can afford five thousand of them for the old price of one.
       </p>
       <p>
         The picture below stages the contest on the earlier valley, built this time
@@ -231,9 +230,9 @@ export function Module3() {
         examples. With that, the exercise: you write the update step and the loop
         that feeds it: shuffle the column order, walk it in mini-batches, repeat
         (one full pass through the dataset is called an epoch). The course supplies
-        the gradient, computed exactly the way you did it by hand above: nudge a
-        parameter, measure the cost twice, divide. It is correct, and it is slow;
-        the panel after the exercise measures how slow.
+        the gradient, measured by nudging every parameter to both sides and
+        rescoring, as described earlier. It is correct, and it is slow; the panel
+        after the exercise measures how slow.
       </p>
 
       <ExercisePage exercise={sgdExercise} />
@@ -250,13 +249,13 @@ export function Module3() {
         gloss="Same counting as Module 2's 11,935: each layer's weight matrix is (neurons in this layer) times (inputs feeding it), plus one bias per neuron."
       />
       <p>
-        Training works, and it is visibly slow. The slowness has a precise shape:
-        estimating the gradient numerically takes two cost evaluations per parameter
-        per step, and each cost evaluation is a full forward pass over the batch.
-        With 33 parameters, that is 66 passes per step. The digit reader from
-        Module 2 has 11,935 parameters, so one step would cost 23,870 passes, and
-        training it this way stops being realistic. What's needed is a way to get
-        every slope from roughly one pass, and that is what backpropagation is.
+        Training works, and it is visibly slow. The slowness is the factor SGD left
+        standing in the bill you priced before the exercise: two cost measurements
+        per parameter, every step. With 33 parameters that is 66 passes over the
+        batch per step, and the panel counts them as it runs. On the digit reader's
+        11,935 parameters, training this way stops being realistic. What's needed is
+        a way to get every slope from roughly one pass, and that is what
+        backpropagation is.
       </p>
       <SgdLivePanel />
 
@@ -265,7 +264,7 @@ export function Module3() {
           "The cost function turns learning into search; the gradient turns search into walking downhill.",
           "The learning rate trades speed against stability, and elongated valleys punish any single choice.",
           "Mini-batch SGD buys many cheap noisy steps instead of few exact ones, and it wins.",
-          "Numerical gradients cost two forward passes per parameter: the motivation for backpropagation.",
+          "Nudge-measured gradients cost two cost measurements per parameter per step: the motivation for backpropagation.",
         ]}
         chapter="Chapter 1 (learning with gradient descent)"
         href="http://neuralnetworksanddeeplearning.com/chap1.html"
