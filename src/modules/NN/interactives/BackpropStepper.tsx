@@ -63,21 +63,23 @@ const STEPS: Step[] = [
     tex: "\\delta^3 = (a^3 - y) \\odot \\sigma'(z^3)",
     gloss: (t) =>
       `Gap ${fmt(t.a3[0] - 1)} times σ′(z³) = ${fmt(t.a3[0] * (1 - t.a3[0]))} gives ` +
-      `δ³ = ${fmt(t.d3[0])}. Negative blame reads: raising this neuron's evidence would lower the cost.`,
+      `δ³ = ${fmt(t.d3[0])} (the circled dot means multiply matching entries; each side here has ` +
+      `just one). Negative blame reads: raising this neuron's evidence would lower the cost.`,
   },
   {
     title: "BP2: blame flows backward",
     tex: "\\delta^2 = \\big((w^3)^T \\delta^3\\big) \\odot \\sigma'(z^2)",
     gloss: (t) =>
       `Each hidden neuron receives δ³ scaled by its outgoing wire, then multiplies by its own σ′: ` +
-      `δ = ${fmt(t.d2[0])}, ${fmt(t.d2[1])}, ${fmt(t.d2[2])}. Watch h₂: its wire to the output is ` +
-      `negative, so the blame arrives with its sign flipped.`,
+      `δ = ${fmt(t.d2[0])}, ${fmt(t.d2[1])}, ${fmt(t.d2[2])}. The raised T (transpose) flips w³ so ` +
+      `the same wires read backward. Watch h₂: its wire is negative, so blame arrives sign-flipped.`,
   },
   {
     title: "BP3 and BP4: every slope, read off",
     tex: "\\frac{\\partial C}{\\partial b^l} = \\delta^l, \\qquad \\frac{\\partial C}{\\partial w^l} = \\delta^l (a^{l-1})^T",
     gloss: () =>
-      "All 13 slopes at once: a bias's slope is its neuron's blame, and a wire's slope is the " +
+      "All 13 slopes at once (∂C/∂b is read as one name: the slope of C per nudge of b, Module 3's " +
+      "nudge-and-divide number). A bias's slope is its neuron's blame; a wire's slope is the " +
       "receiver's blame times the activation the wire carried. Select any knob (click a wire or " +
       "circle) to read its slope below, then drag its slider and watch every number react.",
   },

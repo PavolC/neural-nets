@@ -146,6 +146,27 @@ this floor after direct feedback; every later module must be written to it too.
 - **Mind vocabulary collisions.** "Line" means the decision boundary in this
   course; never reuse it for an equation or a row of code. Prefer short
   sentences over connective-heavy ones; wordiness reads as weirdness.
+- **Interactives carry the algorithm; equations recap it.** Module 4's first
+  draft put nine equations and 1,200 words before its centerpiece stepper, and
+  the learner reported it "over my head". The fix that worked: teach the one
+  genuinely new concept in prose with concrete numbers, reach the interactive by
+  the midpoint, and present the formal equations after it as "what you just
+  watched, written down". Notation is taught just-in-time, one symbol at the
+  moment it first appears (an equation gloss or a step card is a fine place),
+  never as a several-notations dump paragraph.
+- **Log first, explain second.** For any multi-stage numeric process, show the
+  full log of concrete values (before, after, change) as one figure or table
+  FIRST, then explain each stage as a rule that predicts the next logged number
+  from the previous one. Claims-first prose ("nudge w and z moves by x times
+  that amount") floats past this learner; prediction-against-a-log lands. Run
+  checks in the multiplying direction (factor times change = next change), not
+  the dividing direction.
+- **Multi-factor arithmetic never sits inline.** Chains like 0.235 x 2.0 x
+  (-0.108) inside a sentence are the densest thing on a page. Put them in
+  display math with \underbrace labels naming each factor, or in a small table
+  (knob, value, read off as). This is the "arithmetic goes in display math"
+  rule applied to products, and it makes pages FEEL lighter even when the
+  equation count rises.
 - **Assume weeks pass between modules.** Never lean on a bare name from an
   earlier module (fire, the contrarian, the nine numbers) as a load-bearing
   reference; either restate the thing in a few plain words or drop the
