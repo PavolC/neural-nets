@@ -161,6 +161,20 @@ this floor after direct feedback; every later module must be written to it too.
   that amount") floats past this learner; prediction-against-a-log lands. Run
   checks in the multiplying direction (factor times change = next change), not
   the dividing direction.
+- **Departures wear the Aside box.** Anything that pauses the main thread (a
+  borrowed analogy, a scope note, a why-digression like Module 2's
+  loop-vs-matrix) goes in the shared <Aside> component from ModuleBits, never
+  in a long parenthetical; the shaded box tells the reader the lesson pauses
+  and resumes. Models: Module 3's nudge-size trade-off, Module 4's currency
+  chain, Module 1's how-special-is-this-toy notes.
+- **A borrowed mini-world is allowed when the home story has no carrier.** The
+  concert world has no natural chain-of-conversions, so Module 4 teaches
+  factors as posted exchange rates in a two-booth currency chain (a raise:
+  euros -> dollars -> pesos), proven with the primary learner live, then maps
+  back explicitly (raise = nudge, pesos = cost, factor = posted rate,
+  through-rate = slope). Keep such a world to one beat plus one figure, map
+  every element back by name, and let its vocabulary (booth, posted rate,
+  through-rate) run through the section it serves.
 - **Demonstrate on numbers where the mechanism is visible.** Module 4 first
   proved "the change comes out multiplied by the partner" on the hop whose
   partner was 1.0, and the learner read it as "changing by 0.01 changes it by

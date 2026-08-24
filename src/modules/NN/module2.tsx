@@ -1,4 +1,4 @@
-import { AfterThis, Figure, Recap } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, Recap } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { ExercisePage } from "../../components/ExercisePage";
 import { feedforwardExercise } from "../../exercises/feedforward";
@@ -80,15 +80,17 @@ export function Module2() {
       <Figure caption="How the shapes lock together. Teal is the input side: W is n wide because a is n tall, one weight per input, and the two must match or the multiply is impossible. Purple is the neuron side: W has m rows, so Wa, b, and a' are all m tall, one entry per neuron. The shaded strip shows one neuron's whole story: its row of W, times all of a, plus its own bias entry, becomes its entry of a'. For Module 2's hidden layer, m = 15 and n = 784.">
         <ShapesDiagram />
       </Figure>
-      <p>
-        Why matrices instead of a Python loop over neurons? The loop runs in the
-        interpreter, one neuron at a time; the matrix product hands the whole layer
-        to fast numerical code in one call. The same discipline that keeps shapes
-        honest makes the code hundreds of times faster. (To be precise about what
-        got banned: looping over the hundreds of neurons inside a layer. Looping
-        over the two or three layers of a network is normal, and you are about to
-        write exactly that loop.)
-      </p>
+      <Aside>
+        <p>
+          Why matrices instead of a Python loop over neurons? The loop runs in the
+          interpreter, one neuron at a time; the matrix product hands the whole
+          layer to fast numerical code in one call. The same discipline that keeps
+          shapes honest makes the code hundreds of times faster. To be precise
+          about what got banned: looping over the hundreds of neurons inside a
+          layer. Looping over the two or three layers of a network is normal, and
+          you are about to write exactly that loop.
+        </p>
+      </Aside>
 
       <p>
         Time to leave four-dot toy worlds. The real task of this course is reading

@@ -1,4 +1,4 @@
-import { AfterThis, Figure, Recap } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, Recap } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { ExercisePage } from "../../components/ExercisePage";
 import { sigmoidNeuronExercise } from "../../exercises/sigmoid-neuron";
@@ -123,18 +123,22 @@ export function Module1() {
         label attached to the example. The label is painted on, not plotted; it is
         not a third input. Finally, the line is the neuron's opinion: yes for
         every point on one side, no for the other, whether or not a dot sits
-        there. Learning means making side and color agree on every dot. Two honest
-        notes about how special this toy is: our four dots are the entire universe
-        of possible inputs only because each fact is 0 or 1 (real inputs are
-        usually continuous, so the plane holds endless possible points and a
-        dataset is a scattering of labeled dots across it), and only two inputs
-        fit on paper at all. Every network has an input space like this one;
-        Module 2's has 784 axes, one per pixel. The geometry survives; the
-        drawing does not.
+        there. Learning means making side and color agree on every dot.
       </p>
       <Figure caption="Drag the two round handles to place the line. Position = the inputs, color = the required answer, side of the line = the neuron's answer. OR and AND fall in seconds; then switch to XOR and keep trying: no single straight cut ever puts both green points on one side and both gold points on the other.">
         <SeparatingLine />
       </Figure>
+      <Aside>
+        <p>
+          Two honest notes about how special this toy is. Our four dots are the
+          entire universe of possible inputs only because each fact is 0 or 1;
+          real inputs are usually continuous, so the plane holds endless
+          possible points and a dataset is a scattering of labeled dots across
+          it. And only two inputs fit on paper at all. Every network has an
+          input space like this one (Module 2's has 784 axes, one per pixel);
+          the geometry survives, the drawing does not.
+        </p>
+      </Aside>
 
       <p>
         The third dataset belongs to the contrarian. They go out exactly when one
@@ -201,7 +205,7 @@ export function Module1() {
         Now the stacking. If one neuron is one line, use three neurons. Wire them
         like this:
       </p>
-      <Figure caption="The smallest network that can beat XOR. Each green-bordered circle is one neuron; a column of them is called a layer. The gray circles are just the two input numbers. Every arrow carries a weight (six arrows, six weights), and each of the three neurons adds its own bias: nine numbers in total.">
+      <Figure caption="The smallest network that can beat XOR. Each green-bordered circle is one neuron; a column of them is called a layer. The gray circles are just the two input numbers. Every arrow is a wire, the route a value travels between two places, and every wire carries one weight (six wires, six weights); each of the three neurons adds its own bias: nine numbers in total.">
         <TinyNetDiagram />
       </Figure>
       <p>

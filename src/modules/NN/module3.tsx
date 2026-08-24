@@ -1,4 +1,4 @@
-import { AfterThis, Figure, Recap } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, Recap } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { ExercisePage } from "../../components/ExercisePage";
 import { sgdExercise } from "../../exercises/sgd";
@@ -72,16 +72,22 @@ export function Module3() {
         over the four corners: 0.08714. Divide the change in cost by the size of the
         nudge: (0.08714 - 0.08758) / 0.01, about -0.044. That number is the knob's
         slope, the same m as in y = mx + c, measured at the point where you currently
-        stand. Its minus sign says the cost falls when this knob goes up. (The nudge
-        size is a free choice with a trade-off: the ground curves, so a big nudge
-        smears the measurement over a stretch of hillside, while a smaller one reads
-        the slope right under your feet. We used 0.01 to keep the numbers readable;
-        the course's gradient helper, which you will meet in the exercise, nudges by
-        0.00001. It also nudges to both sides, once down and once up, and reads the
-        slope between the two measurements, which centers the reading on the exact
-        spot where you stand; your version read between -2.00 and -1.99, so it sat a
-        half-nudge to one side. Either way, one slope costs two cost measurements.)
+        stand. Its minus sign says the cost falls when this knob goes up.
       </p>
+      <Aside>
+        <p>
+          The nudge size is a free choice with a trade-off: the ground curves,
+          so a big nudge smears the measurement over a stretch of hillside,
+          while a smaller one reads the slope right under your feet. We used
+          0.01 to keep the numbers readable; the course's gradient helper, which
+          you will meet in the exercise, nudges by 0.00001. It also nudges to
+          both sides, once down and once up, and reads the slope between the two
+          measurements, which centers the reading on the exact spot where you
+          stand; your version read between -2.00 and -1.99, so it sat a
+          half-nudge to one side. Either way, one slope costs two cost
+          measurements.
+        </p>
+      </Aside>
       <p>
         Every knob answers this same question, and you can put it to all nine below.
         The curve is the real cost of this network as one chosen knob moves, the

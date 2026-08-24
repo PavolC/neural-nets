@@ -1650,3 +1650,38 @@ footer a {
 .ripple-kind-gap {
   fill: var(--loss);
 }
+
+/* Recall strips: small re-renders of the ripple log's relevant segments,
+   placed above the paragraph that discusses them (module 4). */
+.ripple-slice {
+  display: block;
+  margin: 1.4rem auto 0.4rem;
+  font-family: system-ui, sans-serif;
+}
+
+/* Asides: quick departures from the lesson (analogies, scope notes),
+   visually set off so the main thread reads as pausing and resuming. */
+.module-aside {
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+  background: #f6f6f2;
+  padding: 0.1rem 1.1rem 0.9rem;
+  margin: 1.4rem 0;
+}
+
+.module-aside-label {
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0.8rem 0 0.2rem;
+}
+
+.module-aside p {
+  font-size: 0.95rem;
+}
+
+.module-aside .module-figure {
+  margin: 0.9rem 0 0.4rem;
+}

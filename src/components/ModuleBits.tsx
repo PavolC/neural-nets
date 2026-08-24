@@ -17,6 +17,18 @@ export function AfterThis({ items }: { items: string[] }) {
   );
 }
 
+/** A quick departure from the lesson (an analogy, a scope note, a why-
+ * digression), visually set off so the reader knows the main thread pauses
+ * here and resumes after the box. */
+export function Aside({ children }: { children: ReactNode }) {
+  return (
+    <aside className="module-aside">
+      <p className="module-aside-label">An aside</p>
+      {children}
+    </aside>
+  );
+}
+
 export function Figure({ children, caption }: { children: ReactNode; caption: string }) {
   return (
     <figure className="module-figure">
