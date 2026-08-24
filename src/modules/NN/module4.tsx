@@ -16,19 +16,18 @@ export function Module4() {
       />
 
       <p>
-        Module 3 ended with a bill. To train, you needed the slope of the cost for
-        every knob, and you measured each one the honest way: nudge that knob, rerun
-        the whole network on the batch, twice, divide. Two full runs bought one
-        slope. On the toy network's 33 knobs that was affordable. On the digit
-        reader from Module 2, with its 11,935 weights and biases, one training step
-        costs 23,870 full runs, and the waste is obvious once you say it out loud:
-        run number fourteen thousand recomputes every neuron in the network just to
-        ask a question about one knob. Backpropagation gets every slope, all 11,935
-        of them, from one forward pass plus one backward sweep of comparable price.
-        And they are exact, not nudge-and-divide estimates. This module is about
-        understanding how that can possibly work; you will not write code today
-        (that is Module 5, and it will be short). Instead: one worked example, four
-        equations, one visualization you can step through, and a quiz.
+        Module 3's method has a cost worth stating exactly. Each knob's slope came
+        from nudging that one knob and rerunning the whole network on the batch,
+        twice: two full runs per slope. On the toy network's 33 knobs that was
+        affordable. On the digit reader from Module 2, with its 11,935 weights and
+        biases, one training step costs 23,870 full runs, and almost all of that
+        work is redundant: each run recomputes every neuron in the network to answer
+        a question about a single knob. Backpropagation removes the redundancy. One
+        forward pass, plus one backward sweep of comparable price, produces every
+        slope, all 11,935 of them, exact rather than nudge-and-divide estimates.
+        This module explains how; Module 5 is where you implement it. There is no
+        code here, just a worked example, the four equations, a visualization you
+        can step through, and a quiz.
       </p>
 
       <p>
@@ -104,20 +103,20 @@ export function Module4() {
       />
       <p>
         The nudge measurement said <M tex="-0.050" />, and the product says{" "}
-        <M tex="-0.0508" />. They agree, and of the two, the product is the exact
-        one: the nudge method was always an estimate (it used a small step instead
-        of a truly tiny one). This multiply-the-local-slopes fact is called the
-        chain rule, named after exactly the picture you just walked through, and it
-        is the entire mathematical content of backpropagation. Everything else is
-        bookkeeping.
+        <M tex="-0.0508" />. They agree, and the product is the exact one: the
+        nudge method approximates, because it uses a small step where the true
+        slope wants a vanishingly small one. The multiply-the-local-slopes rule is
+        called the chain rule, and it is the only piece of mathematics
+        backpropagation needs. The rest of the algorithm is arranging the
+        multiplications so that no factor is ever computed twice.
       </p>
       <Figure caption="The path of the nudge. Each box is a quantity the forward pass computed (its value inside); each arrow multiplies a passing wiggle by its local factor. The slope of the cost for w1 is the product of all five factors: −0.0508.">
         <ChainRippleDiagram />
       </Figure>
 
       <p>
-        The bookkeeping matters, though, because done naively you would compute one
-        product per knob. Look at <M tex="b_1" />'s product: nudging{" "}
+        Arranged naively, it is still one full product per knob. Look at{" "}
+        <M tex="b_1" />'s product: nudging{" "}
         <M tex="b_1" /> moves <M tex="z_1" /> one-for-one (its local factor is 1),
         and from <M tex="z_1" /> onward its path is identical to{" "}
         <M tex="w_1" />'s. Same for the second neuron's two knobs: both paths merge
@@ -142,9 +141,9 @@ export function Module4() {
         the weight gets multiplied by: for <M tex="w_2" /> that is{" "}
         <M tex="0.6225 \times (-0.1081) = -0.0673" />, and for <M tex="w_1" /> it
         is <M tex="1.0 \times (-0.0508) = -0.0508" /> (the same number as the bias
-        only because the wire happens to carry exactly 1.0). Count what just
-        happened: one forward pass, one backward sweep of two blames, and all four
-        slopes are on the table. That is backpropagation, in miniature.
+        only because the wire happens to carry exactly 1.0). The total: one forward
+        pass, one backward sweep of two blames, and all four slopes. That is
+        backpropagation, in miniature.
       </p>
 
       <p>
@@ -219,7 +218,7 @@ export function Module4() {
       </p>
       <Eq
         tex="\underbrace{3 \times 2}_{\text{hidden } w} + \underbrace{3}_{\text{hidden } b} + \underbrace{1 \times 3}_{\text{output } w} + \underbrace{1}_{\text{output } b} = 6 + 3 + 3 + 1 = 13"
-        gloss="Thirteen knobs, so the backward pass owes us thirteen slopes. The weights shown on the wires are a hand-picked starting point, not a trained network: training them is Module 5's job."
+        gloss="Thirteen knobs, so the backward pass must deliver thirteen slopes. The weights shown on the wires are a hand-picked starting point, not a trained network: training them is Module 5's job."
       />
       <p>
         The input is fixed at one training example, good weather without the
@@ -244,9 +243,9 @@ export function Module4() {
       </Figure>
 
       <p>
-        No code this module, deliberately: Module 5 is where you implement all four
-        equations, and it goes much better if you can already think in them. So
-        before moving on, three predictions. Commit to an answer before you click,
+        Module 5 is where you implement all four equations, and the implementation
+        goes better if you can already think in them. So before moving on, three
+        predictions. Commit to an answer before you click,
         and verify each one afterward by actually doing it in the stepper above
         (the questions describe the stepper's starting weights; press Reset weights
         first if you have been experimenting).
@@ -254,19 +253,18 @@ export function Module4() {
       <DeltaQuiz />
 
       <p>
-        Close with the tally that justifies the whole module. For the digit
-        reader's 11,935 knobs, Module 3's method needs two full network runs per
-        knob per training step: 23,870 forward passes to take one step downhill.
-        The four equations need one forward pass, plus one backward sweep that
-        touches each neuron and each weight about once, roughly the price of a
-        second forward pass. Call it two passes against twenty-four thousand: about
-        ten thousand times cheaper, and exact instead of estimated. That is why
-        backpropagation, and not a faster computer, is what made neural networks
-        trainable. In Module 5 you will implement BP1 through BP4 in NumPy, and the
-        nudge method gets a retirement job: the course will nudge-and-measure every
-        knob of a tiny network the slow way and compare your backward pass against
-        it, number by number. When the two agree, your gradients are right, and the
-        real training run begins.
+        The tally, one last time, at the digit reader's scale. Module 3's method
+        needs two full network runs per knob per training step: 23,870 forward
+        passes to take one step downhill. The four equations need one forward pass,
+        plus one backward sweep that touches each neuron and each weight about
+        once, roughly the price of a second forward pass. Two passes against
+        twenty-four thousand: about ten thousand times cheaper, and exact instead
+        of estimated. That is why backpropagation, and not a faster computer, is
+        what made neural networks trainable. In Module 5 you implement BP1 through
+        BP4 in NumPy, and the nudge method takes on a new job: the course will
+        nudge-and-measure every knob of a tiny network the slow way and compare
+        your backward pass against it, number by number. When the two agree, your
+        gradients are right, and the real training run begins.
       </p>
 
       <Recap

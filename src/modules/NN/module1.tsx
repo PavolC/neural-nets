@@ -112,8 +112,7 @@ export function Module1() {
         their dataset, then place the line so it reproduces their rule on all four
         dots. And this is the part to internalize: dragging the line IS choosing{" "}
         <M tex="w_1, w_2, b" />; the readout under the chart shows, live, which
-        three numbers your line corresponds to. OR and AND should each take you a
-        few seconds.
+        three numbers your line corresponds to. OR and AND go quickly.
       </p>
       <Figure caption="Drag the two round handles to place the line. OR and AND fall in seconds. Then switch to XOR and keep trying: no single straight cut ever puts both green points on one side and both gold points on the other.">
         <SeparatingLine />
@@ -145,8 +144,8 @@ export function Module1() {
       </table>
       <p>
         Four points, and no line works: the greens sit on one diagonal, the golds on
-        the other, so any line that separates them would have to bend. This is not a
-        curiosity. When it was proved in 1969 that a single neuron cannot represent
+        the other, so any line that separates them would have to bend. When it was
+        proved in 1969 that a single neuron cannot represent
         XOR, funding and faith in the whole field collapsed for years. The eventual
         answer was not a smarter neuron. It was neurons feeding other neurons.
       </p>
@@ -239,18 +238,16 @@ export function Module1() {
         the solid purple line, becomes the at-least-one detector, and{" "}
         <M tex="h_2" />, the dashed teal line, the both detector. Break the solution
         one slider at a time to feel what each number does, then start over and
-        rebuild it. Getting all four dots right by hand is genuinely fiddly, and
-        that is foreshadowing: Module 3 is about making the computer do the
-        fiddling.
+        rebuild it. Getting all four dots right by hand is fiddly. Module 3 is
+        about making the computer do the fiddling.
       </p>
       <Figure caption="The 2-2-1 network on its four XOR points. Move any slider and watch that neuron's line, and the output's shading, respond.">
         <XorNetwork />
       </Figure>
 
       <p>
-        Time to build the neuron in code, which means two minutes of NumPy, the
-        Python library for arrays of numbers. Everything in this exercise uses five
-        ideas:
+        Time to build the neuron in code, using NumPy, the Python library for
+        arrays of numbers. Everything in this exercise uses five ideas:
       </p>
       <pre className="hint-pre">{`import numpy as np
 

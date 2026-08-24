@@ -60,8 +60,8 @@ function buildQuestions(): Question[] {
         `the gap (now nearly −1, as large as it gets) by σ′(z³), and at z³ = ${fmt(q2.z3[0])} ` +
         `the sigmoid is flat: its slope is ${fmt(q2.a3[0] * (1 - q2.a3[0]), 4)}. A saturated ` +
         `neuron barely responds to nudges, so no nudge looks worth taking, so gradient descent ` +
-        `barely moves it: badly wrong and barely learning, at the same time. Remember this ` +
-        `feeling; Module 7 exists to fix it.`,
+        `barely moves it: badly wrong and barely learning, at the same time. Module 7 returns ` +
+        `to exactly this problem.`,
     },
     {
       setup:

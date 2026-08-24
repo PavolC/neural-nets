@@ -72,7 +72,7 @@ export function Module3() {
       />
 
       <p>
-        Feel this rule before you code it. Below is the simplest possible landscape:
+        Play with this rule before you code it. Below is the simplest possible landscape:
         not a network, just one made-up knob w whose cost is w times w, a single bowl.
         Watch how the steps shrink by themselves as the ball nears the bottom. That is
         the rule working: each step is the learning rate times the slope, and the
@@ -108,8 +108,8 @@ export function Module3() {
         single score has to look at.
       </p>
       <p>
-        Stochastic gradient descent cheats on exactly that ("stochastic" is just an
-        older word for random). Do not score against all the examples: grab a small
+        Stochastic gradient descent saves exactly that expense ("stochastic" is just
+        an older word for random). Do not score against all the examples: grab a small
         random handful of them, called a mini-batch, and score against the handful.
         The handful's verdict about which way is downhill is only roughly right, but
         it costs a tiny fraction of a full pass. Take the slightly wrong step, grab a
@@ -123,9 +123,8 @@ export function Module3() {
         the rings drawn are the average of all 12. The full-batch walker reads all 12
         examples before each step, so it follows the average pull, smoothly. The SGD
         walker reads one example per step and follows that example's pull alone:
-        wobbly, but twelve times cheaper. The counter next to the buttons keeps the
-        honest tally, examples looked at, so judge the race by that instead of by
-        steps.
+        wobbly, but twelve times cheaper. The counter next to the buttons tallies
+        examples looked at; judge the race by that instead of by steps.
       </p>
       <Figure caption="Same valley, same start, same learning rate. Full batch consults all 12 examples per step; SGD consults one. Count what each has looked at: SGD reaches the neighborhood of the minimum having read a fraction of the data.">
         <BatchVsSgd />
@@ -150,15 +149,15 @@ export function Module3() {
         that feeds it: shuffle the column order, walk it in mini-batches, repeat
         (one full pass through the dataset is called an epoch). The course supplies
         the gradient, computed exactly the way you did it by hand above: nudge a
-        parameter, measure the cost twice, divide. It is honest and correct, and you
-        are about to discover its price.
+        parameter, measure the cost twice, divide. It is correct, and it is slow;
+        the panel after the exercise measures how slow.
       </p>
 
       <ExercisePage exercise={sgdExercise} />
 
       <p>
-        Your sgd is real. The panel below points it at a concert-shaped dataset, forty
-        noisy copies of the contrarian's four corners, and hands it a network with two
+        The panel below points your sgd at a concert-shaped dataset, forty noisy
+        copies of the contrarian's four corners, and hands it a network with two
         inputs, eight hidden neurons, and one output. Eight hidden neurons instead of
         XOR's two is a free choice: spare detectors make learning from a random start
         more forgiving, at the price of more parameters to train. Count them:
@@ -168,12 +167,13 @@ export function Module3() {
         gloss="Same counting as Module 2's 11,935: each layer's weight matrix is (neurons in this layer) times (inputs feeding it), plus one bias per neuron."
       />
       <p>
-        Now watch the clock, and count what training costs. Estimating the gradient
-        numerically takes two cost evaluations per parameter per step, and each cost
-        evaluation is a full forward pass over the batch. With 33 parameters that
-        bill is merely annoying. The digit reader from Module 2 has 11,935 parameters,
-        and there the bill is fatal. What we need is a way to get every partial
-        derivative from roughly one pass, and that is exactly what backpropagation is.
+        Training works, and it is visibly slow. The slowness has a precise shape:
+        estimating the gradient numerically takes two cost evaluations per parameter
+        per step, and each cost evaluation is a full forward pass over the batch.
+        With 33 parameters, that is 66 passes per step. The digit reader from
+        Module 2 has 11,935 parameters, so one step would cost 23,870 passes, and
+        training it this way stops being realistic. What's needed is a way to get
+        every slope from roughly one pass, and that is what backpropagation is.
       </p>
       <SgdLivePanel />
 

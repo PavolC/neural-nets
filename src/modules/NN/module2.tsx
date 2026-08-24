@@ -96,7 +96,7 @@ export function Module2() {
         Time to leave four-dot toy worlds. The real task of this course is reading
         handwritten digits from MNIST, a classic collection of 70,000 of them
         (this course bundles a slice of it). And here is the bridge from fuzzy to
-        numeric: a digit image IS already numbers. Each one is a 28-by-28 grid of
+        numeric: a digit image is already numbers. Each one is a 28-by-28 grid of
         ink levels, 0 for blank paper, 1 for full ink. Read the grid row by row into
         one long column and you get 784 numbers: that column is the network's input,
         exactly like <M tex="(x_1, x_2)" /> was, just taller. Point at the image
@@ -127,12 +127,13 @@ export function Module2() {
       </p>
       <Eq
         tex="\underbrace{15 \times 784}_{\text{hidden } W} + \underbrace{15}_{\text{hidden } b} + \underbrace{10 \times 15}_{\text{output } W} + \underbrace{10}_{\text{output } b} = 11{,}760 + 15 + 150 + 10 = 11{,}935"
-        gloss="The hidden layer's W has one row per neuron (15) and one column per input (784), plus one bias per neuron; the output layer reads the 15 hidden activations the same way. Nearly twelve thousand knobs: slider-fiddling is over, which is why Module 3 exists."
+        gloss="The hidden layer's W has one row per neuron (15) and one column per input (784), plus one bias per neuron; the output layer reads the 15 hidden activations the same way. Nearly twelve thousand knobs, far too many to set by hand; Module 3 is about finding them automatically."
       />
 
       <p>
-        The network below has already been trained for you (86% test accuracy; you
-        will beat it later), so you can study what learned numbers actually look
+        The network below has already been trained for you (86% test accuracy; the
+        network you train in Module 5 does better), so you can study what learned
+        numbers actually look
         like. Focus on a single hidden neuron. It works like every neuron so far:
         784 weights, one per pixel, and its evidence rises when ink lands on pixels
         where its weight is positive, falls when ink lands where its weight is

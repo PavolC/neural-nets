@@ -169,6 +169,32 @@ this floor after direct feedback; every later module must be written to it too.
 - Each module opens with "What you'll be able to do after this" (2-3 items) and closes
   with a recap and a "Go deeper" link to the corresponding Nielsen chapter.
 
+### Register: plotted, narrator muted (adopted after Module 4; applies to all modules)
+
+Modules are plotted like a story (setup, tally, payoff, callbacks): keep that. What
+must go is the audible narrator, the voice that sells, promises, and points at its
+own storytelling. Concretely:
+
+- Motivate with numbers, not verdicts. Let 23,870 be the drama. A judgment is allowed
+  once, in plain words ("training it this way stops being realistic"), never as a
+  punchline ("the bill is fatal") and never twice for rhythm.
+- No promises about the reader's future experience ("it will be short", "you will
+  beat it later", "should take you a few seconds").
+- No stage directions that command attention or feelings ("watch the clock, and
+  count", "remember this feeling", "feel this rule"). Directing perception at content
+  is fine ("watch how the steps shrink as the ground flattens").
+- Never narrate the course's own storytelling ("and that is foreshadowing"). Devices
+  stay, labels go: a callback works without being announced.
+- No flattery or possession theatrics ("Your sgd is real").
+- No moralized vocabulary for algorithms ("the honest way", "SGD cheats").
+- Replace aphorisms with their literal content. "Everything else is bookkeeping"
+  became "the rest is arranging the multiplications so no factor is computed twice",
+  which teaches more. Punchlines compress by discarding information.
+- Test for a borderline sentence: could it appear unchanged in a careful colleague's
+  explanation email? "The bill is fatal" fails; "stops being realistic" passes.
+- Exception: a module's final beat may carry one slightly hot sentence. Endings do
+  gating work in a self-paced course, and they are the two-minute-demo moments.
+
 ## Repo layout
 
 ```
