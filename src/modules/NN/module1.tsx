@@ -114,7 +114,25 @@ export function Module1() {
         <M tex="w_1, w_2, b" />; the readout under the chart shows, live, which
         three numbers your line corresponds to. OR and AND go quickly.
       </p>
-      <Figure caption="Drag the two round handles to place the line. OR and AND fall in seconds. Then switch to XOR and keep trying: no single straight cut ever puts both green points on one side and both gold points on the other.">
+      <p>
+        Before you drag anything, settle how to read this kind of picture, because
+        three different things live on it. A dot's position says only what the
+        inputs are: weather across, friend up. A dot's color is an answer, and note
+        the shift: in the concert plot above, color showed the neuron's own
+        computed verdict; from here on, color shows the verdict we demand, the
+        label attached to the example. The label is painted on, not plotted; it is
+        not a third input. Finally, the line is the neuron's opinion: yes for
+        every point on one side, no for the other, whether or not a dot sits
+        there. Learning means making side and color agree on every dot. Two honest
+        notes about how special this toy is: our four dots are the entire universe
+        of possible inputs only because each fact is 0 or 1 (real inputs are
+        usually continuous, so the plane holds endless possible points and a
+        dataset is a scattering of labeled dots across it), and only two inputs
+        fit on paper at all. Every network has an input space like this one;
+        Module 2's has 784 axes, one per pixel. The geometry survives; the
+        drawing does not.
+      </p>
+      <Figure caption="Drag the two round handles to place the line. Position = the inputs, color = the required answer, side of the line = the neuron's answer. OR and AND fall in seconds; then switch to XOR and keep trying: no single straight cut ever puts both green points on one side and both gold points on the other.">
         <SeparatingLine />
       </Figure>
 

@@ -98,6 +98,18 @@ Conventions per module: opens with "What you'll be able to do after this" (2-3 i
 - **Interactive:** Per-layer gradient magnitude bars on the learner's own network, with a layer-count slider (2 to 6 hidden layers): watch early-layer gradients collapse as depth grows. Toggle sigmoid vs. ReLU to see the mitigation.
 - **Exercise:** None mandatory. Optional: swap sigmoid for ReLU in their network and compare training on 3 hidden layers.
 - **Covers conceptually, does not implement:** convnets (Nielsen Ch. 6). From-scratch convolutions in Pyodide are slow and add little conceptual return; say this openly in the module and link the chapter.
+- **Closing note to include (learner-requested): embedding spaces and LLMs.** Build the
+  bridge from the course's own artifacts, in this order: input space (the concert plane;
+  MNIST's 784 axes) -> hidden activations as a learned re-description (the XOR network's
+  (h1, h2) space, where classes that were not line-separable become separable) -> word
+  embeddings (a word starts as a one-hot column, one slot per vocabulary word; multiplying
+  by a learned matrix selects that word's row, and training by the same SGD drags
+  similarly-used words to nearby points, so distance and direction acquire meaning) ->
+  LLMs as the same substrate (columns, matrices, cost, gradient descent) at billions of
+  parameters. Name attention as the genuinely new ingredient and leave it unexplained.
+  One line to keep: input space is where the data arrives; embedding space is where the
+  network chooses to think, and it learns that choice by the descent the learner
+  implemented in Module 3.
 - **Ends with:** A closing page: what the learner built, in their own code, and a curated "where to go next" list (Nielsen Ch. 5-6, then modern resources).
 
 ## 5. Content conventions
