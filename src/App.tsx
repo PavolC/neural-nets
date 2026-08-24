@@ -5,8 +5,28 @@ import { subscribeProgress } from "./state/progress";
 
 const DEMO_TAB = "demo";
 
+// The active tab lives in the URL hash (#m1, #demo) so a reload or a shared
+// link lands on the same module. Locked or unknown hashes fall back to the
+// first module.
+function tabFromHash(): string {
+  const id = window.location.hash.slice(1);
+  if (id === DEMO_TAB) return DEMO_TAB;
+  const idx = MODULES.findIndex((m) => m.id === id);
+  if (idx >= 0 && isModuleUnlocked(idx)) return id;
+  return MODULES[0].id;
+}
+
 export default function App() {
-  const [tab, setTab] = useState<string>(MODULES[0].id);
+  const [tab, setTab] = useState<string>(tabFromHash);
+  const selectTab = (id: string) => {
+    window.location.hash = id;
+    setTab(id);
+  };
+  useEffect(() => {
+    const onHashChange = () => setTab(tabFromHash());
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, []);
   // Gating depends on exercise completion; re-render when it changes.
   const [, setProgressTick] = useState(0);
   useEffect(() => subscribeProgress(() => setProgressTick((t) => t + 1)), []);
@@ -29,7 +49,7 @@ export default function App() {
                 className={`tab ${tab === m.id ? "tab-active" : ""}`}
                 disabled={!unlocked}
                 title={unlocked ? undefined : "Pass the previous module's exercise to unlock"}
-                onClick={() => setTab(m.id)}
+                onClick={() => selectTab(m.id)}
               >
                 {unlocked ? m.navLabel : `🔒 ${m.navLabel}`}
               </button>
@@ -37,7 +57,7 @@ export default function App() {
           })}
           <button
             className={`tab ${tab === DEMO_TAB ? "tab-active" : ""}`}
-            onClick={() => setTab(DEMO_TAB)}
+            onClick={() => selectTab(DEMO_TAB)}
           >
             Training demo
           </button>
@@ -58,7 +78,7 @@ export default function App() {
                     disabled={!nextUnlocked}
                     title={nextUnlocked ? undefined : "Pass this module's exercise first"}
                     onClick={() => {
-                      setTab(next.id);
+                      selectTab(next.id);
                       window.scrollTo(0, 0);
                     }}
                   >
