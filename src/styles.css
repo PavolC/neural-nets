@@ -659,29 +659,49 @@ button:disabled {
 
 /* XOR network */
 
-.xor-net {
+/* Three stacked phase sections; each holds its chart beside the sliders
+   that own it. Fixed chart basis: wrap depends only on window width, never
+   on content, so nothing jumps while a slider is being dragged. */
+.xor-phase + .xor-phase {
+  border-top: 1px dashed var(--rule);
+  margin-top: 1.1rem;
+  padding-top: 0.9rem;
+}
+
+.xor-phase-title {
+  font-size: 1rem;
+  margin: 0 0 0.3rem;
+}
+
+.xor-phase-body {
   display: flex;
   gap: 1.2rem;
   flex-wrap: wrap;
+  align-items: flex-start;
 }
 
-/* Fixed-basis columns: whether the sliders sit beside or below the plane
-   depends only on the window width, never on content, so nothing jumps
-   while a slider is being dragged. */
-.xor-plane {
-  flex: 0 0 320px;
-  max-width: 320px;
+.xor-chart {
+  flex: 0 0 300px;
+  max-width: 300px;
+}
+
+.xor-phase-controls {
+  flex: 1 1 320px;
+  min-width: 280px;
 }
 
 .xor-plane-stack {
   position: relative;
-  width: 320px;
-  height: 320px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
 }
 
 .xor-plane-stack canvas {
   image-rendering: pixelated;
   border: 1px solid var(--rule);
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .xor-plane-stack svg {
@@ -690,6 +710,7 @@ button:disabled {
   width: 100%;
   height: 100%;
 }
+
 
 .hidden-line-1 {
   stroke: #6a51a3;
@@ -702,18 +723,67 @@ button:disabled {
   stroke-dasharray: 2 1.2;
 }
 
-.xor-sliders {
-  flex: 1 1 320px;
+.output-line {
+  stroke: var(--ink);
+  stroke-width: 1;
 }
 
-.xor-sliders fieldset {
+.hidden-grid {
+  stroke: rgba(0, 0, 0, 0.16);
+  stroke-width: 0.35;
+  stroke-dasharray: 1.5 1.5;
+}
+
+.xor-space-label {
+  font-size: 0.82rem;
+  font-family: system-ui, sans-serif;
+  color: var(--muted);
+  margin: 0.6rem 0 0.25rem;
+}
+
+.h1-color {
+  color: #6a51a3;
+}
+
+.h2-color {
+  color: #1b7a99;
+}
+
+.h1-axis-strip {
+  stroke: #6a51a3;
+  stroke-width: 1.6;
+  opacity: 0.75;
+}
+
+.h2-axis-strip {
+  stroke: #1b7a99;
+  stroke-width: 1.6;
+  stroke-dasharray: 2 1.2;
+  opacity: 0.75;
+}
+
+.axis-id {
+  font-family: system-ui, sans-serif;
+  font-size: 4.2px; /* viewBox units; the panel is square so this scales cleanly */
+  font-weight: 600;
+}
+
+.h1-fill {
+  fill: #6a51a3;
+}
+
+.h2-fill {
+  fill: #1b7a99;
+}
+
+.xor-phase-controls fieldset {
   border: 1px solid var(--rule);
   border-radius: 6px;
-  margin-bottom: 0.5rem;
-  padding: 0.3rem 0.7rem 0.5rem;
+  margin: 0 0 0.6rem;
+  padding: 0.3rem 0.8rem 0.55rem;
 }
 
-.xor-sliders legend {
+.xor-phase-controls legend {
   font-size: 0.85rem;
   color: var(--muted);
   font-family: system-ui, sans-serif;

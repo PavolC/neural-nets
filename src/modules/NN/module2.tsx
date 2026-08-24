@@ -62,13 +62,9 @@ export function Module2() {
         inputs made <M tex="W" /> of shape <M tex="(2, 2)" />; in general a layer
         of <M tex="m" /> neurons reading <M tex="n" /> inputs has <M tex="W" /> of
         shape <M tex="(m, n)" />, and activations are always columns, shape{" "}
-        <M tex="(n, 1)" />. NumPy also allows a third thing we deliberately avoid:
-        np.array([1.0, 2.0, 3.0]) has the odd-looking shape (3,), trailing comma and
-        all. That comma is real notation (Python's way of writing a one-item
-        list-of-shapes), and it marks a flat array: three numbers in a bare line
-        that is neither a row nor a column. Flat arrays make matrix arithmetic
-        misbehave silently, so the course rule is simple: build columns, and if a
-        shape ever prints with a trailing comma, treat it as a bug. One warning,
+        <M tex="(n, 1)" />, never flat: Module 1's trailing-comma rule stands, and
+        it matters more here, because a flat array in a matrix product misbehaves
+        silently instead of failing loudly. One warning,
         because everyone trips here once: the shape names the receiving layer
         first. Data may flow from 2 inputs to 1 neuron, but that layer's matrix is{" "}
         <M tex="(1, 2)" />: rows first, and the rows belong to the layer being
@@ -129,6 +125,22 @@ export function Module2() {
         tex="\underbrace{15 \times 784}_{\text{hidden } W} + \underbrace{15}_{\text{hidden } b} + \underbrace{10 \times 15}_{\text{output } W} + \underbrace{10}_{\text{output } b} = 11{,}760 + 15 + 150 + 10 = 11{,}935"
         gloss="The hidden layer's W has one row per neuron (15) and one column per input (784), plus one bias per neuron; the output layer reads the 15 hidden activations the same way. Nearly twelve thousand knobs, far too many to set by hand; Module 3 is about finding them automatically."
       />
+
+      <p>
+        And where did Module 1's geometry go? Nowhere: it scaled. A point in a
+        784-axis space sounds exotic, but it is nothing deeper than a list of 784
+        numbers, so every image is one point in that space (one axis per pixel;
+        moving along an axis brightens one pixel). The training images are labeled
+        dots scattered through it, exactly like the four dots in the plane, and
+        each hidden neuron still makes one straight cut through the space, yes on
+        one side, no on the other; it just takes 784 weights to aim the cut. Then
+        the re-description move happens again: the hidden layer's 15 outputs are
+        themselves a list of 15 numbers, a new point in a new, much smaller space
+        (in Module 1, the hidden pair turned each input point into a new
+        two-number point; same move, bigger). The output layer's ten neurons never
+        see pixels at all: they make their ten cuts in that 15-axis space, where
+        training will have arranged for the digit classes to finally be separable.
+      </p>
 
       <p>
         The network below has already been trained for you (86% test accuracy; the

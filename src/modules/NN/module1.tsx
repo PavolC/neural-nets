@@ -189,10 +189,12 @@ export function Module1() {
       />
       <p>
         A sigmoid neuron outputs <M tex="\sigma(w \cdot x + b)" />: not a verdict but
-        a confidence, like the 0.93 or 0.02 you just watched. It still draws the same line through the
-        plane, but near the line it hedges, and that hedging is what makes gradual
-        learning possible. Every neuron in this course from here on is a sigmoid
-        neuron.
+        a confidence, like the 0.93 or 0.02 you just watched. It still draws the
+        same line through the plane, but near the line its answers pass through the
+        in-between values, 0.4, 0.5, 0.6, instead of leaping from 0 to 1. Those
+        in-between answers are what make gradual learning possible: nudge a weight a
+        little and the output moves a little, visibly. Every neuron in this course
+        from here on is a sigmoid neuron.
       </p>
 
       <p>
@@ -245,21 +247,20 @@ export function Module1() {
         </tbody>
       </table>
       <p>
-        The playground below is this exact network with all nine numbers on sliders,
+        The playground below is this exact network, all nine numbers on sliders,
         and the four dots are the contrarian's dataset from above, the same four
-        weather-and-friend situations no single line could split. How to read it:
-        the shading is the output neuron's verdict for every possible input at once,
-        green for go, sand for stay. The solid purple line is where{" "}
-        <M tex="h_1" />'s own evidence crosses zero; the dashed teal line is{" "}
-        <M tex="h_2" />'s. Each slider group is labeled with its line. Press "Show a
-        solution" and it sets exactly the numbers from the table: <M tex="h_1" />,
-        the solid purple line, becomes the at-least-one detector, and{" "}
-        <M tex="h_2" />, the dashed teal line, the both detector. Break the solution
-        one slider at a time to feel what each number does, then start over and
-        rebuild it. Getting all four dots right by hand is fiddly. Module 3 is
-        about making the computer do the fiddling.
+        situations no single line could split. It is laid out as three sections,
+        one per stage of the pipeline, each with its own key. The one idea to
+        carry in: the combined verdict is phase 2 looked up at each point's
+        reports, so the hidden sliders decide where inputs land, and the output
+        sliders decide what landing there means. Press "Show a solution" (exactly
+        the table's numbers) and watch phase 2: the two green dots, unseparable
+        in phase 1, get parked almost on top of each other, and one straight cut
+        finishes the job. Break the solution one slider at a time, then rebuild
+        it. Getting all four dots right by hand is fiddly; Module 3 is about
+        making the computer do the fiddling.
       </p>
-      <Figure caption="The 2-2-1 network on its four XOR points. Move any slider and watch that neuron's line, and the output's shading, respond.">
+      <Figure caption="The 2-2-1 network in three sections, one per stage: the hidden layer's cuts and report-tints in input space, with its six sliders; hidden space, where reports are coordinates and the output neuron cuts once, with its three; and the combined verdict, which is phase 2 looked up for every input.">
         <XorNetwork />
       </Figure>
 
@@ -279,7 +280,9 @@ np.exp(-2.0)    # e^(-2); given an array, it does every entry at once`}</pre>
         Two conventions to adopt now, because the whole course uses them. First,
         lists of numbers are always columns, shape (n, 1), meaning n rows and 1
         column; the shape is the first thing the tests check, and the error
-        messages will coach you when it is off. Second, write numbers with decimal
+        messages will coach you when it is off. If a shape ever prints as (3,),
+        with a trailing comma (real notation: it marks a one-item shape), you have
+        a flat array, neither row nor column: in this course, that is a bug. Second, write numbers with decimal
         points: 6.0, or its lazy shorthand 6. (yes, a bare trailing dot). The dot
         tells NumPy to store fractions; np.array([6, 2, 1]) would quietly build an
         integer-only array, and weights, activations, and gradients are all

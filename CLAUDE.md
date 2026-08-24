@@ -167,6 +167,11 @@ this floor after direct feedback; every later module must be written to it too.
   (knob, value, read off as). This is the "arithmetic goes in display math"
   rule applied to products, and it makes pages FEEL lighter even when the
   equation count rises.
+- **Interactives carry their own keys; prose then shrinks.** Put each chart's
+  how-to-read key on the interactive itself (section titles, one-line legends at
+  the point of use). The prose before it keeps only what sections cannot say:
+  the connection to earlier material and the single carrying idea. Prose that
+  narrates an interactive's own labels is duplication to delete.
 - **Assume weeks pass between modules.** Never lean on a bare name from an
   earlier module (fire, the contrarian, the nine numbers) as a load-bearing
   reference; either restate the thing in a few plain words or drop the
