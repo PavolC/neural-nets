@@ -80,38 +80,58 @@ export function Module4() {
         go (the last digit drifts by one here and there, because the log is
         rounded to five decimals).
       </p>
-      <Figure caption="The nudge's whole path. w1 moves by +0.01, and the change ripples through z1, a1, z2, a2 into the cost, multiplied at every arrow by that arrow's local factor. The colors group the factors by kind: purple factors are multiplications passing a change through scaled (the input, the wire), green are sigmoid's steepness where each neuron sits, red is the gap at the cost. The product of all five factors is the slope of the cost for w1.">
+      <Figure caption="The nudge's whole path. w1 moves by +0.01, and the change ripples through z1, a1, z2, a2 into the cost, multiplied at every arrow by that arrow's local factor. The colors sort the factors into their three kinds. Purple: whatever the wiggling quantity is multiplied by (the input, the wire). Green: sigmoid's steepness where that neuron sits. Red: the gap between output and right answer. The product of all five factors is the slope of the cost for w1.">
         <ChainRippleDiagram />
       </Figure>
 
       <p>
-        First, what kind of number a factor is, because it is not a new kind.
-        Every arrow answers the same question: when the number at my tail wiggles
-        a little, how much does the number at my head wiggle? That is a slope,
-        exactly the kind of number Module 3 measured (wiggle the input, watch the
-        output, divide). Module 3 measured one long slope, from a knob all the way
-        to the cost, by rerunning the whole network. The picture chops that long
-        trip into five short hops and gives each hop its own little slope. Five
-        factors, but only three kinds, and the picture colors them to match.
+        Start with what kind of number a factor is: a slope. Every arrow answers
+        the question "when the number at my tail wiggles a little, how much does
+        the number at my head wiggle?", which is Module 3's kind of number:
+        wiggle, watch, divide. The picture is Module 3's one long knob-to-cost
+        slope chopped into five short hops, each with its own little slope. Five
+        factors, only three kinds, and the picture colors them to match.
       </p>
       <p>
-        The purple factors sit where something gets multiplied. <M tex="z_1" /> is
-        a total, and <M tex="w_1" /> enters it multiplied by the input (that is
-        what <M tex="z_1 = w_1 x + b_1" /> says), so <M tex="w_1" />'s changes get
-        multiplied by the input too. Concretely: at <M tex="x = 1.0" />, nudging{" "}
-        <M tex="w_1" /> from 1.00 to 1.01 moves the product from 1.000 to 1.010,
-        the whole nudge; at <M tex="x = 0.5" /> the product would move half as
-        far; at <M tex="x = 0" />, not at all, and <M tex="w_1" /> would be a knob
-        that changes nothing. The wire from A to B is the same situation one hop
-        later: <M tex="a_1" /> enters <M tex="z_2" /> multiplied by{" "}
-        <M tex="w_2 = 2.0" />, so <M tex="a_1" />'s wiggle of 0.00235 lands on{" "}
-        <M tex="z_2" /> doubled: <M tex="2.0 \times 0.00235 = 0.00470" />, matching
-        the log. The rule for this kind: your changes are scaled by whatever you
-        are multiplied by.
+        Measured that way, a factor seems to need the nudged run: it is a ratio
+        of two changes, and a change needs a before and an after. But measuring
+        is not the only way to know a slope. A slope is a property of the spot
+        where you stand (Module 3's bowl had its tilt before any ball rolled),
+        and every arrow in this chain is machinery we built ourselves, so its
+        rule is known. Know the rule, and you can compute the arrow's slope at
+        the standing spot directly, from the first run's numbers, with no wiggle
+        involved. The three kinds below each come with that shortcut, and the
+        log's job is to certify them. The payoff if they hold: the log cost a
+        second full run of the network, the shortcuts cost nothing, and the
+        slope Module 3 paid a second run for comes out of numbers already in
+        hand.
       </p>
       <p>
-        The green factors are the two sigmoids, and their answer is Module 1's
-        slider. How much a neuron's confidence moves when its evidence moves
+        The purple factors live where two numbers multiply, and one subtraction
+        explains both of them. Take the wire hop, where the log shows something
+        real happening: <M tex="a_1" />'s wiggle of 0.00235 lands on{" "}
+        <M tex="z_2" /> as 0.00470, twice as big. Why exactly twice? The old
+        total is <M tex="z_2 = 2.0\,a_1 + b_2" />; the new total is the same
+        thing with <M tex="a_1 + 0.00235" /> in place of <M tex="a_1" />.
+        Subtract old from new:
+      </p>
+      <Eq
+        tex="\underbrace{2.0\,(a_1 + 0.00235) + b_2}_{\text{new } z_2} - \underbrace{(2.0\,a_1 + b_2)}_{\text{old } z_2} = 2.0 \times 0.00235 = 0.00470"
+        gloss="The b2's cancel, the 2.0-times-a1 parts cancel, and what remains is the wiggle times the wire. A change riding into a multiplication comes out multiplied: that is the whole mechanism."
+      />
+      <p>
+        So a purple factor is the other partner in the product. The first arrow
+        is the same subtraction with the roles swapped: there the wiggling thing
+        is <M tex="w_1" />, so the partner is the input <M tex="x" />, and our
+        input happens to be 1.0, which is why the nudge passed through unchanged.
+        An input of 0.5 would let half through; an input of 0 would kill it, and{" "}
+        <M tex="w_1" /> would be a knob that changes nothing. Wiggle the
+        activation and the factor is the weight; wiggle the weight and the factor
+        is the activation. Both partners are known without any nudge.
+      </p>
+      <p>
+        The green factors belong to the two sigmoids, and you met this kind in
+        Module 1's slider. How much a neuron's confidence moves when its evidence moves
         depends on where the neuron currently sits on the curve: eager on the
         steep middle, nearly deaf out on the flat ends. The factor is the
         steepness at that exact spot. Steepness has a shorthand,{" "}
@@ -124,22 +144,21 @@ export function Module4() {
       />
       <p>
         You do not have to take the formula on faith; it is checkable the Module 3
-        way (wiggle <M tex="z" />, divide). Neuron A sits at <M tex="z_1 = 0.5" />,
-        near the steep middle, so the formula gives a healthy{" "}
-        <M tex="0.6225 \times 0.3775 = 0.235" />, and the log agrees:{" "}
-        <M tex="0.235 \times 0.0100 = 0.00235" />, exactly <M tex="a_1" />'s
-        change. Neuron B sits at <M tex="z_2 = 0.2449" />, also near the middle:
-        steepness <M tex="0.5609 \times 0.4391 = 0.246" />, and the log agrees
-        again, <M tex="0.246 \times 0.00470 = 0.00116" />. (Had either neuron been
-        far out on a flat end, its factor would be near zero, and the nudge would
-        die right there.)
+        way (wiggle <M tex="z" />, divide). Both neurons sit near the steep
+        middle, so both factors are healthy, and both come from first-run
+        confidences alone: <M tex="0.6225 \times 0.3775 = 0.235" /> for A,{" "}
+        <M tex="0.5609 \times 0.4391 = 0.246" /> for B. The log agrees twice:{" "}
+        <M tex="0.235 \times 0.0100 = 0.00235" /> and{" "}
+        <M tex="0.246 \times 0.00470 = 0.00116" />. (Had either neuron been far
+        out on a flat end, its factor would be near zero, and the nudge would die
+        right there.)
       </p>
       <p>
-        The red factor belongs to the cost, and its size is the current miss.
-        Think about when a wiggle in the output matters. If the output already
-        sits on its target, wiggling it barely changes the squared miss; if the
-        output is badly wrong, the same wiggle moves the squared miss a lot. So
-        the factor is the gap itself, and it arrives with a flip worth noticing:
+        The red factor belongs to the cost, and its size is the size of the
+        current miss: wiggling an output that already sits on its target barely
+        changes the squared miss, while the same wiggle on a badly wrong output
+        changes it a lot. So the factor is the gap itself, read straight off the
+        first run's output, and it arrives with a flip worth noticing:
         Module 3 wrote gaps as right answer minus output, but the slope comes out
         the other way around, output minus right answer,{" "}
         <M tex="a_2 - y = 0.5609 - 1 = -0.4391" />. The sign carries the
@@ -153,12 +172,9 @@ export function Module4() {
         change exactly.
       </p>
       <p>
-        Now put the hops back together. The nudge to <M tex="w_1" /> becomes a
-        wiggle in <M tex="z_1" /> (× 1.0), which becomes a wiggle in{" "}
-        <M tex="a_1" /> (× 0.235), then in <M tex="z_2" /> (× 2.0), then in{" "}
-        <M tex="a_2" /> (× 0.246), then in the cost (× −0.439). Each hop
-        multiplies by its own little slope, so the whole trip multiplies by all
-        five:
+        That is all three kinds, and not one factor touched the nudged run:
+        everything was in hand the moment the first forward pass finished.
+        Multiply the five hops together and the slope falls out:
       </p>
       <Eq
         tex="1.0 \times 0.2350 \times 2.0 \times 0.2463 \times (-0.4391) = -0.0508"
@@ -166,17 +182,18 @@ export function Module4() {
       />
       <p>
         The nudge measurement said <M tex="-0.050" />, and the product says{" "}
-        <M tex="-0.0508" />. They agree, and the product is the exact one: the
+        <M tex="-0.0508" />. They agree, and only the measurement needed a second
+        run. The product is also the exact one: the
         nudge method approximates, because it uses a small step where the true
-        slope wants a vanishingly small one, the smearing Module 3's aside
-        described. The multiply-the-local-slopes rule is
+        slope wants a vanishingly small one (the smearing Module 3's aside
+        described). The multiply-the-local-slopes rule is
         called the chain rule, and it is the only piece of mathematics
         backpropagation needs. The rest of the algorithm is arranging the
         multiplications so that no factor is ever computed twice.
       </p>
 
       <p>
-        Arranged naively, it is still one product of five factors per knob, so look
+        The naive arrangement is one full product of five factors per knob, so look
         for shared work. Write <M tex="w_1" />'s product next to{" "}
         <M tex="b_1" />'s. A nudge to <M tex="b_1" /> starts at the same neuron and
         rides the same path; the only difference is the first factor, because{" "}
@@ -193,12 +210,12 @@ export function Module4() {
         Greek letter delta) is the slope of the cost with respect to that neuron's
         evidence <M tex="z" />: everything downstream of the neuron, collapsed into
         one number. Call it the neuron's blame: how much the cost cares about this
-        neuron's total. The chain has two neurons, so two blames, and the second
-        one is built from the first:
+        neuron's total. The chain has two neurons, so two blames, and neuron A's
+        is built from neuron B's:
       </p>
       <Eq
         tex="\delta_B = \underbrace{0.2463}_{\text{own } \sigma'} \times \underbrace{(-0.4391)}_{\text{gap}} = -0.1081, \qquad \delta_A = \underbrace{0.2350}_{\text{own } \sigma'} \times \underbrace{2.0}_{\text{wire}} \times \underbrace{(-0.1081)}_{\delta_B} = -0.0508"
-        gloss="Neuron B touches the cost directly, so its blame is its responsiveness times the gap. Neuron A's blame arrives from downstream: delta-B, carried back through the connecting wire, scaled by A's own responsiveness. Blame flows backward, one cheap step per neuron."
+        gloss="Neuron B touches the cost directly, so its blame is its own steepness times the gap. Neuron A's blame arrives from downstream: delta-B, carried back through the connecting wire, scaled by A's own steepness. Blame flows backward, one cheap step per neuron."
       />
       <p>
         And once a neuron's blame is known, its knobs read their slopes straight
@@ -296,11 +313,11 @@ export function Module4() {
       </p>
       <Eq
         tex="\delta^L = (a^L - y) \odot \sigma'(z^L) \tag{BP1}"
-        gloss="Blame starts at the output layer: the gap in each output entry, times how responsive that neuron currently is (the circled dot means multiply matching entries, NumPy's plain *, no adding). A saturated neuron has sigma-prime near zero and soaks up almost no blame, even when it is wrong."
+        gloss="Blame starts at the output layer: the gap in each output entry, times that neuron's current steepness (the circled dot means multiply matching entries, NumPy's plain *, no adding). A saturated neuron has sigma-prime near zero and soaks up almost no blame, even when it is wrong."
       />
       <Eq
         tex="\delta^l = \big( (w^{l+1})^T \, \delta^{l+1} \big) \odot \sigma'(z^l) \tag{BP2}"
-        gloss="Blame flows backward: each neuron of layer l collects blame along its outgoing wires and adds, then scales by its own responsiveness. The raised T (transpose) flips the matrix so the same wires read backward, and the shapes agree by Module 2's inner-numbers-touch rule: in the stepper, (3, 1) times (1, 1) gives (3, 1), one collected blame per hidden neuron."
+        gloss="Blame flows backward: each neuron of layer l collects blame along its outgoing wires and adds, then scales by its own steepness. The raised T (transpose) flips the matrix so the same wires read backward, and the shapes agree by Module 2's inner-numbers-touch rule: in the stepper, (3, 1) times (1, 1) gives (3, 1), one collected blame per hidden neuron."
       />
       <Eq
         tex="\frac{\partial C}{\partial b^l} = \delta^l \tag{BP3}"

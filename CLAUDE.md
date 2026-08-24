@@ -161,6 +161,20 @@ this floor after direct feedback; every later module must be written to it too.
   that amount") floats past this learner; prediction-against-a-log lands. Run
   checks in the multiplying direction (factor times change = next change), not
   the dividing direction.
+- **Demonstrate on numbers where the mechanism is visible.** Module 4 first
+  proved "the change comes out multiplied by the partner" on the hop whose
+  partner was 1.0, and the learner read it as "changing by 0.01 changes it by
+  0.01, so what?". A worked example whose value makes the key effect a no-op
+  (multiply by 1, add 0, gap of 0) teaches that nothing happened. Lead with an
+  instance where the effect shows (the times-2 wire), then explain the no-op
+  value as the special case it is.
+- **State what a section buys before proving it.** Module 4's factor
+  paragraphs read to the learner as "simple math, overexplained" until the
+  stakes came first: every factor is computable from the first run alone, so
+  the nudge and its second run become unnecessary. When a stretch of prose
+  verifies something, open with the one-sentence payoff the verification
+  earns, and close by cashing it out; checks without stated stakes read as
+  arithmetic for its own sake.
 - **Teach kinds, not instances.** When several facts repeat one pattern (Module
   4's five ripple factors), position-by-position derivations read as N separate
   proofs and lose the learner even when each line checks out. Instead: name the
