@@ -135,6 +135,12 @@ this floor after direct feedback; every later module must be written to it too.
   much as math symbols do. Also flag order reversals explicitly: weight shapes
   name the receiving layer first, so data flowing 2 -> 1 gives a (1, 2) matrix;
   teach the check "the inner numbers must touch" ((1, 2) @ (2, 1) -> (1, 1)).
+  A symbol also needs its spoken name, not just its meaning, whenever code
+  borrows that name: the course said the gradient is written with an
+  upside-down delta but never that the symbol is read "nabla", so the
+  `nabla_w` / `nabla_b` in every later prompt and skeleton looked like an
+  unrelated word. Name the glyph where it first appears, then bridge to the
+  code names at their own first use.
 - **No unexplained constants.** Every number in the prose is either derived in
   front of the reader, quoted from an earlier module, or explicitly labeled a
   free design choice with its trade-off (hidden layer size: more detectors vs

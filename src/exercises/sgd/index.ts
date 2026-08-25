@@ -18,8 +18,12 @@ export const sgdExercise: Exercise = {
       "showed. Call course.gradient(weights, biases, X, Y) to get the " +
       "slopes: it takes the same inputs as quadratic_cost, and where " +
       "quadratic_cost returns the score, gradient returns (nabla_w, " +
-      "nabla_b), one slope array per parameter array, nabla_w[0] shaped " +
-      "like weights[0] and so on. Apply the rule to every weight and " +
+      "nabla_b). Those two names are the module's ∇C: nabla is how that " +
+      "upside-down delta is read, and the pair is the one list of slopes " +
+      "split in two, the weights' slopes and the biases' slopes. There is " +
+      "one slope array per parameter array, nabla_w[0] shaped like " +
+      "weights[0] and so on, and each number in it is the slope of the " +
+      "knob in the matching spot. Apply the rule to every weight and " +
       "bias, and return (new_weights, new_biases), built as new lists of " +
       "new arrays with the inputs untouched (the tests check).",
     "sgd(weights, biases, X, Y, eta, epochs, batch_size, rng) loops it " +

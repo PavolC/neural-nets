@@ -109,7 +109,10 @@ export function Module3() {
         Now repeat this for each of the nine knobs, always putting the previous knob
         back before nudging the next. Nine measurements, nine slopes. That full list,
         one slope per knob, is called the gradient and written <M tex="\nabla C" />.
-        For this network, at this exact setting of the knobs, it comes out as:
+        The symbol is an upside-down capital delta, and it is read "nabla", so{" "}
+        <M tex="\nabla C" /> is spoken as "nabla C" or "the gradient of C". It names
+        the whole list, not a tenth number. For this network, at this exact setting
+        of the knobs, it comes out as:
       </p>
       <Eq
         tex="\nabla C = (\underbrace{-0.024,\; -0.024,\; -0.041}_{\text{h1's knobs}},\; \underbrace{0.017,\; 0.017,\; 0.041}_{\text{h2's knobs}},\; \underbrace{-0.035,\; -0.009,\; -0.044}_{\text{output's knobs}})"

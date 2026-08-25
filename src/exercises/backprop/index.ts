@@ -14,7 +14,9 @@ export const backpropExercise: Exercise = {
     "The contract, precisely: backprop(weights, biases, x, y) handles ONE " +
       "example. x is a single input column, shape (n_in, 1); y is its " +
       "right answer as a one-hot column, shape (n_out, 1). It returns " +
-      "(nabla_w, nabla_b): lists of arrays shaped exactly like weights " +
+      "(nabla_w, nabla_b), the same pair your sgd already takes: the " +
+      "gradient, split into the weights' slopes and the biases' slopes. " +
+      "They are lists of arrays shaped exactly like weights " +
       "and biases, each entry the exact slope of this example's cost " +
       "(one half times the sum of squared gaps, no averaging) for that " +
       "parameter. Read the parameters, never change them; moving them is " +
