@@ -387,7 +387,7 @@ export function Module4() {
       </p>
       <Eq
         tex="\delta^3 = (a^3 - y) \odot \sigma'(z^3) \tag{BP1}"
-        gloss="Blame starts at the output layer: the gap in each output entry, times that neuron's current steepness (the circled dot means multiply matching entries, NumPy's plain *, no adding). A saturated neuron has sigma-prime near zero and soaks up almost no blame, even when it is wrong."
+        gloss="Blame starts at the output layer: the gap in each output entry, times that neuron's current steepness (the circled dot means multiply matching entries, NumPy's plain *, no adding). Steepness is named by position on the curve, sigma-prime at z3, but sigmoid lets you compute it from the height instead: a3 times (1 minus a3), same number through either door. A saturated neuron has sigma-prime near zero and soaks up almost no blame, even when it is wrong."
       />
       <Eq
         tex="\delta^2 = \big( (w^3)^T \, \delta^3 \big) \odot \sigma'(z^2) \tag{BP2}"
@@ -402,14 +402,19 @@ export function Module4() {
         gloss="Every weight's slope is the receiving neuron's blame times the activation its wire carried: entry factor times the delta at the junction, for all wires at once. The shapes tell the story: delta-2 is (3, 1), the transposed input column is (1, 2), and their product is (3, 2), one slope per weight, in exactly the shape of w2; the entry in row j, column k is delta-j times a-k."
       />
       <p>
-        And each equation is a receipt for work already done:
+        And each equation is a receipt for work already done, twice over: once
+        in the chain, by hand, and once in the stepper you just walked (its
+        numbers are still on screen above; the BP2 and BP4 entries follow{" "}
+        <M tex="h_1" />, whose activation is 0.818 and whose steepness is
+        0.818 × 0.182 = 0.149):
       </p>
       <table className="truth-table">
         <thead>
           <tr>
             <th>equation</th>
             <th>in road words</th>
-            <th>you already computed it</th>
+            <th>in the chain, by hand</th>
+            <th>in the stepper, steps 4 to 6</th>
           </tr>
         </thead>
         <tbody>
@@ -417,21 +422,25 @@ export function Module4() {
             <td>BP1</td>
             <td>the last stretch's price: own steepness × the gap</td>
             <td><M tex="\delta_B = 0.2463 \times (-0.4391) = -0.1081" /></td>
+            <td><M tex="\delta^3 = (0.593 - 1) \times 0.241 = -0.098" /></td>
           </tr>
           <tr>
             <td>BP2</td>
             <td>collect along outgoing wires, add, × own steepness</td>
             <td><M tex="\delta_A = 0.2350 \times 2.0 \times (-0.1081) = -0.0508" /></td>
+            <td><M tex="4.0 \times (-0.098) \times 0.149 \approx -0.059" /></td>
           </tr>
           <tr>
             <td>BP3</td>
             <td>a bias's ramp factor is 1</td>
             <td><M tex="\text{slope for } b_2 = \delta_B" /></td>
+            <td><M tex="\text{slope for } b^3 = \delta^3 = -0.098" /></td>
           </tr>
           <tr>
             <td>BP4</td>
             <td>entry factor × the δ at the junction</td>
             <td><M tex="\text{slope for } w_2 = 0.6225 \times (-0.1081) = -0.0673" /></td>
+            <td><M tex="h_1\text{'s wire: } 0.818 \times (-0.098) \approx -0.080" /></td>
           </tr>
         </tbody>
       </table>
