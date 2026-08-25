@@ -7,10 +7,10 @@ export const backpropExercise: Exercise = {
   id: "backprop",
   title: "Backpropagation",
   prompt: [
-    "Two functions wait in the editor. sigmoid_prime is one line: Module " +
-      "4's steepness formula, sigmoid(z) times one minus sigmoid(z), " +
-      "elementwise like sigmoid itself. backprop is the algorithm, about " +
-      "twenty lines, and every line is one of the four equations above.",
+    "Two functions wait in the editor. sigmoid_prime is a single formula: " +
+      "Module 4's steepness, sigmoid(z) times one minus sigmoid(z), " +
+      "elementwise like sigmoid itself. backprop is the algorithm, and " +
+      "every statement in it is one of the four equations above.",
     "The contract, precisely: backprop(weights, biases, x, y) handles ONE " +
       "example. x is a single input column, shape (n_in, 1); y is its " +
       "right answer as a one-hot column, shape (n_out, 1). It returns " +
@@ -35,12 +35,14 @@ export const backpropExercise: Exercise = {
       "first and fill them as the loop walks.",
     "The tests climb a ladder: sigmoid_prime's values, your shapes, then " +
       "exact numbers on a small fixed network, then the gradient check, " +
-      "the strictest test in this course. It builds a 3-4-4-2 network " +
-      "(two hidden layers, so your backward loop has to actually loop), " +
-      "measures all 46 slopes the slow Module 3 way, nudging every " +
-      "parameter both ways, and compares them to yours one by one, " +
-      "demanding agreement to within one part in ten million. Last, your " +
-      "slopes drive a descent that retrains Module 1's XOR network.",
+      "the strictest test in this course. It builds a 3-5-4-2 network: " +
+      "two hidden layers, so your backward loop has to actually loop, " +
+      "with 54 knobs by the usual count (weights 15 + 20 + 8, biases " +
+      "5 + 4 + 2). The check measures all 54 slopes the slow Module 3 " +
+      "way, nudging every parameter both ways, and compares them to " +
+      "yours one by one, demanding agreement to within one part in ten " +
+      "million. Passing it means your backpropagation is correct. Last, " +
+      "your slopes drive a descent that retrains Module 1's XOR network.",
     "Once the tests pass, point your code at Module 4's by-hand numbers, " +
       "the two-neuron chain. Append this and press Run my code:",
     {
@@ -61,7 +63,7 @@ export const backpropExercise: Exercise = {
     },
     "The four slopes should be Module 4's table exactly: -0.0508 for both " +
       "of neuron A's knobs, -0.0673 and -0.1081 for neuron B's. And the " +
-      "two w1 lines agree to about ten decimal places: the nudge method " +
+      "two w1 printouts agree to about ten decimal places: the nudge method " +
       "approximates, from two reruns per knob, what your code now " +
       "computes exactly, all knobs in one sweep.",
   ],
@@ -72,7 +74,7 @@ export const backpropExercise: Exercise = {
     test: "test_gradient_check",
     note:
       "The gradient check passed: on a network your code has never seen, " +
-      "all 46 of your slopes match nudge-and-measure to within one part " +
+      "all 54 of your slopes match nudge-and-measure to within one part " +
       "in ten million. This is the strongest guarantee the course can " +
       "give. Your backpropagation is correct.",
   },
@@ -102,6 +104,10 @@ export const backpropExercise: Exercise = {
       "            delta = (weights[-l+1].T @ delta) * sigmoid_prime(zs[-l])   # BP2\n" +
       "            nabla_b[-l] = delta\n" +
       "            nabla_w[-l] = delta @ activations[-l-1].T\n" +
-      "        return nabla_w, nabla_b",
+      "        return nabla_w, nabla_b\n\n" +
+      "    Reading the loop's indices: -l names the layer being blamed, so\n" +
+      "    weights[-l+1], one step less negative, is the layer AFTER it, the\n" +
+      "    wires the blame flows back through. At l = 2 that is weights[-1],\n" +
+      "    the last weight matrix.",
   ],
 };

@@ -223,7 +223,8 @@ export function BackpropTrainPanel() {
         <p className="interactive-status">
           Done: {(result.accuracy * 100).toFixed(1)}% of the {result.n_test.toLocaleString()}{" "}
           held-out digits read correctly, after {result.steps.toLocaleString()} descent
-          steps in {result.seconds.toFixed(1)} seconds. The same run on nudge-measured
+          steps ({(result.n_train / 10).toLocaleString()} mini-batches per epoch, {EPOCHS}{" "}
+          epochs) in {result.seconds.toFixed(1)} seconds. The same run on nudge-measured
           gradients, at the step price measured above, works out to about{" "}
           {formatHours(result.nudge_total_hours)}. Same sgd, same cost, same data; the
           only change is where the slopes come from.

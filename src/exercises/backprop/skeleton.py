@@ -1,6 +1,7 @@
 """Exercise: backpropagation.
 
-Module 4's four equations as code. Two functions; the first is one line.
+Module 4's four equations as code. Two functions; the first is a single
+formula.
 
 Provided by the course:
 - sigmoid(z): from Module 1, elementwise, any shape.

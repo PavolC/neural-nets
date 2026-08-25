@@ -134,28 +134,30 @@ def test_backprop_hidden_layer():
 
 
 def test_gradient_check():
-    """the gradient check: your slopes against nudge-and-measure, all 46"""
+    """the gradient check: your slopes against nudge-and-measure, all 54"""
     from course import feedforward, numerical_gradient
-    # A fixed 3-4-4-2 network: two hidden layers, so the backward loop has
-    # to take more than one step.
+    # A fixed 3-5-4-2 network: two hidden layers, so the backward loop has
+    # to take more than one step, and no two layers the same size, so every
+    # transposed product keeps its shapes honest.
     weights = [
         np.array([[-0.8, -1.32, -0.25],
                   [0.42, 1.14, 0.11],
                   [-0.55, -0.78, 0.75],
-                  [1.63, 0.27, -1.23]]),
-        np.array([[-0.96, 1.6, 0.2, -1.73],
-                  [-0.08, -1.16, -0.63, -0.49],
-                  [-0.71, 0.55, -0.06, -0.59],
-                  [0.41, 0.83, -1.64, -0.26]]),
-        np.array([[-0.98, -0.17, -1.29, 0.02],
-                  [-0.04, -0.3, -1.05, -0.4]]),
+                  [1.63, 0.27, -1.23],
+                  [-0.96, 1.6, 0.2]]),
+        np.array([[-1.73, -0.08, -1.16, -0.63, -0.49],
+                  [-0.71, 0.55, -0.06, -0.59, 0.41],
+                  [0.83, -1.64, -0.26, -0.98, -0.17],
+                  [-1.29, 0.02, -0.04, -0.3, -1.05]]),
+        np.array([[-0.4, -1.09, -1.36, 0.22],
+                  [-1.11, 1.17, 0.72, -2.0]]),
     ]
     biases = [
-        np.array([[-1.09], [-1.36], [0.22], [-1.11]]),
-        np.array([[1.17], [0.72], [-2.0], [0.27]]),
-        np.array([[-1.1], [0.03]]),
+        np.array([[0.27], [-1.1], [0.03], [0.04], [-1.99]]),
+        np.array([[-0.23], [-0.26], [0.96], [-1.18]]),
+        np.array([[0.74], [-1.1]]),
     ]
-    x = np.array([[0.04], [-1.99], [-0.23]])
+    x = np.array([[-0.33], [-0.84], [1.45]])
     y = np.array([[1.0], [0.0]])
 
     nabla_w, nabla_b = backprop(weights, biases, x, y)
@@ -182,12 +184,12 @@ def test_gradient_check():
             )
     assert worst < 1e-7, (
         f"the gradient check failed: {worst_report} (relative discrepancy "
-        f"{worst:.2e}; the bar is 1e-7, and a correct backprop clears it "
-        "by a factor of twenty). Both methods measure the same slopes, so "
-        "a gap this size is a formula bug, not rounding. If only layers 1 "
-        "and 2 disagree while layer 3 matches, your backward loop is off "
-        "by one: check that BP2 transposes the NEXT layer's weights and "
-        "that sigmoid_prime gets THIS layer's stored z."
+        f"{worst:.2e}; the bar is 1e-7, and a correct backprop lands near "
+        "1e-9). Both methods measure the same slopes, so a gap this size "
+        "is a formula bug, not rounding. If only layers 1 and 2 disagree "
+        "while layer 3 matches, your backward loop is off by one: check "
+        "that BP2 transposes the NEXT layer's weights and that "
+        "sigmoid_prime gets THIS layer's stored z."
     )
 
 
