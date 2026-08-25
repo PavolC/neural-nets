@@ -1,4 +1,4 @@
-import { AfterThis, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { ExercisePage } from "../../components/ExercisePage";
 import { backpropExercise } from "../../exercises/backprop";
@@ -36,6 +36,9 @@ export function Module5() {
         backprop into your own sgd, unchanged, and trains the digit reader for
         real.
       </p>
+      <Figure caption="Where backprop goes. Your sgd from Module 3 asks one question per step and does not care who answers it; the answer is a slope for every knob. Two machines can answer. The dashed one is what you have been using: correct, and priced per knob, because each knob needs its own pair of rescores. The solid one is this module's exercise, priced per pass instead: every knob's slope falls out of one trip forward and one sweep back.">
+        <PipelineDiagram />
+      </Figure>
 
       <SectionHeader id="m5-cost" title="One example at a time" />
       <p>
@@ -69,6 +72,23 @@ export function Module5() {
         Module 3's wobble seen up close: each mini-batch's average is a
         different compromise between examples like these.)
       </p>
+      <Aside>
+        <p>
+          Module 2 banned Python loops over neurons, and averaging per-example
+          slopes means looping over examples, so it is worth saying which loops
+          that ban covers. The objection there was scale: a loop over the
+          hundreds of neurons inside a layer spends hundreds of interpreter
+          steps on work one matrix product does in a single call. A mini-batch
+          is ten examples, so this loop spends ten steps, and each step still
+          hands a whole layer's multiplication to the same fast numerical code.
+          A faster arrangement does exist, and production code uses it: stack
+          the batch as columns, run the four equations on whole matrices, and
+          have BP3 add along the batch instead of reading the blame column
+          directly. It returns the same gradients to the last decimal place.
+          One example per call is the version that matches the four equations
+          one for one, and that is the version worth writing by hand.
+        </p>
+      </Aside>
       <p>
         For a digit image, the right answer <M tex="y" /> is a column of ten
         numbers, 1.0 in the digit's slot and 0.0 everywhere else (the packing is
@@ -89,9 +109,27 @@ export function Module5() {
         The translation to NumPy is nearly mechanical, because Module 4 already
         glossed every symbol: the circled dot is the elementwise <code>*</code>,
         the raised T is <code>.T</code>, and matrix products are <code>@</code>.
-        Each equation becomes one NumPy statement. The shapes column below runs
-        each statement on the digit reader's hidden layer, where Module 2's
-        inner-numbers-touch check confirms every product:
+        Each equation becomes one NumPy statement.
+      </p>
+      <p>
+        Shapes are what make those statements concrete, so here is the network
+        they are aimed at: the digit reader this module trains. 784 inputs, one
+        per pixel of a 28-by-28 image; one hidden layer of 30 neurons; 10
+        outputs, one per digit. Module 2 drew this same three-layer shape with
+        15 hidden neurons, few enough for its circles to fit in a diagram, and
+        named 30 as the classic setup for reading digits. Either size is a free
+        choice: more pattern-detectors against more parameters to train.
+      </p>
+      <p>
+        The size fixes the two weight matrices: (30, 784) into the hidden layer,
+        (10, 30) into the output, receiving layer named first as in Module 2.
+        Choosing differently would change no symbol in the four equations, only
+        these numbers. Two names in the table below are the ones your{" "}
+        <code>sgd</code> already takes: <code>nabla_b</code> for the biases'
+        slopes and <code>nabla_w</code> for the weights', the two halves of
+        Module 3's <M tex="\nabla C" />. The table walks one pass of the backward
+        sweep through the network, BP1 at the output layer where blame starts,
+        then BP2 to BP4 one layer back:
       </p>
       <table className="truth-table">
         <thead>
@@ -110,7 +148,7 @@ export function Module5() {
           <tr>
             <td>BP2</td>
             <td><code>delta = (w_next.T @ delta) * sigmoid_prime(z)</code></td>
-            <td>(30, 10) @ (10, 1) gives (30, 1)</td>
+            <td><code>.T</code> makes (10, 30) into (30, 10); @ (10, 1) gives (30, 1)</td>
           </tr>
           <tr>
             <td>BP3</td>
@@ -120,7 +158,7 @@ export function Module5() {
           <tr>
             <td>BP4</td>
             <td><code>nabla_w = delta @ a_prev.T</code></td>
-            <td>(30, 1) @ (1, 784) gives (30, 784)</td>
+            <td>(30, 1) @ (1, 784) gives (30, 784), the weights' own shape</td>
           </tr>
         </tbody>
       </table>
@@ -148,8 +186,22 @@ export function Module5() {
         slot. The figure shows both counting directions on a two-layer network's
         receipts:
       </p>
-      <Figure caption="What the forward pass stores, for a network of two layers (like the 2-3-1 fixture in the tests, or the digit reader). Each box shows its entry's positive index on top and its negative index below: both name the same slot. BP1 reads zs[-1]; BP4 at the output layer reads activations[-2]; the backward loop steps both pointers left together.">
+      <Figure caption="What the forward pass stores, for a network of two layers (like the 2-3-1 fixture in the tests, or the digit reader). Each box shows its entry's positive index on top and its negative index below: both name the same slot. BP1 reads zs[-1]; BP4 at the output layer reads activations[-2].">
         <ReceiptsDiagram />
+      </Figure>
+
+      <p>
+        Reading those lists is one thing; walking them is the other. The
+        backward sweep visits one layer per pass. BP1 starts the walk at the
+        output layer, and every later pass is BP2 carrying the blame one layer
+        further back. What makes the code fiddly is that each pass reads the
+        same slots as the pass before, one step further left: the{" "}
+        <M tex="z" /> of the layer being blamed, and the activations that fed
+        that layer. Two passes finish the digit reader; a deeper network
+        repeats the second panel with everything shifted left again.
+      </p>
+      <Figure caption="The backward walk over the same receipts, pass by pass. Shaded slots are the ones that pass reads. The window slides one box left each pass, which is the whole motion of the loop: get it wrong by one and the tests say so, because the sigmoid steepness would come from the wrong layer's z.">
+        <BackwardWalkDiagram />
       </Figure>
 
       <SectionHeader id="m5-exercise" title="Write backprop" />
@@ -157,11 +209,9 @@ export function Module5() {
 
       <SectionHeader id="m5-train" title="The real training run" />
       <p>
-        The network for the real run is 784-30-10. Module 2's diagram used 15
-        hidden neurons so the circles fit on screen, and named 30 as the
-        classic training setup; thirty detectors instead of fifteen is the same
-        free choice Module 2 called out, more little pattern-detectors against
-        more parameters to train. The counting rule from Module 2 prices it:
+        The network is the digit reader the shapes table set up: 784 pixels in,
+        30 hidden neurons, 10 digit outputs. Module 2's counting rule prices its
+        knobs:
       </p>
       <Eq
         tex="\underbrace{30 \times 784}_{\text{hidden } w} + \underbrace{30}_{\text{hidden } b} + \underbrace{10 \times 30}_{\text{output } w} + \underbrace{10}_{\text{output } b} = 23{,}520 + 30 + 300 + 10 = 23{,}860"
@@ -270,6 +320,173 @@ function ReceiptsDiagram() {
         zs
       </text>
       {zs.map((b, i) => box(X0 + (i + 1) * (BW + GAP), rowY.zs, b, `z${i}`))}
+    </svg>
+  );
+}
+
+// Static diagram: where backprop sits in the machinery the learner already
+// owns. sgd asks one question per step; two implementations can answer it,
+// one priced per knob (the nudge method) and one priced per pass (backprop).
+// No numbers here on purpose: the bill is derived later, in m5-train.
+function PipelineDiagram() {
+  const SGD = { x: 24, y: 74, w: 166, h: 84 };
+  const FORK = 358; // where the two answers branch
+  const IMPL = { x: 388, w: 400, h: 84 };
+  const TOP_Y = 20;
+  const BOT_Y = 144;
+  const topMid = TOP_Y + IMPL.h / 2;
+  const botMid = BOT_Y + IMPL.h / 2;
+  return (
+    <svg viewBox="0 0 812 242" className="chain-ripple" role="img"
+         aria-label="Your sgd from Module 3 asks which way is downhill and receives one slope per knob. Two implementations can answer: nudge-and-measure, the course's gradient function, priced per knob; or your backprop, priced per pass, one forward pass and one backward sweep for every knob at once.">
+      <defs>
+        <marker id="pipe-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6"
+                markerHeight="6" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" className="ripple-head" />
+        </marker>
+      </defs>
+
+      <rect x={SGD.x} y={SGD.y} width={SGD.w} height={SGD.h} rx={6} className="ripple-box" />
+      <text x={SGD.x + SGD.w / 2} y={SGD.y + 32} textAnchor="middle" className="ripple-title">
+        your sgd
+      </text>
+      <text x={SGD.x + SGD.w / 2} y={SGD.y + 52} textAnchor="middle" className="ripple-value">
+        Module 3, unchanged
+      </text>
+      <text x={SGD.x + SGD.w / 2} y={SGD.y + 69} textAnchor="middle" className="ripple-value">
+        one step per mini-batch
+      </text>
+
+      {/* the exchange: a question out, slopes back */}
+      <line x1={SGD.x + SGD.w} y1={104} x2={FORK - 2} y2={104}
+            className="ripple-arrow" markerEnd="url(#pipe-head)" />
+      <text x={(SGD.x + SGD.w + FORK) / 2} y={96} textAnchor="middle" className="ripple-why">
+        which way is downhill?
+      </text>
+      <line x1={FORK - 2} y1={134} x2={SGD.x + SGD.w} y2={134}
+            className="ripple-arrow" markerEnd="url(#pipe-head)" />
+      <text x={(SGD.x + SGD.w + FORK) / 2} y={152} textAnchor="middle" className="ripple-why">
+        one slope per knob
+      </text>
+
+      {/* branch to the two answers */}
+      <line x1={FORK} y1={topMid} x2={FORK} y2={botMid} className="ripple-arrow" />
+      <line x1={FORK} y1={topMid} x2={IMPL.x} y2={topMid} className="ripple-arrow" />
+      <line x1={FORK} y1={botMid} x2={IMPL.x} y2={botMid} className="ripple-arrow" />
+
+      <text x={IMPL.x} y={TOP_Y - 8} className="ripple-change">
+        what you have been using
+      </text>
+      <rect x={IMPL.x} y={TOP_Y} width={IMPL.w} height={IMPL.h} rx={6}
+            className="ripple-box-old" />
+      <text x={IMPL.x + IMPL.w / 2} y={TOP_Y + 30} textAnchor="middle" className="ripple-title">
+        nudge-and-measure
+      </text>
+      <text x={IMPL.x + IMPL.w / 2} y={TOP_Y + 50} textAnchor="middle" className="ripple-value">
+        the course's gradient function
+      </text>
+      <text x={IMPL.x + IMPL.w / 2} y={TOP_Y + 70} textAnchor="middle" className="ripple-value">
+        two rescores of the batch, for each knob separately
+      </text>
+
+      <text x={IMPL.x} y={BOT_Y - 8} className="ripple-change">
+        what you write in this module
+      </text>
+      <rect x={IMPL.x} y={BOT_Y} width={IMPL.w} height={IMPL.h} rx={6} className="ripple-box" />
+      <text x={IMPL.x + IMPL.w / 2} y={BOT_Y + 30} textAnchor="middle" className="ripple-title">
+        your backprop
+      </text>
+      <text x={IMPL.x + IMPL.w / 2} y={BOT_Y + 50} textAnchor="middle" className="ripple-value">
+        the four equations, once per example
+      </text>
+      <text x={IMPL.x + IMPL.w / 2} y={BOT_Y + 70} textAnchor="middle" className="ripple-value">
+        one pass forward, one sweep back, every knob at once
+      </text>
+    </svg>
+  );
+}
+
+// Static small-multiple: the backward sweep's two passes over the receipts of
+// a two-layer network, with the slots each pass reads shaded. Makes the
+// loop's one-step-left motion visible instead of asking the reader to
+// imagine it (and the off-by-one the tests diagnose).
+function BackwardWalkDiagram() {
+  const PANEL_W = 390;
+  const BW = 112;
+  const GAP = 8;
+  const BH = 44;
+  const ACTS_Y = 44;
+  const ZS_Y = 112;
+  const panels = [
+    {
+      x: 8,
+      title: "pass 1 · BP1, at the output layer",
+      acts: [
+        { label: "a[-3]", note: "the input x", read: false },
+        { label: "a[-2]", note: "fed the output layer", read: true },
+        { label: "a[-1]", note: "the answer", read: true },
+      ],
+      zs: [
+        { label: "z[-2]", note: "", read: false },
+        { label: "z[-1]", note: "output evidence", read: true },
+      ],
+      writes: "writes nabla_b[-1] and nabla_w[-1]",
+    },
+    {
+      x: 8 + PANEL_W + 16,
+      title: "pass 2 · BP2, one layer back",
+      acts: [
+        { label: "a[-3]", note: "fed the hidden layer", read: true },
+        { label: "a[-2]", note: "", read: false },
+        { label: "a[-1]", note: "", read: false },
+      ],
+      zs: [
+        { label: "z[-2]", note: "hidden evidence", read: true },
+        { label: "z[-1]", note: "", read: false },
+      ],
+      writes: "writes nabla_b[-2] and nabla_w[-2]",
+    },
+  ];
+  const slot = (
+    x: number,
+    y: number,
+    s: { label: string; note: string; read: boolean },
+    key: string,
+  ) => (
+    <g key={key}>
+      <rect x={x} y={y} width={BW} height={BH} rx={5}
+            className={s.read ? "ripple-box-read" : "ripple-box-idle"} />
+      <text x={x + BW / 2} y={y + 19} textAnchor="middle" className="ripple-change">
+        {s.label}
+      </text>
+      <text x={x + BW / 2} y={y + 35} textAnchor="middle" className="ripple-value">
+        {s.note}
+      </text>
+    </g>
+  );
+  return (
+    <svg viewBox="0 0 812 212" className="chain-ripple" role="img"
+         aria-label="Two panels. Pass 1, BP1 at the output layer, reads activations[-1], activations[-2] and zs[-1], and writes the last layer's slopes. Pass 2, BP2 one layer back, reads activations[-3] and zs[-2], and writes the hidden layer's slopes: the same window of slots, moved one box left.">
+      {panels.map((p, pi) => (
+        <g key={pi}>
+          <text x={p.x + PANEL_W / 2} y={20} textAnchor="middle" className="ripple-title">
+            {p.title}
+          </text>
+          <text x={p.x + 4} y={ACTS_Y - 6} className="ripple-band-label">activations</text>
+          {p.acts.map((s, i) => slot(p.x + 4 + i * (BW + GAP), ACTS_Y, s, `a${pi}${i}`))}
+          <text x={p.x + 4} y={ZS_Y - 6} className="ripple-band-label">zs</text>
+          {p.zs.map((s, i) =>
+            slot(p.x + 4 + (i + 1) * (BW + GAP), ZS_Y, s, `z${pi}${i}`),
+          )}
+          <text x={p.x + PANEL_W / 2} y={ZS_Y + BH + 26} textAnchor="middle"
+                className="ripple-why">
+            {p.writes}
+          </text>
+        </g>
+      ))}
+      <text x={406} y={206} textAnchor="middle" className="ripple-change">
+        shaded = read on this pass
+      </text>
     </svg>
   );
 }

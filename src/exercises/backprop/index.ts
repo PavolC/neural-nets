@@ -27,14 +27,10 @@ export const backpropExercise: Exercise = {
       "backward half is BP1 once, then BP2, BP3, BP4 in a loop that " +
       "walks from the last layer toward the first, filling nabla_w and " +
       "nabla_b back to front.",
-    "Walking back to front is where one Python habit earns its keep: " +
-      "negative indices. A list counts from the end with them: " +
-      "activations[-1] is the last entry (the network's output), " +
-      "activations[-2] the one before it, zs[-1] the last stored z. " +
-      "Assignment works the same way, so nabla_b[-1] = delta fills the " +
-      "last layer's slot. One more tool: np.zeros_like(w) makes a " +
-      "zeros array of w's shape, so you can build the two result lists " +
-      "first and fill them as the loop walks.",
+    "One new NumPy tool for the backward half: np.zeros_like(w) makes a " +
+      "zeros array of w's shape. Build nabla_w and nabla_b that way " +
+      "before the walk starts, then fill their slots as the loop goes, " +
+      "with the negative indices the section above laid out.",
     "The tests climb a ladder: sigmoid_prime's values, your shapes, then " +
       "exact numbers on a small fixed network, then the gradient check, " +
       "the strictest test in this course. It builds a 3-5-4-2 network: " +

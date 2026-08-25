@@ -210,7 +210,7 @@ button:disabled {
   margin: 0.8rem 0;
 }
 
-.output-panel h3 {
+.output-panel h5 {
   font-size: 0.85rem;
   font-family: system-ui, sans-serif;
   text-transform: uppercase;
@@ -315,7 +315,7 @@ button:disabled {
   background: #fbfbf7;
 }
 
-.hint h3 {
+.hint h5 {
   font-size: 0.95rem;
   margin: 0.8rem 0 0.4rem;
 }
@@ -341,8 +341,18 @@ button:disabled {
 
 /* ---------- module pages ---------- */
 
-.module h2 {
+/* Direct child only: the module's own title. A descendant selector here used
+   to hand the module-title size to any nested h2 (the exercise's), which then
+   outranked the section heading above it. */
+.module > h2 {
   font-size: 1.5rem;
+}
+
+/* The exercise sits inside a section, so its title ranks below a section
+   heading (1.15rem) and above body text. */
+.exercise-title {
+  font-size: 1.05rem;
+  margin: 2.2rem 0 0.5rem;
 }
 
 .after-this,
@@ -1799,4 +1809,26 @@ footer a {
     /* slices keep their natural pixel size (small ones must not stretch) */
     max-width: none !important;
   }
+}
+
+/* Module 5's pipeline picture: the implementation being superseded. */
+.ripple-box-old {
+  fill: #f6f6f4;
+  stroke: var(--muted);
+  stroke-width: 1.1;
+  stroke-dasharray: 5 4;
+}
+
+/* Module 5's backward-walk panels: a receipt slot read on this pass, and one
+   left alone. */
+.ripple-box-read {
+  fill: #dbeade;
+  stroke: var(--accent);
+  stroke-width: 1.4;
+}
+
+.ripple-box-idle {
+  fill: #fbfbf9;
+  stroke: var(--rule);
+  stroke-width: 1;
 }

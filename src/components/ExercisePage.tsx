@@ -156,10 +156,10 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
 
   return (
     <section className="exercise">
-      <h2>
+      <h4 className="exercise-title">
         Exercise: {exercise.title}
         {completed && <span className="badge-done" title="All tests passed">passed</span>}
-      </h2>
+      </h4>
       {exercise.prompt.map((part, i) =>
         typeof part === "string" ? (
           <p key={i}>{part}</p>
@@ -220,7 +220,7 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
 
         {ranOnce && !running && (
           <div className="output-panel">
-            <h3>Output</h3>
+            <h5>Output</h5>
             <pre>
               {output.length
                 ? output.join("\n")
@@ -246,19 +246,19 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
       <div className="hints">
         {reveal > 0 && (
           <div className="hint">
-            <h3>Hint 1</h3>
+            <h5>Hint 1</h5>
             <p>{exercise.hints[0]}</p>
           </div>
         )}
         {reveal > 1 && (
           <div className="hint">
-            <h3>Hint 2</h3>
+            <h5>Hint 2</h5>
             <pre className="hint-pre">{exercise.hints[1]}</pre>
           </div>
         )}
         {reveal > 2 && (
           <div className="hint">
-            <h3>Reference solution</h3>
+            <h5>Reference solution</h5>
             <pre className="hint-pre">{exercise.solution}</pre>
             <button className="button-secondary" onClick={copySolution} disabled={running}>
               Copy solution into editor
