@@ -101,7 +101,9 @@ export function Aside({ children }: { children: ReactNode }) {
 export function Figure({ children, caption }: { children: ReactNode; caption: string }) {
   return (
     <figure className="module-figure">
-      {children}
+      {/* Wide diagrams keep a readable size on small screens and scroll
+          sideways inside this wrapper instead of shrinking to illegibility. */}
+      <div className="figure-scroll">{children}</div>
       <figcaption>{caption}</figcaption>
     </figure>
   );

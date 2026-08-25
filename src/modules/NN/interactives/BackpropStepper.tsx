@@ -242,9 +242,10 @@ export function BackpropStepper() {
         <Eq tex={stepDef.tex} gloss={stepDef.gloss(trace)} />
       </div>
 
+      <div className="figure-scroll">
       <svg
-        viewBox="0 0 672 362"
-        className="interactive-svg"
+        viewBox="-70 0 812 362"
+        className="interactive-svg bp-diagram"
         role="img"
         aria-label="A 2-3-1 network: two inputs feed three hidden neurons, which feed one output neuron. Wires and circles are clickable."
       >
@@ -304,6 +305,7 @@ export function BackpropStepper() {
           {show.cost ? `C = ${fmt(trace.cost, 4)}` : ""}
         </text>
       </svg>
+      </div>
 
       <div className="bp-lower">
         <div className="bp-table-scroll">

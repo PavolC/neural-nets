@@ -96,6 +96,10 @@ export function Module4() {
       </Figure>
 
       <SectionHeader id="m4-rates" title="Factors are posted rates" />
+      <p>
+        What a factor is, and why it costs nothing to know, is easiest to see
+        far from any network for one beat.
+      </p>
       <Aside>
         <p>
           You are paid in euros and support family in Mexico, and two currency
@@ -526,7 +530,7 @@ function CurrencyDiagram() {
   const Y0 = 40;
   const BH = 52;
   return (
-    <svg viewBox="0 0 780 150" className="chain-ripple" role="img"
+    <svg viewBox="-16 0 812 150" className="chain-ripple" role="img"
          aria-label="A 5 euro raise passes through two currency booths, times 2 into dollars and times 3 into pesos, arriving as 30 extra pesos; the through-rate is 6 pesos per euro">
       {boxes.map((b, i) => {
         const x = X0 + i * (BW + GAP);
@@ -608,8 +612,7 @@ function RoadDiagram() {
     ["b₂", 384, 2, 12, "× 1", ""],
   ];
   return (
-    <svg viewBox="-80 0 780 258" className="chain-ripple"
-         style={{ width: "min(760px, 100%)", margin: "0 auto" }} role="img"
+    <svg viewBox="-96 0 812 258" className="chain-ripple" role="img"
          aria-label="The road from z1 through a1, z2, a2 to the cost, with knobs w1 and b1 entering at z1 and w2 and b2 entering at z2; delta-A prices the road from z1, delta-B from z2. Green bands group z1 and a1 inside neuron A and z2 and a2 inside neuron B.">
       <defs>
         <marker id="road-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6"
@@ -705,8 +708,7 @@ function NetworkAnatomyDiagram() {
     </text>
   ));
   return (
-    <svg viewBox="0 0 730 330" className="chain-net"
-         style={{ width: "min(730px, 100%)" }} role="img"
+    <svg viewBox="-41 0 812 330" className="chain-net" role="img"
          aria-label="The 2-3-1 network labeled: layer 1 is the input column a1 equals x; layer 2 has three neurons with columns z2, a2, delta2 and biases b2; layer 3 has one neuron with z3, a3, delta3 and bias b3; w2 and w3 are the wire ledgers; the target y and cost C sit outside the network">
       <text x={110} y={22} textAnchor="middle" className="ripple-band-label">layer 1</text>
       <text x={330} y={22} textAnchor="middle" className="ripple-band-label">layer 2</text>
@@ -772,8 +774,7 @@ function NetworkAnatomyDiagram() {
 // neuron's own steepness scales the sum. The upgrade BP2 generalizes.
 function ForkDiagram() {
   return (
-    <svg viewBox="0 0 640 244" className="chain-net"
-         style={{ width: "min(640px, 100%)" }} role="img"
+    <svg viewBox="-86 0 812 244" className="chain-net" role="img"
          aria-label="A hidden neuron feeds two output neurons with blames −0.10 and +0.08 through wires of weight 4.0 and −4.0; blame flows backward along each wire multiplied by its weight, the arrivals −0.40 and −0.32 add to −0.72, and times the neuron's own steepness 0.15 gives δ = −0.108">
       <defs>
         <marker id="fork-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6"
@@ -832,7 +833,7 @@ function ChainNetDiagram() {
     />
   );
   return (
-    <svg viewBox="0 0 580 160" className="chain-net" role="img"
+    <svg viewBox="-116 0 812 160" className="chain-net" role="img"
          aria-label="A chain: input x feeds neuron A through weight w1, neuron A feeds neuron B through weight w2, and neuron B's confidence is the answer, compared against the target y = 1">
       <defs>
         <marker id="chain-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7"
@@ -921,6 +922,7 @@ function RippleSlice({ arrows }: { arrows: number[] }) {
     </g>
   );
   return (
+    <div className="figure-scroll">
     <svg viewBox={`0 0 ${W} 140`} className="ripple-slice"
          style={{ width: `${W}px`, maxWidth: "100%" }} role="img"
          aria-label={`Recall from the log: ${arrows
@@ -956,6 +958,7 @@ function RippleSlice({ arrows }: { arrows: number[] }) {
         );
       })}
     </svg>
+    </div>
   );
 }
 

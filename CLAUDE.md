@@ -110,6 +110,14 @@ this floor after direct feedback; every later module must be written to it too.
 - **Succeed before failing.** The learner solves OR and AND before meeting XOR;
   "press Show a solution, break it one slider at a time, then rebuild" is a valid
   on-ramp for a fiddly interactive.
+- **Diagram widths are standardized, two families.** Box-and-arrow diagrams
+  (chain-ripple / chain-net classes, the stepper's diagram, Module 5's
+  receipts) share one 812-unit-wide viewBox rendered at full column width:
+  pad a narrower layout by lowering the viewBox min-x to center it, never by
+  scaling. Plot-family figures (concert-plot, tiny-net, shapes-diagram)
+  render at exactly natural scale, capped at their viewBox width and
+  centered. On sub-720px screens the box family keeps min-width 620px and
+  pans inside .figure-scroll. New diagrams join one of the two families.
 - **Interactives must not jump.** Fixed-basis flex columns (wrap depends on window
   width, never content), reserved heights for changing status text (.status-fixed),
   statuses on their own full-width line inside control rows, range inputs allowed

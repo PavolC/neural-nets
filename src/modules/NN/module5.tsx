@@ -239,7 +239,7 @@ function ReceiptsDiagram() {
   );
   return (
     <svg
-      viewBox="0 0 580 220"
+      viewBox="-116 0 812 220"
       className="chain-ripple"
       role="img"
       aria-label="The two lists a forward pass stores: activations with three entries indexed 0, 1, 2 or -3, -2, -1, and zs with two entries indexed 0, 1 or -2, -1"
