@@ -2299,3 +2299,22 @@ footer a {
     font-size: 15px;
   }
 }
+
+/* Placeholders for the two things that now arrive in their own chunk. The
+   editor's reserves its real height so the page does not jump when it lands. */
+.code-editor-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: system-ui, sans-serif;
+  font-size: 0.9rem;
+  color: var(--muted);
+  background: var(--surface-card);
+}
+
+.module-loading {
+  color: var(--muted);
+  font-family: system-ui, sans-serif;
+  font-size: 0.9rem;
+  padding: 2rem 0;
+}

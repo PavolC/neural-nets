@@ -8,7 +8,8 @@ import {
 import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
 import { loadCode, loadCompleted, subscribeProgress } from "../../../state/progress";
 import { feedforwardExercise } from "../../../exercises/feedforward";
-import { divergingColor, drawMnistDigit, useInViewOnce } from "./utils";
+import { divergingColor, drawMnistDigit } from "./utils";
+import { useInViewOnce } from "../../../components/useInViewOnce";
 
 // Module 2 interactive: a 784-15-10 network, rendered compactly. Hovering a
 // hidden neuron shows its 784 incoming weights as a 28x28 image patch.

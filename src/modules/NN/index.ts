@@ -1,26 +1,49 @@
-import type { ComponentType } from "react";
+import { lazy, type ComponentType } from "react";
 import { Module1 } from "./module1";
-import { Module2 } from "./module2";
-import { Module3 } from "./module3";
-import { Module4 } from "./module4";
-import { Module5 } from "./module5";
-import { Module6 } from "./module6";
 
 export interface ModuleDef {
   id: string;
   navLabel: string;
   Component: ComponentType;
+  /** Start fetching this module's chunk without rendering it. App calls this on
+   * idle for every module, so a tab switch never waits on a download. */
+  preload?: () => void;
 }
 
-// Every module is reachable from the start: the reader decides the order, and
-// the nav never withholds anything. (Exercise completion still gates the
-// payoff panels that run the reader's own code, because those need the code to
-// exist; that check lives in the panels themselves.)
+// Module 1 is what a first visit lands on, so it ships in the main chunk. The
+// rest load separately: every module used to be parsed and rendered before
+// anything painted, and modules 2 to 6 are the larger half of that work. Each
+// one still stays mounted once visited, so editor and visualization state
+// survives tab switches exactly as before.
+function deferred(load: () => Promise<{ default: ComponentType }>) {
+  return { Component: lazy(load), preload: () => void load() };
+}
+
 export const MODULES: ModuleDef[] = [
   { id: "m1", navLabel: "1 · Neurons", Component: Module1 },
-  { id: "m2", navLabel: "2 · Feedforward", Component: Module2 },
-  { id: "m3", navLabel: "3 · Descent", Component: Module3 },
-  { id: "m4", navLabel: "4 · Backprop", Component: Module4 },
-  { id: "m5", navLabel: "5 · Training", Component: Module5 },
-  { id: "m6", navLabel: "6 · Universality", Component: Module6 },
+  {
+    id: "m2",
+    navLabel: "2 · Feedforward",
+    ...deferred(() => import("./module2").then((m) => ({ default: m.Module2 }))),
+  },
+  {
+    id: "m3",
+    navLabel: "3 · Descent",
+    ...deferred(() => import("./module3").then((m) => ({ default: m.Module3 }))),
+  },
+  {
+    id: "m4",
+    navLabel: "4 · Backprop",
+    ...deferred(() => import("./module4").then((m) => ({ default: m.Module4 }))),
+  },
+  {
+    id: "m5",
+    navLabel: "5 · Training",
+    ...deferred(() => import("./module5").then((m) => ({ default: m.Module5 }))),
+  },
+  {
+    id: "m6",
+    navLabel: "6 · Universality",
+    ...deferred(() => import("./module6").then((m) => ({ default: m.Module6 }))),
+  },
 ];

@@ -219,7 +219,7 @@ export function BackpropStepper() {
           ◀ Back
         </button>
         <button
-          className="button-secondary bp-next"
+          className="button-secondary"
           disabled={step === STEPS.length - 1}
           onClick={() => setStep((s) => Math.min(STEPS.length - 1, s + 1))}
         >

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { fetchMnistTest, type MnistTestSubset } from "../../../runtime/assets";
-import { drawMnistDigit, useInViewOnce } from "./utils";
+import { drawMnistDigit } from "./utils";
+import { useInViewOnce } from "../../../components/useInViewOnce";
 
 // Module 2 interactive: an image is just numbers. One real MNIST test
 // digit, blown up; pointing at any pixel shows its brightness value and

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { TrainingDemo } from "./m0/TrainingDemo";
 import { MODULES } from "./modules/NN";
 
@@ -15,10 +15,31 @@ function tabFromHash(): string {
 
 export default function App() {
   const [tab, setTab] = useState<string>(tabFromHash);
+  // Which modules have been opened. Modules load on demand, but once one is
+  // rendered it stays rendered, so its editor and visualization state survives
+  // every later tab switch.
+  const [opened, setOpened] = useState<Set<string>>(() => new Set([tabFromHash()]));
   const selectTab = (id: string) => {
     window.location.hash = id;
     setTab(id);
   };
+  useEffect(() => {
+    setOpened((prev) => (prev.has(tab) ? prev : new Set(prev).add(tab)));
+  }, [tab]);
+
+  // Warm the remaining module chunks once the page is quiet, so deferring them
+  // costs a download on first paint and nothing on navigation.
+  useEffect(() => {
+    const warm = () => MODULES.forEach((m) => m.preload?.());
+    const idle = window.requestIdleCallback;
+    if (idle) {
+      const id = idle(warm);
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(warm, 1500);
+    return () => window.clearTimeout(id);
+  }, []);
+
   useEffect(() => {
     const onHashChange = () => setTab(tabFromHash());
     window.addEventListener("hashchange", onHashChange);
@@ -102,8 +123,8 @@ export default function App() {
         </nav>
       </header>
       <main>
-        {/* Everything stays mounted so tab switches never lose editor or
-            visualization state. */}
+        {/* A module renders on first visit and stays rendered after that, so
+            tab switches never lose editor or visualization state. */}
         {MODULES.map((m, i) => {
           const next = MODULES[i + 1];
           return (
@@ -114,7 +135,9 @@ export default function App() {
                 panels.current[m.id] = el;
               }}
             >
-              <m.Component />
+              <Suspense fallback={<p className="module-loading">Loading {m.navLabel}...</p>}>
+                {opened.has(m.id) && <m.Component />}
+              </Suspense>
               {next && (
                 <div className="next-module">
                   <button onClick={() => selectTab(next.id)}>

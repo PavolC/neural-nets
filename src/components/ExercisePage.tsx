@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import type { Exercise } from "../exercises/types";
 import type { TestRunResult, WorkerResponse } from "../runtime/messages";
 import { sendRequest, terminateWorker } from "../runtime/workerClient";
@@ -11,7 +11,19 @@ import {
   saveCompleted,
   saveRevealStage,
 } from "../state/progress";
-import { CodeEditor, type CodeEditorHandle } from "./CodeEditor";
+import type { CodeEditorHandle } from "./CodeEditor";
+import { useInViewOnce } from "./useInViewOnce";
+
+// CodeMirror is the largest dependency in the app, 147 KB gzipped against the
+// 155 KB of everything else. It is needed only at an exercise, which sits
+// thousands of pixels into a module, so it loads in its own chunk and that chunk
+// is not requested until the reader is within 600px of the editor. Splitting it
+// out alone was not enough: Module 1 renders on first paint, exercise included,
+// so the lazy import fired immediately and the download was never actually
+// deferred. The in-view gate below is what defers it.
+const CodeEditor = lazy(() =>
+  import("./CodeEditor").then((m) => ({ default: m.CodeEditor })),
+);
 
 const REVEAL_LABELS = ["Show hint 1", "Show hint 2", "Show the solution"];
 
@@ -49,7 +61,12 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
   const [reveal, setReveal] = useState(() => loadRevealStage(exercise.id));
   const [completed, setCompleted] = useState(() => loadCompleted(exercise.id));
   const [fullscreen, setFullscreen] = useState(false);
+  const [editorReady, setEditorReady] = useState(false);
+  const workbenchRef = useRef<HTMLDivElement>(null);
+  const editorNeeded = useInViewOnce(workbenchRef);
   const running = busy !== null;
+  // Nothing to run until the editor chunk has landed and handed over its handle.
+  const canRun = editorReady && !running;
 
   // Fullscreen: Escape exits, and the page behind must not scroll.
   useEffect(() => {
@@ -251,12 +268,22 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
       <div
         className={fullscreen ? "workbench workbench-fullscreen" : "workbench"}
         aria-busy={running}
+        ref={workbenchRef}
       >
-        <CodeEditor
-          initialDoc={initialDoc}
-          onChange={(doc) => saveCode(exercise.id, doc)}
-          handleRef={editorRef}
-        />
+        {/* The placeholder carries the editor's own height, so the page geometry
+            is the same before and after it arrives. */}
+        {editorNeeded ? (
+          <Suspense fallback={<EditorPlaceholder />}>
+            <CodeEditor
+              initialDoc={initialDoc}
+              onChange={(doc) => saveCode(exercise.id, doc)}
+              handleRef={editorRef}
+              onReady={setEditorReady}
+            />
+          </Suspense>
+        ) : (
+          <EditorPlaceholder />
+        )}
 
         <p className="exercise-tip">
           Two ways to run. "Run my code" just executes what is in the editor, so you
@@ -268,10 +295,10 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
         </p>
 
         <div className="exercise-controls">
-          <button onClick={runTests} disabled={running}>
+          <button onClick={runTests} disabled={!canRun}>
             {busy === "tests" ? "Running..." : "Run tests"}
           </button>
-          <button className="button-secondary" onClick={runScratch} disabled={running}>
+          <button className="button-secondary" onClick={runScratch} disabled={!canRun}>
             {busy === "scratch" ? "Running..." : "Run my code"}
           </button>
           {running && (
@@ -279,7 +306,7 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
               Stop
             </button>
           )}
-          <button className="button-secondary" onClick={resetToSkeleton} disabled={running}>
+          <button className="button-secondary" onClick={resetToSkeleton} disabled={!canRun}>
             Reset to skeleton
           </button>
           <button
@@ -347,7 +374,7 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
           <div className="hint">
             <h5>Reference solution</h5>
             <pre className="hint-pre">{exercise.solution}</pre>
-            <button className="button-secondary" onClick={copySolution} disabled={running}>
+            <button className="button-secondary" onClick={copySolution} disabled={!canRun}>
               Copy solution into editor
             </button>
           </div>
@@ -360,6 +387,10 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
       </div>
     </section>
   );
+}
+
+function EditorPlaceholder() {
+  return <div className="code-editor code-editor-loading">Loading the editor...</div>;
 }
 
 function PlaySnippet({ code, onAppend }: { code: string; onAppend: () => void }) {

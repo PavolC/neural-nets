@@ -16,14 +16,20 @@ export function CodeEditor({
   initialDoc,
   onChange,
   handleRef,
+  onReady,
 }: {
   initialDoc: string;
   onChange: (doc: string) => void;
   handleRef: React.MutableRefObject<CodeEditorHandle | null>;
+  /** Called once the view exists and the handle is usable. The parent loads
+   * this component lazily, so until then there is no document to run. */
+  onReady?: (ready: boolean) => void;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
 
   useEffect(() => {
     const view = new EditorView({
@@ -47,8 +53,10 @@ export function CodeEditor({
         view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: doc } });
       },
     };
+    onReadyRef.current?.(true);
     return () => {
       handleRef.current = null;
+      onReadyRef.current?.(false);
       view.destroy();
     };
     // Mount once; initialDoc changes after mount are applied via the handle.
