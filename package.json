@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "bench:speeds": "tsc -p tools/tsconfig.bench.json && echo '{\"type\":\"commonjs\"}' > .bench/package.json && node .bench/tools/bench_layer_speeds.js",
     "preview": "vite preview"
   },
   "dependencies": {

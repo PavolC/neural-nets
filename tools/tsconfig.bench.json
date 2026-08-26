@@ -1,0 +1,17 @@
+{
+  // Compiles tools/bench_layer_speeds.ts (and the panel sources it imports)
+  // to CommonJS in .bench/, which is what `npm run bench:speeds` then runs.
+  // Separate from the app's tsconfig because the bench targets Node rather
+  // than the browser, and the app's build must not typecheck or emit it.
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "../.bench",
+    "types": []
+  },
+  "include": ["bench_layer_speeds.ts"]
+}

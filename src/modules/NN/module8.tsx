@@ -87,10 +87,11 @@ export function Module8() {
       </p>
       <p>
         That is not a coincidence, and what the network is doing at that moment is
-        worth stating. After its first epoch it answers 1 for all thousand images.
-        Its ten outputs on any one image sit between 0.055 and 0.172, all within a
-        tenth of each other, so whichever one is highest wins every image, and the
-        one that is highest is the digit that appeared most often in training.
+        stating. After its first epoch it answers 1 for all thousand images. Every
+        one of its ten outputs, on every one of those images, lands between 0.054
+        and 0.179, and on a single image the highest sits within 0.13 of the
+        lowest. So whichever output is highest wins every image, and the one that
+        is highest is the digit that appeared most often in training.
         After a full pass over 5,000 images it has learned which digit is
         commonest and nothing else.
       </p>
@@ -253,9 +254,9 @@ export function Module8() {
         input count was chosen to keep a neuron's evidence near zero, and it has
         a second consequence: a ledger drawn that way sends a column back at
         about its own length. Averaged over 200 draws of a 30-by-30 ledger the
-        length comes back at 0.98 of what went in, with individual draws between
-        0.71 and 1.30. The four values above, 0.878 to 1.159, are ordinary
-        members of that spread.
+        length comes back at 0.99 of what went in, with the middle 90 percent of
+        those draws between 0.80 and 1.19. The four values above, 0.878 to 1.159,
+        are ordinary members of that spread.
       </p>
       <p>
         The steepness column is about 0.21, every time, and it can never be more
@@ -449,12 +450,12 @@ export function Module8() {
       </p>
       <p>
         What overshooting costs here is specific enough to watch. Run the same
-        four-layer ReLU network at 0.5 and after one epoch 97 percent of the
-        neurons in its fourth layer answer 0 on every one of the 5,000 training
-        images; by the third epoch it is all of them. A layer that always answers
-        0 sends nothing forward and passes nothing back, so the network sits
-        between 9 and 13 percent for the rest of the run. At 0.05 that same layer
-        is 17 percent silent after one epoch and 7 percent after three.
+        four-layer ReLU network at 0.5 and after one epoch 28 of the 30 neurons in
+        its layer 4 answer 0 on every one of the 5,000 training images; by the
+        third epoch it is all 30. A layer that always answers 0 sends nothing
+        forward and passes nothing back, so the network sits between 9 and 13
+        percent for the rest of the run. At 0.05 that same layer has 3 silent
+        neurons after one epoch and 1 after three.
       </p>
       <Aside>
         <p>
@@ -720,7 +721,7 @@ export function Module8() {
       <p>
         Now give the same treatment to something that has no numbers at all. To
         put a word into a network you first have to make it a column, and the
-        honest starting point is one slot per word in the vocabulary: the column
+        plainest starting point is one slot per word in the vocabulary: the column
         is all zeros except a single 1 in that word's slot. That is a one-hot
         column, the same shape as the one-hot label columns your digit reader has
         been training against. It carries no information beyond which word it is:

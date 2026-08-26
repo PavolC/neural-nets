@@ -148,10 +148,18 @@ this floor after direct feedback; every later module must be written to it too.
   `nabla_w` / `nabla_b` in every later prompt and skeleton looked like an
   unrelated word. Name the glyph where it first appears, then bridge to the
   code names at their own first use.
-- **Quoted measurements must come from the code the reader runs.** Numbers in
-  the prose are checked against the panels, so the bench that produces them has
-  to match the browser exactly, not just mathematically. Two traps, both found
-  while writing Module 8: `init_network` draws every weight and then every bias,
+- **Quoted measurements must come from the code the reader runs, and the bench
+  that produces them is committed.** `tools/bench_depth.py` and
+  `npm run bench:speeds` regenerate every number Modules 7 and 8 quote, each
+  section printing the prose sentence it backs; extend one of them rather than
+  writing a throwaway. A module's numbers can come from two different engines
+  (the Pyodide panels use NumPy's PCG64, the layer-speed panel its own
+  mulberry32), and they are not meant to agree: never quote a number from one
+  engine for a measurement the reader makes with the other, and say which panel
+  a table came from when both are on the page. Prefer statistics that hold
+  still: the mean and the middle 90 percent of 200 draws reproduce, the extremes
+  of that same stream do not. The bench has to match the browser exactly, not
+  just mathematically. Two traps, both found while writing Module 8: `init_network` draws every weight and then every bias,
   so a bench that interleaves them builds a different network from the same
   seed; and `batch_gradient` sums per-example gradients in a loop, so a
   vectorized bench rounds differently. The second one matters because a deep
@@ -333,3 +341,11 @@ own storytelling. Concretely:
 - `npm run build`: static production build (deployable to any static host).
 - `python3 tools/make_mnist_subset.py`: regenerate `public/data/mnist_subset.bin.gz`
   (pure stdlib, downloads MNIST from a public mirror, deterministic output).
+- `python3 tools/bench_depth.py`: re-measure every Python-side number Modules 7
+  and 8 quote, on the browser's own code path (needs NumPy; `--quick` for 5
+  epochs, `--only <section>` for one section). Each section prints the prose
+  sentence it backs, so a number that has drifted is visible without holding
+  the module open beside it.
+- `npm run bench:speeds`: the same for the layer-speed and hop tables, by
+  importing `deepNet.ts` (the panel's own arithmetic) into Node. No new
+  dependency: it compiles through `tools/tsconfig.bench.json` into `.bench/`.
