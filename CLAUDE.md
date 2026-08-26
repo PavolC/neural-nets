@@ -341,6 +341,10 @@ own storytelling. Concretely:
 - `npm run build`: static production build (deployable to any static host).
 - `python3 tools/make_mnist_subset.py`: regenerate `public/data/mnist_subset.bin.gz`
   (pure stdlib, downloads MNIST from a public mirror, deterministic output).
+- `python3 tools/check_exercises.py`: run every exercise's tests against its
+  reference solution (all must pass) and against its skeleton (all must fail,
+  with the skeleton's own NotImplementedError). Same harness the app runs, so
+  it gates a change to any test, skeleton or solution. Needs NumPy.
 - `python3 tools/bench_depth.py`: re-measure every Python-side number Modules 7
   and 8 quote, on the browser's own code path (needs NumPy; `--quick` for 5
   epochs, `--only <section>` for one section). Each section prints the prose
