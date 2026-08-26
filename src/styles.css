@@ -17,8 +17,50 @@
   --disabled-fg: #4f5a54;
   --disabled-rule: #cfd4ce;
   /* The surface a horizontal scroll container sits on, so its edge-fade
-     affordance blends in. Overridden inside white panels below. */
-  --scroll-surface: #fdfdfb;
+     affordance blends in. Defaults to the page ground; white panels below
+     redeclare it. */
+  --scroll-surface: var(--bg);
+
+  /* Ink for text sitting on a saturated fill (--accent, --acc, --loss).
+     Deliberately not shared with the #fff used as a *surface*: one is ink,
+     one is a ground, and they would move for different reasons. */
+  --on-accent: #fff;
+
+  /* Figure and data hues, each naming one thing in one diagram family.
+     Aliases of the values already in use, at those values: they are NOT
+     merged with each other even where two are nearly identical, because
+     each identifies a different quantity and they move independently.
+     Module 1's two hidden neurons keep their identity colours across the
+     wiring diagram, the plots and the legend swatches. */
+  --data-purple: #6a51a3; /* h1 */
+  --data-teal: #1b7a99; /* h2 */
+  --data-gold: #c8a24a; /* the hard-threshold curve, and class 0 */
+  --data-orange: #d17a22;
+  --data-green: #2a9f65;
+
+  /* Panel surfaces, likewise aliased at their existing values. All three sit
+     within a hair of each other and of #fff; collapsing them would be a
+     visible change, however small, so they stay distinct. */
+  --surface-card: #fbfbf7; /* bordered cards: hints, recap, snippet footer */
+  --surface-sunken: #f4f4f0; /* code strips and table headers */
+  --surface-note: #f6f6f2; /* inline notes and asides */
+  --node-idle: #e8e8e2; /* an unlit neuron or input box */
+
+  /* The reading column and the gutter table of contents beside it. The toc's
+     position is computed from these rather than hardcoded, so moving the
+     column cannot silently leave the toc behind. */
+  --col-width: 920px;
+  --col-shift: 100px; /* how far left of centre the column sits, above 1200px */
+  --toc-width: 190px;
+  --toc-gap: 28px;
+
+  /* Corner radii: controls, panels, and pills. The scrollbar thumb's old 4px
+     is the same shape as the pill, because 999px clamps to half of its 8px
+     height. */
+  --radius-sm: 3px;
+  --radius: 6px;
+  --radius-lg: 8px;
+  --radius-pill: 999px;
   color-scheme: light;
 }
 
@@ -41,7 +83,7 @@ body {
 }
 
 .app {
-  max-width: 920px;
+  max-width: var(--col-width);
   margin: 0 auto;
   padding: 2.5rem 1.25rem 4rem;
 }
@@ -53,7 +95,7 @@ body {
    takes over. */
 @media (min-width: 1200px) {
   .app {
-    margin-left: max(0px, calc((100% - 920px) / 2 - 100px));
+    margin-left: max(0px, calc((100% - var(--col-width)) / 2 - var(--col-shift)));
   }
 }
 
@@ -77,9 +119,9 @@ button {
   font-size: 1rem;
   padding: 0.5rem 1.1rem;
   border: 1px solid var(--accent);
-  border-radius: 6px;
+  border-radius: var(--radius);
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   cursor: pointer;
 }
 
@@ -95,7 +137,7 @@ button:disabled {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
 }
 
 .button-secondary {
@@ -134,9 +176,9 @@ button:disabled {
   display: inline-block;
   margin-left: 0.6rem;
   padding: 0.1rem 0.55rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
   background: var(--acc);
-  color: #fff;
+  color: var(--on-accent);
   font-size: 0.7rem;
   font-family: system-ui, sans-serif;
   letter-spacing: 0.04em;
@@ -146,7 +188,7 @@ button:disabled {
 
 .code-editor {
   border: 1px solid var(--rule);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
   margin: 1rem 0;
   font-size: 0.85rem;
@@ -196,7 +238,9 @@ button:disabled {
   margin-left: auto;
 }
 
-.exercise-controls {
+/* A row of controls, under the editor or beside an interactive. */
+.exercise-controls,
+.interactive-controls {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -209,9 +253,9 @@ button:disabled {
 }
 
 .play-snippet pre {
-  background: #f4f4f0;
+  background: var(--surface-sunken);
   border: 1px solid var(--rule);
-  border-radius: 6px 6px 0 0;
+  border-radius: var(--radius) var(--radius) 0 0;
   border-bottom: none;
   padding: 0.7rem;
   margin: 0;
@@ -223,9 +267,9 @@ button:disabled {
   display: flex;
   gap: 0.5rem;
   border: 1px solid var(--rule);
-  border-radius: 0 0 6px 6px;
+  border-radius: 0 0 var(--radius) var(--radius);
   padding: 0.35rem 0.5rem;
-  background: #fbfbf7;
+  background: var(--surface-card);
 }
 
 .play-snippet-buttons button {
@@ -256,7 +300,7 @@ button:disabled {
 .output-panel pre {
   background: #1e1e1c;
   color: #e6e6e0;
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 0.75rem;
   font-size: 0.85rem;
   overflow: auto;
@@ -296,8 +340,8 @@ button:disabled {
 .test-orient {
   font-size: 0.92rem;
   color: var(--ink);
-  background: #f6f6f2;
-  border-radius: 6px;
+  background: var(--surface-note);
+  border-radius: var(--radius);
   padding: 0.5rem 0.7rem;
   margin: 0.3rem 0 0.7rem;
 }
@@ -330,7 +374,7 @@ button:disabled {
    gradient check; see the design doc's exercise/test contract). */
 .flagship-banner {
   border: 2px solid var(--acc);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   background: #eef7f2;
   color: var(--ink);
   padding: 0.8rem 1rem;
@@ -343,7 +387,7 @@ button:disabled {
   gap: 0.6rem;
   padding: 0.5rem 0.7rem;
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: var(--radius);
   margin-bottom: 0.4rem;
   font-size: 0.9rem;
 }
@@ -381,10 +425,10 @@ button:disabled {
 
 .hint {
   border: 1px solid var(--rule);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   padding: 0.2rem 1rem 0.8rem;
   margin-bottom: 0.8rem;
-  background: #fbfbf7;
+  background: var(--surface-card);
 }
 
 .hint h5 {
@@ -401,8 +445,8 @@ button:disabled {
 .hint-pre {
   white-space: pre-wrap;
   font-size: 0.8rem;
-  background: #f4f4f0;
-  border-radius: 6px;
+  background: var(--surface-sunken);
+  border-radius: var(--radius);
   padding: 0.7rem;
   overflow-x: auto;
 }
@@ -451,10 +495,10 @@ button:disabled {
 .recap {
   border: 1px solid var(--rule);
   border-left: 3px solid var(--accent);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   padding: 0.2rem 1.1rem 0.8rem;
   margin: 1.2rem 0;
-  background: #fbfbf7;
+  background: var(--surface-card);
 }
 
 .after-this h3,
@@ -513,7 +557,7 @@ button:disabled {
 
 .scroll-x::-webkit-scrollbar-thumb {
   background: var(--rule-strong);
-  border-radius: 4px;
+  border-radius: var(--radius-pill);
 }
 
 .scroll-x::-webkit-scrollbar-track {
@@ -566,8 +610,9 @@ button:disabled {
   text-align: center;
 }
 
-.truth-table th {
-  background: #f4f4f0;
+.truth-table th,
+.bp-table th {
+  background: var(--surface-sunken);
   font-weight: 600;
 }
 
@@ -600,17 +645,17 @@ button:disabled {
 }
 
 .line-swatch-h1 {
-  border-top: 2.5px solid #6a51a3;
+  border-top: 2.5px solid var(--data-purple);
 }
 
 .line-swatch-h2 {
-  border-top: 2.5px dashed #1b7a99;
+  border-top: 2.5px dashed var(--data-teal);
 }
 
 .line-swatch-out {
   height: 12px;
-  background: linear-gradient(90deg, #e8dbbf, #2a9f65);
-  border-radius: 3px;
+  background: linear-gradient(90deg, #e8dbbf, var(--data-green));
+  border-radius: var(--radius-sm);
 }
 
 /* Sigmoid vs hard threshold (Module 1) */
@@ -620,7 +665,7 @@ button:disabled {
 }
 
 .step-curve {
-  stroke: #c8a24a;
+  stroke: var(--data-gold);
   stroke-width: 2.5;
 }
 
@@ -642,7 +687,7 @@ button:disabled {
 }
 
 .dot-step {
-  fill: #c8a24a;
+  fill: var(--data-gold);
   stroke: #fff;
   stroke-width: 1.5;
 }
@@ -654,7 +699,7 @@ button:disabled {
 }
 
 .swatch-step {
-  fill: #c8a24a;
+  fill: var(--data-gold);
 }
 
 .swatch-sigmoid {
@@ -668,11 +713,11 @@ button:disabled {
   margin: 0 auto;
   background: #fff;
   border: 1px solid var(--rule);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
 }
 
 .concert-go-zone {
-  fill: #2a9f65;
+  fill: var(--data-green);
   opacity: 0.13;
 }
 
@@ -699,7 +744,7 @@ button:disabled {
 }
 
 .tiny-net-input {
-  fill: #e8e8e2;
+  fill: var(--node-idle);
   stroke: var(--muted);
   stroke-width: 1.2;
 }
@@ -710,7 +755,9 @@ button:disabled {
   stroke-width: 1.8;
 }
 
-.tiny-net-label {
+/* The italic label that names a quantity inside a diagram. */
+.tiny-net-label,
+.shape-name {
   font-family: Georgia, serif;
   font-style: italic;
   font-size: 17px;
@@ -727,7 +774,7 @@ button:disabled {
 
 .interactive {
   border: 1px solid var(--rule);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   padding: 0.8rem;
   background: #fff;
 }
@@ -745,14 +792,6 @@ button:disabled {
 .drag-handle,
 .sculpt-surface {
   touch-action: none;
-}
-
-.interactive-controls {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  flex-wrap: wrap;
-  margin-bottom: 0.5rem;
 }
 
 .interactive-status {
@@ -786,12 +825,12 @@ button:disabled {
 .chip {
   padding: 0.2rem 0.7rem;
   font-size: 0.85rem;
-  border-radius: 999px;
+  border-radius: var(--radius-pill);
 }
 
 .chip-active {
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .axis-guides line {
@@ -799,8 +838,12 @@ button:disabled {
   stroke-dasharray: 3 3;
 }
 
+/* The small muted sans label every figure uses: ticks, axis names, node
+   names. It was declared three times, one of them an exact duplicate. */
 .axis-guides text,
-.chart-tick {
+.chart-tick,
+.chart-axis-label,
+.netdiag-label {
   font-family: system-ui, sans-serif;
   font-size: 11px;
   fill: var(--muted);
@@ -833,7 +876,7 @@ button:disabled {
 }
 
 .pt-class0 {
-  fill: #c8a24a;
+  fill: var(--data-gold);
 }
 
 .pt-class1 {
@@ -863,7 +906,9 @@ button:disabled {
   margin: 0 0 0.3rem;
 }
 
-.xor-phase-body {
+/* A chart beside its readout, stacking when the column gets narrow. */
+.xor-phase-body,
+.pixels-row {
   display: flex;
   gap: 1.2rem;
   flex-wrap: wrap;
@@ -906,12 +951,12 @@ button:disabled {
 
 
 .hidden-line-1 {
-  stroke: #6a51a3;
+  stroke: var(--data-purple);
   stroke-width: 0.8;
 }
 
 .hidden-line-2 {
-  stroke: #1b7a99;
+  stroke: var(--data-teal);
   stroke-width: 0.8;
   stroke-dasharray: 2 1.2;
 }
@@ -935,21 +980,21 @@ button:disabled {
 }
 
 .h1-color {
-  color: #6a51a3;
+  color: var(--data-purple);
 }
 
 .h2-color {
-  color: #1b7a99;
+  color: var(--data-teal);
 }
 
 .h1-axis-strip {
-  stroke: #6a51a3;
+  stroke: var(--data-purple);
   stroke-width: 1.6;
   opacity: 0.75;
 }
 
 .h2-axis-strip {
-  stroke: #1b7a99;
+  stroke: var(--data-teal);
   stroke-width: 1.6;
   stroke-dasharray: 2 1.2;
   opacity: 0.75;
@@ -962,16 +1007,16 @@ button:disabled {
 }
 
 .h1-fill {
-  fill: #6a51a3;
+  fill: var(--data-purple);
 }
 
 .h2-fill {
-  fill: #1b7a99;
+  fill: var(--data-teal);
 }
 
 .xor-phase-controls fieldset {
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: var(--radius);
   margin: 0 0 0.6rem;
   padding: 0.3rem 0.8rem 0.55rem;
   /* Fieldsets default to min-inline-size: min-content, which blocks the
@@ -1038,7 +1083,7 @@ button:disabled {
 }
 
 .ball-sgd {
-  fill: #d17a22;
+  fill: var(--data-orange);
 }
 
 .ball-trail {
@@ -1065,12 +1110,12 @@ button:disabled {
 }
 
 .traj-sgd {
-  stroke: #d17a22;
+  stroke: var(--data-orange);
 }
 
 /* The measured-slope segment in the cost-vs-knob chart. */
 .tangent {
-  stroke: #d17a22;
+  stroke: var(--data-orange);
   stroke-width: 2.2;
   stroke-linecap: round;
 }
@@ -1102,7 +1147,7 @@ button:disabled {
 }
 
 .swatch-sgd {
-  fill: #d17a22;
+  fill: var(--data-orange);
 }
 
 .sparkline {
@@ -1117,28 +1162,28 @@ button:disabled {
 }
 
 .shape-m {
-  fill: #6a51a3;
+  fill: var(--data-purple);
   fill-opacity: 0.1;
-  stroke: #6a51a3;
+  stroke: var(--data-purple);
   stroke-width: 1.4;
 }
 
 .shape-n {
-  fill: #1b7a99;
+  fill: var(--data-teal);
   fill-opacity: 0.1;
-  stroke: #1b7a99;
+  stroke: var(--data-teal);
   stroke-width: 1.4;
 }
 
 .shape-w {
-  fill: #6a51a3;
+  fill: var(--data-purple);
   fill-opacity: 0.04;
   stroke: var(--ink);
   stroke-width: 1.4;
 }
 
 .shape-row {
-  fill: #6a51a3;
+  fill: var(--data-purple);
   fill-opacity: 0.22;
   stroke: none;
 }
@@ -1146,13 +1191,6 @@ button:disabled {
 .shapes-grid {
   stroke: var(--rule);
   stroke-width: 0.8;
-}
-
-.shape-name {
-  font-family: Georgia, serif;
-  font-style: italic;
-  font-size: 17px;
-  fill: var(--ink);
 }
 
 .shape-op {
@@ -1167,21 +1205,14 @@ button:disabled {
 }
 
 .dim-m {
-  fill: #6a51a3;
+  fill: var(--data-purple);
 }
 
 .dim-n {
-  fill: #1b7a99;
+  fill: var(--data-teal);
 }
 
 /* pixels-are-numbers (Module 2) */
-.pixels-row {
-  display: flex;
-  gap: 1.2rem;
-  flex-wrap: wrap;
-  align-items: flex-start;
-}
-
 .pixels-stack {
   position: relative;
   flex: 0 0 280px;
@@ -1243,14 +1274,8 @@ button:disabled {
 }
 
 .netdiag-input {
-  fill: #e8e8e2;
+  fill: var(--node-idle);
   stroke: var(--muted);
-}
-
-.netdiag-label {
-  font-family: system-ui, sans-serif;
-  font-size: 11px;
-  fill: var(--muted);
 }
 
 .netdiag-edge {
@@ -1314,7 +1339,7 @@ button:disabled {
   padding: 0.3rem;
   background: #fff;
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: var(--radius);
   color: var(--ink);
 }
 
@@ -1407,20 +1432,13 @@ button:disabled {
   width: 100%;
   height: auto;
   border: 1px solid var(--rule);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   background: #fff;
 }
 
 .chart-grid {
   stroke: var(--rule);
   stroke-width: 1;
-}
-
-.chart-tick,
-.chart-axis-label {
-  font-family: system-ui, sans-serif;
-  font-size: 11px;
-  fill: var(--muted);
 }
 
 .chart-tick-loss {
@@ -1462,9 +1480,9 @@ button:disabled {
 }
 
 .demo-log pre {
-  background: #f4f4f0;
+  background: var(--surface-sunken);
   border: 1px solid var(--rule);
-  border-radius: 6px;
+  border-radius: var(--radius);
   padding: 0.75rem;
   overflow-x: auto;
   font-size: 0.8rem;
@@ -1532,7 +1550,9 @@ footer a {
   fill: var(--ink);
 }
 
-.ripple-factor {
+/* The emphasised red number: a ripple factor, and the stepper's cost. */
+.ripple-factor,
+.bp-cost {
   font-size: 14px;
   font-weight: 600;
   fill: var(--loss);
@@ -1561,7 +1581,7 @@ footer a {
 .bp-eqcard {
   min-height: 13.3em;
   border: 1px solid var(--rule);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   padding: 0.4rem 0.9rem 0.5rem;
   background: #f9faf9;
   margin-bottom: 0.6rem;
@@ -1632,12 +1652,6 @@ footer a {
   pointer-events: none;
 }
 
-.bp-cost {
-  font-size: 14px;
-  font-weight: 600;
-  fill: var(--loss);
-}
-
 .bp-edge-hit {
   stroke: transparent;
   stroke-width: 16;
@@ -1697,18 +1711,13 @@ footer a {
   min-width: 3em;
 }
 
-.bp-table th {
-  background: #f4f4f0;
-  font-weight: 600;
-}
-
 .bp-delta-cell {
   color: var(--loss);
   font-weight: 600;
 }
 
-.bp-cost-row {
-  text-align: left !important;
+.bp-table td.bp-cost-row {
+  text-align: left;
   color: var(--muted);
 }
 
@@ -1717,7 +1726,7 @@ footer a {
   min-width: 0;
   min-height: 7em;
   border: 1px dashed var(--rule);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   padding: 0.5rem 0.8rem;
   font-family: system-ui, sans-serif;
   font-size: 0.88rem;
@@ -1768,7 +1777,7 @@ footer a {
   text-align: left;
   padding: 0.4rem 0.7rem;
   border: 1px solid var(--rule-strong);
-  border-radius: 6px;
+  border-radius: var(--radius);
   /* the global button rule is accent-on-white-text; undo both halves */
   background: #fff;
   color: var(--ink);
@@ -1785,7 +1794,6 @@ footer a {
 
 .quiz-option:not([aria-disabled="true"]):hover {
   border-color: var(--accent);
-  background: #fff;
 }
 
 .quiz-correct {
@@ -1813,9 +1821,9 @@ footer a {
   display: inline-block;
   margin-right: 0.5em;
   padding: 0.05rem 0.4rem;
-  border-radius: 3px;
+  border-radius: var(--radius-sm);
   background: var(--acc);
-  color: #fff;
+  color: var(--on-accent);
   font-family: system-ui, sans-serif;
   font-size: 0.68rem;
   letter-spacing: 0.04em;
@@ -1831,8 +1839,8 @@ footer a {
   font-size: 0.92rem;
   font-family: system-ui, sans-serif;
   color: var(--ink);
-  background: #f6f6f2;
-  border-radius: 6px;
+  background: var(--surface-note);
+  border-radius: var(--radius);
   padding: 0.5rem 0.7rem;
   margin: 0.3rem 0 0.2rem;
 }
@@ -1871,8 +1879,8 @@ footer a {
    visually set off so the main thread reads as pausing and resuming. */
 .module-aside {
   border: 1px solid var(--rule);
-  border-radius: 8px;
-  background: #f6f6f2;
+  border-radius: var(--radius-lg);
+  background: var(--surface-note);
   padding: 0.1rem 1.1rem 0.9rem;
   margin: 1.4rem 0;
 }
@@ -1908,8 +1916,16 @@ footer a {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  left: min(calc((100% - 920px) / 2 + 848px), calc(100% - 204px));
-  width: 190px;
+  /* Sits one gutter to the right of the text column. Derived, not magic:
+     the column's left edge is (100% - 920) / 2 - 100 (see .app above), its
+     right edge is 920 further on, and the toc starts a 28px gap after that,
+     so 920 - 100 + 28 = 848. The min() is the guard rail: 190 wide plus a
+     14px margin is 204, so it can never be pushed off the right edge. */
+  left: min(
+    calc((100% - var(--col-width)) / 2 - var(--col-shift) + var(--col-width) + var(--toc-gap)),
+    calc(100% - var(--toc-width) - 14px)
+  );
+  width: var(--toc-width);
   max-height: 80vh;
   overflow-y: auto;
   font-family: system-ui, sans-serif;
@@ -2115,7 +2131,7 @@ footer a {
   margin: 0 auto;
   background: #fff;
   border: 1px solid var(--rule);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
 }
 
 .curve-grid {
