@@ -155,8 +155,19 @@ Conventions per module: opens with "What you'll be able to do after this" (2-3 i
 
 Each milestone should end in a deployable state. Deploy early (GitHub Pages) so the demo link exists from M1 onward.
 
-## 9. Open questions (fine to defer)
+## 9. Open questions (all since resolved)
 
-- MDX vs. TSX for module content authoring (decide in M1 based on friction).
-- Whether Module 5's big training run should offer a "use reference backprop" fallback so a stuck learner can still experience Modules 7-8 (recommended: yes, clearly labeled).
-- Dark mode. (No.)
+This section is kept as written; the answers are recorded here rather than by editing the questions away.
+
+- MDX vs. TSX for module content authoring (decide in M1 based on friction). **TSX.** Prose beats are short and always interleaved with components, so MDX would have added a dependency without saving friction.
+- Whether Module 5's big training run should offer a "use reference backprop" fallback so a stuck learner can still experience Modules 7-8 (recommended: yes, clearly labeled). **Yes, and it fell out of the architecture rather than being built.** Modules 7 and 8's panels take their gradient from `course.backprop`, so no panel after Module 5 requires the learner's own version; only Module 5's own payoff run does. Module 5's locked panel and the start page both say so.
+- Dark mode. (No.) **Still no.**
+
+## 10. What the build actually produced
+
+Milestones 0 through 5 are complete. Departures from the plan above, all deliberate:
+
+- **Module 8 grew a payoff run and a second engine.** The design doc called for per-layer gradient bars with a depth slider and a sigmoid/ReLU toggle; that is `LayerSpeedBars` (TypeScript, so the bars move as fast as the slider does), and beside it `DepthTrainPanel` trains one hidden layer against four with the learner's own code in Pyodide. Two engines means two sets of numbers from two random generators: `tools/bench_layer_speeds.ts` and `tools/bench_depth.py` regenerate them, and CLAUDE.md records that a number from one must never be quoted for the other.
+- **The optional ReLU exercise was not built.** Module 8 swaps the squash inside its own panel instead, which gets the comparison without asking the learner to rewrite `backprop` after the course has already taken its summit.
+- **A start page was added** (not in the design doc): what the course is, how the machinery works, the eight modules, the training demo that used to sit on a tab of its own, and the stored progress with save, load and reset. It is where a bare link lands.
+- **Gating stayed softer than section 3 proposed.** Nothing locks a module; what an exercise gates is the panel that runs the learner's code, since there is nothing to run until the code exists.
