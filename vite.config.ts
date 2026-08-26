@@ -5,7 +5,10 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   base: "./",
   plugins: [react()],
-  // Honor an assigned port (e.g. from the Claude Code preview harness) so two
-  // sessions can run dev servers side by side; falls back to Vite's default.
-  server: process.env.PORT ? { port: Number(process.env.PORT) } : undefined,
+  // The dev server always answers on 5174, so a bookmarked or hand-typed
+  // localhost:5174 is never wrong. strictPort makes a busy port a startup
+  // error instead of a silent hop to 5175: a drifting port is how you end up
+  // reloading an address that nothing is serving. PORT still wins, so the
+  // preview harness can assign one and two sessions can run side by side.
+  server: { port: Number(process.env.PORT) || 5174, strictPort: true },
 });
