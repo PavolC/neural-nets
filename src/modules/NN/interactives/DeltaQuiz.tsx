@@ -60,8 +60,8 @@ function buildQuestions(): Question[] {
         `the gap (now nearly −1, as large as it gets) by σ′(z³), and at z³ = ${fmt(q2.z3[0])} ` +
         `the sigmoid is flat: its slope is ${fmt(q2.a3[0] * (1 - q2.a3[0]), 4)}. A saturated ` +
         `neuron barely responds to nudges, so no nudge looks worth taking, so gradient descent ` +
-        `barely moves it: badly wrong and barely learning, at the same time. Module 7 returns ` +
-        `to exactly this problem.`,
+        `barely moves it: badly wrong and barely learning, at the same time. Nielsen chapter 3 ` +
+        `opens on exactly this problem.`,
     },
     {
       setup:
@@ -128,11 +128,21 @@ export function DeltaQuiz() {
                   <button
                     key={oi}
                     className={`quiz-option ${cls}`}
-                    disabled={picked !== null}
-                    onClick={() =>
-                      setAnswers((prev) => prev.map((a, i) => (i === qi ? oi : a)))
-                    }
+                    // aria-disabled, not disabled: the answer stays focusable
+                    // so it can be read back, and the global disabled styling
+                    // no longer fades the correct/wrong colours to a wash.
+                    aria-disabled={picked !== null}
+                    onClick={() => {
+                      if (picked !== null) return;
+                      setAnswers((prev) => prev.map((a, i) => (i === qi ? oi : a)));
+                    }}
                   >
+                    {picked !== null && oi === q.correct && (
+                      <span className="quiz-tag">correct answer</span>
+                    )}
+                    {picked !== null && oi === picked && oi !== q.correct && (
+                      <span className="quiz-tag quiz-tag-wrong">your answer</span>
+                    )}
                     {opt}
                   </button>
                 );

@@ -286,7 +286,8 @@ export function Module4() {
         activation arriving on its wire, because that activation is what the weight
         gets multiplied by. All four knobs of the chain:
       </p>
-      <table className="truth-table">
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
         <thead>
           <tr>
             <th>knob</th>
@@ -300,7 +301,8 @@ export function Module4() {
           <tr><td><M tex="b_1" /></td><td>−0.0508</td><td><M tex="\delta_A" /></td></tr>
           <tr><td><M tex="w_1" /></td><td>−0.0508</td><td><M tex="x \times \delta_A = 1.0 \times (-0.0508)" /></td></tr>
         </tbody>
-      </table>
+        </table>
+      </div>
       <p>
         Now count what all four slopes cost. One forward pass, already paid,
         posted every rate. One backward walk priced the two stretches:{" "}
@@ -412,7 +414,8 @@ export function Module4() {
         <M tex="h_1" />, whose activation is 0.818 and whose steepness is
         0.818 × 0.182 = 0.149):
       </p>
-      <table className="truth-table">
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
         <thead>
           <tr>
             <th>equation</th>
@@ -447,7 +450,8 @@ export function Module4() {
             <td><M tex="h_1\text{'s wire: } 0.818 \times (-0.098) \approx -0.080" /></td>
           </tr>
         </tbody>
-      </table>
+        </table>
+      </div>
       <p>
         Read the four as one machine. The forward pass computes and stores every{" "}
         <M tex="z" /> and <M tex="a" /> (you built this in Module 2). BP1 turns the
@@ -502,7 +506,7 @@ export function Module4() {
           "Backprop answers 'which way should each knob move' with one forward pass and one backward sweep of blame, instead of two cost measurements per knob, and its answers are exact.",
           "A nudge's effect on the cost is the product of the local factors along its path (the chain rule); the forward pass posts every factor, and a neuron's blame delta is the downstream stretch priced once per neuron.",
           "The four equations: blame starts at the output as gap times sigma-prime (BP1), flows backward through the transposed wires (BP2), every bias's slope is its neuron's blame (BP3), and every weight's slope is blame times the activation its wire carried (BP4).",
-          "A saturated neuron has sigma-prime near zero and soaks up almost no blame even when badly wrong: quadratic cost's weakness, and Module 7's opening problem.",
+          "A saturated neuron has sigma-prime near zero and soaks up almost no blame even when badly wrong: quadratic cost's weakness, and the problem the cross-entropy cost in Nielsen chapter 3 exists to solve.",
         ]}
         chapter="Chapter 2 (how the backpropagation algorithm works)"
         href="http://neuralnetworksanddeeplearning.com/chap2.html"
@@ -922,7 +926,7 @@ function RippleSlice({ arrows }: { arrows: number[] }) {
     </g>
   );
   return (
-    <div className="figure-scroll">
+    <div className="figure-scroll scroll-x" tabIndex={0}>
     <svg viewBox={`0 0 ${W} 140`} className="ripple-slice"
          style={{ width: `${W}px`, maxWidth: "100%" }} role="img"
          aria-label={`Recall from the log: ${arrows

@@ -5,7 +5,20 @@
   --loss: #b3423a;
   --acc: #0b6e4f;
   --rule: #e2e2e2;
+  /* For boundaries that identify a control (a quiz option, a digit
+     thumbnail): --rule sits at 1.27:1 against the page, which is fine for a
+     decorative container edge and too faint to mark something clickable. */
+  --rule-strong: #c4cac2;
   --bg: #fdfdfb;
+  /* Disabled controls, as explicit colors rather than an opacity wash. A
+     faded control still has to be readable: the label is often the only thing
+     explaining why it is disabled. */
+  --disabled-bg: #ecefea;
+  --disabled-fg: #4f5a54;
+  --disabled-rule: #cfd4ce;
+  /* The surface a horizontal scroll container sits on, so its edge-fade
+     affordance blends in. Overridden inside white panels below. */
+  --scroll-surface: #fdfdfb;
   color-scheme: light;
 }
 
@@ -31,6 +44,17 @@ body {
   max-width: 920px;
   margin: 0 auto;
   padding: 2.5rem 1.25rem 4rem;
+}
+
+/* Wide enough for the gutter table of contents: the column sits a little left
+   of centre so the toc has real room beside it. Centred, the toc had nowhere to
+   go but the window edge, which is why it used to need 1360px before it could
+   appear at all. Below this the column re-centres and the sticky section bar
+   takes over. */
+@media (min-width: 1200px) {
+  .app {
+    margin-left: max(0px, calc((100% - 920px) / 2 - 100px));
+  }
 }
 
 h1 {
@@ -59,9 +83,37 @@ button {
   cursor: pointer;
 }
 
+button:hover:not(:disabled) {
+  border-color: #095a41;
+  background: #095a41;
+}
+
+button:active:not(:disabled) {
+  background: #07452f;
+}
+
+.button-secondary:hover:not(:disabled) {
+  background: #eef5f1;
+  border-color: var(--accent);
+}
+
+.button-secondary:active:not(:disabled) {
+  background: #e2efe8;
+}
+
 button:disabled {
-  opacity: 0.55;
+  background: var(--disabled-bg);
+  border-color: var(--disabled-rule);
+  color: var(--disabled-fg);
   cursor: default;
+}
+
+/* One visible focus ring everywhere, rather than relying on each browser's
+   default surviving the custom backgrounds and removed borders below. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 3px;
 }
 
 .button-secondary {
@@ -71,11 +123,10 @@ button:disabled {
 
 .tabs {
   display: flex;
-  gap: 0.5rem;
+  flex-wrap: wrap;
+  gap: 0 0.5rem;
   margin-top: 1.25rem;
   border-bottom: 1px solid var(--rule);
-  overflow-x: auto;
-  scrollbar-width: thin;
 }
 
 .tab {
@@ -84,11 +135,22 @@ button:disabled {
   border: none;
   border-bottom: 2px solid transparent;
   border-radius: 0;
-  padding: 0.4rem 0.2rem;
-  margin-right: 0.8rem;
+  /* Roomier than the prose needs, so the row clears the 44px touch target. */
+  padding: 0.6rem 0.25rem;
+  margin-right: 0.6rem;
   font-size: 1rem;
   flex-shrink: 0;
   white-space: nowrap;
+}
+
+.tab:hover {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink);
+}
+
+.tab.tab-active:hover {
+  border-bottom-color: var(--accent);
 }
 
 .tab-active {
@@ -225,8 +287,11 @@ button:disabled {
   border-radius: 6px;
   padding: 0.75rem;
   font-size: 0.85rem;
-  overflow-x: auto;
+  overflow: auto;
   min-height: 2.4em;
+  /* Capped everywhere, not only in fullscreen: a chatty run used to push the
+     test results off the bottom of the page. */
+  max-height: 22em;
   margin: 0 0 0.4rem;
   white-space: pre-wrap;
 }
@@ -244,14 +309,49 @@ button:disabled {
   margin: 1rem 0;
 }
 
+/* Same weight as the pass summary: a failure is where the reader needs
+   orientation, so it should not be the quieter of the two. */
 .test-summary {
   font-size: 0.95rem;
-  color: var(--muted);
+  font-weight: bold;
+  color: var(--ink);
 }
 
 .test-summary-pass {
   color: var(--acc);
-  font-weight: bold;
+}
+
+.test-orient {
+  font-size: 0.92rem;
+  color: var(--ink);
+  background: #f6f6f2;
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  margin: 0.3rem 0 0.7rem;
+}
+
+/* Results left standing while the next run is in flight, or after the editor
+   ran on its own: still there (so the page does not collapse), and marked by a
+   rule plus the note below rather than by fading. Dimming them with opacity
+   dropped the failure messages and the cross marks under 4.5:1, and a stale
+   result is still a result the reader has to be able to read. */
+.test-results-stale {
+  border-left: 3px solid var(--rule-strong);
+  padding-left: 0.7rem;
+}
+
+.test-stale-note {
+  font-size: 0.85rem;
+  font-family: system-ui, sans-serif;
+  color: var(--muted);
+  margin: 0 0 0.3rem;
+}
+
+.test-also {
+  font-size: 0.85rem;
+  font-family: system-ui, sans-serif;
+  color: var(--muted);
+  margin: 0.15rem 0 0;
 }
 
 /* Prominent success state for an exercise's flagship test (Module 5's
@@ -349,10 +449,30 @@ button:disabled {
 }
 
 /* The exercise sits inside a section, so its title ranks below a section
-   heading (1.15rem) and above body text. */
+   heading (1.15rem) and above body text. The title is its own span so the
+   badge does not run into it in the accessible name ("A sigmoid neuronpassed").
+   */
 .exercise-title {
   font-size: 1.05rem;
   margin: 2.2rem 0 0.5rem;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+}
+
+/* Visible to a screen reader, not to the eye. Used for the run announcements
+   and for the pass/fail state that the check and cross glyphs alone did not
+   carry. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 .after-this,
@@ -384,7 +504,54 @@ button:disabled {
 
 .eq {
   margin: 1.2rem 0;
+}
+
+/* The scroll sits on the equation alone, never on the block: when .eq itself
+   scrolled, reading the right-hand end of a wide equation carried its
+   plain-language gloss off the screen with it. */
+.eq-scroll {
   overflow-x: auto;
+}
+
+/* Shared affordance for anything that scrolls sideways. Two signals, because
+   neither covers every platform: a persistent thin scrollbar (desktop,
+   Firefox, Android) and edge shadows that appear only when there is more
+   content that way (the only one iOS shows, where overlay scrollbars are
+   invisible until touched). */
+.scroll-x {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--rule-strong) transparent;
+  background-image:
+    linear-gradient(to right, var(--scroll-surface), rgba(255, 255, 255, 0)),
+    linear-gradient(to left, var(--scroll-surface), rgba(255, 255, 255, 0)),
+    linear-gradient(to right, rgba(26, 26, 26, 0.13), rgba(26, 26, 26, 0)),
+    linear-gradient(to left, rgba(26, 26, 26, 0.13), rgba(26, 26, 26, 0));
+  background-position: 0 0, 100% 0, 0 0, 100% 0;
+  background-repeat: no-repeat;
+  background-size: 30px 100%, 30px 100%, 12px 100%, 12px 100%;
+  /* The first two are painted with the content, so they slide away from an
+     edge once it is scrolled past and stop covering the shadow behind. */
+  background-attachment: local, local, scroll, scroll;
+}
+
+.scroll-x::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scroll-x::-webkit-scrollbar-thumb {
+  background: var(--rule-strong);
+  border-radius: 4px;
+}
+
+.scroll-x::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Panels with their own white ground need the fade to match it. */
+.interactive .scroll-x,
+.concert-plot .scroll-x {
+  --scroll-surface: #fff;
 }
 
 .eq-gloss {
@@ -406,15 +573,18 @@ button:disabled {
   margin-top: 0.5rem;
 }
 
+/* The scroll lives on the wrapper, not the table: display:block on a <table>
+   drops its table semantics from the accessibility tree, so the header cells
+   stop being announced as headers. */
+.table-scroll {
+  margin: 0.8rem 0;
+}
+
 .truth-table {
   border-collapse: collapse;
-  margin: 0.8rem auto;
+  margin: 0 auto;
   font-size: 0.9rem;
   font-family: system-ui, sans-serif;
-  display: block;
-  width: fit-content;
-  max-width: 100%;
-  overflow-x: auto;
 }
 
 .truth-table th,
@@ -594,6 +764,14 @@ button:disabled {
   width: 100%;
   height: auto;
   display: block;
+}
+
+/* touch-action: none tells the browser to hand every gesture to the page, so
+   it belongs only on the handful of pixels that are actually dragged. On the
+   whole SVG it also swallowed the page scroll and, on the stepper diagram, the
+   sideways pan that is the only way to see the right-hand side on a phone. */
+.drag-handle,
+.sculpt-surface {
   touch-action: none;
 }
 
@@ -669,7 +847,17 @@ button:disabled {
   fill: #fff;
   stroke: var(--ink);
   stroke-width: 2;
+  pointer-events: none;
+}
+
+/* Invisible, and the thing that actually receives the drag. */
+.sep-grab {
+  fill: transparent;
   cursor: grab;
+}
+
+.sep-grab:active {
+  cursor: grabbing;
 }
 
 .pt-class0 {
@@ -1166,7 +1354,20 @@ button:disabled {
 
 .digit-selected {
   border-color: var(--accent);
-  outline: 2px solid var(--accent);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+/* The hidden neurons' hit area: invisible, finger-sized, focusable. */
+.netdiag-hit {
+  fill: transparent;
+  cursor: pointer;
+}
+
+.netdiag-hit:focus-visible {
+  outline: none;
+  fill: rgba(11, 110, 79, 0.12);
+  stroke: var(--accent);
+  stroke-width: 2;
 }
 
 .pred-ok {
@@ -1446,10 +1647,6 @@ footer a {
   pointer-events: none;
 }
 
-.bp-avalue-dark {
-  fill: #fff;
-}
-
 .bp-bias {
   font-size: 12.5px;
   fill: var(--muted);
@@ -1598,7 +1795,7 @@ footer a {
   font-size: 0.92rem;
   text-align: left;
   padding: 0.4rem 0.7rem;
-  border: 1px solid var(--rule);
+  border: 1px solid var(--rule-strong);
   border-radius: 6px;
   /* the global button rule is accent-on-white-text; undo both halves */
   background: #fff;
@@ -1606,12 +1803,17 @@ footer a {
   cursor: pointer;
 }
 
-.quiz-option:disabled {
+/* Answered options keep aria-disabled rather than the disabled attribute, so
+   they stay focusable and keep their full-strength correct/wrong colours. That
+   means this rule must not set any of those colours: the correct/wrong/dimmed
+   rules below own them. */
+.quiz-option[aria-disabled="true"] {
   cursor: default;
 }
 
-.quiz-option:not(:disabled):hover {
+.quiz-option:not([aria-disabled="true"]):hover {
   border-color: var(--accent);
+  background: #fff;
 }
 
 .quiz-correct {
@@ -1626,8 +1828,31 @@ footer a {
   color: var(--ink);
 }
 
+/* Only the options the reader did not pick recede, and by less than the old
+   blanket 0.55: at that strength the correct answer was the faintest thing on
+   the page, because the disabled attribute faded it too. */
 .quiz-dimmed {
-  opacity: 0.55;
+  color: var(--muted);
+  border-color: var(--rule);
+}
+
+/* Right and wrong were carried by border colour alone. */
+.quiz-tag {
+  display: inline-block;
+  margin-right: 0.5em;
+  padding: 0.05rem 0.4rem;
+  border-radius: 3px;
+  background: var(--acc);
+  color: #fff;
+  font-family: system-ui, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: 0.1em;
+}
+
+.quiz-tag-wrong {
+  background: var(--loss);
 }
 
 .quiz-explain {
@@ -1704,21 +1929,102 @@ footer a {
   scroll-margin-top: 18px;
 }
 
+/* Tracks the text column rather than the window's right edge, which is what
+   let the breakpoint come down from 1360px. The min() is the guard rail: the
+   toc can never be pushed off the right of the viewport. */
 .module-toc {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  right: 18px;
+  left: min(calc((100% - 920px) / 2 + 848px), calc(100% - 204px));
   width: 190px;
+  max-height: 80vh;
+  overflow-y: auto;
   font-family: system-ui, sans-serif;
 }
 
-/* The toc lives in the right gutter beside the 920px column; below this
-   width there is no gutter, so it hides rather than overlap the prose. */
-@media (max-width: 1359px) {
+/* Below this there is no gutter beside the column, so the gutter toc gives way
+   to the sticky bar at the top of the module. */
+@media (max-width: 1199px) {
   .module-toc {
     display: none;
   }
+}
+
+/* Narrow screens: the modules run to tens of thousands of pixels and the
+   header scrolls away, so without this there is no way to move around one
+   except dragging. A one-line bar names the section you are in and opens the
+   list of the rest. */
+.module-jump {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: none;
+  margin: 0 -1.25rem 1rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
+  font-family: system-ui, sans-serif;
+}
+
+@media (max-width: 1199px) {
+  .module-jump {
+    display: block;
+  }
+}
+
+.module-jump-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--ink);
+  font-size: 0.85rem;
+  text-align: left;
+  padding: 0.7rem 1.25rem;
+}
+
+.module-jump-toggle .module-jump-where {
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  flex: 0 0 auto;
+}
+
+.module-jump-toggle .module-jump-title {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.module-jump-toggle:hover {
+  background: transparent;
+  border-color: transparent;
+}
+
+.module-jump-caret {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.module-jump-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 1.25rem 0.6rem;
+  max-height: 55vh;
+  overflow-y: auto;
+  border-top: 1px solid var(--rule);
+}
+
+.module-jump-list .module-toc-item {
+  padding: 0.5rem 0;
+  font-size: 0.85rem;
 }
 
 .module-toc-label {
@@ -1793,10 +2099,9 @@ footer a {
 }
 
 /* Wide diagrams: on narrow screens, keep a readable size and scroll sideways
-   inside the figure instead of shrinking the labels to illegibility. */
-.figure-scroll {
-  overflow-x: auto;
-}
+   inside the figure instead of shrinking the labels to illegibility. The
+   .scroll-x class on the same element supplies the overflow and the affordance
+   that says it scrolls. */
 
 @media (max-width: 720px) {
   .chain-ripple,
@@ -1831,4 +2136,183 @@ footer a {
   fill: #fbfbf9;
   stroke: var(--rule);
   stroke-width: 1;
+}
+
+/* ---------- Module 6: universality ---------- */
+
+/* The static target-curve figure. Plot family (CLAUDE.md): rendered at
+   natural scale, capped at its viewBox width and centred. */
+.curve-figure {
+  display: block;
+  width: min(480px, 100%);
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: 8px;
+}
+
+.curve-grid {
+  stroke: var(--rule);
+  stroke-dasharray: 3 3;
+}
+
+/* One colour code across both of this module's interactives: dashed ink is
+   the curve being matched, green is what the network answers, and muted
+   dashed is an intermediate the network adds up on the way there. */
+.curve-target {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 2;
+  stroke-dasharray: 7 4;
+}
+
+.curve-net {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.2;
+}
+
+.curve-attempt {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.6;
+  opacity: 0.5;
+}
+
+.bump-part {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.4;
+  stroke-dasharray: 5 3;
+}
+
+.bump-zero {
+  stroke: var(--rule-strong);
+}
+
+/* The score as a picture: the band between the two curves, whose area is the
+   number under the chart. */
+.curve-gap {
+  fill: var(--loss);
+  opacity: 0.16;
+  stroke: none;
+}
+
+.bump-readout {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.bump-readout li {
+  margin: 0.15rem 0;
+}
+
+/* One bar is the contribution of one pair of hidden neurons. */
+.sculpt-bar {
+  fill: var(--accent);
+  opacity: 0.12;
+}
+
+/* The bar's top edge: dragged with a pointer, and a keyboard slider in its
+   own right, so the heights are reachable without a mouse. */
+.sculpt-cap {
+  fill: var(--accent);
+  opacity: 0.5;
+  cursor: ns-resize;
+}
+
+.sculpt-cap:hover,
+.sculpt-cap:focus-visible {
+  opacity: 1;
+}
+
+/* The pointer surface over the whole plot: a tap or drag anywhere in it sets
+   the bar (or draws the curve) at that spot. */
+.sculpt-surface {
+  fill: transparent;
+  cursor: ns-resize;
+}
+
+.sculpt-legend {
+  font-family: system-ui, sans-serif;
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0.5rem 0 0;
+}
+
+.sculpt-group-label {
+  font-family: system-ui, sans-serif;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.sculpt-stats {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 1.3rem;
+  margin: 0.5rem 0 0.2rem;
+  padding: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* Fixed-width values, so a count going from 6 to 144 cannot re-wrap the row
+   while a slider is being dragged. */
+.sculpt-stats li {
+  flex: 0 0 auto;
+}
+
+.sculpt-stats b {
+  color: var(--ink);
+  display: inline-block;
+  min-width: 3ch;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.sculpt-score b {
+  color: var(--accent);
+}
+
+/* The two-input tower diagram: the plane of two dials, one panel per stage. */
+.tower-plane {
+  fill: #fff;
+  stroke: var(--rule-strong);
+  stroke-width: 1.2;
+}
+
+.tower-band {
+  fill: var(--accent);
+  opacity: 0.16;
+}
+
+.tower-cross {
+  fill: var(--accent);
+  opacity: 0.16;
+}
+
+.tower-tower {
+  fill: var(--accent);
+  opacity: 0.42;
+}
+
+.tower-num {
+  font-size: 13px;
+  font-weight: 600;
+  fill: var(--ink);
+}
+
+/* Both of this module's charts carry wide viewBoxes (620 and 640 units), so a
+   phone renders them at about half scale and their labels would land near
+   6px. Bump the labels there, to the ~8px the narrower interactives reach. */
+@media (max-width: 560px) {
+  .m6-chart .chart-tick {
+    font-size: 15px;
+  }
 }

@@ -51,10 +51,12 @@ const toPy = (v: number) => scale(v, DOMAIN[0], DOMAIN[1], H - 30, 10);
 const fromPx = (px: number) => scale(px, 30, W - 10, DOMAIN[0], DOMAIN[1]);
 const fromPy = (py: number) => scale(py, H - 30, 10, DOMAIN[0], DOMAIN[1]);
 
+const START: [number, number][] = [[-0.2, 0.8], [1.2, 0.4]];
+
 export function SeparatingLine() {
   const [dataset, setDataset] = useState<DatasetId>("OR");
   // The line is defined by two draggable handles.
-  const [handles, setHandles] = useState<[number, number][]>([[-0.2, 0.8], [1.2, 0.4]]);
+  const [handles, setHandles] = useState<[number, number][]>(START);
   const dragging = useRef<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -103,6 +105,9 @@ export function SeparatingLine() {
             {id}
           </button>
         ))}
+        <button className="button-secondary" onClick={() => setHandles(START)}>
+          Reset the line
+        </button>
         <span className={`interactive-status ${solved ? "status-good" : ""}`}>
           {solved
             ? `${correct} of ${points.length} separated. Solved!`
@@ -151,15 +156,20 @@ export function SeparatingLine() {
           );
         })}
         {handles.map((h, i) => (
-          <circle
-            key={i}
-            cx={toPx(h[0])} cy={toPy(h[1])} r={7}
-            className="sep-handle"
-            onPointerDown={(e) => {
-              dragging.current = i;
-              (e.target as Element).setPointerCapture?.(e.pointerId);
-            }}
-          />
+          <g key={i}>
+            <circle cx={toPx(h[0])} cy={toPy(h[1])} r={7} className="sep-handle" />
+            {/* The grab area, not the dot: a 7px radius is under a fingertip.
+                touch-action lives here rather than on the whole chart, so a
+                swipe anywhere else still scrolls the page. */}
+            <circle
+              cx={toPx(h[0])} cy={toPy(h[1])} r={20}
+              className="sep-grab drag-handle"
+              onPointerDown={(e) => {
+                dragging.current = i;
+                (e.target as Element).setPointerCapture?.(e.pointerId);
+              }}
+            />
+          </g>
         ))}
       </svg>
     </div>

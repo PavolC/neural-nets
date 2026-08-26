@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { sendRequest } from "../../../runtime/workerClient";
+import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
 import { loadCode, loadCompleted, subscribeProgress } from "../../../state/progress";
 import { sgdExercise } from "../../../exercises/sgd";
 
@@ -96,6 +96,14 @@ export function SgdLivePanel() {
         setRunning(false);
         setStatus("");
       }
+      // Stop can also come from another panel's Stop button: terminateWorker
+      // resolves every pending request, so without this the button here would
+      // stay stuck on its running label.
+      if (msg.type === "cancelled") {
+        setRunning(false);
+        setStatus("Stopped.");
+        return;
+      }
       if (msg.type === "error") {
         setError(msg.message);
         setRunning(false);
@@ -121,6 +129,11 @@ export function SgdLivePanel() {
         <button onClick={run} disabled={running}>
           {running ? "Training..." : result ? "Train again" : "Train a tiny network with your sgd"}
         </button>
+        {running && (
+          <button className="button-secondary" onClick={terminateWorker}>
+            Stop
+          </button>
+        )}
         <span className={error ? "demo-status demo-status-error" : "demo-status"}>
           {error ?? status}
         </span>

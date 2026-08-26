@@ -5,10 +5,10 @@ import {
   type MnistTestSubset,
   type PretrainedWeights,
 } from "../../../runtime/assets";
-import { sendRequest } from "../../../runtime/workerClient";
+import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
 import { loadCode, loadCompleted, subscribeProgress } from "../../../state/progress";
 import { feedforwardExercise } from "../../../exercises/feedforward";
-import { divergingColor, drawMnistDigit } from "./utils";
+import { divergingColor, drawMnistDigit, useInViewOnce } from "./utils";
 
 // Module 2 interactive: a 784-15-10 network, rendered compactly. Hovering a
 // hidden neuron shows its 784 incoming weights as a 28x28 image patch.
@@ -78,13 +78,20 @@ export function NetworkDiagram() {
   const [results, setResults] = useState<DigitResult[] | null>(null);
   const [running, setRunning] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
+  const [pinned, setPinned] = useState<number | null>(null);
   const [unlocked, setUnlocked] = useState(() => loadCompleted(feedforwardExercise.id));
 
   const patchRef = useRef<HTMLCanvasElement>(null);
   const digitRefs = useRef<(HTMLCanvasElement | null)[]>([]);
   const bigDigitRef = useRef<HTMLCanvasElement>(null);
+  const hostRef = useRef<HTMLDivElement>(null);
+  const inView = useInViewOnce(hostRef);
 
   useEffect(() => {
+    if (!inView) {
+      // Still subscribe: the unlock state matters before the assets do.
+      return subscribeProgress(() => setUnlocked(loadCompleted(feedforwardExercise.id)));
+    }
     Promise.all([fetchPretrainedWeights(), fetchMnistTest()])
       .then(([w, m]) => {
         setWeights(w);
@@ -92,7 +99,7 @@ export function NetworkDiagram() {
       })
       .catch((err) => setLoadError(String(err)));
     return subscribeProgress(() => setUnlocked(loadCompleted(feedforwardExercise.id)));
-  }, []);
+  }, [inView]);
 
   useEffect(() => {
     if (!mnist) return;
@@ -128,6 +135,9 @@ export function NetworkDiagram() {
         if (msg.type === "pythonDone") {
           setResults(msg.result as DigitResult[]);
           setRunning(false);
+        } else if (msg.type === "cancelled") {
+          // Another panel's Stop button also cancels this request.
+          setRunning(false);
         } else if (msg.type === "error") {
           setRunError(msg.message);
           setRunning(false);
@@ -136,14 +146,24 @@ export function NetworkDiagram() {
     );
   };
 
-  if (loadError) return <p className="demo-status demo-status-error">Could not load assets: {loadError}</p>;
-  if (!weights || !mnist) return <p className="demo-status">Loading network and digits...</p>;
+  if (loadError)
+    return (
+      <div className="interactive" ref={hostRef}>
+        <p className="demo-status demo-status-error">Could not load assets: {loadError}</p>
+      </div>
+    );
+  if (!weights || !mnist)
+    return (
+      <div className="interactive" ref={hostRef}>
+        <p className="demo-status">Loading network and digits...</p>
+      </div>
+    );
 
   const current = results?.[selected] ?? null;
   const maxW1 = Math.max(...weights.weights[1].flat().map(Math.abs));
 
   return (
-    <div className="interactive">
+    <div className="interactive" ref={hostRef}>
       <div className="netdiag">
         <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`} className="netdiag-svg">
           <rect x={INPUT_X - 24} y={SVG_H / 2 - 24} width={48} height={48} className="netdiag-input" rx={4} />
@@ -175,14 +195,43 @@ export function NetworkDiagram() {
             )),
           )}
           {Array.from({ length: 15 }, (_, j) => (
-            <circle
-              key={`h${j}`}
-              cx={HIDDEN_X} cy={hiddenY(j)} r={9}
-              className={`netdiag-neuron ${hovered === j ? "neuron-hover" : ""}`}
-              fill={current ? `rgba(11, 110, 79, ${current.hidden[j]})` : "#e8e8e2"}
-              onMouseEnter={() => setHovered(j)}
-              onMouseLeave={() => setHovered(null)}
-            />
+            <g key={`h${j}`}>
+              <circle
+                cx={HIDDEN_X} cy={hiddenY(j)} r={9}
+                className={`netdiag-neuron ${hovered === j ? "neuron-hover" : ""}`}
+                fill={current ? `rgba(11, 110, 79, ${current.hidden[j]})` : "#e8e8e2"}
+              />
+              {/* Hover alone put this weight image out of reach of every touch
+                  screen and every keyboard. Tap or Enter pins it; a second
+                  press lets go. The transparent disc is the hit area: 9px is
+                  smaller than a fingertip. */}
+              <circle
+                cx={HIDDEN_X} cy={hiddenY(j)} r={16}
+                className="netdiag-hit"
+                role="button"
+                tabIndex={0}
+                aria-pressed={hovered === j}
+                aria-label={`Hidden neuron ${j + 1} of 15: show the pixels it looks at`}
+                onPointerEnter={(e) => {
+                  if (e.pointerType === "mouse") setHovered(j);
+                }}
+                onPointerLeave={(e) => {
+                  if (e.pointerType === "mouse" && pinned !== j) setHovered(null);
+                }}
+                onClick={() => {
+                  const next = pinned === j ? null : j;
+                  setPinned(next);
+                  setHovered(next);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key !== "Enter" && e.key !== " ") return;
+                  e.preventDefault();
+                  const next = pinned === j ? null : j;
+                  setPinned(next);
+                  setHovered(next);
+                }}
+              />
+            </g>
           ))}
           {Array.from({ length: 10 }, (_, j) => (
             <g key={`o${j}`}>
@@ -217,8 +266,8 @@ export function NetworkDiagram() {
       <div className="payoff">
         {!unlocked ? (
           <p className="payoff-locked">
-            Locked: pass the feedforward exercise below, then come back and run your own
-            code on real digits here.
+            This panel runs your own feedforward, so it needs the exercise below
+            passed first. Come back here once its tests are green.
           </p>
         ) : (
           <>
@@ -226,6 +275,11 @@ export function NetworkDiagram() {
               <button onClick={runPayoff} disabled={running}>
                 {running ? "Running..." : results ? "Run again" : "Run your feedforward on real digits"}
               </button>
+              {running && (
+                <button className="button-secondary" onClick={terminateWorker}>
+                  Stop
+                </button>
+              )}
               {runError && <span className="demo-status demo-status-error">{runError}</span>}
             </div>
             <div className="digit-strip">
@@ -233,6 +287,12 @@ export function NetworkDiagram() {
                 <button
                   key={i}
                   className={`digit-thumb ${selected === i ? "digit-selected" : ""}`}
+                  aria-pressed={selected === i}
+                  aria-label={
+                    results
+                      ? `Digit ${i + 1}: a ${mnist.labels[i]}, read as ${results[i].pred}`
+                      : `Digit ${i + 1}: a ${mnist.labels[i]}`
+                  }
                   onClick={() => setSelected(i)}
                 >
                   <canvas
@@ -243,6 +303,9 @@ export function NetworkDiagram() {
                   />
                   {results && (
                     <span className={results[i].pred === mnist.labels[i] ? "pred-ok" : "pred-bad"}>
+                      <span aria-hidden="true">
+                        {results[i].pred === mnist.labels[i] ? "\u2713" : "\u2717"}
+                      </span>
                       {results[i].pred}
                     </span>
                   )}

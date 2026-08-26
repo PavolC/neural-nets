@@ -153,7 +153,8 @@ export function Module1() {
         differ, 0 when they agree. As a personality it is admittedly contrived; its
         fame comes from what it does to neurons. The whole task is four dots:
       </p>
-      <table className="truth-table">
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
         <thead>
           <tr>
             <th><M tex="x_1" /></th>
@@ -168,7 +169,8 @@ export function Module1() {
           <tr><td>1</td><td>0</td><td>yes</td><td>1 (green)</td></tr>
           <tr><td>1</td><td>1</td><td>no</td><td>0 (gold)</td></tr>
         </tbody>
-      </table>
+        </table>
+      </div>
       <p>
         Four points, and no line works: the greens sit on one diagonal, the golds on
         the other, so any line that separates them would have to bend. When it was
@@ -244,7 +246,8 @@ export function Module1() {
         <M tex="h_2" />, bias <M tex="-4" />). "At least one, but not both" is
         exactly XOR. Check every case:
       </p>
-      <table className="truth-table">
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
         <thead>
           <tr>
             <th><M tex="x_1" /></th>
@@ -261,7 +264,8 @@ export function Module1() {
           <tr><td>1</td><td>0</td><td>≈ 1</td><td>≈ 0</td><td>≈ 1</td><td>1 (green)</td></tr>
           <tr><td>1</td><td>1</td><td>≈ 1</td><td>≈ 1</td><td>≈ 0</td><td>0 (gold)</td></tr>
         </tbody>
-      </table>
+        </table>
+      </div>
       <p>
         The playground below is this exact network, all nine numbers on sliders,
         and the four dots are the contrarian's dataset from above, the same four

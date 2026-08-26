@@ -38,6 +38,7 @@ export function ModuleToc() {
   const ref = useRef<HTMLElement>(null);
   const [sections, setSections] = useState<{ id: string; title: string }[]>([]);
   const [active, setActive] = useState<string | null>(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     const article = ref.current?.closest("article");
@@ -63,26 +64,70 @@ export function ModuleToc() {
     };
   }, []);
 
+  // Scrolling alone leaves a keyboard reader's focus behind in the nav, so the
+  // arrow keys keep scrolling the list instead of the section they just chose.
+  const goTo = (id: string) => {
+    const heading = document.getElementById(id);
+    if (!heading) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    heading.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    heading.tabIndex = -1;
+    heading.focus({ preventScroll: true });
+    setOpen(false);
+  };
+
+  const activeTitle =
+    sections.find((s) => s.id === active)?.title ?? sections[0]?.title ?? "";
+
   return (
-    <nav ref={ref} className="module-toc" aria-label="On this page">
-      <p className="module-toc-label">On this page</p>
-      <ul>
-        {sections.map((s) => (
-          <li key={s.id}>
-            <button
-              className={`module-toc-item ${active === s.id ? "module-toc-active" : ""}`}
-              onClick={() =>
-                document
-                  .getElementById(s.id)
-                  ?.scrollIntoView({ behavior: "smooth", block: "start" })
-              }
-            >
-              {s.title}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <>
+      {/* Narrow screens have no gutter for the floating toc, and the module
+          nav in the header has long scrolled away by the time it is wanted. */}
+      <nav className="module-jump" aria-label="Jump to a section">
+        <button
+          className="module-jump-toggle"
+          aria-expanded={open}
+          onClick={() => setOpen((o) => !o)}
+        >
+          <span className="module-jump-where">Section</span>
+          <span className="module-jump-title">{activeTitle}</span>
+          <span className="module-jump-caret" aria-hidden="true">
+            {open ? "▲" : "▼"}
+          </span>
+        </button>
+        {open && (
+          <ul className="module-jump-list">
+            {sections.map((s) => (
+              <li key={s.id}>
+                <button
+                  className={`module-toc-item ${active === s.id ? "module-toc-active" : ""}`}
+                  aria-current={active === s.id ? "true" : undefined}
+                  onClick={() => goTo(s.id)}
+                >
+                  {s.title}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </nav>
+      <nav ref={ref} className="module-toc" aria-label="On this page">
+        <p className="module-toc-label">On this page</p>
+        <ul>
+          {sections.map((s) => (
+            <li key={s.id}>
+              <button
+                className={`module-toc-item ${active === s.id ? "module-toc-active" : ""}`}
+                aria-current={active === s.id ? "true" : undefined}
+                onClick={() => goTo(s.id)}
+              >
+                {s.title}
+              </button>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </>
   );
 }
 
@@ -102,8 +147,12 @@ export function Figure({ children, caption }: { children: ReactNode; caption: st
   return (
     <figure className="module-figure">
       {/* Wide diagrams keep a readable size on small screens and scroll
-          sideways inside this wrapper instead of shrinking to illegibility. */}
-      <div className="figure-scroll">{children}</div>
+          sideways inside this wrapper instead of shrinking to illegibility.
+          scroll-x supplies the overflow plus the edge fade that says there is
+          more; tabIndex lets a keyboard reach the scroll. */}
+      <div className="figure-scroll scroll-x" tabIndex={0}>
+        {children}
+      </div>
       <figcaption>{caption}</figcaption>
     </figure>
   );

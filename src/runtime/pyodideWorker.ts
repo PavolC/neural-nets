@@ -43,7 +43,10 @@ let pyodidePromise: Promise<Pyodide> | null = null;
 function getPyodide(): Promise<Pyodide> {
   if (!pyodidePromise) {
     pyodidePromise = (async () => {
-      status("Downloading Pyodide runtime (about 10 MB, first run only)...");
+      // Not "first run only": pressing Stop discards the worker, so this runs
+      // again on the next attempt. The browser cache is what makes the repeat
+      // cheap, and that is what the reader needs told.
+      status("Downloading the Python runtime (about 10 MB, then cached)...");
       const mod = await import(/* @vite-ignore */ `${PYODIDE_BASE_URL}pyodide.mjs`);
       const pyodide: Pyodide = await mod.loadPyodide({
         indexURL: PYODIDE_BASE_URL,

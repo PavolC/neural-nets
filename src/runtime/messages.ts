@@ -60,4 +60,7 @@ export type WorkerResponse =
   | { type: "testsDone"; id: number; result: TestRunResult }
   | { type: "report"; id: number; payload: unknown }
   | { type: "pythonDone"; id: number; result: unknown }
+  // The reader pressed Stop. Distinct from "error" so the UI can return to
+  // idle instead of reporting a fault the reader caused on purpose.
+  | { type: "cancelled"; id: number }
   | { type: "error"; id: number; message: string };

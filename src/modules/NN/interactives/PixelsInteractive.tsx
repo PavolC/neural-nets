@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { fetchMnistTest, type MnistTestSubset } from "../../../runtime/assets";
-import { drawMnistDigit } from "./utils";
+import { drawMnistDigit, useInViewOnce } from "./utils";
 
 // Module 2 interactive: an image is just numbers. One real MNIST test
 // digit, blown up; pointing at any pixel shows its brightness value and
@@ -15,35 +15,58 @@ export function PixelsInteractive() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [cell, setCell] = useState<{ r: number; c: number } | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const hostRef = useRef<HTMLDivElement>(null);
+  const inView = useInViewOnce(hostRef);
 
   useEffect(() => {
+    if (!inView) return;
     fetchMnistTest().then(setMnist).catch((err) => setLoadError(String(err)));
-  }, []);
+  }, [inView]);
 
   useEffect(() => {
     if (mnist && canvasRef.current) drawMnistDigit(canvasRef.current, mnist.images, DIGIT_INDEX);
   }, [mnist]);
 
-  if (loadError) return <p className="demo-status demo-status-error">Could not load the digit: {loadError}</p>;
-  if (!mnist) return <p className="demo-status">Loading a digit...</p>;
-
-  const onMove = (e: React.MouseEvent) => {
+  // Pointer, not mouse: the same handler then covers a finger and a stylus.
+  // With onMouseMove this whole panel did nothing at all on a phone, and its
+  // status line read "Point anywhere on the image." forever.
+  const onMove = (e: React.PointerEvent) => {
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
     const c = Math.min(N - 1, Math.max(0, Math.floor(((e.clientX - rect.left) / rect.width) * N)));
     const r = Math.min(N - 1, Math.max(0, Math.floor(((e.clientY - rect.top) / rect.height) * N)));
     setCell({ r, c });
   };
 
+  if (loadError)
+    return (
+      <div className="interactive" ref={hostRef}>
+        <p className="demo-status demo-status-error">
+          Could not load the digit: {loadError}
+        </p>
+      </div>
+    );
+  if (!mnist)
+    return (
+      <div className="interactive" ref={hostRef}>
+        <p className="demo-status">Loading a digit...</p>
+      </div>
+    );
+
   const value = cell ? mnist.images[DIGIT_INDEX * 784 + cell.r * N + cell.c] / 255 : 0;
   const label = mnist.labels[DIGIT_INDEX];
 
   return (
-    <div className="interactive">
+    <div className="interactive" ref={hostRef}>
       <div className="pixels-row">
         <div
           className="pixels-stack"
-          onMouseMove={onMove}
-          onMouseLeave={() => setCell(null)}
+          onPointerMove={onMove}
+          onPointerDown={onMove}
+          // A finger lifting is not the reader losing interest: keep the last
+          // pixel on screen so the numbers can be read after the tap.
+          onPointerLeave={(e) => {
+            if (e.pointerType === "mouse") setCell(null);
+          }}
         >
           <canvas ref={canvasRef} width={N} height={N} style={{ width: SIZE, height: SIZE }} />
           <svg viewBox={`0 0 ${N} ${N}`} preserveAspectRatio="none">
@@ -58,7 +81,7 @@ export function PixelsInteractive() {
               ? `The pixel at row ${cell.r}, column ${cell.c} holds the number ${value.toFixed(2)}. ` +
                 `Unrolled, it is entry ${cell.r * N + cell.c} of the 784-tall input column ` +
                 `(row ${cell.r} times 28, plus column ${cell.c}).`
-              : "Point anywhere on the image."}
+              : "Point at the image, or tap it, to read a pixel."}
           </p>
           <p className="pixels-note">
             This is a real test digit (its label: {label}). To you it is a {label}; to the

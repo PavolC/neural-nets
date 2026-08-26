@@ -1,5 +1,7 @@
 // Shared helpers for the interactive visualizations.
 
+import { useEffect, useState } from "react";
+
 export function sigmoid(z: number): number {
   return 1 / (1 + Math.exp(-z));
 }
@@ -48,4 +50,32 @@ export function drawMnistDigit(
     img.data[i * 4 + 3] = 255;
   }
   ctx.putImageData(img, 0, 0);
+}
+
+/** True once the element has been on screen, and true forever after.
+ *
+ * Every module is mounted at load so tab switches keep their state, which used
+ * to mean Module 2's interactives fetched a megabyte of MNIST before the reader
+ * had left Module 1's first paragraph. Hidden modules have no box, so the
+ * observer stays quiet until the reader actually arrives. */
+export function useInViewOnce(ref: React.RefObject<Element | null>): boolean {
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    if (seen) return;
+    const el = ref.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setSeen(true);
+      return;
+    }
+    const obs = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((e) => e.isIntersecting)) setSeen(true);
+      },
+      { rootMargin: "600px" },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [ref, seen]);
+  return seen;
 }

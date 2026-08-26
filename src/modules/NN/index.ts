@@ -1,31 +1,26 @@
 import type { ComponentType } from "react";
-import { loadCompleted } from "../../state/progress";
 import { Module1 } from "./module1";
 import { Module2 } from "./module2";
 import { Module3 } from "./module3";
 import { Module4 } from "./module4";
 import { Module5 } from "./module5";
+import { Module6 } from "./module6";
 
 export interface ModuleDef {
   id: string;
   navLabel: string;
-  /** Exercises that must pass before the NEXT module unlocks. */
-  exerciseIds: string[];
   Component: ComponentType;
 }
 
+// Every module is reachable from the start: the reader decides the order, and
+// the nav never withholds anything. (Exercise completion still gates the
+// payoff panels that run the reader's own code, because those need the code to
+// exist; that check lives in the panels themselves.)
 export const MODULES: ModuleDef[] = [
-  { id: "m1", navLabel: "1 · Neurons", exerciseIds: ["sigmoid-neuron"], Component: Module1 },
-  { id: "m2", navLabel: "2 · Feedforward", exerciseIds: ["feedforward"], Component: Module2 },
-  { id: "m3", navLabel: "3 · Descent", exerciseIds: ["sgd"], Component: Module3 },
-  // Module 4 deliberately has no exercise (a quiz instead), so it gates
-  // nothing beyond what Module 3's exercise already gates.
-  { id: "m4", navLabel: "4 · Backprop", exerciseIds: [], Component: Module4 },
-  { id: "m5", navLabel: "5 · Training", exerciseIds: ["backprop"], Component: Module5 },
+  { id: "m1", navLabel: "1 · Neurons", Component: Module1 },
+  { id: "m2", navLabel: "2 · Feedforward", Component: Module2 },
+  { id: "m3", navLabel: "3 · Descent", Component: Module3 },
+  { id: "m4", navLabel: "4 · Backprop", Component: Module4 },
+  { id: "m5", navLabel: "5 · Training", Component: Module5 },
+  { id: "m6", navLabel: "6 · Universality", Component: Module6 },
 ];
-
-/** A module unlocks when every exercise of every earlier module has passed.
- * Navigation back to anything already unlocked is always allowed. */
-export function isModuleUnlocked(index: number): boolean {
-  return MODULES.slice(0, index).every((m) => m.exerciseIds.every(loadCompleted));
-}

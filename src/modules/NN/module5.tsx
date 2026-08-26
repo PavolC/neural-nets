@@ -131,7 +131,8 @@ export function Module5() {
         sweep through the network, BP1 at the output layer where blame starts,
         then BP2 to BP4 one layer back:
       </p>
-      <table className="truth-table">
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
         <thead>
           <tr>
             <th>equation</th>
@@ -161,7 +162,8 @@ export function Module5() {
             <td>(30, 1) @ (1, 784) gives (30, 784), the weights' own shape</td>
           </tr>
         </tbody>
-      </table>
+        </table>
+      </div>
 
       <SectionHeader id="m5-receipts" title="Keep receipts" />
       <p>
@@ -256,7 +258,8 @@ export function Module5() {
           "Backprop is a forward pass that keeps receipts (every z, every activation) plus a backward sweep that turns them into every slope: BP1 once at the output, then BP2, BP3, BP4 walking toward the input.",
           "It handles one example per call; a mini-batch's gradient is the average of its examples' slopes, so your sgd plugged in unchanged.",
           "The gradient check is the strongest guarantee in this course: two independent methods, your equations and nudge-and-measure, agreeing on every parameter of a network to within one part in ten million.",
-          "The digit reader trains in seconds where nudge-measured gradients would need hours: same descent, same cost, same data, cheaper slopes. Module 6 is a playground interlude; Module 7 returns here to make this training better, starting from quadratic cost's saturation weakness.",
+          "The digit reader trains in seconds where nudge-measured gradients would need hours: same descent, same cost, same data, cheaper slopes.",
+          "You have now written a sigmoid neuron, a feedforward pass, stochastic gradient descent and backpropagation, and together they read handwritten digits. Module 6 steps away from training to ask what a network of sigmoid neurons can represent at all.",
         ]}
         chapter="Chapter 2 (how the backpropagation algorithm works)"
         href="http://neuralnetworksanddeeplearning.com/chap2.html"

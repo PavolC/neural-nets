@@ -54,6 +54,12 @@ export function TrainingDemo() {
           setPhase("done");
           setStatus("Done.");
           break;
+        case "cancelled":
+          setPhase("idle");
+          // The button returns to its idle label, so do not name a button that
+          // is no longer on screen.
+          setStatus("Stopped.");
+          break;
         case "error":
           setPhase("error");
           setStatus(`Something went wrong: ${msg.message}`);
@@ -66,12 +72,14 @@ export function TrainingDemo() {
 
   return (
     <section className="demo">
-      <h2>Milestone 0: train a network in your browser</h2>
+      <h2>See where this ends up: a trained digit reader</h2>
       <p>
-        This feasibility spike trains a 784-30-10 sigmoid network on 5,000 MNIST digits
-        (1,000 held out for testing) with plain stochastic gradient descent. Python and
-        NumPy run in a Web Worker via Pyodide, so the page stays responsive while it
-        trains. Loss and test accuracy stream in live after every epoch.
+        This is the finished thing, running the course's own reference code rather than
+        yours: a 784-30-10 sigmoid network trained on 5,000 MNIST digits (1,000 held out
+        for testing) with plain stochastic gradient descent. By Module 5 you will have
+        written the parts that make it work. Python and NumPy run in a Web Worker via
+        Pyodide, so the page stays responsive while it trains, and loss and test accuracy
+        stream in live after every epoch.
       </p>
       <div className="demo-controls">
         <button onClick={start} disabled={phase === "running"}>
@@ -87,7 +95,9 @@ export function TrainingDemo() {
           rate {TRAIN_PARAMS.eta}, seed {TRAIN_PARAMS.seed}
         </span>
       </div>
-      <p className={`demo-status demo-status-${phase}`}>{status}</p>
+      <p className={`demo-status demo-status-${phase}`} role="status" aria-live="polite">
+        {status}
+      </p>
       {points.length > 0 && <MetricsChart points={points} totalEpochs={TRAIN_PARAMS.epochs} />}
       {result && (
         <p className="demo-result">

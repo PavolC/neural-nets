@@ -27,18 +27,29 @@ interface ScratchError {
   line: number | null;
 }
 
+/** Which of the two run buttons is in flight. Sharing one boolean meant
+ * pressing "Run my code" relabelled "Run tests" to "Running...". */
+type RunKind = "tests" | "scratch";
+
 export function ExercisePage({ exercise }: { exercise: Exercise }) {
   const editorRef = useRef<CodeEditorHandle | null>(null);
-  const [running, setRunning] = useState(false);
+  const [busy, setBusy] = useState<RunKind | null>(null);
   const [status, setStatus] = useState("");
   const [result, setResult] = useState<TestRunResult | null>(null);
+  // Results survive the next run instead of being cleared: unmounting them
+  // collapsed the page by well over a thousand pixels and put it back
+  // afterwards. They are marked stale rather than removed.
+  const [stale, setStale] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cancelled, setCancelled] = useState(false);
   const [output, setOutput] = useState<string[]>([]);
+  const [trimmed, setTrimmed] = useState(false);
   const [scratchError, setScratchError] = useState<ScratchError | null>(null);
   const [ranOnce, setRanOnce] = useState(false);
   const [reveal, setReveal] = useState(() => loadRevealStage(exercise.id));
   const [completed, setCompleted] = useState(() => loadCompleted(exercise.id));
   const [fullscreen, setFullscreen] = useState(false);
+  const running = busy !== null;
 
   // Fullscreen: Escape exits, and the page behind must not scroll.
   useEffect(() => {
@@ -46,22 +57,40 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setFullscreen(false);
     };
+    // A hash change unmounts nothing but does hide this module, and the
+    // overlay would go with it while body overflow stayed hidden, leaving a
+    // page that cannot be scrolled until a reload.
+    const onHashChange = () => setFullscreen(false);
     window.addEventListener("keydown", onKey);
+    window.addEventListener("hashchange", onHashChange);
     document.body.style.overflow = "hidden";
     return () => {
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener("hashchange", onHashChange);
       document.body.style.overflow = "";
     };
   }, [fullscreen]);
 
+  const outputRef = useRef<HTMLPreElement>(null);
+  // Follow the tail while a run streams, unless the reader has scrolled up to
+  // look at something.
+  useEffect(() => {
+    const el = outputRef.current;
+    if (!el) return;
+    const nearBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
+    if (nearBottom) el.scrollTop = el.scrollHeight;
+  }, [output]);
+
   const initialDoc = loadCode(exercise.id) ?? exercise.skeleton;
 
-  const beginRun = () => {
-    setRunning(true);
+  const beginRun = (kind: RunKind) => {
+    setBusy(kind);
     setRanOnce(true);
     setError(null);
+    setCancelled(false);
     setScratchError(null);
     setOutput([]);
+    setTrimmed(false);
     setStatus("Starting...");
   };
 
@@ -71,11 +100,20 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
         setStatus(msg.text);
         return true;
       case "log":
-        if (msg.source === "stdout") setOutput((prev) => [...prev.slice(-199), msg.text]);
+        if (msg.source === "stdout")
+          setOutput((prev) => {
+            if (prev.length >= 200) setTrimmed(true);
+            return [...prev.slice(-199), msg.text];
+          });
+        return true;
+      case "cancelled":
+        setCancelled(true);
+        setBusy(null);
+        setStatus("");
         return true;
       case "error":
         setError(msg.message);
-        setRunning(false);
+        setBusy(null);
         setStatus("");
         return true;
       default:
@@ -85,8 +123,8 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
 
   const runTests = () => {
     if (!editorRef.current) return;
-    beginRun();
-    setResult(null);
+    beginRun("tests");
+    setStale(true);
     sendRequest(
       {
         type: "runTests",
@@ -97,7 +135,8 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
         if (collectCommon(msg)) return;
         if (msg.type === "testsDone") {
           setResult(msg.result);
-          setRunning(false);
+          setStale(false);
+          setBusy(null);
           setStatus("");
           if (msg.result.passed) {
             setCompleted(true);
@@ -110,7 +149,9 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
 
   const runScratch = () => {
     if (!editorRef.current) return;
-    beginRun();
+    beginRun("scratch");
+    // The verdict on screen was reached by code that may since have changed.
+    if (result) setStale(true);
     sendRequest(
       {
         type: "runPython",
@@ -122,7 +163,7 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
         if (msg.type === "pythonDone") {
           const r = msg.result as { error: ScratchError | null };
           setScratchError(r.error);
-          setRunning(false);
+          setBusy(null);
           setStatus("");
         }
       },
@@ -130,11 +171,18 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
   };
 
   const resetToSkeleton = () => {
-    if (!window.confirm("Replace your code with the original skeleton? Your edits and progress on this exercise will be lost.")) return;
+    if (
+      !window.confirm(
+        "Replace your code with the original skeleton? Your edits, your revealed hints and this exercise's passed mark will be lost. Other modules are unaffected.",
+      )
+    )
+      return;
     resetExercise(exercise.id);
     editorRef.current?.setDoc(exercise.skeleton);
     setResult(null);
+    setStale(false);
     setError(null);
+    setCancelled(false);
     setScratchError(null);
     setOutput([]);
     setRanOnce(false);
@@ -154,11 +202,33 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
     saveCode(exercise.id, exercise.solution);
   };
 
+  // One announcement per state change, from a region that is always mounted:
+  // a live region inserted in the same tick as its text is announced
+  // unreliably. Without this, a screen reader hears nothing at all between
+  // pressing Run tests and finding the results by hand, every single run.
+  const liveMessage = error
+    ? `Run failed. ${error}`
+    : cancelled
+      ? "Stopped."
+      : busy
+        ? status || "Running..."
+        : result && !stale
+          ? result.setup_error
+            ? "Your code did not run. The reason is above the results."
+            : result.passed
+              ? "All tests passed."
+              : `${result.tests.filter((t) => t.passed).length} of ${result.tests.length} tests passed.`
+          : "";
+
   return (
     <section className="exercise">
       <h4 className="exercise-title">
-        Exercise: {exercise.title}
-        {completed && <span className="badge-done" title="All tests passed">passed</span>}
+        <span>Exercise: {exercise.title}</span>
+        {completed && (
+          <span className="badge-done" title="All tests passed">
+            passed
+          </span>
+        )}
       </h4>
       {exercise.prompt.map((part, i) =>
         typeof part === "string" ? (
@@ -178,7 +248,10 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
         ),
       )}
 
-      <div className={fullscreen ? "workbench workbench-fullscreen" : "workbench"}>
+      <div
+        className={fullscreen ? "workbench workbench-fullscreen" : "workbench"}
+        aria-busy={running}
+      >
         <CodeEditor
           initialDoc={initialDoc}
           onChange={(doc) => saveCode(exercise.id, doc)}
@@ -188,17 +261,18 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
         <p className="exercise-tip">
           Two ways to run. "Run my code" just executes what is in the editor, so you
           can call your functions, print(...) values, and experiment. "Run tests"
-          checks your work. Everything you print appears in the Output panel below.
-          The editor is resizable (drag its bottom edge); Tab indents, and Escape
-          then Tab moves keyboard focus out.
+          checks your work. Everything you print appears in the Output panel below,
+          as it happens. The editor is resizable (drag its bottom edge); Tab indents,
+          and Escape then Tab moves keyboard focus out. Your code is saved in this
+          browser only.
         </p>
 
         <div className="exercise-controls">
           <button onClick={runTests} disabled={running}>
-            {running ? "Running..." : "Run tests"}
+            {busy === "tests" ? "Running..." : "Run tests"}
           </button>
           <button className="button-secondary" onClick={runScratch} disabled={running}>
-            Run my code
+            {busy === "scratch" ? "Running..." : "Run my code"}
           </button>
           {running && (
             <button className="button-secondary" onClick={terminateWorker}>
@@ -215,16 +289,27 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
             {fullscreen ? "Exit fullscreen (Esc)" : "Fullscreen"}
           </button>
         </div>
+        <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {liveMessage}
+        </p>
         {status && <p className="demo-status">{status}</p>}
+        {cancelled && <p className="demo-status">Stopped. Press Run tests to try again.</p>}
         {error && <p className="demo-status demo-status-error">Something went wrong: {error}</p>}
 
-        {ranOnce && !running && (
+        {/* Mounted from the first run onward, including while a run is in
+            flight: prints stream in during the run, which is when the reader
+            wants them, and the panel no longer appears and disappears
+            underneath the page on every click. */}
+        {ranOnce && (
           <div className="output-panel">
             <h5>Output</h5>
-            <pre>
+            <pre ref={outputRef}>
+              {trimmed && "(earlier output trimmed to the last 200 lines)\n"}
               {output.length
                 ? output.join("\n")
-                : "(your code printed nothing; add print(...) anywhere to inspect values)"}
+                : running
+                  ? "(waiting for output...)"
+                  : "(your code printed nothing; add print(...) anywhere to inspect values)"}
             </pre>
             {scratchError && (
               <p className="demo-status demo-status-error">
@@ -235,7 +320,9 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
           </div>
         )}
 
-        {result && <TestResults result={result} flagship={exercise.flagship} />}
+        {result && (
+          <TestResults result={result} flagship={exercise.flagship} stale={stale} />
+        )}
       </div>
 
       <details className="demo-log tests-viewer">
@@ -298,19 +385,37 @@ function PlaySnippet({ code, onAppend }: { code: string; onAppend: () => void })
   );
 }
 
+/** Failures that stopped for the same reason, collected under one card. The
+ * untouched skeleton fails every test with the identical NotImplementedError,
+ * which used to render as six full-size copies of one sentence. */
+function groupFailures(tests: TestRunResult["tests"]) {
+  const groups: { message: string; titles: string[] }[] = [];
+  for (const t of tests) {
+    if (t.passed) continue;
+    const existing = groups.find((g) => g.message === t.message);
+    if (existing) existing.titles.push(t.title);
+    else groups.push({ message: t.message, titles: [t.title] });
+  }
+  return groups;
+}
+
 function TestResults({
   result,
   flagship,
+  stale,
 }: {
   result: TestRunResult;
   flagship?: { test: string; note: string };
+  stale: boolean;
 }) {
   if (result.setup_error) {
     const { message, line } = result.setup_error;
     return (
-      <div className="test-results">
+      <div className={stale ? "test-results test-results-stale" : "test-results"}>
         <div className="test-result test-fail">
-          <span className="test-mark">✗</span>
+          <span className="test-mark" aria-hidden="true">
+            ✗
+          </span>
           <div>
             <strong>Your code did not run</strong>
             <p>
@@ -323,25 +428,67 @@ function TestResults({
     );
   }
   const passedCount = result.tests.filter((t) => t.passed).length;
+  const failures = groupFailures(result.tests);
+  const nothingWritten =
+    failures.length > 0 &&
+    passedCount === 0 &&
+    failures.every((g) => g.message.includes("NotImplementedError"));
   const flagshipPassed =
     flagship && result.tests.some((t) => t.name === flagship.test && t.passed);
   return (
-    <div className="test-results">
+    <div className={stale ? "test-results test-results-stale" : "test-results"}>
+      {stale && (
+        <p className="test-stale-note">
+          From an earlier run. Press Run tests to check the code as it stands now.
+        </p>
+      )}
       <p className={result.passed ? "test-summary test-summary-pass" : "test-summary"}>
         {result.passed
           ? "All tests passed."
           : `${passedCount} of ${result.tests.length} tests passed.`}
       </p>
+      {nothingWritten && (
+        <p className="test-orient">
+          Nothing is implemented yet, so every test stopped at the first function it
+          called. Work down the list below: the earlier functions are the ones the
+          later tests need.
+        </p>
+      )}
       {flagshipPassed && <p className="flagship-banner">{flagship.note}</p>}
-      {result.tests.map((t) => (
-        <div key={t.name} className={`test-result ${t.passed ? "test-pass" : "test-fail"}`}>
-          <span className="test-mark">{t.passed ? "✓" : "✗"}</span>
+      {failures.map((g) => (
+        <div key={g.message} className="test-result test-fail">
+          <span className="test-mark" aria-hidden="true">
+            ✗
+          </span>
           <div>
-            <strong>{t.title}</strong>
-            {!t.passed && <p>{t.message}</p>}
+            <strong>
+              <span className="sr-only">Failed: </span>
+              {g.titles[0]}
+            </strong>
+            {g.titles.length > 1 && (
+              <p className="test-also">
+                and {g.titles.length - 1} more for the same reason: {g.titles.slice(1).join("; ")}
+              </p>
+            )}
+            <p>{g.message}</p>
           </div>
         </div>
       ))}
+      {result.tests
+        .filter((t) => t.passed)
+        .map((t) => (
+          <div key={t.name} className="test-result test-pass">
+            <span className="test-mark" aria-hidden="true">
+              ✓
+            </span>
+            <div>
+              <strong>
+                <span className="sr-only">Passed: </span>
+                {t.title}
+              </strong>
+            </div>
+          </div>
+        ))}
     </div>
   );
 }

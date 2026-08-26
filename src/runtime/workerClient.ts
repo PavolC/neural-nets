@@ -14,7 +14,7 @@ let worker: Worker | null = null;
 const handlers = new Map<number, Handler>();
 let nextId = 1;
 
-const FINAL_TYPES = new Set(["trainDone", "testsDone", "pythonDone", "error"]);
+const FINAL_TYPES = new Set(["trainDone", "testsDone", "pythonDone", "cancelled", "error"]);
 
 function ensureWorker(): Worker {
   if (!worker) {
@@ -27,6 +27,18 @@ function ensureWorker(): Worker {
       if (FINAL_TYPES.has(msg.type)) handlers.delete(msg.id);
       handler?.(msg);
     };
+    // Without these a worker that dies (out of memory, a Pyodide fault) leaves
+    // every pending request unanswered and the UI spinning with no way out.
+    const fail = (message: string) => {
+      worker = null;
+      const pending = [...handlers.entries()];
+      handlers.clear();
+      for (const [id, h] of pending) h({ type: "error", id, message });
+    };
+    worker.onerror = (e) =>
+      fail(e.message || "the Python runtime stopped responding. Press Run tests to restart it.");
+    worker.onmessageerror = () =>
+      fail("the Python runtime sent something unreadable. Press Run tests to restart it.");
   }
   return worker;
 }
@@ -41,14 +53,15 @@ export function sendRequest(req: DistributiveOmit<WorkerRequest, "id">, onMessag
 }
 
 /** Hard-stop the worker (the only way out of runaway learner code, e.g. an
- * infinite loop). Pending requests get an error response; the next request
- * boots a fresh worker (the runtime re-download is served from HTTP cache). */
+ * infinite loop). Pending requests get a "cancelled" response; the next
+ * request boots a fresh worker (the runtime re-download is served from HTTP
+ * cache). */
 export function terminateWorker(): void {
   worker?.terminate();
   worker = null;
   const pending = [...handlers.entries()];
   handlers.clear();
   for (const [id, handler] of pending) {
-    handler({ type: "error", id, message: "cancelled: the Python runtime was stopped" });
+    handler({ type: "cancelled", id });
   }
 }

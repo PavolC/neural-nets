@@ -188,10 +188,11 @@ export function BackpropStepper() {
           className={`bp-neuron ${selected ? "bp-node-selected" : ""}`}
           style={{ fill }}
         />
-        <text
-          x={pos.x} y={pos.y + 5} textAnchor="middle"
-          className={`bp-avalue ${a !== null && a > 0.55 ? "bp-avalue-dark" : ""}`}
-        >
+        {/* The number stays dark at every activation. Flipping it to white
+            above a = 0.55 put it at 2.26:1 against a fill that is only half
+            saturated there; white never reaches 4.5:1 anywhere in the range,
+            and dark never drops below 4.25:1. */}
+        <text x={pos.x} y={pos.y + 5} textAnchor="middle" className="bp-avalue">
           {a === null ? "" : fmt(a)}
         </text>
         <text x={pos.x} y={pos.y + R + 17} textAnchor="middle" className="bp-bias">
@@ -242,7 +243,7 @@ export function BackpropStepper() {
         <Eq tex={stepDef.tex} gloss={stepDef.gloss(trace)} />
       </div>
 
-      <div className="figure-scroll">
+      <div className="figure-scroll scroll-x" tabIndex={0}>
       <svg
         viewBox="-70 0 812 362"
         className="interactive-svg bp-diagram"
@@ -308,7 +309,7 @@ export function BackpropStepper() {
       </div>
 
       <div className="bp-lower">
-        <div className="bp-table-scroll">
+        <div className="bp-table-scroll scroll-x" tabIndex={0}>
         <table className="bp-table">
           <thead>
             <tr>

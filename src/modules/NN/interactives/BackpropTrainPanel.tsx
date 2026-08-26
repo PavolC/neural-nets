@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { assetUrl } from "../../../runtime/assets";
-import { sendRequest } from "../../../runtime/workerClient";
+import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
 import { loadCode, loadCompleted, subscribeProgress } from "../../../state/progress";
 import { backpropExercise } from "../../../exercises/backprop";
 import { sgdExercise } from "../../../exercises/sgd";
@@ -180,6 +180,14 @@ export function BackpropTrainPanel() {
           setRunning(false);
           setStatus("");
         }
+        // Stop can also come from another panel's Stop button: terminateWorker
+        // resolves every pending request, so without this the button here would
+        // stay stuck on its running label.
+        if (msg.type === "cancelled") {
+          setRunning(false);
+          setStatus("Stopped.");
+          return;
+        }
         if (msg.type === "error") {
           setError(msg.message);
           setRunning(false);
@@ -190,10 +198,14 @@ export function BackpropTrainPanel() {
   };
 
   if (!unlocked) {
+    const missing = [
+      loadCompleted(backpropExercise.id) ? null : "the backprop exercise above",
+      loadCompleted(sgdExercise.id) ? null : "Module 3's sgd exercise",
+    ].filter(Boolean);
     return (
       <p className="payoff-locked">
-        Locked: pass the backprop exercise above, then train the digit reader here
-        with your own code.
+        This run is your own backprop driving your own sgd, so it needs{" "}
+        {missing.join(" and ")} passed first. Come back here once the tests are green.
       </p>
     );
   }
@@ -204,6 +216,11 @@ export function BackpropTrainPanel() {
         <button onClick={run} disabled={running}>
           {running ? "Training..." : result ? "Train again" : "Train the digit reader"}
         </button>
+        {running && (
+          <button className="button-secondary" onClick={terminateWorker}>
+            Stop
+          </button>
+        )}
         <span className={`demo-status status-fixed ${error ? "demo-status-error" : ""}`}>
           {error ?? status}
         </span>
