@@ -94,3 +94,79 @@ def numerical_gradient(cost_fn, weights, biases, eps=1e-5):
     nabla_w = [grad_of(weights, l) for l in range(len(weights))]
     nabla_b = [grad_of(biases, l) for l in range(len(biases))]
     return nabla_w, nabla_b
+
+
+def sigmoid_prime(z):
+    """Sigmoid's steepness at z: sigmoid(z) * (1 - sigmoid(z)), elementwise.
+
+    Built by the learner in Module 5.
+    """
+    s = sigmoid(z)
+    return s * (1.0 - s)
+
+
+def quadratic_output_delta(a, y, z):
+    """BP1 under the quadratic cost: the gap times the output's steepness.
+
+    The output layer's blame, exactly as the learner wrote it in Module 5's
+    backprop. Provided as a function so it can be swapped (see backprop's
+    output_delta argument).
+    """
+    return (a - y) * sigmoid_prime(z)
+
+
+def backprop(weights, biases, x, y, output_delta=None):
+    """Every parameter's slope for ONE example, via BP1 to BP4.
+
+    The learner's Module 5 algorithm, with one seam: output_delta(a, y, z)
+    supplies the output layer's blame (BP1). It defaults to
+    quadratic_output_delta, which reproduces Module 5's function exactly;
+    Module 7 passes a different one. Everything after BP1 is untouched,
+    which is the point.
+
+    x is one input column (n_in, 1), y its right answer (n_out, 1).
+    Returns (nabla_w, nabla_b), lists shaped like weights and biases.
+
+    Adapted from Michael Nielsen's network.py (MIT license).
+    """
+    if output_delta is None:
+        output_delta = quadratic_output_delta
+
+    a = x
+    activations = [x]
+    zs = []
+    for w, b in zip(weights, biases):
+        z = w @ a + b
+        zs.append(z)
+        a = sigmoid(z)
+        activations.append(a)
+
+    nabla_w = [np.zeros_like(w) for w in weights]
+    nabla_b = [np.zeros_like(b) for b in biases]
+
+    delta = output_delta(activations[-1], y, zs[-1])   # BP1
+    nabla_b[-1] = delta                               # BP3
+    nabla_w[-1] = delta @ activations[-2].T            # BP4
+
+    for l in range(2, len(weights) + 1):
+        delta = (weights[-l + 1].T @ delta) * sigmoid_prime(zs[-l])  # BP2
+        nabla_b[-l] = delta
+        nabla_w[-l] = delta @ activations[-l - 1].T
+
+    return nabla_w, nabla_b
+
+
+def batch_gradient(weights, biases, X, Y, output_delta=None):
+    """A mini-batch's gradient: backprop per column, slopes averaged.
+
+    The adapter Module 5's training panel used, in one place. X is
+    (n_in, m), Y is (n_out, m). Returns (nabla_w, nabla_b).
+    """
+    m = X.shape[1]
+    nabla_w = [np.zeros_like(w) for w in weights]
+    nabla_b = [np.zeros_like(b) for b in biases]
+    for k in range(m):
+        dw, db = backprop(weights, biases, X[:, k:k + 1], Y[:, k:k + 1], output_delta)
+        nabla_w = [t + d for t, d in zip(nabla_w, dw)]
+        nabla_b = [t + d for t, d in zip(nabla_b, db)]
+    return [t / m for t in nabla_w], [t / m for t in nabla_b]

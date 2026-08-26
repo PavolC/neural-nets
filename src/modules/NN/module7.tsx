@@ -1,0 +1,760 @@
+import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
+import { Eq, M } from "../../components/Math";
+import { ExercisePage } from "../../components/ExercisePage";
+import { crossEntropyExercise } from "../../exercises/cross-entropy";
+import { smartInitExercise } from "../../exercises/smart-init";
+import { l2Exercise } from "../../exercises/l2";
+import { BlameCurves } from "./interactives/BlameCurves";
+import { CostSwapPanel } from "./interactives/CostSwapPanel";
+import { InitStartPanel } from "./interactives/InitStartPanel";
+import { OverfitFigure } from "./interactives/OverfitFigure";
+import { RegularizePanel } from "./interactives/RegularizePanel";
+import { SlowNeuron } from "./interactives/SlowNeuron";
+
+export function Module7() {
+  return (
+    <article className="module">
+      <h2>Module 7: Making it actually work</h2>
+      <AfterThis
+        items={[
+          "Read the two factors in BP1 that leave a badly wrong output neuron barely learning, and pick a cost that removes one of them.",
+          "Change three lines of your own network (the output blame, the scale of the starting weights, the weight update) and measure what each one buys.",
+          "Tell learning from memorizing by watching four numbers, and say what regularization does and does not fix.",
+        ]}
+      />
+      <ModuleToc />
+
+      <SectionHeader id="m7-plan" title="Three complaints" />
+      <p>
+        Module 5 finished a working digit reader: your feedforward, your sgd,
+        your backprop, 89 percent of a thousand held-out digits read
+        correctly. Nielsen's Chapter 1 trains this same 784-30-10 shape on the
+        full 50,000 images and reports about 95 percent. Some of that gap is
+        the bundled slice being ten times smaller. The rest is the setup, and
+        this module makes three specific complaints about it.
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>the complaint</th>
+              <th>where it bites</th>
+              <th>what changes</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>an output neuron that is confidently wrong barely learns</td>
+              <td>the last layer, throughout training</td>
+              <td>BP1, the output layer's blame</td>
+            </tr>
+            <tr>
+              <td>most hidden neurons start flat, before anything is learned</td>
+              <td>the hidden layer, before the first step</td>
+              <td>how the starting weights are drawn</td>
+            </tr>
+            <tr>
+              <td>training keeps improving on the images it has and stops improving on the rest</td>
+              <td>everywhere, once the data runs short</td>
+              <td>the update rule for the weights</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Each fix is one line, and each one comes with a measurement of what it
+        bought. To keep them one-liners, the course now hands your Module 5
+        algorithm back to you with a seam in it:
+      </p>
+      <div className="play-snippet">
+        <pre>{`from course import backprop
+nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
+      </div>
+      <p>
+        Same four equations, same forward pass keeping receipts, same backward
+        sweep. The one difference is the last argument: a function that
+        supplies the output layer's blame, the quantity BP1 computes. Leave it
+        out and you get exactly what you wrote in Module 5. The first exercise
+        below writes a different one.
+      </p>
+
+      <SectionHeader id="m7-slowdown" title="Badly wrong, barely learning" />
+      <p>
+        Start with one neuron, because the effect is easiest to see there and
+        it is the same effect in the digit reader. One input, pinned at 1. One
+        weight, one bias. The right answer is 0, so the neuron's job is to
+        answer 0, and at the moment it answers 0.982.
+      </p>
+      <p>
+        Train it by descent, the same rule as everywhere else: measure both
+        knobs' slopes, step against them, repeat. Here is the log, one line
+        per checkpoint.
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>after this many steps</th>
+              <th>1</th>
+              <th>25</th>
+              <th>100</th>
+              <th>200</th>
+              <th>300</th>
+              <th>400</th>
+              <th>500</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>the answer</td>
+              <td>0.9819</td>
+              <td>0.9794</td>
+              <td>0.9641</td>
+              <td>0.7887</td>
+              <td>0.2028</td>
+              <td>0.1217</td>
+              <td>0.0930</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        A hundred steps move the answer by 0.018. It takes 469 steps to get
+        below 0.1. And the neuron is not stuck at a bad spot in the
+        landscape: given enough steps it walks all the way down, and the
+        second half of the walk is fast. The slow part is the beginning, which
+        is where it is most wrong.
+      </p>
+      <p>
+        Start it closer to the answer instead, at 0.818 rather than 0.982, and
+        it reaches 0.1 in 273 steps. Being more wrong at the start made the
+        first stretch slower. That is the complaint, and the interactive is
+        where to check it: drag the weight and the bias, watch the number of
+        steps in the last column.
+      </p>
+      <Figure caption="One neuron learning to answer 0, with the input pinned at 1. The two lines are the same descent under two different costs; the second one is defined later in this module, so for now the quadratic line is the one to follow. Press Play to walk the run, and drag w and b to start it somewhere else: the further the starting answer is from 0, the longer the flat stretch at the beginning.">
+        <SlowNeuron />
+      </Figure>
+      <p>
+        The reason is in BP1, the equation that starts the backward sweep. It
+        is a product of two factors:
+      </p>
+      <Eq
+        tex="\delta^L = \underbrace{(a - y)}_{\text{the gap}} \odot \underbrace{\sigma'(z^L)}_{\text{the steepness}}"
+        gloss="Module 4's BP1. The gap is how wrong the answer is; the steepness is how much the answer moves when the evidence moves, which for a sigmoid is a(1-a). The circled dot is the elementwise product, NumPy's plain star. Every slope in the network is built from this number, so whatever happens to it happens to all of them."
+      />
+      <p>
+        Both factors depend on the answer <M tex="a" />, and they pull in
+        opposite directions. The gap grows as the answer gets worse. The
+        steepness shrinks, because a sigmoid at 0.98 is nearly flat. Multiply
+        them and read the product across the range:
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>the answer</th>
+              <th>the gap</th>
+              <th>the steepness a(1 − a)</th>
+              <th>the blame, gap × steepness</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>0.500</td><td>0.500</td><td>0.2500</td><td>0.1250</td></tr>
+            <tr><td>0.667</td><td>0.667</td><td>0.2222</td><td>0.1481</td></tr>
+            <tr><td>0.900</td><td>0.900</td><td>0.0900</td><td>0.0810</td></tr>
+            <tr><td>0.980</td><td>0.980</td><td>0.0196</td><td>0.0192</td></tr>
+            <tr><td>0.999</td><td>0.999</td><td>0.0010</td><td>0.0010</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The blame peaks at 0.148, when the answer is two thirds wrong, and
+        falls away on both sides. Past that peak the steepness shrinks faster
+        than the gap grows, so the worse the answer, the smaller the blame,
+        and the smaller every slope the backward sweep produces from it. At an
+        answer of 0.999 the blame is 0.001: as wrong as a sigmoid can be, and
+        learning at a thousandth of the rate.
+      </p>
+      <Figure caption="The blame the output layer receives, against how wrong its answer is (right answer 0, so the answer is also the gap). The dots mark three rows of the table. Everything right of the peak is the complaint: more wrong, less blame, slower learning.">
+        <BlameCurves />
+      </Figure>
+      <p>
+        Module 4's quiz already met this in the digit reader: drag the output
+        bias to −8 and the network answers 0.0003 when the right answer is 1,
+        while its blame collapses to almost nothing. The same neuron, at the
+        same time, is as wrong as it can be and as slow to learn as it can be.
+      </p>
+
+      <SectionHeader id="m7-ce" title="A cost that notices" />
+      <p>
+        Which factor should change? Not the steepness. That factor is a fact
+        about the neuron: nudge the evidence <M tex="z" /> of a saturated
+        sigmoid and its answer really does barely move, and any correct
+        gradient has to say so. The other factor is where the choice is. The
+        gap is not a law of nature; it is what the quadratic cost happens to
+        charge for a wrong answer, and that cost was picked in Module 3
+        because squared gaps were the obvious way to score.
+      </p>
+      <p>
+        So look at what the quadratic cost charges. Per output neuron it is{" "}
+        <M tex="\tfrac12 (a - y)^2" />, and with a right answer of 0 that is
+        half the answer squared:
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>the answer (right answer 0)</th>
+              <th>0.500</th>
+              <th>0.900</th>
+              <th>0.980</th>
+              <th>0.999</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>what the quadratic cost charges</td>
+              <td>0.125</td>
+              <td>0.405</td>
+              <td>0.480</td>
+              <td>0.499</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The charge is capped at 0.5, and almost all of it is spent by the time
+        the answer reaches 0.9. Between 0.9 and 0.999 the network gets much
+        more wrong and its bill rises by 0.094. The blame descent acts on is
+        built out of that bill, so a cost that hardly distinguishes those two
+        answers hands descent hardly any reason to prefer one over the other.
+      </p>
+      <p>
+        So say what a replacement has to do, in slopes. Module 4 found that
+        every factor along a nudge's path is a slope, and BP1's two factors are
+        both slopes:
+        how much the cost changes per unit of answer, and how much the answer
+        changes per unit of evidence, which is the steepness. Their product
+        should be the gap. At an answer of 0.98 the steepness is 0.0196 and the
+        gap is 0.98, so the cost's slope there has to be 50, because 50 times
+        0.0196 is 0.98. In general it has to be{" "}
+        <M tex="(a - y) / (a(1-a))" />: the gap divided by the steepness, so
+        that the steepness cancels when the two are multiplied.
+      </p>
+      <p>
+        A cost with that slope exists, and writing it down needs one function
+        the course has not used yet. Module 1 met <M tex="e" />, the number
+        2.718, inside the sigmoid. The natural logarithm{" "}
+        <M tex="\ln a" /> is the reverse question: the power you have to raise{" "}
+        <M tex="e" /> to in order to get <M tex="a" />. For answers between 0
+        and 1 it is negative, and it dives without limit as the answer
+        approaches 0:
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>a</th>
+              <th>1</th>
+              <th>0.5</th>
+              <th>0.1</th>
+              <th>0.02</th>
+              <th>0.001</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ln a</td>
+              <td>0</td>
+              <td>−0.693</td>
+              <td>−2.303</td>
+              <td>−3.912</td>
+              <td>−6.908</td>
+            </tr>
+            <tr>
+              <td>−ln a</td>
+              <td>0</td>
+              <td>0.693</td>
+              <td>2.303</td>
+              <td>3.912</td>
+              <td>6.908</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Read the second row as a price list. If the right answer is 1, charge{" "}
+        <M tex="-\ln a" />: nothing for answering 1, 0.693 for answering 0.5,
+        6.908 for answering 0.001. If the right answer is 0, charge the same
+        thing about the other end, <M tex="-\ln(1-a)" />. One line covers both
+        cases, because one of the two terms is always multiplied by zero:
+      </p>
+      <Eq
+        tex="C = -\big[\, y \ln a + (1-y) \ln (1 - a) \,\big]"
+        gloss="The cross-entropy cost, for one output neuron. With y = 1 the second term vanishes and the charge is -ln a; with y = 0 the first vanishes and the charge is -ln(1-a). A network's cost is this summed over the output neurons and averaged over the examples, the same shape of bookkeeping as the quadratic cost, with no bookkeeping half."
+      />
+      <p>
+        Now check that slope, by nudging. At an answer of 0.98
+        with a right answer of 0 the charge is{" "}
+        <M tex="-\ln(0.02) = 3.912" />. Nudge the answer up by 0.001 and the
+        charge becomes <M tex="-\ln(0.019) = 3.963" />. The rise is 0.051, and
+        the prediction was 50 times 0.001, so 0.050. The charge really does
+        rise by about 50 per unit of answer at that spot, where the quadratic
+        cost was rising by 0.98.
+      </p>
+      <p>
+        And that is the whole fix, because the two factors multiply:
+      </p>
+      <Eq
+        tex="\delta^L = \underbrace{\frac{a - y}{a(1-a)}}_{\text{the cost's slope}} \times \underbrace{a(1-a)}_{\text{the steepness}} = a - y"
+        gloss="The steepness appears once in the numerator's denominator and once as itself, so it cancels: the output layer's blame is the gap alone. At an answer of 0.98 against a right answer of 0 that is 50 times 0.0196, which is 0.98. Module 4's identity that sigma-prime equals a(1-a) is what makes the cancellation exact rather than approximate."
+      />
+      <p>
+        Put both blames on the same axes. The quadratic curve is the one from
+        the last section; the cross-entropy line runs straight to 1.
+      </p>
+      <Figure caption="The same axes as before, with cross-entropy's blame added. It is the diagonal: blame equals gap, so a worse answer always means a bigger correction. The quadratic curve is unchanged, and the two dots at an answer of 0.98 are 0.0192 and 0.98, a factor of 51 apart.">
+        <BlameCurves showCrossEntropy />
+      </Figure>
+      <p>
+        In the code, one line changes. BP1 was{" "}
+        <code>delta = (a - y) * sigmoid_prime(z)</code> and becomes{" "}
+        <code>delta = a - y</code>. BP2, BP3 and BP4 are untouched, and so is
+        the forward pass.
+      </p>
+      <p>
+        BP2 keeping its <M tex="\sigma'" /> is worth a sentence, because it
+        looks like an oversight. It is not. The <M tex="\sigma'" /> in BP1 was
+        multiplying a badly chosen charge; the <M tex="\sigma'" /> in BP2
+        answers a real question, namely how much a hidden neuron's evidence
+        moves its own activation. No choice of cost changes that. So
+        this fix covers the output layer only, and a flat hidden neuron still
+        swallows the blame passing through it. That is the next section's
+        subject.
+      </p>
+      <Aside>
+        <p>
+          One more pairing worth naming, since it is what most classifiers
+          use today. Instead of ten independent sigmoids, a
+          softmax output layer divides each neuron's{" "}
+          <M tex="e^z" /> by the total across the layer, so the ten answers
+          add to 1 and can be read as probabilities: the network says how it
+          splits its confidence rather than answering ten separate yes-or-no
+          questions. Pair softmax with a cost called the log-likelihood and the
+          output layer's blame comes out as <M tex="a - y" /> again, by the
+          same kind of cancellation. Nothing in this course needs it, and the
+          ten-sigmoid version you have is what Nielsen's Chapters 1 to 3
+          use.
+        </p>
+      </Aside>
+      <p>
+        One consequence before the code: the step size has to change with the
+        cost. The quadratic blame never exceeds 0.148, and the cross-entropy
+        blame reaches 1, roughly seven times larger. Module 5 trained at{" "}
+        <M tex="\eta = 3.0" />, found by trying; the runs below use{" "}
+        <M tex="\eta = 0.5" />, found the same way, and the ratio of about six
+        is the ratio of the blames. This is not a cost of the fix, just a
+        reminder that eta and the cost are not independent choices.
+      </p>
+
+      <ExercisePage exercise={crossEntropyExercise} />
+      <p>
+        The panel below trains the digit reader three times from the same
+        starting parameters, the same ones Module 5 used: 5,000 images, 8
+        epochs, mini-batches of 10, your sgd doing the walking. Two runs share
+        a step size of 0.5 and differ only in the output blame. The third is
+        the quadratic cost again at Module 5's step size of 3.0, which is that
+        module's own run cut short at 8 epochs.
+      </p>
+      <Figure caption="Three runs, one chart. Everything is held fixed except the output blame and the step size: the same wiring, the same starting numbers, the same shuffle, the same sgd. Each run takes a few seconds per epoch, and Stop ends it.">
+        <CostSwapPanel />
+      </Figure>
+      <p>
+        Read it in two parts. At a shared step size of 0.5 the two costs are
+        far apart: the quadratic run reaches 62.6 percent and the
+        cross-entropy run 86.5 percent, and the first epoch alone is 32.4
+        against 71.7. Then the third line closes most of that gap by cranking
+        eta to 3.0, reaching 86.6 percent. So on this network the cross-entropy
+        cost does not make a smarter network. It makes one that learns at a
+        step size where the other crawls, and that starts learning in its
+        first epoch rather than climbing out of the slowdown first.
+      </p>
+      <p>
+        Which leaves the accuracy roughly where Module 5 left it. The next
+        complaint is the one that moves it.
+      </p>
+
+      <SectionHeader id="m7-birth" title="Saturated at birth" />
+      <p>
+        Measure the hidden layer of Module 5's network before it takes a single
+        step. Thirty neurons, 5,000 training images, so 150,000 readings of
+        one neuron's evidence <M tex="z" /> on one image. Here is how they are
+        spread, and what the sigmoid's steepness is where they land.
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>distance of z from zero</th>
+              <th>0 to 1</th>
+              <th>1 to 2</th>
+              <th>2 to 4</th>
+              <th>4 to 8</th>
+              <th>8 or more</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>share of the readings</td>
+              <td>8.8%</td>
+              <td>8.6%</td>
+              <td>16.4%</td>
+              <td>27.9%</td>
+              <td>38.4%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The typical distance is 7.43, and the median steepness is 0.0020,
+        against the 0.25 a neuron has at its steepest. Almost 62 percent of
+        the readings are flatter than 0.01. A hidden neuron in that state
+        passes almost nothing backward and moves almost nowhere, and it is in
+        that state before it has learned anything at all: the flatness is an
+        accident of how the weights were drawn.
+      </p>
+      <p>
+        Why the draw does that is a counting argument. A hidden neuron's
+        evidence is a sum of 784 terms, one per pixel, each a weight times a
+        pixel value, plus the bias. Most pixels of a digit are black, and on
+        average 103 of the 784 are above half brightness. So about a hundred
+        weights contribute, each drawn from a bell of spread 1.
+      </p>
+      <p>
+        A hundred random pushes of size about 1 do not cancel out to nothing,
+        and they do not add up to a hundred either. They pile up to about the
+        square root of the count: <M tex="\sqrt{100} = 10" />. That
+        square-root rule for adding up independent random quantities is the
+        one fact here taken on trust rather than derived, and it can at least
+        be checked. The exact version of the rule says the spread of the
+        weighted sum is the square root of the total of the squared pixel
+        values, which for these images averages 87.4, giving{" "}
+        <M tex="\sqrt{87.4} = 9.35" />. The measured spread of{" "}
+        <M tex="z" /> is 9.28.
+      </p>
+      <p>
+        Nine is a long way out on a sigmoid. So the fix is to divide the pile
+        back down, and the rule gives the divisor: shrink each weight by the
+        square root of the number of inputs feeding its layer. For the hidden
+        layer that is <M tex="\sqrt{784} = 28" />.
+      </p>
+      <Eq
+        tex="w = \frac{\text{a draw of spread } 1}{\sqrt{n_{\text{in}}}} \qquad\text{and}\qquad \frac{9.28}{28} = 0.33"
+        gloss="Every weight into a layer is drawn as before and then divided by the square root of that layer's input count, n-in: 28 for the 784 pixels, and the square root of 30 for the layer reading the 30 hidden neurons. The weighted sum's spread falls from 9.28 to 0.33, so the bias, still drawn at spread 1, becomes the larger term and the evidence lands within about 1 of zero."
+      />
+      <p>
+        Measured on the same 150,000 readings, the typical distance from zero
+        falls from 7.43 to 0.78, and the median steepness rises from 0.0020 to
+        0.2203, close to the sigmoid's maximum of 0.25. Nothing is flatter than
+        0.01 any more.
+      </p>
+      <Aside>
+        <p>
+          The biases keep their spread of 1, and after the division they are
+          the bigger of the two terms in <M tex="z" />. Shrinking them too
+          would push the evidence closer to zero still, and it is not worth
+          doing: a bias is one number per neuron rather than one per wire, so
+          nothing piles up in it, and starting every neuron at exactly the
+          middle of the sigmoid removes some of the variety the layer starts
+          with. Nielsen's Chapter 3 leaves the biases at spread 1 as well, and
+          reports that the choice makes little difference either way.
+        </p>
+      </Aside>
+
+      <ExercisePage exercise={smartInitExercise} />
+      <p>
+        The comparison below is as controlled as this course gets. Same
+        wiring, same cross-entropy blame, same sgd, same step size of 0.5,
+        same shuffle, and the same random numbers from the same seed. One run
+        divides them; the other does not.
+      </p>
+      <Figure caption="Two starting points, fifteen epochs each. The table above the chart is the hidden layer measured before either run takes a step; the chart is test accuracy per epoch afterwards. The dashed line is Module 5's start, the solid line yours.">
+        <InitStartPanel />
+      </Figure>
+      <p>
+        The divided start reads 85.3 percent of the held-out digits after one
+        epoch, which is more than the other start reaches in its first four,
+        and 92.1 percent after fifteen against 87.8. Module 5's own run, the quadratic
+        cost at a step size of 3.0, reached 89.2 percent over the same fifteen
+        epochs, so the network has gained about three points on where this
+        module started, and this change is where they came from.
+      </p>
+      <p>
+        One footnote on the two fixes together. Each of these costs can
+        be given a step size that suits it, and when both are tuned they land
+        within about half a point of each other; the closing section shows that
+        grid. What the cross-entropy cost reliably removes is the slowdown
+        itself, which is why it needs no cranked step size, and what the
+        division reliably removes is a flat start. They are not competing.
+      </p>
+
+      <SectionHeader id="m7-overfit" title="Learning the training set" />
+      <p>
+        The third complaint needs a smaller dataset to become visible, so take
+        the first 1,000 of the 5,000 training images and train on those alone.
+        The held-out thousand stays exactly as it was. (The slice is not
+        rigged: its ten digits appear between 87 and 117 times each.) Watch
+        four numbers rather than two, the cost and the accuracy on the images
+        the network trains on, and the same pair on the images it never sees.
+      </p>
+      <Figure caption="Eighty epochs on 1,000 images, with the cross-entropy cost and the divided start. Solid lines are the images the network trains on, dashed lines the thousand held out. Green is accuracy on the left axis, red is cost on the right. The two solid lines keep improving to the end of the run; the two dashed ones stop at about epoch 10 and the dashed cost then turns around and rises.">
+        <OverfitFigure />
+      </Figure>
+      <p>
+        By epoch 29 the network answers all 1,000 training images correctly,
+        and it keeps going: the training cost falls from 0.065 at epoch 20 to
+        0.0093 at epoch 80, still dropping. Nothing in that stretch improves
+        what the network does with a digit it has not seen. Accuracy on the held-out digits
+        sat at 85.5 percent at epoch 20 and sits at 86.3 percent at epoch 80,
+        and the held-out cost bottomed out at 0.84 around epoch 9 and has
+        risen to 1.09 by the end.
+      </p>
+      <p>
+        The two held-out lines are saying different things and both are worth
+        having. Accuracy counts how often the biggest of the ten outputs is
+        the right digit, so it ignores confidence. Cost prices the confidence.
+        A rising held-out cost with flat held-out accuracy means the network is
+        getting more sure of itself, right and wrong alike, on digits it has
+        never seen. That is what the last seventy epochs bought: the same
+        digits recognized, with more confidence behind each answer.
+      </p>
+      <p>
+        The name for this is overfitting, and it is not a bug in the
+        implementation. Descent was asked to make the cost on 1,000 images as
+        small as possible, and it is doing exactly that. Whether small cost on
+        those 1,000 has anything to do with the next digit is not a question
+        the cost function was ever asked.
+      </p>
+      <p>
+        Two things follow. The first is a habit rather than a technique: hold
+        data out, and score on it. The 1,000 held-out digits in this course
+        have never been trained on, in any module. Without them, the training
+        cost falling to 0.0093 would look like success.
+      </p>
+      <p>
+        The second is that the cure closest to hand is more data. This same
+        network on all 5,000 images reached 92.1 percent a section ago, against
+        86.3 here. Five times the data, six points. When more data is available
+        that is the thing to do, and when it is not there is a technique for
+        getting part of the way.
+      </p>
+
+      <SectionHeader id="m7-l2" title="Shrink every weight" />
+      <p>
+        Track one more number through that run: the total of every weight
+        squared, which is a plain measure of how big the weights have become.
+        The divided start puts it at 39. By epoch 20, with the training images
+        essentially all correct, it is 1,189, and by epoch 80 it is 1,926. The
+        weights keep growing through the whole stretch where nothing improves.
+      </p>
+      <p>
+        Big weights are what confident answers are made of. Evidence far from
+        zero needs large weights to get there, and large weights also mean a
+        small change in a few pixels swings the answer a long way. So the
+        network that has driven its training cost to 0.0093 is a network that
+        reacts sharply to the exact pixels it was trained on. That is the
+        informal story, and it is worth saying that it is informal: why big
+        weights and poor generalization go together is understood in
+        particular cases rather than in general.
+      </p>
+      <p>
+        The technique acts on the measurable part. Add the weights' own size to
+        the cost, so that descent has a reason to keep them small unless the
+        data insists otherwise:
+      </p>
+      <Eq
+        tex="C_{\text{total}} = \underbrace{C}_{\text{the cross-entropy cost}} + \underbrace{\frac{\lambda}{2n} \sum_w w^2}_{\text{the new term}}"
+        gloss="Lambda is a positive number you choose, the exchange rate between fitting the data and keeping the weights small: zero recovers the old cost exactly, and large values care more about small weights than about right answers. n is the number of training examples, there so that the same lambda means the same thing whatever the dataset size. The sum runs over every weight in the network; biases are not included."
+      />
+      <p>
+        Descent needs the new term's slope for one weight, which means the
+        slope of <M tex="w^2" />. Nudge it by hand: move <M tex="w" /> by a
+        small amount <M tex="h" /> and{" "}
+        <M tex="(w + h)^2 - w^2 = 2wh + h^2" />, so per unit of nudge the rise
+        is <M tex="2w + h" />, which for a small nudge is <M tex="2w" />. Two
+        things follow. The new term contributes{" "}
+        <M tex="\lambda w / n" /> to that weight's slope, the 2 cancelling the
+        half. And Module 3's bookkeeping half in{" "}
+        <M tex="\tfrac12 (a - y)^2" /> was this same cancellation, promised
+        there and settled here: halving a squared quantity makes its slope the
+        quantity itself. Put the new slope into the update rule and collect the
+        two terms in <M tex="w" />:
+      </p>
+      <Eq
+        tex="w \;\leftarrow\; w - \eta \frac{\lambda}{n} w - \eta \frac{\partial C}{\partial w} \;=\; \Big( 1 - \frac{\eta \lambda}{n} \Big) w - \eta \frac{\partial C}{\partial w}"
+        gloss="The same update as Module 3's, with the weight multiplied by a number slightly below 1 before the usual step. That factor is the whole technique, and the name for it says what it does: weight decay. Biases keep the old rule exactly, since the new term does not mention them."
+      />
+      <p>
+        Put numbers in it. The run below uses <M tex="\eta = 0.5" />,{" "}
+        <M tex="n = 1000" /> and <M tex="\lambda = 1" />, so the factor is{" "}
+        <M tex="1 - 0.5/1000 = 0.9995" />. One epoch is 100 mini-batches, so
+        100 steps, and left entirely alone a weight would shrink to{" "}
+        <M tex="0.9995^{100} = 0.951" /> of itself per epoch, about five
+        percent. Nothing is left alone, of course: the gradient is pulling the
+        other way the whole time. What the factor sets is how hard a weight has
+        to be pulled to stay where it is, and a weight that only helps with a
+        handful of training images is not pulled hard enough.
+      </p>
+
+      <ExercisePage exercise={l2Exercise} />
+      <p>
+        Both runs in the panel go through your l2_step, one with{" "}
+        <M tex="\lambda = 0" />, which is your Module 3 update exactly, and one
+        with the lambda you pick. Same 1,000 images, same eighty epochs, same
+        shuffle. The starting point is a control too, because the answer
+        depends on it.
+      </p>
+      <Figure caption="The same 1,000-image run, with and without weight decay. Switch between accuracy (solid for the images trained on, dashed for the held-out ones) and the cost on the held-out digits. The starting point matters more than lambda does, so try both settings of it.">
+        <RegularizePanel />
+      </Figure>
+      <p>
+        Two readings, and they disagree. From your divided start, weight decay
+        at <M tex="\lambda = 1" /> leaves the held-out accuracy where it was,
+        85.7 percent averaged over the last twenty epochs against 86.4 without
+        it. That gap is smaller than the run-to-run wobble: three different
+        shuffles of the unregularized run alone land between 85.2 and 86.2
+        percent. What decay does change is the two numbers it aims at. The
+        held-out cost ends at 0.86 instead of 1.09, and the total of the
+        squared weights at 655 instead of 1,926, so the network stopped growing
+        and stopped becoming more confident while reading the same digits.
+      </p>
+      <p>
+        Switch the start to Module 5's undivided draw and the same comparison
+        answers differently. Those weights begin at a total of 23,538, since
+        that is what not dividing by 28 means, and without decay they stay
+        there: 25,528 after eighty epochs, with the held-out accuracy stalled
+        at 77.8 percent. With <M tex="\lambda = 1" /> the decay pulls them down
+        to 679 over the course of the run and the accuracy reaches 85.1
+        percent, seven points better.
+      </p>
+      <p>
+        Which is the same fix as the last section's, arriving from the other
+        end. The division set the weights to a sane size before training; the
+        decay pulls them to a sane size during it. Where the division has
+        already been done, weight decay has no runaway to catch. So the summary
+        of this cycle is a narrow one: decay reliably holds the weights and the
+        held-out cost down, and it buys accuracy where something else was
+        leaving the weights too large. Lambda is one more number found by trying, and the
+        panel's other settings are there to be tried:{" "}
+        <M tex="\lambda = 5" /> holds the weights down hard enough that the
+        network reads fewer digits.
+      </p>
+
+      <SectionHeader id="m7-more" title="The rest of the toolbox" />
+      <p>
+        Everything in this module was a constant chosen by trying: the step
+        size, lambda, thirty hidden neurons, mini-batches of ten, fifteen
+        epochs. Those choices are called hyperparameters, to separate them from
+        the parameters descent finds on its own, and there is no equation for
+        them. Here is the trying, for two of them, at fifteen epochs on the
+        5,000 images.
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>test accuracy after 15 epochs</th>
+              <th>η = 0.5</th>
+              <th>η = 1.0</th>
+              <th>η = 3.0</th>
+              <th>η = 6.0</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>quadratic cost, Module 5's start</td>
+              <td>70.8%</td>
+              <td>79.4%</td>
+              <td>89.2%</td>
+              <td>89.9%</td>
+            </tr>
+            <tr>
+              <td>cross-entropy cost, Module 5's start</td>
+              <td>87.8%</td>
+              <td>89.3%</td>
+              <td>87.6%</td>
+              <td>80.9%</td>
+            </tr>
+            <tr>
+              <td>quadratic cost, the divided start</td>
+              <td>90.0%</td>
+              <td>90.3%</td>
+              <td>91.0%</td>
+              <td>91.3%</td>
+            </tr>
+            <tr>
+              <td>cross-entropy cost, the divided start</td>
+              <td>92.1%</td>
+              <td>92.3%</td>
+              <td>87.7%</td>
+              <td>69.4%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Three things are readable there. Each row has a best column and it is
+        not the same column, which is why a cost cannot be judged at a fixed
+        step size. The quadratic rows are still climbing at the right-hand
+        edge, where the cross-entropy rows have already fallen off: the
+        slowdown showing up as a demand for a bigger step, and the absence of
+        it showing up as a lower ceiling on how big a step is useful. And the
+        best of each row runs 89.9, 89.3, 91.3, 92.3, so the two changes
+        together are worth about two and a half points at their own best
+        settings, while a single row spans nineteen points or more from its
+        worst column to its best. Getting the step size wrong costs more than
+        either fix earns.
+      </p>
+      <p>
+        How to search, when there is no equation: change one thing, rerun,
+        keep it if the held-out score improved. Move in factors of about three
+        rather than small increments, because the interesting range spans
+        orders of magnitude. Start with the step size, since a bad one makes
+        everything else unreadable. And score on held-out data, never on the
+        training images.
+      </p>
+      <p>
+        Four more techniques exist for the overfitting problem, named here and
+        not implemented. More training data, which is the strongest of them and
+        the reason this course's numbers sit below Nielsen's. Artificial data,
+        made by shifting and rotating the images you have, which works because
+        a rotated 3 is still a 3. Dropout, which switches off a random half of
+        the hidden neurons on each mini-batch, so no neuron can rely on any
+        particular other one. And early stopping, which is simply reading the
+        chart above and keeping the network from epoch 10 rather than epoch 80.
+      </p>
+      <p>
+        What has not changed in this module is the machinery. The cost is a
+        different formula, the starting weights are divided by a square root,
+        and the update has one extra factor. The forward pass, the four
+        equations, the backward sweep, the mini-batch shuffle and the descent
+        are exactly the code you wrote in Modules 2, 3 and 5. Module 8 asks
+        what happens to those four equations when the network gets deep, and
+        the answer is already visible in BP2.
+      </p>
+
+      <Recap
+        items={[
+          "BP1 multiplies the gap by the output's steepness, so under the quadratic cost a confidently wrong neuron gets a blame near zero: at an answer of 0.999 against a right answer of 0 the blame is 0.001. The blame peaks at 0.148 and falls away past two thirds wrong.",
+          "The cross-entropy cost charges -ln of the confidence in the right answer, which rises without limit, and its charge rises by exactly the gap divided by the steepness. The steepness cancels and BP1 becomes delta = a - y, one line. BP2 keeps its own sigma-prime, which is a fact about hidden neurons rather than a choice of cost.",
+          "Weights drawn at spread 1 pile up over about a hundred lit pixels to an evidence spread of 9.3, leaving 62 percent of hidden neurons flatter than 0.01 before training starts. Dividing each layer's weights by the square root of its input count puts the typical evidence within 1 of zero, with no neuron below 0.01, and is worth 4.3 points of accuracy against the same cost started undivided.",
+          "Training on 1,000 images reaches 100 percent on those images while the held-out accuracy stops improving and the held-out cost turns around and rises: the network is buying confidence, not recognition. Weight decay multiplies every weight by a factor just under 1 each step, which reliably holds the weights and the held-out cost down, and buys accuracy only where something else left the weights too large.",
+          "Every constant here was found by trying, and the grid shows the step size mattering more than the cost. Module 8 takes the four equations into deep networks and finds a limit that no choice of cost fixes.",
+        ]}
+        chapter="Chapter 3 (improving the way neural networks learn)"
+        href="http://neuralnetworksanddeeplearning.com/chap3.html"
+      />
+    </article>
+  );
+}

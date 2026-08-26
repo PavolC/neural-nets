@@ -82,6 +82,13 @@ no accounts, no backend, no analytics.
   worker's `runPython` request: the snippet reads input via
   `json.loads(_args_json)`, may stream progress with `_js_report(json_string)`, and
   must evaluate to a JSON string. First-party snippets only.
+- **`course.backprop` carries a seam for BP1** (added in Module 7): its signature is
+  `backprop(weights, biases, x, y, output_delta=None)`, the learner's Module 5
+  algorithm with the output layer's blame lifted into an argument (default
+  `quadratic_output_delta`, which reproduces Module 5 exactly). This is what keeps
+  Module 7's three exercises one-line diffs instead of rewrites; `batch_gradient`
+  beside it is the per-example-average adapter Module 5's panel used inline. Module 7's
+  panels swap the delta rather than the algorithm, and say so in the prose.
 
 ## Module authoring playbook (learned from the primary learner, follow it)
 

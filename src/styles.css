@@ -2318,3 +2318,149 @@ footer a {
   font-size: 0.9rem;
   padding: 2rem 0;
 }
+
+/* ---------- Module 7: making it actually work ---------- */
+
+/* Two identities across this module's charts and figures: line A is the
+   setting being improved on (the quadratic cost, Module 5's start, no
+   regularization) and line B is the change being measured. Where a chart
+   shows the same run scored two ways, solid is the images trained on and
+   dashed the ones held out. */
+.m7-line-a,
+.slow-line-quad {
+  stroke: var(--data-orange);
+}
+
+.m7-line-b,
+.slow-line-cross {
+  stroke: var(--accent);
+}
+
+.m7-line-dashed {
+  stroke-dasharray: 6 4;
+}
+
+.m7-swatch {
+  display: inline-block;
+  width: 18px;
+  height: 0;
+  margin-right: 0.45rem;
+  vertical-align: 0.28em;
+  border-top: 3px solid;
+  /* The swatches inherit their identity from the same classes the SVG paths
+     use, which set stroke; a border needs the colour in currentColor terms,
+     so each identity restates it here. */
+}
+
+.m7-swatch.m7-line-a,
+.m7-swatch.slow-line-quad {
+  border-top-color: var(--data-orange);
+}
+
+.m7-swatch.m7-line-b,
+.m7-swatch.slow-line-cross {
+  border-top-color: var(--accent);
+}
+
+/* The overfitting figure scores one run four ways rather than comparing two
+   runs, so it keeps the course's chart vocabulary from Module 5 instead of
+   this module's A-and-B pair: green is accuracy, red is cost. */
+.m7-swatch.chart-line-acc {
+  border-top-color: var(--acc);
+}
+
+.m7-swatch.chart-line-loss {
+  border-top-color: var(--loss);
+}
+
+.m7-swatch.m7-line-dashed {
+  border-top-style: dashed;
+}
+
+.m7-legend {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 1.1rem;
+  margin: 0.45rem 0 0;
+  padding: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.m7-result-list {
+  margin: 0.3rem 0 0.6rem;
+  padding-left: 1.2rem;
+}
+
+/* Grouped choices inside a panel's control row. Fixed-basis columns so the
+   wrap depends on the window width and never on the labels (CLAUDE.md:
+   interactives must not jump). */
+.m7-choice {
+  flex: 0 1 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0.3rem 0.55rem 0.45rem;
+  margin: 0;
+  min-width: 0;
+}
+
+.m7-choice legend {
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+  color: var(--muted);
+  padding: 0 0.3rem;
+}
+
+/* Plot family (CLAUDE.md): natural scale, capped at the viewBox width,
+   centred. The two static figures carry their own widths. */
+.blame-figure {
+  width: min(520px, 100%);
+}
+
+.overfit-figure {
+  width: min(640px, 100%);
+}
+
+/* The confidently wrong end of the blame plot, and the peak past which more
+   wrong means less blame. */
+.blame-zone {
+  fill: var(--loss);
+  opacity: 0.06;
+}
+
+.blame-peak {
+  stroke: var(--data-orange);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.blame-dot-quad {
+  fill: var(--data-orange);
+}
+
+.blame-dot-cross {
+  fill: var(--accent);
+}
+
+.blame-label-quad {
+  fill: var(--data-orange);
+}
+
+.blame-label-cross {
+  fill: var(--accent);
+}
+
+/* Both of this module's wide charts (640 units) render at about half scale on
+   a phone, the same problem Module 6's charts had. */
+@media (max-width: 560px) {
+  .overfit-figure .chart-tick,
+  .blame-figure .chart-tick {
+    font-size: 15px;
+  }
+}
