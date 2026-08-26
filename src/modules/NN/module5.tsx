@@ -127,9 +127,8 @@ export function Module5() {
         these numbers. Two names in the table below are the ones your{" "}
         <code>sgd</code> already takes: <code>nabla_b</code> for the biases'
         slopes and <code>nabla_w</code> for the weights', the two halves of
-        Module 3's <M tex="\nabla C" />. The table walks one pass of the backward
-        sweep through the network, BP1 at the output layer where blame starts,
-        then BP2 to BP4 one layer back:
+        Module 3's <M tex="\nabla C" />. Read the right-hand column for how
+        often each equation runs, because that differs across the four:
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
@@ -137,33 +136,54 @@ export function Module5() {
           <tr>
             <th>equation</th>
             <th>in NumPy</th>
-            <th>shapes on the digit reader</th>
+            <th>where it runs, and the shapes it makes</th>
           </tr>
         </thead>
         <tbody>
           <tr>
             <td>BP1</td>
             <td><code>delta = (a - y) * sigmoid_prime(z)</code></td>
-            <td>(10, 1), one blame per output neuron</td>
+            <td>once, at the output layer: delta is (10, 1), one blame per output neuron</td>
           </tr>
           <tr>
             <td>BP2</td>
             <td><code>delta = (w_next.T @ delta) * sigmoid_prime(z)</code></td>
-            <td><code>.T</code> makes (10, 30) into (30, 10); @ (10, 1) gives (30, 1)</td>
+            <td>once per earlier layer: <code>.T</code> makes (10, 30) into (30, 10), and @ (10, 1) gives (30, 1)</td>
           </tr>
           <tr>
             <td>BP3</td>
-            <td><code>nabla_b = delta</code></td>
-            <td>(30, 1), exactly the biases' shape</td>
+            <td><code>nabla_b[l] = delta</code></td>
+            <td>once per layer: (10, 1) then (30, 1), exactly the biases' shapes</td>
           </tr>
           <tr>
             <td>BP4</td>
-            <td><code>nabla_w = delta @ a_prev.T</code></td>
-            <td>(30, 1) @ (1, 784) gives (30, 784), the weights' own shape</td>
+            <td><code>nabla_w[l] = delta @ a_prev.T</code></td>
+            <td>once per layer: (10, 30) then (30, 784), the weights' own shapes</td>
           </tr>
         </tbody>
         </table>
       </div>
+
+      <p>
+        Add that column up, because the four equations do not produce four
+        numbers. Two of them produce nothing you keep: BP1 and BP2 build{" "}
+        <M tex="\delta" />, one blame per neuron, and that column lives inside
+        the function and is gone once it returns. The other two are the
+        answers, and they run once per layer, so this network's two layers
+        fill four arrays: (10, 1) and (10, 30) at the output layer, (30, 1)
+        and (30, 784) at the hidden one. Those are the shapes of the network's
+        own biases and weights, and the four arrays hold 23,860 numbers
+        between them, one for every knob. Nothing gets combined at the end;
+        the loop fills the slots as it walks.
+      </p>
+      <p>
+        Matching those shapes is not tidiness, it is what lets your sgd run
+        unchanged. Its update subtracts entry by entry,{" "}
+        <code>w - eta * nabla_w</code>, so every slope has to sit in the same
+        spot as the knob it belongs to. What backprop returns is a
+        slope-shaped shadow of the network: same layers, same shapes, one
+        number per knob.
+      </p>
 
       <SectionHeader id="m5-receipts" title="Keep receipts" />
       <p>
