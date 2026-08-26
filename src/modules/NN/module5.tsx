@@ -170,12 +170,12 @@ export function Module5() {
         <M tex="\delta" />, one blame per neuron, and that column lives inside
         the function and is gone once it returns. The other two are the
         answers, and they run once per layer, so this network's two layers
-        fill four arrays: (10, 1) and (10, 30) at the output layer, (30, 1)
-        and (30, 784) at the hidden one. Those are the shapes of the network's
-        own biases and weights, and the four arrays hold 23,860 numbers
-        between them, one for every knob. Nothing gets combined at the end;
-        the loop fills the slots as it walks.
+        fill four arrays. Nothing gets combined at the end; the loop fills the
+        slots as it walks. Here is everything that comes back:
       </p>
+      <Figure caption="What backprop returns, beside what it is the gradient of. Each slope array has the shape of the parameter array directly above it, so the two lists pair up slot for slot: nabla_w[0] against weights[0], and so on. Count the entries and the gradient holds one number for every knob in the network.">
+        <GradientShapeDiagram />
+      </Figure>
       <p>
         Matching those shapes is not tidiness, it is what lets your sgd run
         unchanged. Its update subtracts entry by entry,{" "}
@@ -232,13 +232,13 @@ export function Module5() {
       <SectionHeader id="m5-train" title="The real training run" />
       <p>
         The network is the digit reader the shapes table set up: 784 pixels in,
-        30 hidden neurons, 10 digit outputs. Module 2's counting rule prices its
-        knobs:
+        30 hidden neurons, 10 digit outputs, and the 23,860 knobs counted with
+        its gradient above. That is almost exactly double Module 2's 11,935,
+        because doubling the hidden layer doubles everything except the ten
+        output biases. At the nudge method's price of two rescores per knob,
+        one step of descent here would cost 47,720 passes over the mini-batch.
+        Your backward sweep replaces all of them.
       </p>
-      <Eq
-        tex="\underbrace{30 \times 784}_{\text{hidden } w} + \underbrace{30}_{\text{hidden } b} + \underbrace{10 \times 30}_{\text{output } w} + \underbrace{10}_{\text{output } b} = 23{,}520 + 30 + 300 + 10 = 23{,}860"
-        gloss="Almost exactly double Module 2's 11,935: doubling the hidden layer doubles everything except the ten output biases. At the nudge method's price of two rescores per knob, one step of descent on this network would cost 47,720 passes over the mini-batch. Your backward sweep replaces all of them."
-      />
       <p>
         The data is the course's bundled slice of MNIST: 5,000 training images,
         plus 1,000 test images that stay held out, never trained on. Every
@@ -509,6 +509,90 @@ function BackwardWalkDiagram() {
       ))}
       <text x={406} y={206} textAnchor="middle" className="ripple-change">
         shaded = read on this pass
+      </text>
+    </svg>
+  );
+}
+
+// Static diagram: the gradient's shape, beside the parameters it is the
+// gradient of. The course states "shaped like weights and biases" in five
+// places and had never drawn it, which is what let the four equations read
+// as four numbers. The counts under the slope row derive the 23,860 the
+// training section then spends.
+function GradientShapeDiagram() {
+  const ROW_TOP = 32;
+  const ROW_BOT = 116;
+  const BH = 52;
+  const panels = [
+    {
+      title: "weights, and their slopes",
+      x: 18,
+      bw: 214,
+      gap: 12,
+      pairs: [
+        { param: "weights[0]", grad: "nabla_w[0]", shape: "(30, 784)", count: "23,520" },
+        { param: "weights[1]", grad: "nabla_w[1]", shape: "(10, 30)", count: "300" },
+      ],
+    },
+    {
+      title: "biases, and their slopes",
+      x: 496,
+      bw: 146,
+      gap: 12,
+      pairs: [
+        { param: "biases[0]", grad: "nabla_b[0]", shape: "(30, 1)", count: "30" },
+        { param: "biases[1]", grad: "nabla_b[1]", shape: "(10, 1)", count: "10" },
+      ],
+    },
+  ];
+  const box = (x: number, y: number, w: number, name: string, shape: string,
+               cls: string, key: string) => (
+    <g key={key}>
+      <rect x={x} y={y} width={w} height={BH} rx={6} className={cls} />
+      <text x={x + w / 2} y={y + 21} textAnchor="middle" className="ripple-title">{name}</text>
+      <text x={x + w / 2} y={y + 40} textAnchor="middle" className="ripple-change">{shape}</text>
+    </g>
+  );
+  return (
+    <svg viewBox="0 0 812 232" className="chain-ripple" role="img"
+         aria-label="Two panels. On the left, weights[0] of shape (30, 784) and weights[1] of shape (10, 30), each with the slope array nabla_w[0] and nabla_w[1] of the same shape directly below it, holding 23,520 and 300 numbers. On the right, biases[0] of shape (30, 1) and biases[1] of shape (10, 1), with nabla_b[0] and nabla_b[1] below them, holding 30 and 10. The four slope arrays hold 23,860 numbers in total, one per knob.">
+      <defs>
+        <marker id="grad-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5"
+                markerHeight="5" orient="auto">
+          <path d="M 0 0 L 8 4 L 0 8 z" className="ripple-head" />
+        </marker>
+      </defs>
+      <line x1={478} y1={20} x2={478} y2={196} className="shapes-grid" />
+      {panels.map((p, pi) => {
+        const span = p.bw * 2 + p.gap;
+        return (
+          <g key={pi}>
+            <text x={p.x + span / 2} y={18} textAnchor="middle" className="ripple-band-label">
+              {p.title}
+            </text>
+            {p.pairs.map((pair, i) => {
+              const x = p.x + i * (p.bw + p.gap);
+              const mid = x + p.bw / 2;
+              return (
+                <g key={i}>
+                  {box(x, ROW_TOP, p.bw, pair.param, pair.shape, "ripple-box", `p${pi}${i}`)}
+                  <line x1={mid} y1={ROW_TOP + BH + 4} x2={mid} y2={ROW_BOT - 4}
+                        className="ripple-arrow" markerEnd="url(#grad-head)" />
+                  {pi === 0 && i === 0 && (
+                    <text x={mid + 8} y={ROW_BOT - 12} className="ripple-why">same shape</text>
+                  )}
+                  {box(x, ROW_BOT, p.bw, pair.grad, pair.shape, "ripple-box-read", `g${pi}${i}`)}
+                  <text x={mid} y={ROW_BOT + BH + 22} textAnchor="middle" className="ripple-change">
+                    {pair.count}
+                  </text>
+                </g>
+              );
+            })}
+          </g>
+        );
+      })}
+      <text x={406} y={222} textAnchor="middle" className="ripple-product">
+        23,520 + 300 + 30 + 10 = 23,860 numbers, one for every knob in the network
       </text>
     </svg>
   );
