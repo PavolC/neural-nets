@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { assetUrl } from "../../../runtime/assets";
 import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
-import { loadCode, loadCompleted, subscribeProgress } from "../../../state/progress";
+import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
 import { backpropExercise } from "../../../exercises/backprop";
 import { sgdExercise } from "../../../exercises/sgd";
 
@@ -130,7 +130,7 @@ interface TrainResult {
   nudge_total_hours: number;
 }
 
-const bothDone = () => loadCompleted(backpropExercise.id) && loadCompleted(sgdExercise.id);
+const bothDone = () => codeReady(backpropExercise.id) && codeReady(sgdExercise.id);
 
 export function BackpropTrainPanel() {
   const [unlocked, setUnlocked] = useState(bothDone);
@@ -199,8 +199,8 @@ export function BackpropTrainPanel() {
 
   if (!unlocked) {
     const missing = [
-      loadCompleted(backpropExercise.id) ? null : "the backprop exercise above",
-      loadCompleted(sgdExercise.id) ? null : "Module 3's sgd exercise",
+      codeReady(backpropExercise.id) ? null : "the backprop exercise above",
+      codeReady(sgdExercise.id) ? null : "Module 3's sgd exercise",
     ].filter(Boolean);
     return (
       <p className="payoff-locked">

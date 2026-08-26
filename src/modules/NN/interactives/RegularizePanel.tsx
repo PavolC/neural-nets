@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { assetUrl } from "../../../runtime/assets";
 import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
-import { loadCode, loadCompleted, subscribeProgress } from "../../../state/progress";
+import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
 import { crossEntropyExercise } from "../../../exercises/cross-entropy";
 import { smartInitExercise } from "../../../exercises/smart-init";
 import { l2Exercise } from "../../../exercises/l2";
@@ -108,9 +108,9 @@ interface Summary {
 }
 
 const needed = () =>
-  loadCompleted(crossEntropyExercise.id) &&
-  loadCompleted(smartInitExercise.id) &&
-  loadCompleted(l2Exercise.id);
+  codeReady(crossEntropyExercise.id) &&
+  codeReady(smartInitExercise.id) &&
+  codeReady(l2Exercise.id);
 
 export function RegularizePanel() {
   const [unlocked, setUnlocked] = useState(needed);
@@ -175,9 +175,9 @@ export function RegularizePanel() {
 
   if (!unlocked) {
     const missing = [
-      loadCompleted(crossEntropyExercise.id) ? null : "the cross-entropy exercise",
-      loadCompleted(smartInitExercise.id) ? null : "the starting-point exercise",
-      loadCompleted(l2Exercise.id) ? null : "the decaying step above",
+      codeReady(crossEntropyExercise.id) ? null : "the cross-entropy exercise",
+      codeReady(smartInitExercise.id) ? null : "the starting-point exercise",
+      codeReady(l2Exercise.id) ? null : "the decaying step above",
     ].filter(Boolean);
     return (
       <p className="payoff-locked">

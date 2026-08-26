@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { assetUrl } from "../../../runtime/assets";
 import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
-import { loadCode, loadCompleted, subscribeProgress } from "../../../state/progress";
+import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
 import { crossEntropyExercise } from "../../../exercises/cross-entropy";
 import { smartInitExercise } from "../../../exercises/smart-init";
 import { sgdExercise } from "../../../exercises/sgd";
@@ -105,9 +105,9 @@ const LINES: Record<string, { label: string; cls: string; dashed?: boolean }> = 
 };
 
 const needed = () =>
-  loadCompleted(crossEntropyExercise.id) &&
-  loadCompleted(smartInitExercise.id) &&
-  loadCompleted(sgdExercise.id);
+  codeReady(crossEntropyExercise.id) &&
+  codeReady(smartInitExercise.id) &&
+  codeReady(sgdExercise.id);
 
 export function InitStartPanel() {
   const [unlocked, setUnlocked] = useState(needed);
@@ -174,9 +174,9 @@ export function InitStartPanel() {
 
   if (!unlocked) {
     const missing = [
-      loadCompleted(crossEntropyExercise.id) ? null : "the cross-entropy exercise",
-      loadCompleted(smartInitExercise.id) ? null : "the starting-point exercise above",
-      loadCompleted(sgdExercise.id) ? null : "Module 3's sgd exercise",
+      codeReady(crossEntropyExercise.id) ? null : "the cross-entropy exercise",
+      codeReady(smartInitExercise.id) ? null : "the starting-point exercise above",
+      codeReady(sgdExercise.id) ? null : "Module 3's sgd exercise",
     ].filter(Boolean);
     return (
       <p className="payoff-locked">

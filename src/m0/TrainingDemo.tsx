@@ -72,7 +72,7 @@ export function TrainingDemo() {
 
   return (
     <section className="demo">
-      <h2>See where this ends up: a trained digit reader</h2>
+      <h3>See where this ends up: a trained digit reader</h3>
       <p>
         This is the finished thing, running the course's own reference code rather than
         yours: a 784-30-10 sigmoid network trained on 5,000 MNIST digits (1,000 held out

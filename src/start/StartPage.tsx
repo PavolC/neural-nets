@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { TrainingDemo } from "../m0/TrainingDemo";
 import { EXERCISES } from "../exercises/registry";
 import {
+  codeReady,
   exportProgress,
   importProgress,
   loadCompleted,
@@ -239,6 +240,12 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
                   <span className="sr-only">{done ? ", passed" : ", not passed yet"}</span>
                 </span>
                 <span className="start-progress-builds">{e.builds}</span>
+                {done && !codeReady(e.id) && (
+                  <span className="start-progress-warn">
+                    Passed, but its code is not stored here, so panels that run it stay
+                    locked.
+                  </span>
+                )}
               </span>
               <button
                 className="button-secondary"

@@ -2727,7 +2727,9 @@ footer a {
 
 .start-progress li {
   display: flex;
-  align-items: baseline;
+  /* Not baseline: a title that wraps to two lines puts its baseline on the
+     second one, which drops the tick to the middle of the row. */
+  align-items: flex-start;
   gap: 0.7rem;
   padding: 0.55rem 0;
   border-top: 1px solid var(--rule);
@@ -2759,6 +2761,9 @@ footer a {
   padding: 0;
   color: var(--accent);
   font: inherit;
+  /* A button centres its text by default, which is invisible until a title
+     wraps on a narrow screen and then reads as a stray centred heading. */
+  text-align: left;
   cursor: pointer;
 }
 
@@ -2794,6 +2799,8 @@ footer a {
   border-top: 1px solid var(--rule);
 }
 
-.start-page .demo h2 {
-  font-size: 1.15rem;
+.start-progress-warn {
+  display: block;
+  color: var(--loss);
+  font-size: 0.85rem;
 }

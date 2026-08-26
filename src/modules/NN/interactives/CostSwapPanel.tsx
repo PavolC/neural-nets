@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { assetUrl } from "../../../runtime/assets";
 import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
-import { loadCode, loadCompleted, subscribeProgress } from "../../../state/progress";
+import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
 import { crossEntropyExercise } from "../../../exercises/cross-entropy";
 import { sgdExercise } from "../../../exercises/sgd";
 import { EpochChart, type EpochSeries } from "./EpochChart";
@@ -91,7 +91,7 @@ const LINES: Record<string, { label: string; cls: string; dashed?: boolean }> = 
 };
 
 const needed = () =>
-  loadCompleted(crossEntropyExercise.id) && loadCompleted(sgdExercise.id);
+  codeReady(crossEntropyExercise.id) && codeReady(sgdExercise.id);
 
 export function CostSwapPanel() {
   const [unlocked, setUnlocked] = useState(needed);
@@ -150,8 +150,8 @@ export function CostSwapPanel() {
 
   if (!unlocked) {
     const missing = [
-      loadCompleted(crossEntropyExercise.id) ? null : "the cross-entropy exercise above",
-      loadCompleted(sgdExercise.id) ? null : "Module 3's sgd exercise",
+      codeReady(crossEntropyExercise.id) ? null : "the cross-entropy exercise above",
+      codeReady(sgdExercise.id) ? null : "Module 3's sgd exercise",
     ].filter(Boolean);
     return (
       <p className="payoff-locked">

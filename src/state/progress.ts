@@ -70,6 +70,18 @@ export function subscribeProgress(fn: () => void): () => void {
   return () => window.removeEventListener(PROGRESS_EVENT, fn);
 }
 
+/** Passed, and the code that passed is still stored.
+ *
+ * The panels that train with the learner's own code need both, and the two
+ * can come apart: a progress file that carries the passed marks without the
+ * editor contents, or storage cleared halfway. Gating on the pass alone gave
+ * those panels an unlocked button that quietly did nothing, because every one
+ * of them returns early when the code turns out to be missing.
+ */
+export function codeReady(exerciseId: string): boolean {
+  return loadCompleted(exerciseId) && loadCode(exerciseId) !== null;
+}
+
 export function resetExercise(exerciseId: string): void {
   remove(`code:${exerciseId}`);
   remove(`reveal:${exerciseId}`);

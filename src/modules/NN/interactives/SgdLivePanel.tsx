@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
-import { loadCode, loadCompleted, subscribeProgress } from "../../../state/progress";
+import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
 import { sgdExercise } from "../../../exercises/sgd";
 
 // Module 3 payoff: run the learner's own sgd on a toy 2D dataset, live.
@@ -67,14 +67,14 @@ interface SgdResult {
 }
 
 export function SgdLivePanel() {
-  const [unlocked, setUnlocked] = useState(() => loadCompleted(sgdExercise.id));
+  const [unlocked, setUnlocked] = useState(() => codeReady(sgdExercise.id));
   const [costs, setCosts] = useState<number[]>([]);
   const [status, setStatus] = useState("");
   const [result, setResult] = useState<SgdResult | null>(null);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => subscribeProgress(() => setUnlocked(loadCompleted(sgdExercise.id))), []);
+  useEffect(() => subscribeProgress(() => setUnlocked(codeReady(sgdExercise.id))), []);
 
   const run = () => {
     const code = loadCode(sgdExercise.id);

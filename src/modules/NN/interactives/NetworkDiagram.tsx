@@ -6,7 +6,7 @@ import {
   type PretrainedWeights,
 } from "../../../runtime/assets";
 import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
-import { loadCode, loadCompleted, subscribeProgress } from "../../../state/progress";
+import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
 import { feedforwardExercise } from "../../../exercises/feedforward";
 import { divergingColor, drawMnistDigit } from "./utils";
 import { useInViewOnce } from "../../../components/useInViewOnce";
@@ -80,7 +80,7 @@ export function NetworkDiagram() {
   const [running, setRunning] = useState(false);
   const [runError, setRunError] = useState<string | null>(null);
   const [pinned, setPinned] = useState<number | null>(null);
-  const [unlocked, setUnlocked] = useState(() => loadCompleted(feedforwardExercise.id));
+  const [unlocked, setUnlocked] = useState(() => codeReady(feedforwardExercise.id));
 
   const patchRef = useRef<HTMLCanvasElement>(null);
   const digitRefs = useRef<(HTMLCanvasElement | null)[]>([]);
@@ -91,7 +91,7 @@ export function NetworkDiagram() {
   useEffect(() => {
     if (!inView) {
       // Still subscribe: the unlock state matters before the assets do.
-      return subscribeProgress(() => setUnlocked(loadCompleted(feedforwardExercise.id)));
+      return subscribeProgress(() => setUnlocked(codeReady(feedforwardExercise.id)));
     }
     Promise.all([fetchPretrainedWeights(), fetchMnistTest()])
       .then(([w, m]) => {
@@ -99,7 +99,7 @@ export function NetworkDiagram() {
         setMnist(m);
       })
       .catch((err) => setLoadError(String(err)));
-    return subscribeProgress(() => setUnlocked(loadCompleted(feedforwardExercise.id)));
+    return subscribeProgress(() => setUnlocked(codeReady(feedforwardExercise.id)));
   }, [inView]);
 
   useEffect(() => {

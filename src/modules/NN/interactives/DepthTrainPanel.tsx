@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { assetUrl } from "../../../runtime/assets";
 import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
-import { loadCode, loadCompleted, subscribeProgress } from "../../../state/progress";
+import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
 import { crossEntropyExercise } from "../../../exercises/cross-entropy";
 import { smartInitExercise } from "../../../exercises/smart-init";
 import { sgdExercise } from "../../../exercises/sgd";
@@ -154,9 +154,9 @@ const LINES: Record<string, { label: string; cls: string; dashed?: boolean }> = 
 };
 
 const needed = () =>
-  loadCompleted(crossEntropyExercise.id) &&
-  loadCompleted(smartInitExercise.id) &&
-  loadCompleted(sgdExercise.id);
+  codeReady(crossEntropyExercise.id) &&
+  codeReady(smartInitExercise.id) &&
+  codeReady(sgdExercise.id);
 
 export function DepthTrainPanel() {
   const [unlocked, setUnlocked] = useState(needed);
@@ -232,9 +232,9 @@ export function DepthTrainPanel() {
 
   if (!unlocked) {
     const missing = [
-      loadCompleted(crossEntropyExercise.id) ? null : "Module 7's cross-entropy exercise",
-      loadCompleted(smartInitExercise.id) ? null : "Module 7's starting-point exercise",
-      loadCompleted(sgdExercise.id) ? null : "Module 3's sgd exercise",
+      codeReady(crossEntropyExercise.id) ? null : "Module 7's cross-entropy exercise",
+      codeReady(smartInitExercise.id) ? null : "Module 7's starting-point exercise",
+      codeReady(sgdExercise.id) ? null : "Module 3's sgd exercise",
     ].filter(Boolean);
     return (
       <p className="payoff-locked">
