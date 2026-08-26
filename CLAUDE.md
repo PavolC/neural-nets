@@ -148,6 +148,18 @@ this floor after direct feedback; every later module must be written to it too.
   `nabla_w` / `nabla_b` in every later prompt and skeleton looked like an
   unrelated word. Name the glyph where it first appears, then bridge to the
   code names at their own first use.
+- **Quoted measurements must come from the code the reader runs.** Numbers in
+  the prose are checked against the panels, so the bench that produces them has
+  to match the browser exactly, not just mathematically. Two traps, both found
+  while writing Module 8: `init_network` draws every weight and then every bias,
+  so a bench that interleaves them builds a different network from the same
+  seed; and `batch_gradient` sums per-example gradients in a loop, so a
+  vectorized bench rounds differently. The second one matters because a deep
+  sigmoid network amplifies it: two mathematically identical runs agree for
+  about seven epochs and then drift a point or two apart. Where a run is still
+  moving at the end, quote an average over the last several epochs (Module 7's
+  regularization section and Module 8's depth tables both do) rather than a
+  single epoch's score that will not reproduce.
 - **No unexplained constants.** Every number in the prose is either derived in
   front of the reader, quoted from an earlier module, or explicitly labeled a
   free design choice with its trade-off (hidden layer size: more detectors vs

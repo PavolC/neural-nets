@@ -9,11 +9,10 @@ page never freezes.
 
 ## Status
 
-**Milestone 4 (Modules 6-8) is under way: Modules 6 and 7 are live, Module 8 is not
-written yet.** Module 6 (universality) is an interlude with no code and no gate: build a
-bump out of two large-weight sigmoid neurons, then sculpt a target curve out of bumps
-and watch the area between the curves shrink as the bar count rises, priced at two
-hidden neurons and six numbers per bar. Module 7 (making it actually work) runs three
+**Milestone 4 (Modules 6-8) is complete.** Module 6 (universality) is an interlude with
+no code and no gate: build a bump out of two large-weight sigmoid neurons, then sculpt
+a target curve out of bumps and watch the area between the curves shrink as the bar
+count rises, priced at two hidden neurons and six numbers per bar. Module 7 (making it actually work) runs three
 problem-fix cycles over the learner's own network, each a one-line diff measured by a
 live before-and-after training run: the cross-entropy cost, whose output blame is the
 gap itself, in place of BP1's gap-times-steepness; starting weights divided by the
@@ -23,6 +22,24 @@ the update rule. The first two together take the digit reader from about 89% to 
 92% over the same fifteen epochs. The overfitting cycle trains on a deliberately small
 1,000-image slice, where the network reaches 100% on the images it trains on while the
 held-out cost turns around and climbs.
+
+Module 8 (why deep is hard) takes the same network deeper and measures what breaks.
+Four hidden layers of 30 score 12.6% after a full epoch, which is exactly the share of
+the held-out digits that are 1s, because the network has learned the commonest digit
+and nothing else. A layer-speed chart on a log axis shows why before training starts:
+each backward hop multiplies the blame column by about 1 through the wire ledger, which
+is what Module 7's division by the square root of the input count buys, and by at most
+0.25 for the sigmoid's steepness, so the first hidden layer learns about five to the
+power of the depth slower than the output (567 times at four hidden layers, 3,002 at
+five). The chart opens the depth, the squash and the size of the drawn weights, and
+shows BP2's two factors per hop; a Pyodide panel then trains one hidden layer against
+four with the learner's own init_network, sgd and backprop. ReLU takes the ceiling off
+the steepness factor, which flattens the depth cost (0.8 of a point across one to four
+hidden layers, against five for the sigmoid) at a step size ten times smaller, and
+doubling the weights under ReLU sends the hops past 1 in the other direction. The
+module closes with weight sharing in convolutional layers, embedding spaces as the
+same learned re-description a hidden layer performs, what the learner built across the
+whole course, and a curated where-to-go-next list.
 
 **Milestone 3 (Modules 4-5, the summit) is complete.** Module 4 (backpropagation, the
 idea) teaches the four equations through a step-through visualization of a 2-3-1

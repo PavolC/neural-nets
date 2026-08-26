@@ -2464,3 +2464,175 @@ footer a {
     font-size: 15px;
   }
 }
+
+/* ---------- Module 8: why deep is hard ---------- */
+
+/* The layer-speed bars. Hidden layers carry this module's subject colour;
+   the output layer is what every other bar is measured against, so it takes
+   the identity Module 7's charts give to the thing being compared with. */
+.m8-bars .m8-bar-hidden {
+  fill: var(--accent);
+}
+
+.m8-bars .m8-bar-out {
+  fill: var(--data-orange);
+}
+
+.m8-bar-sub {
+  opacity: 0.75;
+}
+
+.m8-hop-arrow {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 1.2;
+}
+
+.m8-arrow-head {
+  fill: var(--muted);
+}
+
+.m8-hop-label {
+  fill: var(--ink);
+}
+
+/* The chart's own how-to-read key, above it rather than in the prose
+   (CLAUDE.md: interactives carry their own keys). */
+.m8-key {
+  font-family: system-ui, sans-serif;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--muted);
+  margin: 0.5rem 0 0.55rem;
+}
+
+.m8-readout {
+  font-family: system-ui, sans-serif;
+  font-size: 0.88rem;
+  color: var(--muted);
+  margin: 0.45rem 0 0;
+}
+
+/* Its own full-width line inside the controls row, the same rule statuses
+   follow: the step size changes with the squash, and a note that shares a line
+   with the chips would re-wrap them (CLAUDE.md: interactives must not jump). */
+.m8-eta-note {
+  flex-basis: 100%;
+  min-width: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0.1rem 0 0;
+}
+
+/* Fixed basis so the wrap depends on the window width and never on the
+   depth label (CLAUDE.md: interactives must not jump). */
+.m8-depth {
+  flex: 0 1 300px;
+}
+
+.m8-depth span {
+  width: 7em;
+}
+
+/* Plot family (CLAUDE.md): natural scale, capped at the viewBox width,
+   centred. Each of this module's two static figures carries its own width. */
+.m8-conv {
+  display: block;
+  width: min(560px, 100%);
+  margin: 0 auto;
+}
+
+.m8-spaces {
+  display: block;
+  width: min(500px, 100%);
+  margin: 0 auto;
+}
+
+.m8-conv-image {
+  fill: #fff;
+  stroke: var(--rule-strong);
+  stroke-width: 1;
+}
+
+.m8-conv-grid {
+  stroke: var(--rule);
+  stroke-width: 0.7;
+}
+
+.m8-conv-window {
+  fill: var(--accent);
+  fill-opacity: 0.14;
+  stroke: var(--accent);
+  stroke-width: 1.4;
+}
+
+.m8-conv-cell {
+  fill: var(--accent);
+  stroke: var(--accent);
+  stroke-width: 0.8;
+}
+
+.m8-conv-wire {
+  fill: none;
+  stroke: var(--muted);
+  stroke-width: 0.9;
+  stroke-opacity: 0.55;
+}
+
+.m8-conv-box {
+  fill: var(--surface-sunken);
+  stroke: var(--accent);
+  stroke-width: 1.4;
+}
+
+.m8-conv-boxtext {
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  fill: var(--ink);
+}
+
+.m8-space-frame {
+  fill: #fff;
+  stroke: var(--rule-strong);
+  stroke-width: 1;
+}
+
+/* The output neuron's single cut in hidden space. */
+.m8-space-cut {
+  stroke: var(--ink);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 3;
+}
+
+.m8-built-list,
+.m8-next-list {
+  margin: 0.4rem 0 0.9rem;
+  padding-left: 1.2rem;
+}
+
+.m8-built-list li,
+.m8-next-list li {
+  margin-bottom: 0.5rem;
+}
+
+/* This module's figures are wider than a phone, so they render at about two
+   thirds scale there and their labels would land near 7px. Bump them to the
+   ~9px the narrower interactives reach, the same fix Module 6's charts use. */
+@media (max-width: 560px) {
+  /* The bar labels are numbers to be read against the tables in the prose, so
+     they get a bigger bump than an axis tick would. */
+  .m8-bars .chart-tick {
+    font-size: 17px;
+  }
+
+  .m8-conv .tiny-net-caption,
+  .m8-conv .m8-conv-boxtext {
+    font-size: 15px;
+  }
+
+  .m8-spaces .chart-tick,
+  .m8-spaces .tiny-net-caption {
+    font-size: 14px;
+  }
+}
