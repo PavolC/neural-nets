@@ -106,6 +106,12 @@ export const backpropExercise: Exercise = {
       "    Reading the loop's indices: -l names the layer being blamed, so\n" +
       "    weights[-l+1], one step less negative, is the layer AFTER it, the\n" +
       "    wires the blame flows back through. At l = 2 that is weights[-1],\n" +
-      "    the last weight matrix.",
+      "    the last weight matrix.\n\n" +
+      "    One warning about that letter: this l is not the l of the four\n" +
+      "    equations. Here it counts steps back from the end, so l = 2 is\n" +
+      "    the second-to-last layer whatever the network's depth; there it\n" +
+      "    numbers layers from the front. On a two-layer network the two\n" +
+      "    happen to agree, which is exactly why a deeper one catches an\n" +
+      "    off-by-one.",
   ],
 };

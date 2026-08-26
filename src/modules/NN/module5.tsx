@@ -106,6 +106,28 @@ export function Module5() {
         gloss="Module 4's equations, with one upgrade: the layer letter l stands for each layer in turn (2 then 3 on this page; the tests also try a deeper network), which is exactly the loop you are about to write, and L names the last layer. Blame starts at the output as gap times steepness, flows backward through the transposed wires, and every slope reads off a blame; if any of the four feels foreign, the Module 4 stepper is the place to rebuild it."
       />
       <p>
+        One index trap in BP2, worth settling before writing it. A weight
+        matrix's superscript names the layer it feeds into, so the numbering
+        starts at 2: layer 1 is the input column, nothing feeds into it, and
+        there is no <M tex="w^1" />. This three-layer network therefore has
+        exactly two matrices, <M tex="w^2" /> into the hidden layer and{" "}
+        <M tex="w^3" /> into the output. Three layers, two matrices, always one
+        fewer, and the one that is missing is at the front. So BP2 at{" "}
+        <M tex="l = 2" /> asks for <M tex="w^3" />, which is simply the last
+        matrix; <M tex="w^{l+1}" /> can never run off the end, because BP2 only
+        ever runs on a layer that has a layer after it.
+      </p>
+      <p>
+        Your code numbers those same two matrices the other way, from zero and
+        by position: <code>weights[0]</code> is <M tex="w^2" /> and{" "}
+        <code>weights[1]</code> is <M tex="w^3" />, so the index is the
+        superscript minus two. Two matrices either way; the math starts
+        counting at 2 and the list starts at 0. The table below sidesteps the
+        arithmetic by writing <code>w_next</code>, because inside the loop the
+        matrix you need is always the one belonging to the layer you just
+        finished.
+      </p>
+      <p>
         The translation to NumPy is nearly mechanical, because Module 4 already
         glossed every symbol: the circled dot is the elementwise <code>*</code>,
         the raised T is <code>.T</code>, and matrix products are <code>@</code>.
