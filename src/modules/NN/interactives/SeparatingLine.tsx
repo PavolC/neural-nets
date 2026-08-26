@@ -125,6 +125,8 @@ export function SeparatingLine() {
         ref={svgRef}
         viewBox={`0 0 ${W} ${H}`}
         className="interactive-svg"
+        role="img"
+        aria-label="The four concert situations as dots on a plane, weather across and friend up, with a draggable straight line cutting it. Dots the line puts on the wrong side are ringed, and the line's weights and bias are printed under the chart."
         onPointerMove={onPointerMove}
         onPointerUp={() => (dragging.current = null)}
         onPointerLeave={() => (dragging.current = null)}

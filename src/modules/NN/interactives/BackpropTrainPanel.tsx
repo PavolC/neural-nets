@@ -206,6 +206,8 @@ export function BackpropTrainPanel() {
       <p className="payoff-locked">
         This run is your own backprop driving your own sgd, so it needs{" "}
         {missing.join(" and ")} passed first. Come back here once the tests are green.
+        Only this panel waits on it: Modules 6 to 8 read on without it, and their
+        own training panels use the course's copy of backprop rather than yours.
       </p>
     );
   }

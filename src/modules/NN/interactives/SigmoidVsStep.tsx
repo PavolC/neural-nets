@@ -36,7 +36,12 @@ export function SigmoidVsStep() {
           <code>{z.toFixed(2)}</code>
         </label>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="interactive-svg">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="interactive-svg"
+        role="img"
+        aria-label="Two answer curves over the same evidence: the hard step, which jumps from 0 to 1 at zero, and the sigmoid, which rises through it smoothly. A dot on each marks what the two answer at the chosen evidence, and the readout below repeats both numbers."
+      >
         {[0, 0.5, 1].map((v) => (
           <g key={v}>
             <line x1={40} x2={W - 16} y1={py(v)} y2={py(v)} className="chart-grid" />

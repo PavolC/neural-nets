@@ -144,7 +144,12 @@ export function CostVsKnob() {
             : `push this knob ${direction} to lower the cost.`}
         </span>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="interactive-svg">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="interactive-svg"
+        role="img"
+        aria-label="Cost on the upright axis against one knob's value across, drawn as a curve, with the knob's current position marked. The numbers are repeated in the readout beside the chart."
+      >
         <line x1={44} y1={H - 28} x2={W - 12} y2={H - 28} className="axis-line" />
         <line x1={44} y1={12} x2={44} y2={H - 28} className="axis-line" />
         <text x={40} y={py(0) + 4} className="chart-tick" textAnchor="end">0</text>

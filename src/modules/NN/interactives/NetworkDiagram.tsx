@@ -166,7 +166,12 @@ export function NetworkDiagram() {
   return (
     <div className="interactive" ref={hostRef}>
       <div className="netdiag">
-        <svg viewBox={`0 0 ${SVG_W} ${SVG_H}`} className="netdiag-svg">
+        <svg
+          viewBox={`0 0 ${SVG_W} ${SVG_H}`}
+          className="netdiag-svg"
+          role="img"
+          aria-label="The 784-15-10 network as a diagram: one box for the 784 inputs, fifteen hidden neurons in a column, and ten output neurons for the digits, wired left to right. Pointing at a neuron shows its incoming weights as a picture and its numbers in the panel beside the diagram."
+        >
           <rect x={INPUT_X - 24} y={SVG_H / 2 - 24} width={48} height={48} className="netdiag-input" rx={4} />
           <text x={INPUT_X} y={SVG_H / 2 + 40} textAnchor="middle" className="netdiag-label">
             784 inputs

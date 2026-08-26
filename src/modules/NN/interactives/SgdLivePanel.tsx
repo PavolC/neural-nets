@@ -139,7 +139,12 @@ export function SgdLivePanel() {
         </span>
       </div>
       {costs.length > 0 && (
-        <svg viewBox="0 0 440 120" className="interactive-svg sparkline">
+        <svg
+          viewBox="0 0 440 120"
+          className="interactive-svg sparkline"
+          role="img"
+          aria-label="Cost per epoch as a falling line, one point per pass through the training data. The final cost and accuracy are stated in words below the chart."
+        >
           <polyline
             points={costs
               .map((l, i) => `${12 + (i / Math.max(EPOCHS - 1, 1)) * 416},${108 - (l / maxCost) * 96}`)

@@ -88,7 +88,12 @@ export function Descent1D() {
           <code>{eta.toFixed(2)}</code>
         </label>
       </div>
-      <svg viewBox={`0 0 ${W1} ${H1}`} className="interactive-svg">
+      <svg
+        viewBox={`0 0 ${W1} ${H1}`}
+        className="interactive-svg"
+        role="img"
+        aria-label="Cost as a valley over one knob w, with the steps taken so far marked along it. The step size and the current position are set by the controls above and printed beside them."
+      >
         <path d={curve} className="curve" />
         <line x1={36} y1={H1 - 30} x2={W1 - 12} y2={H1 - 30} className="axis-line" />
         <text x={W1 - 16} y={H1 - 10} className="chart-tick" textAnchor="end">w</text>
@@ -190,7 +195,14 @@ export function Descent2D() {
           <code>{eta.toFixed(2)}</code>
         </label>
       </div>
-      <svg ref={svgRef} viewBox={`0 0 ${W2} ${H2}`} className="interactive-svg" onClick={placeStart}>
+      <svg
+        ref={svgRef}
+        viewBox={`0 0 ${W2} ${H2}`}
+        className="interactive-svg"
+        onClick={placeStart}
+        role="img"
+        aria-label="A cost surface over two knobs, drawn as contour rings around its lowest point, with the path the steps have taken from the chosen start. Clicking the chart moves the start; the buttons above step and reset it."
+      >
         {LEVELS.map((c) => (
           <ellipse
             key={c}

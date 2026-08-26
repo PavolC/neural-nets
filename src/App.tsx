@@ -1,16 +1,16 @@
 import { Suspense, useEffect, useRef, useState } from "react";
-import { TrainingDemo } from "./m0/TrainingDemo";
+import { StartPage } from "./start/StartPage";
 import { MODULES } from "./modules/NN";
 
-const DEMO_TAB = "demo";
+const START_TAB = "start";
 
-// The active tab lives in the URL hash (#m1, #demo) so a reload or a shared
-// link lands on the same module. Every module is always reachable; only an
-// unknown hash falls back to the first module.
+// The active tab lives in the URL hash (#start, #m1) so a reload or a shared
+// link lands on the same page. Every module is always reachable; a bare link
+// and an unknown hash both land on the start page, which is where a reader who
+// has not seen the course before needs to arrive.
 function tabFromHash(): string {
   const id = window.location.hash.slice(1);
-  if (id === DEMO_TAB) return DEMO_TAB;
-  return MODULES.some((m) => m.id === id) ? id : MODULES[0].id;
+  return MODULES.some((m) => m.id === id) ? id : START_TAB;
 }
 
 export default function App() {
@@ -103,6 +103,13 @@ export default function App() {
           browser.
         </p>
         <nav className="tabs" aria-label="Course modules">
+          <button
+            className={`tab ${tab === START_TAB ? "tab-active" : ""}`}
+            aria-current={tab === START_TAB ? "page" : undefined}
+            onClick={() => selectTab(START_TAB)}
+          >
+            Start
+          </button>
           {MODULES.map((m) => (
             <button
               key={m.id}
@@ -113,16 +120,17 @@ export default function App() {
               {m.navLabel}
             </button>
           ))}
-          <button
-            className={`tab ${tab === DEMO_TAB ? "tab-active" : ""}`}
-            aria-current={tab === DEMO_TAB ? "page" : undefined}
-            onClick={() => selectTab(DEMO_TAB)}
-          >
-            Training demo
-          </button>
         </nav>
       </header>
       <main>
+        <div
+          hidden={tab !== START_TAB}
+          ref={(el) => {
+            panels.current[START_TAB] = el;
+          }}
+        >
+          <StartPage onGoTo={selectTab} />
+        </div>
         {/* A module renders on first visit and stays rendered after that, so
             tab switches never lose editor or visualization state. */}
         {MODULES.map((m, i) => {
@@ -148,14 +156,6 @@ export default function App() {
             </div>
           );
         })}
-        <div
-          hidden={tab !== DEMO_TAB}
-          ref={(el) => {
-            panels.current[DEMO_TAB] = el;
-          }}
-        >
-          <TrainingDemo />
-        </div>
       </main>
       <footer>
         <p>

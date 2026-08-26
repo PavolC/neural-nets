@@ -216,8 +216,13 @@ export function XorNetwork() {
         <div className="xor-phase-body">
           <div className="xor-chart">
             <div className="xor-plane-stack">
-              <canvas ref={reportsCanvasRef} width={RES} height={RES} />
-              <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+              <canvas ref={reportsCanvasRef} width={RES} height={RES} aria-hidden="true" />
+              <svg
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                role="img"
+                aria-label="Input space, weather across and friend up, tinted by what each hidden neuron reports there, with the line where each neuron's evidence crosses zero and the four situations as dots."
+              >
                 {hiddenLineElements}
                 {inputDots(false)}
               </svg>
@@ -245,8 +250,13 @@ export function XorNetwork() {
         <div className="xor-phase-body">
           <div className="xor-chart">
             <div className="xor-plane-stack">
-              <canvas ref={hiddenCanvasRef} width={RES} height={RES} />
-              <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+              <canvas ref={hiddenCanvasRef} width={RES} height={RES} aria-hidden="true" />
+              <svg
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                role="img"
+                aria-label="Hidden space: the same four situations placed at the pair of numbers the hidden layer reports for them, with the output neuron's line and its confidence ramp across the plane."
+              >
                 {[0, 1].map((v) => (
                   <g key={v}>
                     <line
@@ -299,8 +309,13 @@ export function XorNetwork() {
         <div className="xor-phase-body">
           <div className="xor-chart">
             <div className="xor-plane-stack">
-              <canvas ref={combinedCanvasRef} width={RES} height={RES} />
-              <svg viewBox="0 0 100 100" preserveAspectRatio="none">
+              <canvas ref={combinedCanvasRef} width={RES} height={RES} aria-hidden="true" />
+              <svg
+                viewBox="0 0 100 100"
+                preserveAspectRatio="none"
+                role="img"
+                aria-label="Input space again, now colored by what the whole network answers at every point, with the hidden layer's lines over it and a ring around any of the four situations the network still gets wrong."
+              >
                 {hiddenLineElements}
                 {inputDots(true)}
               </svg>

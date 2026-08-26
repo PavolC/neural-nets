@@ -84,7 +84,12 @@ export function BatchVsSgd() {
           {steps} steps. Examples looked at: batch {steps * N_SAMPLES}, SGD {steps}.
         </span>
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="interactive-svg">
+      <svg
+        viewBox={`0 0 ${W} ${H}`}
+        className="interactive-svg"
+        role="img"
+        aria-label="A cost surface drawn as contour rings around its lowest point, with two descent paths from the same start: the full-batch path, which steps straight downhill, and the mini-batch path, which zigzags around it."
+      >
         {LEVELS.map((c) => (
           <ellipse
             key={c}

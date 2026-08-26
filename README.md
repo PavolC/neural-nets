@@ -1,128 +1,120 @@
-# Grokking Nets (working title)
+# Grokking Nets
 
-A self-contained, browser-based interactive course that teaches neural networks from
-first principles. You read short explanations, manipulate live visualizations, and write
-real Python (NumPy) in an in-browser editor. Your code is checked by automated tests,
-including numerical gradient checking, and trains a real network on MNIST digits. Nothing
-to install: Python runs in your browser via Pyodide (WebAssembly), in a Web Worker so the
-page never freezes.
+A self-contained, browser-based course that teaches neural networks by having you build
+one. You read short explanations, manipulate live visualizations, and write real Python
+(NumPy) in an in-browser editor. Your code is checked by automated tests, including a
+numerical gradient check, and then trains a network that reads handwritten digits.
 
-## Status
+Nothing to install and no account: Python runs in the page through Pyodide (CPython
+compiled to WebAssembly), in a Web Worker so a training run never freezes the tab. The
+only thing that leaves your machine is the runtime download, about 10 MB, on the first
+run.
 
-**Milestone 4 (Modules 6-8) is complete.** Module 6 (universality) is an interlude with
-no code and no gate: build a bump out of two large-weight sigmoid neurons, then sculpt
-a target curve out of bumps and watch the area between the curves shrink as the bar
-count rises, priced at two hidden neurons and six numbers per bar. Module 7 (making it actually work) runs three
-problem-fix cycles over the learner's own network, each a one-line diff measured by a
-live before-and-after training run: the cross-entropy cost, whose output blame is the
-gap itself, in place of BP1's gap-times-steepness; starting weights divided by the
-square root of their layer's input count, which lifts the median hidden-neuron
-steepness from 0.0020 to 0.2203 before a single step is taken; and L2 weight decay in
-the update rule. The first two together take the digit reader from about 89% to about
-92% over the same fifteen epochs. The overfitting cycle trains on a deliberately small
-1,000-image slice, where the network reaches 100% on the images it trains on while the
-held-out cost turns around and climbs.
+The sequence follows Michael Nielsen's *Neural Networks and Deep Learning*, with the
+explanations rewritten around the interactive parts. It assumes Python and high-school
+algebra; vectors, matrices, dot products and slopes are built up from arithmetic where
+they are first needed.
 
-Module 8 (why deep is hard) takes the same network deeper and measures what breaks.
-Four hidden layers of 30 score 12.6% after a full epoch, which is exactly the share of
-the held-out digits that are 1s, because the network has learned the commonest digit
-and nothing else. A layer-speed chart on a log axis shows why before training starts:
-each backward hop multiplies the blame column by about 1 through the wire ledger, which
-is what Module 7's division by the square root of the input count buys, and by at most
-0.25 for the sigmoid's steepness, so the first hidden layer learns about five to the
-power of the depth slower than the output (567 times at four hidden layers, 3,002 at
-five). The chart opens the depth, the squash and the size of the drawn weights, and
-shows BP2's two factors per hop; a Pyodide panel then trains one hidden layer against
-four with the learner's own init_network, sgd and backprop. ReLU takes the ceiling off
-the steepness factor, which flattens the depth cost (0.8 of a point across one to four
-hidden layers, against five for the sigmoid) at a step size ten times smaller, and
-doubling the weights under ReLU sends the hops past 1 in the other direction. The
-module closes with weight sharing in convolutional layers, embedding spaces as the
-same learned re-description a hidden layer performs, what the learner built across the
-whole course, and a curated where-to-go-next list.
-
-**Milestone 3 (Modules 4-5, the summit) is complete.** Module 4 (backpropagation, the
-idea) teaches the four equations through a step-through visualization of a 2-3-1
-network: every activation, weighted input, weight and delta inspectable, the forward
-pass and then the backward sweep one step at a time with the equation in play
-highlighted, any of the 13 knobs editable, followed by a quiz on which delta moves when
-a given weight changes. Module 5 (backpropagation, for real) is the summit exercise: the
-learner writes `backprop` from those equations, and it is checked against
-central-difference numerical gradients on a fixed 3-5-4-2 network, all 54 parameters, to
-within one part in ten million. Passing that unlocks the payoff run, where their own
-backprop inside their own SGD trains the 784-30-10 digit reader to about 89% of the
-held-out thousand in a few seconds, alongside a wall-clock price comparison against
-nudge-measured gradients on the same mini-batch.
-
-**Milestone 2 (Modules 1-3) is complete.** The course spine is live: Module 1 (neurons,
-sigmoid, why XOR needs a hidden layer) with a draggable separating-line playground and
-a 2-2-1 XOR network on sliders; Module 2 (feedforward) with a live 784-15-10 network
-diagram, hoverable weight-image patches, and a payoff panel where the learner's own
-feedforward classifies real MNIST digits with pretrained weights; Module 3 (gradient
-descent) with 1D/2D descent playgrounds, a batch-vs-SGD race, an SGD exercise, and a
-live toy-network training run that quantifies the cost of numerical gradients. Math is
-rendered with KaTeX, each equation glossed in plain language. Every module is reachable
-at any time; what an exercise gates is the payoff panel that runs the learner's code.
-
-**Milestone 1 (exercise pipeline) is complete.** The app has a working exercise loop:
-a CodeMirror editor pre-filled with skeleton Python, a Run tests button that executes
-the learner's code against a deterministic NumPy test suite inside Pyodide, per-test
-pass/fail results whose failure messages teach (shapes, layer order, common
-misconceptions), a three-stage hint reveal (conceptual nudge, pseudocode, full
-solution), and localStorage persistence of code, hints, and completion. Module 2's
-feedforward exercise is the first working example.
-
-**Milestone 0 (feasibility spike) is complete.** The app loads Pyodide + NumPy in a Web
-Worker, loads a bundled MNIST subset (5,000 training / 1,000 test images), trains a
-784-30-10 sigmoid network with a reference implementation, and streams per-epoch loss and
-test accuracy to a live chart. Course modules come next (see
-`nn-course-design-doc.md`, section 8).
-
-Measured envelope (2026-08-23, Chrome, Pyodide 314.0.5): 30 epochs of mini-batch SGD
-complete in about 4.5 seconds and reach 88.6% test accuracy, deterministic at seed 1.
-That is far inside the 60-second budget from the design doc, so no dataset or
-architecture shrinking was needed. Accuracy plateaus just under 90% because of the
-5,000-example subset and the quadratic cost; this meets the course's own Module 5 gate
-(at least 88%), and Module 7 reaches about 92% over fifteen epochs once the
-cross-entropy cost is paired with weights scaled by 1/sqrt(inputs).
-
-## How to run
+## Run it
 
 ```
 npm install
 npm run dev
 ```
 
-Then open the printed URL (the first training run downloads the Pyodide runtime, about
-10 MB, so it needs network access). `npm run build` produces a static build in `dist/`
-deployable to GitHub Pages, Netlify, or any static host.
+Then open the printed URL (http://localhost:5174). `npm run build` produces a static
+site in `dist/` that any static host will serve.
 
-### Regenerating the MNIST subset
+## What you build
 
-`public/data/mnist_subset.bin.gz` is committed, so this is only needed to change the
-subset. Requires network access, pure Python stdlib only:
+Eight modules, each a few readings interleaved with figures, most ending in an exercise
+whose output every later module uses.
 
-```
-python3 tools/make_mnist_subset.py
-```
+| # | Module | You write |
+|---|--------|-----------|
+| 1 | From neurons to networks | `sigmoid`, `fire` |
+| 2 | Feedforward | `feedforward` |
+| 3 | Learning as descent | `sgd_step`, `sgd` |
+| 4 | Backpropagation, the idea | (a step-through visualization and a quiz) |
+| 5 | Backpropagation, for real | `backprop` |
+| 6 | Universality (an interlude) | (a curve-sculpting playground) |
+| 7 | Making it actually work | `cross_entropy_delta`, `init_network`, `l2_step` |
+| 8 | Why deep is hard | (a depth and squash comparison) |
 
-`public/data/pretrained_weights.json.gz` (the Module 2 payoff network) is also
-committed; regenerate with `python3 tools/pretrain_weights.py` (needs NumPy).
+Module 5 is the summit: the learner's `backprop` is checked entry by entry against
+central-difference numerical gradients on a fixed 3-5-4-2 network, to one part in ten
+million, and then trains 784-30-10 to about 89% of a held-out thousand in a few seconds.
+Module 7's three one-line changes take that to about 92%. Module 8 takes the same
+network deeper and measures what breaks: four hidden layers of 30 score 12.6% after a
+full epoch, which is exactly the share of the held-out digits that are 1s.
+
+Nothing is locked. Every module is reachable at any time; what an exercise gates is the
+panel that trains with your own code. Nothing after Module 5 depends on your version of
+`backprop` either, so a learner who never finishes it still gets Modules 6 to 8 in full.
+
+Progress (editor contents, revealed hints, passed marks) lives in this browser's local
+storage. The start page can save it to a file and load it back, which is how you move it
+between browsers.
+
+## Publishing it
+
+`.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to
+`main`. It has never run: this repo has no remote yet. To turn it on, create the
+repository, push, and set **Settings > Pages > Source** to **GitHub Actions**. The build
+is subpath-safe (`base: "./"`), so a project page under `user.github.io/repo/` needs no
+further configuration.
 
 ## Repo layout
 
 ```
 /src/                React app
+/src/start/          the start page: what the course is, the outline, stored progress
 /src/modules/NN/     one file per course module, plus interactives/
 /src/exercises/      per exercise: skeleton.py, tests.py, solution.py, index.ts
 /src/python/         shared Python: course helpers, data loader, reference network, harness
 /src/runtime/        Pyodide Web Worker, message protocol, shared worker client
 /src/components/     shared UI: CodeEditor (CodeMirror), ExercisePage, KaTeX wrappers
 /src/state/          localStorage progress persistence
-/src/m0/             Milestone 0 training demo UI
+/src/m0/             the training demo shown on the start page
 /public/data/        mnist_subset.bin.gz, pretrained_weights.json.gz
-/tools/              build-time scripts (MNIST preprocessing, weight pretraining)
+/tools/              build-time scripts and the benches below
 ```
+
+`CLAUDE.md` holds the working conventions: shape conventions all Python obeys, the
+exercise and test contract, the module authoring playbook, and the voice rules.
+`nn-course-design-doc.md` is the original design.
+
+## Regenerating the data and checking the numbers
+
+The two data files are committed, so these are only needed to change them:
+
+```
+python3 tools/make_mnist_subset.py     # public/data/mnist_subset.bin.gz, stdlib only
+python3 tools/pretrain_weights.py      # public/data/pretrained_weights.json.gz, needs NumPy
+```
+
+Every measurement quoted in Modules 7 and 8 is regenerated by a bench that runs the same
+code path the browser does, each section printing the prose sentence it backs:
+
+```
+python3 tools/bench_depth.py           # the Pyodide panels' numbers (needs NumPy)
+npm run bench:speeds                   # the layer-speed panel's numbers
+```
+
+## Measured envelope
+
+Chrome, Pyodide 314.0.5, 2026-08-23: 30 epochs of mini-batch SGD on the bundled subset
+(5,000 training and 1,000 test images) complete in about 4.5 seconds and reach 88.6% test
+accuracy, deterministic at seed 1. That is well inside the 60-second budget the design
+doc set, so no dataset or architecture shrinking was needed. Accuracy plateaus just under
+90% because of the subsampled data and the quadratic cost; Module 7 reaches about 92%
+once the cross-entropy cost is paired with weights scaled by 1/sqrt(inputs).
+
+Firefox and Safari have not been run against this build. The web APIs it depends on that
+are not ancient are `DecompressionStream` (Safari 16.4+, Firefox 113+) for the gzipped
+data files and `IntersectionObserver` for deferring the editor; `requestIdleCallback` and
+`navigator.clipboard` are both used behind a fallback. So both should work at those
+versions and up, but that is inference, not a test.
 
 ## License and attribution
 

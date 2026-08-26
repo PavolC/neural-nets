@@ -69,8 +69,15 @@ export function PixelsInteractive() {
             if (e.pointerType === "mouse") setCell(null);
           }}
         >
-          <canvas ref={canvasRef} width={N} height={N} style={{ width: SIZE, height: SIZE }} />
-          <svg viewBox={`0 0 ${N} ${N}`} preserveAspectRatio="none">
+          <canvas
+            ref={canvasRef}
+            width={N}
+            height={N}
+            style={{ width: SIZE, height: SIZE }}
+            role="img"
+            aria-label={`A handwritten ${label} from the test set, drawn as 28 rows of 28 brightness values.`}
+          />
+          <svg viewBox={`0 0 ${N} ${N}`} preserveAspectRatio="none" aria-hidden="true">
             {cell && (
               <rect x={cell.c} y={cell.r} width={1} height={1} className="pixel-highlight" />
             )}

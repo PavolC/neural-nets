@@ -2636,3 +2636,164 @@ footer a {
     font-size: 14px;
   }
 }
+
+/* ---------- start page ---------- */
+
+/* The course's front door. It reuses the module column and the module type
+   scale, so arriving here and then arriving at Module 1 feel like one
+   document; what it adds is the outline, the stored-progress list, and the
+   controls for moving that storage around. */
+
+.start-cta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 1.4rem 0 2rem;
+}
+
+.start-cta-note {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.start-facts {
+  padding-left: 1.1rem;
+}
+
+.start-facts li {
+  margin-bottom: 0.6rem;
+}
+
+.start-outline {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 2rem;
+  counter-reset: none;
+}
+
+.start-outline > li {
+  border-top: 1px solid var(--rule);
+  padding: 0.75rem 0;
+}
+
+.start-outline > li:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.start-outline p {
+  margin: 0.25rem 0 0;
+  font-size: 0.95rem;
+}
+
+/* A title that navigates: a button so it is reachable and announced as the
+   control it is, styled as the heading it reads as. */
+.start-outline-title {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.start-outline-title:hover,
+.start-progress-link:hover {
+  text-decoration: underline;
+}
+
+.start-outline-writes {
+  color: var(--muted);
+}
+
+.start-outline-writes code {
+  color: var(--ink);
+}
+
+.start-tick {
+  color: var(--accent);
+  font-size: 0.8rem;
+  font-variant: small-caps;
+  letter-spacing: 0.03em;
+}
+
+.start-progress {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.start-progress li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  padding: 0.55rem 0;
+  border-top: 1px solid var(--rule);
+}
+
+.start-progress li:last-child {
+  border-bottom: 1px solid var(--rule);
+}
+
+.start-progress-mark {
+  color: var(--rule-strong);
+  width: 1rem;
+  flex: none;
+  text-align: center;
+}
+
+.start-done .start-progress-mark {
+  color: var(--accent);
+}
+
+.start-progress-name {
+  flex: 1;
+  min-width: 0;
+}
+
+.start-progress-link {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+.start-progress-where {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-left: 0.4rem;
+}
+
+.start-progress-builds {
+  display: block;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.start-storage {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1.2rem 0 0.4rem;
+}
+
+.start-storage-note {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+/* The demo arrives inside the start page rather than on a tab of its own, so
+   it gets the separation a section break would have given it. */
+.start-page .demo {
+  margin-top: 2.4rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--rule);
+}
+
+.start-page .demo h2 {
+  font-size: 1.15rem;
+}
