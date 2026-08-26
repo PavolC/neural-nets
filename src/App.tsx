@@ -37,19 +37,34 @@ export default function App() {
   // land the reader on Module 2's closing recap. Start every module at its top,
   // which is what the Continue button already did.
   const panels = useRef<Record<string, HTMLDivElement | null>>({});
-  const mounted = useRef(false);
+  // The tab this effect last acted on. A boolean "have I mounted yet" flag does
+  // not survive StrictMode, which runs the effect, cleans up, and runs it again:
+  // the first pass sets the flag and the second pass sails through and scrolls
+  // and steals focus on arrival. Comparing tab values is idempotent.
+  const actedOn = useRef(tab);
 
   useEffect(() => {
-    // Not on the first render: a deep link should not fight the browser's own
-    // restoration, and nothing should steal focus on arrival.
-    if (!mounted.current) {
-      mounted.current = true;
-      return;
-    }
+    // First render, or a re-run for a tab we already handled: leave the page
+    // alone. A deep link should not fight the browser's own restoration.
+    if (actedOn.current === tab) return;
+    actedOn.current = tab;
     window.scrollTo(0, 0);
-    // Keyboard and screen-reader readers would otherwise be left focused on a
-    // button whose panel just went away, which drops focus to the document
-    // start. Land them on the heading of what they just opened instead.
+    // Rescue focus only when the switch is what took it away. The tab strip
+    // lives in the header, outside the panels, so a tab click hides nothing the
+    // reader was focused on; the one control that does is "Continue to Module
+    // N", which sits inside the panel being hidden. Hence the test: is the
+    // focused element inside a subtree we just hid? Asking whether
+    // document.activeElement is <body> answers a different question, and
+    // answers it wrongly twice over. Too early, because React has hidden the
+    // panel but the browser has not blurred the button in it yet; too eager,
+    // because nothing focused is also the resting state of a freshly loaded
+    // page. Both readings put a focus ring around the module title.
+    const active = document.activeElement as HTMLElement | null;
+    const lostFocus =
+      !!active &&
+      active !== document.body &&
+      (!active.isConnected || active.closest("[hidden]") !== null);
+    if (!lostFocus) return;
     const heading = panels.current[tab]?.querySelector<HTMLElement>("h2");
     if (heading) {
       heading.tabIndex = -1;

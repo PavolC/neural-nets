@@ -83,24 +83,6 @@ button {
   cursor: pointer;
 }
 
-button:hover:not(:disabled) {
-  border-color: #095a41;
-  background: #095a41;
-}
-
-button:active:not(:disabled) {
-  background: #07452f;
-}
-
-.button-secondary:hover:not(:disabled) {
-  background: #eef5f1;
-  border-color: var(--accent);
-}
-
-.button-secondary:active:not(:disabled) {
-  background: #e2efe8;
-}
-
 button:disabled {
   background: var(--disabled-bg);
   border-color: var(--disabled-rule);
@@ -141,16 +123,6 @@ button:disabled {
   font-size: 1rem;
   flex-shrink: 0;
   white-space: nowrap;
-}
-
-.tab:hover {
-  background: transparent;
-  border-color: transparent;
-  color: var(--ink);
-}
-
-.tab.tab-active:hover {
-  border-bottom-color: var(--accent);
 }
 
 .tab-active {
@@ -2000,11 +1972,6 @@ footer a {
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 600;
-}
-
-.module-jump-toggle:hover {
-  background: transparent;
-  border-color: transparent;
 }
 
 .module-jump-caret {
