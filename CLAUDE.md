@@ -27,8 +27,19 @@ no accounts, no backend, no analytics.
   `solution.py`. Skeletons contain stubs, docstrings, and shape contracts only.
 - **Attribution and license requirements must never be removed.** The app footer, README,
   and LICENSE carry the CC BY-NC 3.0 attribution to Michael A. Nielsen's *Neural Networks
-  and Deep Learning* (Determination Press, 2015). The derivative work inherits
-  CC BY-NC 3.0 and cannot be commercialized.
+  and Deep Learning* (Determination Press, 2015). The **course content** follows its
+  source and is non-commercial.
+  **State that scope precisely, and do not widen it.** All three places used to say the
+  project inherits CC BY-NC, which is broader than the facts and broader than the licence
+  requires. CC BY-NC 3.0 has no ShareAlike clause, so matching it is a choice about the
+  adapted content rather than an obligation that spreads; and the exercise harness, the
+  Pyodide worker, the brand layer, `tools/` and `course-kit/` contain none of Nielsen's
+  material, so nothing reaches them. Saying otherwise gives away rights over the one
+  asset that transfers to every future course in the series.
+  Nielsen's reference code is **MIT**, which requires its copyright and permission notice
+  to travel with the code. That code is inlined into the Pyodide worker at build time, so
+  `vite.config.ts` emits `LICENSE.txt` into `dist/` and the footer links it. A build that
+  ships the code without the notice is a licence defect, not a formatting one.
 - **No em dashes in any user-facing prose.** Use commas, colons, or parentheses.
 - **`src/brand/` is shared with every other course in the series.** Four of its five
   files are copied unchanged between courses, and `tools/check_brand.py` asserts that

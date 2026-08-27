@@ -1,5 +1,11 @@
-Grokking Nets: license and attribution
-======================================
+Neural Networks (Moving Parts): license and attribution
+=======================================================
+
+This project contains two kinds of material with two different licenses, and
+the distinction matters to anyone reusing it. The course content is adapted
+from a NonCommercial source and carries that restriction. The application that
+runs it, the series brand layer and course-kit/ are original work, contain none
+of Nielsen's material, and are not covered by the grant below.
 
 Course content (prose, pedagogical sequence, visualizations)
 ------------------------------------------------------------
@@ -9,9 +15,29 @@ Determination Press, 2015, licensed under the Creative Commons
 Attribution-NonCommercial 3.0 Unported License (CC BY-NC 3.0):
 https://creativecommons.org/licenses/by-nc/3.0/
 
-As a derivative work, this project's course content inherits CC BY-NC 3.0.
-You may share and adapt it with attribution, for non-commercial purposes
-only. It may not be commercialized.
+The course content, meaning the module prose, the pedagogical sequence and
+the interactive figures under src/modules/, is offered under CC BY-NC 3.0 to
+match its source: share and adapt it with attribution, for non-commercial
+purposes only.
+
+Note that CC BY-NC 3.0 has no ShareAlike clause, so this is a choice to match
+the source rather than an obligation to. What does bind is narrower: no use of
+Nielsen's material for commercial advantage, and no granting of rights in his
+material beyond those held.
+
+The application, the brand layer, and course-kit
+------------------------------------------------
+
+Everything under src/ other than src/modules/, together with src/brand/,
+tools/ and course-kit/, is original work by the author. It contains none of
+Nielsen's prose and none of his code, and the CC BY-NC grant above does not
+extend to it.
+
+No license is granted for it yet. That is a decision still to be made, not a
+refusal, and until it is made these files are all rights reserved. Anyone who
+wants to reuse the exercise harness, the Pyodide worker, the brand layer or
+the kit should ask.
+
 
 Reference code
 --------------
@@ -23,7 +49,7 @@ distributed under the MIT license:
 
     MIT License
 
-    Copyright (c) 2012-2018 Michael Nielsen
+    Copyright (c) 2012-2022 Michael Nielsen
 
     Permission is hereby granted, free of charge, to any person obtaining a
     copy of this software and associated documentation files (the

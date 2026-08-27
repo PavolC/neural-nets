@@ -172,8 +172,15 @@ honours `navigator.doNotTrack`. GoatCounter is free for non-commercial use, whic
 Adapted from Michael A. Nielsen, *Neural Networks and Deep Learning*, Determination
 Press, 2015, licensed [CC BY-NC 3.0](https://creativecommons.org/licenses/by-nc/3.0/).
 
-This project is a free educational tool. As a derivative of the book it inherits
-**CC BY-NC 3.0: it may not be used commercially.** See [LICENSE](LICENSE).
+The **course content** (the module prose, the pedagogical sequence and the interactive
+figures under `src/modules/`) follows its source: **CC BY-NC 3.0, so it may not be used
+commercially.**
+
+The **application around it** is a separate matter. The exercise harness, the Pyodide
+worker, the brand layer, `tools/` and `course-kit/` are original work containing none of
+Nielsen's material, so the CC BY-NC grant does not reach them and they do not inherit its
+restriction. No license is granted for them yet; that is a decision outstanding rather
+than a refusal. See [LICENSE](LICENSE).
 
 Reference implementations are adapted from Nielsen's MIT-licensed code at
 [github.com/mnielsen/neural-networks-and-deep-learning](https://github.com/mnielsen/neural-networks-and-deep-learning).
