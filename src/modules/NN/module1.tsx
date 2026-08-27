@@ -173,10 +173,12 @@ export function Module1() {
       </div>
       <p>
         Four points, and no line works: the greens sit on one diagonal, the golds on
-        the other, so any line that separates them would have to bend. When it was
-        proved in 1969 that a single neuron cannot represent
-        XOR, funding and faith in the whole field collapsed for years. The eventual
-        answer was not a smarter neuron. It was neurons feeding other neurons.
+        the other, so any line that separates them would have to bend. Marvin Minsky
+        and Seymour Papert made that wall famous in their 1969 book{" "}
+        <em>Perceptrons</em> (engineers had been running into it since the early
+        1960s). The answer was not a smarter neuron. It was neurons feeding other
+        neurons, an idea that took until the mid-1980s to catch on, because training
+        a stack of them is harder than training one.
       </p>
 
       <SectionHeader id="m1-sigmoid" title="The sigmoid upgrade" />

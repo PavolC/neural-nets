@@ -22,9 +22,13 @@ export function Module10() {
         Every number your network has seen so far arrived ready. MNIST's pixels
         were already numeric, already between 0 and 1, already complete, already
         split into training and held-out, already labelled as one-hot columns.
-        The course did all of that in <code>tools/make_mnist_subset.py</code>{" "}
-        before you saw a single digit. That preparation is most of the work in a
-        problem of your own, and this module is about doing it.
+        The course did all of that before you saw a single digit:{" "}
+        <code>tools/make_mnist_subset.py</code> took the subset and kept MNIST's
+        own split, and <code>src/python/data_loader.py</code> divided every
+        pixel by 255 and packed the labels into one-hot columns. That
+        preparation is most of the work in a problem of your own, and every step
+        of it is a decision somebody makes (and can get wrong) before any
+        network sees a number.
       </p>
       <p>
         Here is the file this module uses. It is a real survey of penguins from
@@ -103,7 +107,7 @@ export function Module10() {
       </p>
       <Eq
         tex="X \;\text{is}\; (\text{inputs},\, m), \qquad Y \;\text{is}\; (\text{outputs},\, m)"
-        gloss="Example k is column k of X, and its right answer is column k of Y. A row of X is one input across every example: one pixel in Module 2, one measurement here."
+        gloss="Example k is column k of X, and its right answer is column k of Y. A row of X is one input across every example: one pixel in Module 2, one measurement here. Everyone outside this course calls one such row a feature, and this module uses that word from here on, since the file it prepares arrives with some of its features written as words."
       />
       <p>
         The outputs, and the cost that scores them, follow from what you are
@@ -163,12 +167,19 @@ export function Module10() {
         Module 7 already worked out what that does. Its whole argument for
         dividing the starting weights by <M tex="\sqrt{n}" /> counted about a
         hundred lit pixels, each contributing a value near 1, and concluded that
-        the evidence piles up to about the square root of the count. Replace
-        those values with four-thousands and the pile is not 9.3 but tens of
-        thousands, so every hidden neuron is saturated flat before training
-        starts, and the sigmoid overflows on the way. The fix is the same fix,
-        applied at the other end: instead of shrinking the weights to match the
-        inputs, put the inputs on a scale the weights were designed for.
+        the evidence piles up to about the square root of the squared input
+        values added together, which for those images gave 9.3. Here is that
+        same sum on one average penguin, straight out of the file:
+      </p>
+      <Eq
+        tex="\sqrt{\underbrace{4200^2}_{\text{mass}} + \underbrace{200^2}_{\text{flipper}} + \underbrace{44^2}_{\text{bill length}} + \underbrace{17^2}_{\text{bill depth}}} = \sqrt{17{,}682{,}225} \approx 4{,}200"
+        gloss="The four averages from the file, squared and added, then square-rooted: that is the spread of a hidden neuron's evidence when its weights are drawn at spread 1. Module 7's draw divides those weights by the square root of the input count, which is 3 for nine input rows. Dividing 4,200 by 3 still leaves the evidence near 1,400, where the same division landed MNIST's at 0.33."
+      />
+      <p>
+        Every hidden neuron is saturated flat before training starts, and the
+        sigmoid overflows on the way. The fix is the same fix, applied at the
+        other end: instead of shrinking the weights to match the inputs, put the
+        inputs on a scale the weights were designed for.
       </p>
       <Eq
         tex="x' = \frac{x - \text{mean}}{\text{spread}}"
@@ -183,6 +194,19 @@ export function Module10() {
         lesson about optimizing against a number you also report, wearing a
         different hat.
       </p>
+      <Aside>
+        <p>
+          Why not leave the file alone and shrink the weights instead? Divide
+          the starting draw by four thousand and body masses come out near 1,
+          which fixes that row. Bill depths arrive near 17, so the same division
+          leaves bill depth contributing about 0.004 where body mass contributes
+          1, and the network is deaf to it. One division cannot serve two rows
+          that are 245 times apart: a layer has one weight scale, while
+          standardizing gives every row its own mean and spread. You could pick
+          a scale per row by hand, which is this formula in disguise, done where
+          nobody can check it.
+        </p>
+      </Aside>
 
       <SectionHeader id="m10-categories" title="Words, holes and splits" />
       <p>
@@ -206,6 +230,44 @@ export function Module10() {
         Both choices are judgement, and the useful habit is to write down which
         one you made and why.
       </p>
+      <p>
+        Scaling and one-hot rows together turn the first penguin in the file at
+        the top of this page into one column of nine rows, and that column is
+        what your network reads:
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>rows of X</th>
+              <th>what they hold</th>
+              <th>the Adelie from Torgersen</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1 to 4</td>
+              <td>the four measurements, standardized</td>
+              <td>
+                body mass, row 4, is 3,750. The masses average 4,202 with a
+                spread of about 800, the two numbers your <code>standardize</code>{" "}
+                computes for that row, so this bird sits 452 below the average, a
+                bit over half a spread, and the row reads about -0.6
+              </td>
+            </tr>
+            <tr>
+              <td>5, 6, 7</td>
+              <td>Biscoe, Dream, Torgersen</td>
+              <td>0, 0, 1</td>
+            </tr>
+            <tr>
+              <td>8, 9</td>
+              <td>female, male</td>
+              <td>0, 1</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
       <p>
         Then the split, and it has to be shuffled. This file is sorted by
         species, the way files usually arrive sorted by something. Cut it 60, 20
@@ -231,31 +293,42 @@ export function Module10() {
       <p>
         The panel below runs the whole pipeline: your <code>standardize</code>,{" "}
         <code>one_hot</code> and <code>split</code> turn the file into a matrix,
-        and your <code>train</code> from Module 9 does the rest. Two switches,
-        because the two things worth seeing are both comparisons.
+        and your <code>train</code> from Module 9 does the rest.
       </p>
       <Figure caption="The penguin file, prepared by your code and trained by your loop. The switches change the preparation, not the network: same shape, same step size, same epochs, same seeds.">
         <PenguinsPanel />
       </Figure>
       <p>
-        Turn the scaling off first. The network reads 42.6 percent of the
-        held-back penguins, and answering Adelie for every single one would have
-        read 42.6 percent. Those two numbers being equal is the finding: it has
-        learned which species is commonest and nothing else, exactly as Module
-        8's four-layer network did for its first epoch. Turn the scaling on and
-        the same network, on the same rows, reads 100 percent, with 80.9 percent
-        after a single epoch. One preprocessing step is the difference between a
-        network that works and a network that does not.
+        Turn the scaling off first. The network reads 42.6 percent of the 68
+        held-back penguins, and answering Adelie for every one of them would have
+        read 42.6 percent too, because 29 of those 68 are Adelie. (The whole file
+        is 44.2 percent Adelie, 152 of 344, so one shuffled fifth of it landing a
+        little under that is ordinary.) Turn the scaling on and the same network,
+        on the same rows, reads 100 percent, with 80.9 percent after a single
+        epoch. One preprocessing step is the difference between a network that
+        works and a network that does not.
       </p>
       <p>
-        A perfect score should make you suspicious rather than pleased, and here
-        it is worth asking why it happened. The three species really are far
+        Why does the unscaled network match that score exactly, rather than
+        landing somewhere worse? A body mass in the thousands drives every hidden
+        neuron flat, and to the same flat value for every bird, so the hidden
+        layer hands the output layer the same column whichever penguin arrived.
+        The output layer is reading a constant, and the best a constant answer
+        can do is name the commonest species. The network cannot climb out of it
+        either, for the reason Module 7 gave for dividing the starting weights: a
+        flat neuron's steepness is near zero, and BP2 multiplies its blame by
+        that steepness, so the wires feeding it barely move.
+      </p>
+      <p>
+        A perfect score should make you suspicious rather than pleased, so why
+        did this one happen? The three species really are far
         apart in these four measurements: a Gentoo is much heavier with a
         shallower bill, and Chinstraps and Adelies differ clearly in bill length.
         The problem is easy, and the honest report of an easy problem is that it
-        was easy. The other thing that produces a perfect score is a leak, which
-        is what the training-only scaling and the shuffled split were guarding
-        against.
+        was easy. The other thing that produces a perfect score is a leak
+        (anything the held-back rows told you before you scored them, a mean and
+        a spread included), which is what the training-only scaling and the
+        shuffled split were guarding against.
       </p>
 
       <SectionHeader id="m10-errors" title="One number hides the failure" />
@@ -314,13 +387,19 @@ export function Module10() {
       </p>
       <p>
         Start with one hidden layer. Module 8 measured what depth costs when you
-        add it without needing it, and one hidden layer plus enough neurons can
-        already trace any curve, which is what Module 6 spent its length showing.
-        Size that layer somewhere between the number of inputs and the number of
-        outputs: the penguin network has 9 inputs (four measurements,
-        three islands, two sexes), 8 hidden and 3 outputs, and MNIST's had 784,
-        30 and 10. Neither is optimal, and neither needed to be.
+        add it without needing it, and Module 6 showed that a single hidden
+        layer, made wide enough, can already express whatever relationship you
+        are asking the network for. That argument was about such weights existing
+        rather than about descent finding them, so treat one layer as the
+        cheapest thing to try rather than as the right answer. Size that layer
+        somewhere between the number of inputs and the number of outputs: the
+        penguin network is 9, 8 and 3, and MNIST's was 784, 30 and 10. Neither is
+        optimal, and neither needed to be.
       </p>
+      <Eq
+        tex="\underbrace{8 \times 9}_{\text{hidden } W} + \underbrace{8}_{\text{hidden } b} + \underbrace{3 \times 8}_{\text{output } W} + \underbrace{3}_{\text{output } b} = 72 + 8 + 24 + 3 = 107"
+        gloss="Counting the penguin network's knobs, by the same two products as Module 2's count: one weight per wire into a layer, one bias per neuron in it. The nine inputs are the four measurements plus one row per island and one per sex. The 784-30-10 digit reader you trained came to 23,860 knobs by this counting, and the whole penguin network comes to 107."
+      />
       <p>
         Then prove the machinery works before you worry about accuracy: take
         twenty examples, train on them alone, and check the network can reach
@@ -336,8 +415,9 @@ export function Module10() {
       <SectionHeader id="m10-diagnose" title="When it does not train" />
       <p>
         The failures in this course are the common ones, and they are
-        distinguishable by symptom. This is the list, in the order worth checking
-        it.
+        distinguishable by symptom. The rows below run in the order worth
+        checking, from the failures you can see in the cost to the ones that show
+        up only in the scores.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
@@ -390,14 +470,23 @@ export function Module10() {
       <p>
         Two checks are worth running before any of that, because they are the
         ones that separate a wrong network from wrong code. The first is the
-        gradient check you built in Module 5: it works on any network and any
-        cost, and it is the only way to be sure the slopes you are stepping
-        against are the slopes of the thing you are scoring. The second is the
-        initial cost. Before training, a network with ten classes should be
-        about as confused as guessing, and the cross-entropy charge for guessing
-        is <M tex="\ln 10 \approx 2.30" />; for three classes it is{" "}
-        <M tex="\ln 3 \approx 1.10" />. A first cost far from that number means
-        the labels, the outputs or the cost are not lined up.
+        gradient check Module 5's tests ran against your backprop: nudge every
+        parameter, rescore, and compare with the slopes your equations produced.
+        The course wrote that one, but the recipe is Module 3's
+        nudge-and-measure, so you can write it again for a network of your own.
+        The check works on any network and any cost, and it is the only way to be
+        sure the slopes you are stepping against are the slopes of the thing you
+        are scoring. The second is the
+        initial cost. Before training a network answers about 0.5 at every
+        output, and your cost charges each output neuron on its own, so every
+        neuron bills <M tex="-\ln 0.5 = 0.693" /> whether its right answer is 1
+        or 0. Ten outputs come to 6.93 and three come to 2.08. Print the cost
+        before the first step and check it against that count: a first cost far
+        from it means the labels, the outputs or the cost are not lined up.
+        (Networks with a softmax output layer report{" "}
+        <M tex="\ln 10 = 2.30" /> here instead, because their cost charges the
+        layer once rather than charging ten neurons, which is worth knowing
+        before you compare your number with someone else's.)
       </p>
 
       <SectionHeader id="m10-torch" title="How this is done in practice" />

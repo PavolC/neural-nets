@@ -491,9 +491,9 @@ export function Module4() {
         gradients pay two cost measurements per knob per step: 23,870 passes over
         the batch to walk downhill once. The four equations pay one forward pass,
         which also posts every rate, plus one backward sweep that touches each
-        neuron and each weight about once, roughly the price of a second pass. Two passes against
-        twenty-four thousand: about ten thousand times cheaper, and exact instead
-        of estimated. That is why backpropagation, and not a faster computer, is
+        neuron and each weight about once, roughly the price of a second pass. Two
+        passes against 23,870 of them: about twelve thousand times cheaper, and
+        exact instead of estimated. That is why backpropagation, and not a faster computer, is
         what made neural networks trainable. In Module 5 you implement BP1 through
         BP4 in NumPy, and the nudge method takes on a new job: the course will
         nudge-and-measure every knob of a tiny network the slow way and compare
@@ -506,7 +506,7 @@ export function Module4() {
           "Backprop answers 'which way should each knob move' with one forward pass and one backward sweep of blame, instead of two cost measurements per knob, and its answers are exact.",
           "A nudge's effect on the cost is the product of the local factors along its path (the chain rule); the forward pass posts every factor, and a neuron's blame delta is the downstream stretch priced once per neuron.",
           "The four equations: blame starts at the output as gap times sigma-prime (BP1), flows backward through the transposed wires (BP2), every bias's slope is its neuron's blame (BP3), and every weight's slope is blame times the activation its wire carried (BP4).",
-          "A saturated neuron has sigma-prime near zero and soaks up almost no blame even when badly wrong: quadratic cost's weakness, and the problem the cross-entropy cost in Nielsen chapter 3 exists to solve.",
+          "A saturated neuron has sigma-prime near zero and soaks up almost no blame even when badly wrong: quadratic cost's weakness at the output layer, and the problem Module 7's cross-entropy cost exists to solve.",
         ]}
         chapter="Chapter 2 (how the backpropagation algorithm works)"
         href="http://neuralnetworksanddeeplearning.com/chap2.html"

@@ -2,8 +2,8 @@ import { useState } from "react";
 import { scale, sigmoid } from "./utils";
 
 // Module 6 interactive (a): one bump out of two sigmoid neurons. A large
-// weight turns each neuron into a step, and opposite output weights on the
-// two steps leave a flat-topped bump between them. The readout keeps the
+// weight turns each neuron into a step, and opposite weights on the two
+// outgoing wires leave a flat-topped bump between them. The readout keeps the
 // two neurons' actual weights and biases on screen, because the point of
 // the interactive is that the picture and those numbers are one object.
 
@@ -37,7 +37,7 @@ export function BumpBuilder() {
   const flatTop = switchover <= Math.abs(s2 - s1) / 2;
   const status =
     h === 0
-      ? "Height 0: both output weights are zero, so the total is flat wherever the steps sit."
+      ? "Height 0: both outgoing wires carry weight 0, so the total is flat wherever the steps sit."
       : Math.abs(s2 - s1) < 0.001
         ? "The two steps sit on the same spot, so they cancel exactly: the total is flat zero everywhere."
         : s2 > s1
@@ -91,7 +91,7 @@ export function BumpBuilder() {
         viewBox={`0 0 ${W} ${H}`}
         className="interactive-svg m6-chart"
         role="img"
-        aria-label={`Two sigmoid neurons with steepness ${w}, stepping at ${s1.toFixed(2)} and ${s2.toFixed(2)}, added with output weights plus and minus ${h.toFixed(1)}. ${status}`}
+        aria-label={`Two sigmoid neurons with steepness ${w}, stepping at ${s1.toFixed(2)} and ${s2.toFixed(2)}, their outgoing wires carrying plus and minus ${h.toFixed(1)}. ${status}`}
       >
         {[-10, -5, 0, 5, 10].map((v) => (
           <g key={v}>
@@ -119,7 +119,7 @@ export function BumpBuilder() {
         <g>
           <line x1={64} y1={26} x2={86} y2={26} className="bump-part" />
           <text x={92} y={30} className="chart-tick">
-            each neuron's report, times its output weight (+h above, −h below)
+            each neuron's report, times the weight on its outgoing wire (+h above, −h below)
           </text>
           <line x1={64} y1={44} x2={86} y2={44} className="curve-net" />
           <text x={92} y={48} className="chart-tick">the total: what the network answers</text>
@@ -136,8 +136,8 @@ export function BumpBuilder() {
           switches on at <code>{s2.toFixed(2)}</code>
         </li>
         <li>
-          output weights: <code>+{h.toFixed(1)}</code> on the left neuron,{" "}
-          <code>{(-h).toFixed(1)}</code> on the right
+          the outgoing wires: <code>+{h.toFixed(1)}</code> from the left neuron,{" "}
+          <code>{(-h).toFixed(1)}</code> from the right
         </li>
         <li>
           each switchover is <code>{switchover.toFixed(3)}</code> of the dial wide (six divided by

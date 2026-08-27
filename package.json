@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "bench:speeds": "tsc -p tools/tsconfig.bench.json && echo '{\"type\":\"commonjs\"}' > .bench/package.json && node .bench/tools/bench_layer_speeds.js",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "bench:bumps": "tsc -p tools/tsconfig.bumps.json && echo '{\"type\":\"commonjs\"}' > .bench/package.json && node .bench/tools/bench_bumps.js"
   },
   "dependencies": {
     "@codemirror/commands": "6.11.0",

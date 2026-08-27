@@ -26,13 +26,17 @@ export function Module8() {
         layer.
       </p>
       <p>
-        There is a reason to expect that to buy something. A hidden neuron reads
-        784 pixels and answers with one number, and whatever it is looking for it
-        has to find in one step, straight from raw brightness. Stack two hidden
-        layers and the second one reads the first one's thirty answers instead of
-        pixels, so a stroke can be built out of edges and a digit out of strokes,
-        with no single layer having to go from pixels to digits by itself. That
-        is the intuition. Whether it pays is a measurement.
+        There is a reason to expect that to buy something, and Module 6 priced
+        the alternative. Its box network fenced every training image separately,
+        two neurons per pixel per image, 7.8 million of them, and nothing in that
+        construction was shared between one part of the input and another. A
+        hidden neuron reads 784 pixels and reports one number, and whatever it is
+        looking for it has to find in one step, straight from raw brightness.
+        Stack two hidden layers and the second one reads the first one's thirty
+        reports instead of pixels, so a stroke can be built out of edges and a
+        digit out of strokes, with no single layer having to go from pixels to
+        digits by itself. That is the intuition. Whether it pays is a
+        measurement.
       </p>
       <p>
         So run it. Same 5,000 images, same shuffle, same cross-entropy blame,
@@ -86,8 +90,8 @@ export function Module8() {
         are 1s.
       </p>
       <p>
-        That is not a coincidence, and what the network is doing at that moment is
-        stating. After its first epoch it answers 1 for all thousand images. Every
+        That is not a coincidence: after its first epoch the four-layer network
+        answers 1 for all thousand images, whatever the image shows. Every
         one of its ten outputs, on every one of those images, lands between 0.054
         and 0.179, and on a single image the highest sits within 0.13 of the
         lowest. So whichever output is highest wins every image, and the one that
@@ -109,7 +113,8 @@ export function Module8() {
         five points from epoch to epoch at the end of the run, where the one-layer
         network has stayed between 91.3 and 92.2 since its ninth. Some part of this
         network is learning very slowly, and the rest of it works around that part
-        over the first several epochs. The next section finds out which part.
+        over the first several epochs. Which part, though, and what would you
+        measure to find out?
       </p>
 
       <SectionHeader id="m8-speed" title="Which layer is learning" />
@@ -126,7 +131,9 @@ export function Module8() {
         inside the quadratic cost: square every entry, add them up, take the
         square root. Applied to a layer's bias gradient, call it that layer's
         learning speed. Here is one four-hidden-layer network measured at Module
-        7's start, before it has taken a single step. Layer 1 is the 784 pixels,
+        7's start, before it has taken a single step (every speed here comes from
+        the gradient averaged over 200 of the thousand held-out digits, the same
+        batch the panel below uses). Layer 1 is the 784 pixels,
         which have no biases and nothing to learn, so the count starts at 2.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
@@ -158,7 +165,9 @@ export function Module8() {
         times as far as the first hidden layer. That answers which part is slow,
         and it was settled before the network saw a single correction, because
         these are the drawn weights and nothing else. The panel below is the same
-        measurement with the depth on a slider.
+        measurement with the depth on a slider. Press Draw again a few times: over
+        forty draws at this depth the middle value of that gap is about 650 times,
+        so the 567 in the table is an ordinary draw and not a picked one.
       </p>
       <Figure caption="Every layer's learning speed at the start, for a network with the chosen number of hidden layers of 30 neurons. Draw again redraws all the weights from a new random seed: the exact numbers move, the staircase does not.">
         <LayerSpeedBars />
@@ -242,7 +251,7 @@ export function Module8() {
       </p>
       <Eq
         tex="\underbrace{0.2652}_{\text{layer 5's speed}} \times \underbrace{1.159}_{\text{the ledger}} \times \underbrace{0.217}_{\text{the steepness}} = \underbrace{0.0667}_{\text{layer 4's speed}}"
-        gloss="Layer 4's measured speed is 0.06668, so the two factors account for it to four figures. The same check works on the other three rows, and it is the only arithmetic the backward sweep does to the size of a blame column."
+        gloss="Layer 4's measured speed is 0.06668, so the two factors account for it to four figures. Check the other three rows the same way, and every product lands on the speed in that row's own last column. This multiplying is the only arithmetic the backward sweep does to the size of a blame column."
       />
       <p>
         The two middle columns hold two different kinds of number, and each kind
@@ -253,14 +262,20 @@ export function Module8() {
         Module 7 bought. Dividing every weight by the square root of its layer's
         input count was chosen to keep a neuron's evidence near zero, and it has
         a second consequence: a ledger drawn that way sends a column back at
-        about its own length. Averaged over 200 draws of a 30-by-30 ledger the
+        about its own length. Module 7's square-root rule is doing its work a
+        second time here. Every entry of the returned column adds up 30 terms, one
+        per neuron in the layer above, each one a weight of size about 1 divided by
+        the square root of 30, times a blame entry of the size that arrived. Thirty
+        random pushes that small pile up to the square root of 30 times one of
+        them, and the two square roots cancel, so the entries come back the size
+        they went in. Averaged over 200 draws of a 30-by-30 ledger the
         length comes back at 0.99 of what went in, with the middle 90 percent of
         those draws between 0.80 and 1.19. The four values above, 0.878 to 1.159,
         are ordinary members of that spread.
       </p>
       <p>
         The steepness column is about 0.21, every time, and it can never be more
-        than 0.25. Module 7 measured the steepness of a sigmoid as{" "}
+        than 0.25. Module 4 gave the steepness of a sigmoid as{" "}
         <M tex="a(1-a)" />, which is largest when the answer <M tex="a" /> is 0.5
         and equals 0.25 there, and shrinks toward zero at both ends. So the second
         factor is a fraction with a ceiling, and the divided start puts most
@@ -381,16 +396,19 @@ export function Module8() {
       <p>
         Swap the hidden layers of the same four-hidden-layer network to ReLU and
         the hops become 0.634, 0.571, 0.900 and 0.771, and the output ends up 4.0
-        times ahead of the first hidden layer instead of 567. Not 1.0 per hop,
-        because about half the neurons are silent on any given image and their
-        share of the blame is deleted, which shortens the column. It shortens it
-        far less than multiplying every entry by 0.21 does.
+        times ahead of the first hidden layer instead of 567. The hops land under
+        1 rather than on it because a hidden neuron is live only about half the
+        time, and a silent one's share of the blame is deleted, which shortens the
+        column. Deleting half a column's entries shortens it far less than
+        multiplying every entry by 0.21 does.
       </p>
       <p>
-        The panel below is the same measurement with the squash and the size of
-        the starting weights opened up, and with BP2's two factors shown per hop.
-        The weight multiplier is the subject of the next section; for now it stays
-        at 1, which is Module 7's draw exactly.
+        Leave the weight multiplier on the panel below at 1, which is Module 7's
+        divided draw exactly, and switch between the two squashes. A ReLU neuron's
+        steepness is 1 when it is live and 0 when it is not, so averaging it across
+        a layer's neurons and images gives a share. The last column of the table
+        under the chart reports exactly that average, so with ReLU chosen it reads
+        as how often those neurons are live.
       </p>
       <Figure caption="Every layer's learning speed at the start, now with the hidden layers' squash and the size of the drawn weights as controls. The table under the chart is BP2's two steps measured separately for each hop: the two columns multiply to the hop, and the hop is the bar divided by the bar it came from.">
         <LayerSpeedBars full />
@@ -476,9 +494,14 @@ export function Module8() {
         The panel below trains both depths with your own code: your init_network
         builds them, your sgd walks them, and with the sigmoid chosen it is your
         backprop computing every gradient. ReLU cannot be, because your BP2 has{" "}
-        <code>sigmoid_prime</code> written into it; with ReLU chosen the gradient
-        is the course's, with that one line replaced, and the sgd around it is
-        still yours.
+        <code>sigmoid_prime</code> written into it. With ReLU chosen the gradient
+        is the course's copy of your backprop with two lines swapped. Its forward
+        pass squashes each hidden layer with <code>np.maximum(0.0, z)</code>{" "}
+        instead of <code>sigmoid(z)</code>, and its BP2 line multiplies by{" "}
+        <code>(zs[-l] &gt; 0)</code> instead of{" "}
+        <code>sigmoid_prime(zs[-l])</code>, since that comparison is already the
+        1-or-0 steepness row of the table above. The sgd around it is still
+        yours.
       </p>
       <Figure caption="One hidden layer against four, trained identically, fifteen epochs each. The table above the chart is every layer's learning speed measured from your own gradient before either run starts. Each run takes a few seconds per epoch, and Stop ends it.">
         <DepthTrainPanel />
@@ -486,10 +509,10 @@ export function Module8() {
 
       <SectionHeader id="m8-unstable" title="The hop is a product" />
       <p>
-        Nothing so far says that gradients have to shrink going back. The hop is a
+        Does a hop have to be smaller than 1? BP2 does not say so: the hop is a
         product of two measured numbers, and the weight multiplier on the
-        layer-speed panel in the last section changes one of them. Turn it up with
-        the sigmoid selected:
+        layer-speed panel above changes one of them. Turn it up with the sigmoid
+        selected:
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
@@ -541,6 +564,14 @@ export function Module8() {
           </tbody>
         </table>
       </div>
+      <p>
+        The last row is not the row above it raised to the fourth power, the way
+        one fifth per hop was. Four hops of 0.908 would put the output only 1.5
+        times ahead of layer 2, not the 4.2 the table reports. Bigger weights move
+        the four hops by different amounts, so they stop being near enough equal to
+        raise to a power, and this table lists only the hop into layer 2 (the
+        panel's own table prints all four).
+      </p>
       <p>
         The ledger factor rises roughly in step with the multiplier, which is
         what a multiplier does. The steepness factor falls as it rises, because
@@ -683,9 +714,9 @@ export function Module8() {
 
       <SectionHeader id="m8-embed" title="Where the network thinks" />
       <p>
-        One thread runs through every network in this course, and it is worth
-        pulling out by itself, because it is the thread that connects a 2015 digit
-        reader to the models people use now.
+        Every network in this course turns the numbers it is handed into numbers
+        of its own choosing, and that habit connects a 2015 digit reader to the
+        models people use now.
       </p>
       <p>
         Start with where data arrives. Module 1's concert had two inputs, weather
@@ -696,15 +727,17 @@ export function Module8() {
         happened to be measured as.
       </p>
       <p>
-        In that space the contrarian's problem is unsolvable by one neuron, because
-        one neuron cuts with one straight line and no straight line separates those
-        four dots. Module 1 fixed it with two hidden neurons, and the fix is worth
-        looking at again in terms of spaces rather than lines. Each hidden neuron
-        reports a number, so the pair of them reports two numbers, so every input
-        lands somewhere on a second plane with axes <M tex="h_1" /> and{" "}
+        In that space one rule defeats a single neuron: go when exactly one of the
+        two things is good, which puts the two go dots on opposite corners of the
+        square. One neuron cuts with one straight line, and no straight line puts
+        those two dots on one side and the two stay dots on the other. Module 1
+        fixed it with two hidden neurons, and the fix is worth looking at again in
+        terms of spaces rather than lines. Each hidden neuron reports a number, so
+        the pair of them reports two numbers, so every input lands somewhere on a
+        second plane with axes <M tex="h_1" /> and{" "}
         <M tex="h_2" />.
       </p>
-      <Figure caption="The contrarian's four situations, on the left as they arrive and on the right as the hidden layer reports them, using Module 1's solution (h1 asks whether at least one input is on, h2 whether both are). Green means go, gold means stay. On the left no straight line separates the colours. On the right the two green points have landed on top of each other at (0.95, 0.05), and the dashed line is the cut the output neuron makes.">
+      <Figure caption="Module 1's four concert situations, on the left as they arrive and on the right as the hidden layer reports them, using Module 1's solution (h1 asks whether at least one input is on, h2 whether both are). Green means go, gold means stay. On the left no straight line separates the colours. On the right the two green points have landed on top of each other at (0.95, 0.05), and the dashed line is the cut the output neuron makes.">
         <HiddenSpaceFigure />
       </Figure>
       <p>
@@ -758,10 +791,10 @@ export function Module8() {
         closing list is where to go for it.
       </p>
       <p>
-        The sentence to keep is the one that both halves of this section share.
-        Input space is where the data arrives, and it is chosen by whoever
-        collected it. Embedding space is where the network chooses to think, and it
-        learns that choice by the descent you wrote in Module 3.
+        Input space is where the data arrives, and whoever collected it chose it.
+        Embedding space is where the network chooses to think, and it learns that
+        choice by the descent you wrote in Module 3. Module 1's two hidden neurons
+        and a word's column in an embedding table are the same move at two sizes.
       </p>
       <p>
         One thing is still missing before any of that is usable, and it is not

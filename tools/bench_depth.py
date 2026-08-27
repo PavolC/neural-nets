@@ -229,7 +229,8 @@ def bench_depth(b):
 def bench_first_epoch(b):
     section(
         "2. What the 4-layer network answers after one epoch",
-        "answers 1 for all 1,000 images; its ten outputs sit between 0.055 and 0.172; "
+        "answers 1 for all 1,000 images; its ten outputs sit between 0.054 and 0.179, "
+        "and no single image's highest output is more than 0.13 above its lowest; "
         "12.6% is exactly the share of the held-out digits that are 1s",
     )
     r = b.run(4, epochs=1)

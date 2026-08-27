@@ -29,9 +29,13 @@ export function Module7() {
         Module 5 finished a working digit reader: your feedforward, your sgd,
         your backprop, 89 percent of a thousand held-out digits read
         correctly. Nielsen's Chapter 1 trains this same 784-30-10 shape on the
-        full 50,000 images and reports about 95 percent. Some of that gap is
-        the bundled slice being ten times smaller. The rest is the setup, and
-        this module makes three specific complaints about it.
+        full 50,000 images and reports about 95 percent. Module 6 crossed one
+        explanation for that gap off the list: a hidden layer, made wide
+        enough, can express the pixels-to-digit rule, so the shape of the
+        network is not what caps the score. Some of the gap is the bundled
+        slice being ten times smaller, which is fixed here so the run fits in
+        a browser tab. The rest is the setup, and this module makes three
+        specific complaints about it.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
@@ -86,9 +90,12 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         answer 0, and at the moment it answers 0.982.
       </p>
       <p>
-        Train it by descent, the same rule as everywhere else: measure both
-        knobs' slopes, step against them, repeat. Here is the log, one line
-        per checkpoint.
+        Set both knobs to 2, so with the input pinned at 1 the evidence is 4
+        and the answer is <M tex="\sigma(4) = 0.982" />. Now train by descent,
+        the same rule as everywhere else: measure both knobs' slopes, step
+        against them at <M tex="\eta = 0.15" /> (eta, Module 3's step size),
+        repeat. Here is the log, one line per checkpoint, and the figure below
+        walks the same run at those settings.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
@@ -127,10 +134,12 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       </p>
       <p>
         Start it closer to the answer instead, at 0.818 rather than 0.982, and
-        it reaches 0.1 in 273 steps. Being more wrong at the start made the
-        first stretch slower. That is the complaint, and the interactive is
-        where to check it: drag the weight and the bias, watch the number of
-        steps in the last column.
+        it reaches 0.1 in 273 steps: being more wrong at the start made the
+        first stretch slower. That is the complaint, and the figure is where to
+        check it. Its two chips are exactly these two starts (a gentle start
+        sets w = 0.6 and b = 0.9, a saturated start w = 2.0 and b = 2.0). The
+        last column of its table counts the steps to 0.1 for whatever weight
+        and bias you drag to.
       </p>
       <Figure caption="One neuron learning to answer 0, with the input pinned at 1. The two lines are the same descent under two different costs; the second one is defined later in this module, so for now the quadratic line is the one to follow. Press Play to walk the run, and drag w and b to start it somewhere else: the further the starting answer is from 0, the longer the flat stretch at the beginning.">
         <SlowNeuron />
@@ -173,15 +182,28 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         falls away on both sides. Past that peak the steepness shrinks faster
         than the gap grows, so the worse the answer, the smaller the blame,
         and the smaller every slope the backward sweep produces from it. At an
-        answer of 0.999 the blame is 0.001: as wrong as a sigmoid can be, and
-        learning at a thousandth of the rate.
+        answer of 0.999 the blame is 0.001: as wrong as a sigmoid can be, with
+        a blame 148 times smaller than the 0.148 the table peaks at.
       </p>
       <Figure caption="The blame the output layer receives, against how wrong its answer is (right answer 0, so the answer is also the gap). The dots mark three rows of the table. Everything right of the peak is the complaint: more wrong, less blame, slower learning.">
         <BlameCurves />
       </Figure>
       <p>
-        Module 4's quiz already met this in the digit reader: drag the output
-        bias to −8 and the network answers 0.0003 when the right answer is 1,
+        The same two factors predict the log at the top of this section. The
+        neuron starts at 0.98201, so the gap is 0.98201 and the steepness is
+        the gap times 0.01799, or 0.01766 (not the 0.0196 in the table's
+        rounded 0.980 row: the fourth decimal of the answer moves the
+        steepness by a tenth). Both knobs then take the same step, because the
+        input pinned at 1 makes the evidence just <M tex="w + b" />, and the
+        figure's step size is 0.15.
+      </p>
+      <Eq
+        tex="\underbrace{0.98201}_{\text{the gap}} \times \underbrace{0.01766}_{\text{the steepness}} = \underbrace{0.0173}_{\text{the blame}} \qquad 0.15 \times 0.0173 = \underbrace{0.0026}_{\text{per knob}} \qquad \underbrace{0.0052}_{\text{the drop in } z} \times 0.01766 = 0.00009"
+        gloss="Left to right: the blame, the step each knob takes against it, and how far the answer moves once the evidence has fallen by both steps together. The log's first step takes the answer from 0.9820 to 0.9819, a drop of 0.00009, and 500 steps at that rate would leave the answer above 0.93. The walk finishes in 469 because the blame grows as the answer falls back toward two thirds, not because that first rate holds."
+      />
+      <p>
+        Module 4's quiz already met this on its little 2-3-1 network: drag the
+        output bias to −8 and the network answers 0.0036 when the right answer is 1,
         while its blame collapses to almost nothing. The same neuron, at the
         same time, is as wrong as it can be and as slow to learn as it can be.
       </p>
@@ -231,12 +253,15 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         answers hands descent hardly any reason to prefer one over the other.
       </p>
       <p>
-        So say what a replacement has to do, in slopes. Module 4 found that
-        every factor along a nudge's path is a slope, and BP1's two factors are
-        both slopes:
-        how much the cost changes per unit of answer, and how much the answer
-        changes per unit of evidence, which is the steepness. Their product
-        should be the gap. At an answer of 0.98 the steepness is 0.0196 and the
+        So name the target. The output layer should get a blame equal to the
+        gap on its own, <M tex="a - y" />, so that a worse answer always brings
+        a bigger correction (the last section's blame table lists answers whose
+        corrections shrink instead, once they pass two thirds wrong). Module 4
+        found that every factor along a nudge's path is a slope, and BP1's two
+        factors are both slopes: how much the cost changes per unit of answer,
+        and how much the answer changes per unit of evidence, which is the
+        steepness. Their product is the blame, so their product has to come out
+        as the gap. At an answer of 0.98 the steepness is 0.0196 and the
         gap is 0.98, so the cost's slope there has to be 50, because 50 times
         0.0196 is 0.98. In general it has to be{" "}
         <M tex="(a - y) / (a(1-a))" />: the gap divided by the steepness, so
@@ -330,8 +355,9 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         answers a real question, namely how much a hidden neuron's evidence
         moves its own activation. No choice of cost changes that. So
         this fix covers the output layer only, and a flat hidden neuron still
-        swallows the blame passing through it. That is the next section's
-        subject.
+        swallows the blame passing through it. Thirty flat hidden neurons are
+        the second complaint, and they can be measured before training takes a
+        single step.
       </p>
       <Aside>
         <p>
@@ -350,11 +376,13 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       </Aside>
       <p>
         One consequence before the code: the step size has to change with the
-        cost. The quadratic blame never exceeds 0.148, and the cross-entropy
-        blame reaches 1, roughly seven times larger. Module 5 trained at{" "}
+        cost. The quadratic blame never exceeds 0.148 and the cross-entropy
+        blame reaches 1, so at their largest the new blames are about seven
+        times the old ones (1 divided by 0.148 is 6.8). Module 5 trained at{" "}
         <M tex="\eta = 3.0" />, found by trying; the runs below use{" "}
-        <M tex="\eta = 0.5" />, found the same way, and the ratio of about six
-        is the ratio of the blames. This is not a cost of the fix, just a
+        <M tex="\eta = 0.5" />, found the same way. Trying landed on a factor
+        of six between the two step sizes, close to the factor of seven between
+        the two blames. This is not a cost of the fix, just a
         reminder that eta and the cost are not independent choices.
       </p>
 
@@ -371,18 +399,20 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         <CostSwapPanel />
       </Figure>
       <p>
-        Read it in two parts. At a shared step size of 0.5 the two costs are
-        far apart: the quadratic run reaches 62.6 percent and the
-        cross-entropy run 86.5 percent, and the first epoch alone is 32.4
-        against 71.7. Then the third line closes most of that gap by cranking
-        eta to 3.0, reaching 86.6 percent. So on this network the cross-entropy
-        cost does not make a smarter network. It makes one that learns at a
-        step size where the other crawls, and that starts learning in its
-        first epoch rather than climbing out of the slowdown first.
+        Try the obvious shortcut first: if the trouble is that the blames are
+        small, why not take bigger steps? The third run prices it. At a shared
+        step size of 0.5 the two costs are far apart: the quadratic run reaches
+        62.6 percent against the cross-entropy run's 86.5, and the first epoch
+        alone is 32.4 against 71.7. Cranking eta to 3.0 brings the quadratic
+        run level at 86.6 percent, so on this network the cross-entropy cost
+        does not make a smarter network. It makes one that learns at a step
+        size where the other crawls, and that starts learning in its first
+        epoch rather than climbing out of the slowdown first.
       </p>
       <p>
-        Which leaves the accuracy roughly where Module 5 left it. The next
-        complaint is the one that moves it.
+        That leaves the accuracy roughly where Module 5 left it, and it leaves
+        the step size found the way Module 5 found it, by trying whole runs.
+        The flat hidden layer is the complaint that moves the accuracy.
       </p>
 
       <SectionHeader id="m7-birth" title="Saturated at birth" />
@@ -410,8 +440,8 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
               <td>8.8%</td>
               <td>8.6%</td>
               <td>16.4%</td>
-              <td>27.9%</td>
-              <td>38.4%</td>
+              <td>27.8%</td>
+              <td>38.5%</td>
             </tr>
           </tbody>
         </table>
@@ -425,11 +455,14 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         accident of how the weights were drawn.
       </p>
       <p>
-        Why the draw does that is a counting argument. A hidden neuron's
-        evidence is a sum of 784 terms, one per pixel, each a weight times a
-        pixel value, plus the bias. Most pixels of a digit are black, and on
-        average 103 of the 784 are above half brightness. So about a hundred
-        weights contribute, each drawn from a bell of spread 1.
+        Why does the draw land the evidence out there, before anything has
+        been learned? Count the terms. A hidden neuron's evidence is a sum of
+        784 of them, one per pixel, each a weight times a pixel value, plus the
+        bias. Most pixels of a digit are black, and on average 103 of the 784
+        are above half brightness (measured over the bundled images, and the
+        number the exercise below builds its stand-in digits from). So about a
+        hundred weights contribute, each drawn from a bell of spread 1, meaning
+        a typical draw sits about 1 away from the bell's middle.
       </p>
       <p>
         A hundred random pushes of size about 1 do not cancel out to nothing,
@@ -437,11 +470,15 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         square root of the count: <M tex="\sqrt{100} = 10" />. That
         square-root rule for adding up independent random quantities is the
         one fact here taken on trust rather than derived, and it can at least
-        be checked. The exact version of the rule says the spread of the
-        weighted sum is the square root of the total of the squared pixel
-        values, which for these images averages 87.4, giving{" "}
-        <M tex="\sqrt{87.4} = 9.35" />. The measured spread of{" "}
-        <M tex="z" /> is 9.28.
+        be checked. A spread runs a little larger than the plain average
+        distance quoted above (7.43 for these readings), because it squares the
+        far draws before averaging them. The exact version of the rule says the
+        spread of a weighted sum is the square root of the pixel values squared
+        and added up. For one bundled image those squares add to 87.4 on
+        average (fewer than the 103 lit pixels, because a digit's grey edge
+        pixels sit below 1), so the rule predicts{" "}
+        <M tex="\sqrt{87.4} = 9.35" /> against a measured spread of{" "}
+        <M tex="z" /> of 9.28.
       </p>
       <p>
         Nine is a long way out on a sigmoid. So the fix is to divide the pile
@@ -491,12 +528,13 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         module started, and this change is where they came from.
       </p>
       <p>
-        One footnote on the two fixes together. Each of these costs can
-        be given a step size that suits it, and when both are tuned they land
-        within about half a point of each other; the closing section shows that
-        grid. What the cross-entropy cost reliably removes is the slowdown
-        itself, which is why it needs no cranked step size, and what the
-        division reliably removes is a flat start. They are not competing.
+        One footnote on the two fixes together. Each cost can be given a step
+        size that suits it, and at their best columns in the grid at the end of
+        this module the two land close: 89.9 percent for the quadratic cost
+        against 89.3 for cross-entropy, both from Module 5's start. The
+        cross-entropy cost reliably removes the slowdown, which is why it needs
+        no cranked step size, and the division reliably removes a flat start.
+        They are not competing.
       </p>
 
       <SectionHeader id="m7-overfit" title="Learning the training set" />
@@ -552,9 +590,13 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       </p>
       <p>
         Two things follow. The first is a habit rather than a technique: hold
-        data out, and score on it. The 1,000 held-out digits in this course
-        have never been trained on, in any module. Without them, the training
-        cost falling to 0.0093 would look like success.
+        data out, score on it, and read more than one number off it. The 1,000
+        held-out digits in this course have never been trained on, in any
+        module. Without them, the training cost falling to 0.0093 would look
+        like success. Without the second number, the flat held-out accuracy
+        here would hide the held-out cost rising beside it, the way Module 5's
+        89 percent hid a 1 coming back at 122 of 126 and an 8 at only 68 of
+        89.
       </p>
       <p>
         The second is that the cure closest to hand is more data. This same
@@ -593,15 +635,21 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       />
       <p>
         Descent needs the new term's slope for one weight, which means the
-        slope of <M tex="w^2" />. Nudge it by hand: move <M tex="w" /> by a
-        small amount <M tex="h" /> and{" "}
-        <M tex="(w + h)^2 - w^2 = 2wh + h^2" />, so per unit of nudge the rise
-        is <M tex="2w + h" />, which for a small nudge is <M tex="2w" />. Two
-        things follow. The new term contributes{" "}
+        slope of <M tex="w^2" />. Nudge it by hand, the Module 3 way: move{" "}
+        <M tex="w" /> by a small amount <M tex="h" /> and read what the square
+        does.
+      </p>
+      <Eq
+        tex="(w + h)^2 - w^2 = \underbrace{2wh}_{\text{proportional to } h} + \underbrace{h^2}_{\text{negligible for small } h} \qquad\Rightarrow\qquad \text{per unit of nudge, } 2w + h \approx 2w"
+        gloss="Multiply the square out, subtract the old value, and divide by the nudge: the rise per unit of nudge is 2w + h, which for a small nudge is 2w. Check it at w = 3 and h = 0.01, where the two squares are 9 and 9.0601: a rise of 0.0601 for a nudge of 0.01 is 6.01 per unit, against the 6 the rule predicts."
+      />
+      <p>
+        Two things follow. The new term contributes{" "}
         <M tex="\lambda w / n" /> to that weight's slope, the 2 cancelling the
         half. And Module 3's bookkeeping half in{" "}
-        <M tex="\tfrac12 (a - y)^2" /> was this same cancellation, promised
-        there and settled here: halving a squared quantity makes its slope the
+        <M tex="\tfrac12 (a - y)^2" /> is this same cancellation, the one
+        Module 4 cashed in when the output layer's slope came out as the plain
+        gap with no stray 2: halving a squared quantity makes its slope the
         quantity itself. Put the new slope into the update rule and collect the
         two terms in <M tex="w" />:
       </p>
@@ -615,10 +663,11 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         <M tex="1 - 0.5/1000 = 0.9995" />. One epoch is 100 mini-batches, so
         100 steps, and left entirely alone a weight would shrink to{" "}
         <M tex="0.9995^{100} = 0.951" /> of itself per epoch, about five
-        percent. Nothing is left alone, of course: the gradient is pulling the
-        other way the whole time. What the factor sets is how hard a weight has
-        to be pulled to stay where it is, and a weight that only helps with a
-        handful of training images is not pulled hard enough.
+        percent. No weight is left alone, of course, since the gradient is
+        pulling the other way the whole time. So every weight faces a standing
+        test each epoch: shrink by five percent unless the training images keep
+        pulling it back, and a weight that only earns its keep on a handful of
+        the thousand is not pulled back hard enough.
       </p>
 
       <ExercisePage exercise={l2Exercise} />
@@ -636,9 +685,13 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         Two readings, and they disagree. From your divided start, weight decay
         at <M tex="\lambda = 1" /> leaves the held-out accuracy where it was,
         85.7 percent averaged over the last twenty epochs against 86.4 without
-        it. That gap is smaller than the run-to-run wobble: three different
-        shuffles of the unregularized run alone land between 85.2 and 86.2
-        percent. What decay does change is the two numbers it aims at. The
+        it. (Both are averages over the last twenty epochs of the chart, not
+        the epoch-80 numbers the table under it prints, 84.7 with decay and
+        86.3 without: one epoch of an eighty-epoch run wobbles by more than
+        these two runs differ.) That gap is smaller than the run-to-run wobble
+        in any case: the shuffle the panel holds fixed averages 86.4 over those
+        last twenty epochs, and two other shuffles of the same unregularized
+        run give 86.0 and 85.4. What decay does change is the two numbers it aims at. The
         held-out cost ends at 0.86 instead of 1.09, and the total of the
         squared weights at 655 instead of 1,926, so the network stopped growing
         and stopped becoming more confident while reading the same digits.
@@ -726,8 +779,8 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         it showing up as a lower ceiling on how big a step is useful. And the
         best of each row runs 89.9, 89.3, 91.3, 92.3, so the two changes
         together are worth about two and a half points at their own best
-        settings, while a single row spans nineteen points or more from its
-        worst column to its best. Getting the step size wrong costs more than
+        settings, while two of the four rows span nineteen points or more from
+        their worst column to their best. Getting the step size wrong costs more than
         either fix earns.
       </p>
       <p>
@@ -758,9 +811,9 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       </p>
       <p>
         This course has one held-out thousand and uses it for both jobs, so its
-        quoted numbers are a little generous, and the overfitting section
-        measured how generous. Three shuffles of one unchanged setting landed
-        between 85.2 and 86.2 percent there: a point of wobble with nothing
+        quoted numbers are a little generous, and the last section measured
+        how generous. Three shuffles of one unchanged setting landed between
+        85.4 and 86.4 percent there: a point of wobble with nothing
         changed at all. Picking the best of sixteen runs pockets some of that
         wobble as if it were an improvement, which is why a repeated tenth of a
         point is not worth chasing and why the number to trust is one scored on
@@ -777,11 +830,11 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         chart above and keeping the network from epoch 10 rather than epoch 80.
       </p>
       <p>
-        What has not changed in this module is the machinery. The cost is a
+        The machinery underneath all three fixes has not changed. The cost is a
         different formula, the starting weights are divided by a square root,
-        and the update has one extra factor. The forward pass, the four
-        equations, the backward sweep, the mini-batch shuffle and the descent
-        are exactly the code you wrote in Modules 2, 3 and 5. Module 8 asks
+        and the update carries one extra factor. Your forward pass, your
+        backward sweep with its four equations, your mini-batch shuffle and
+        your descent are exactly the code you wrote in Modules 2, 3 and 5. Module 8 asks
         what happens to those four equations when the network gets deep, and
         the answer is already visible in BP2.
       </p>

@@ -222,9 +222,28 @@ this floor after direct feedback; every later module must be written to it too.
   the weight on the wire and not the neuron?"; any prose that files weights
   with neurons (counts, matrix rows) must reconcile against this anatomy in
   place.
+- **A hand-built network gets its wiring drawn, and its parts named the way
+  Modules 1 to 5 name them.** Module 6 built its bump out of "two steps" and
+  gave "the output neuron the weights +6 and -6", with no wiring diagram in
+  the section; the primary learner read it and asked "is this a single neuron
+  per layer? what are we talking about here?". Two bugs behind one question.
+  The prose never said that the two steps are two neurons side by side in one
+  hidden layer, so the shape had to be inferred from a plot of curves: a
+  module that places numbers by hand shows the network those numbers live in,
+  in Module 1's tiny-net idiom (gray input circles, green-bordered neurons,
+  one weight per arrow, a two-line caption under each column, biases beside
+  the neuron that holds them). And "output weight" was a coined term the
+  course never establishes, filing weights with a neuron; the established
+  phrasing is the wire's ("the wire out of h1 carries +6"). Before coining a
+  noun, check what the earlier modules already call the thing, and check the
+  reverse too: Module 6 had "band" meaning a step's switchover in one section
+  and a strip of the concert plane in another.
 - **Mind vocabulary collisions.** "Line" means the decision boundary in this
   course; never reuse it for an equation or a row of code. Prefer short
-  sentences over connective-heavy ones; wordiness reads as weirdness.
+  sentences over connective-heavy ones; wordiness reads as weirdness. A word
+  must also not appear before the section that defines it: Module 6's bump
+  payoff said "outside its own slice" one section ahead of "Slice the dial into
+  equal pieces", so it leaned on a word the reader did not have yet.
 - **Interactives carry the algorithm; equations recap it.** Module 4's first
   draft put nine equations and 1,200 words before its centerpiece stepper, and
   the learner reported it "over my head". The fix that worked: teach the one
@@ -283,6 +302,25 @@ this floor after direct feedback; every later module must be written to it too.
   exercise) gets named as a deliberate shrink in the opener, with the reason,
   plus the sentence that the small case is a sub-case and not a detour: hold
   783 pixels still, turn one, and the outputs trace curves.
+- **Three sentence shapes to keep out of module prose, all found by the
+  primary learner in Module 6 ("dense, backwards, vague, clippy").** First,
+  clefts and abstract-first openers: "What no part of the argument provides
+  is...", "Nothing in that argument stops anywhere", "The claim is about
+  relationships". They front a placeholder and delay the content, which reads
+  as backwards. Give every sentence a concrete subject and a verb, in that
+  order. Second, short pronoun aphorisms, especially as paragraph openers:
+  Module 6's limits section had four consecutive paragraphs beginning "It
+  covers...", "It promises...", "It says can, not will", with the antecedent
+  five paragraphs away. Name the subject each time, even at the cost of a
+  longer sentence. Third, meta-narration of the exposition ("this section
+  makes X, the next turns it into Y", "now the question this page opened
+  with", "shrink it to one input"): describe the thing, not the plan for
+  describing it. The measurable signature, comparing against Modules 1 to 5:
+  cleft openers at or under 5 percent of sentences, pronoun aphorisms at or
+  under 5 percent, median sentence length 19 to 23 words. Cutting words is
+  not the fix when prose reads badly; Module 6 got clippy precisely because
+  two rounds of cutting turned full sentences into telegraphese. Rejoin
+  clauses instead.
 - **State what a section buys before proving it.** Module 4's factor
   paragraphs read to the learner as "simple math, overexplained" until the
   stakes came first: every factor is computable from the first run alone, so
@@ -409,3 +447,8 @@ own storytelling. Concretely:
 - `npm run bench:speeds`: the same for the layer-speed and hop tables, by
   importing `deepNet.ts` (the panel's own arithmetic) into Node. No new
   dependency: it compiles through `tools/tsconfig.bench.json` into `.bench/`.
+- `npm run bench:bumps`: every number Module 6 quotes (the bars-to-area table,
+  the sharpness experiment, the bump's biases and peak), by importing
+  `bumpMath.ts`, which is the arithmetic CurveSculptor and BumpBuilder both
+  run. Module 6's figures come from a browser panel rather than Pyodide, so
+  this is the bench that keeps them honest.

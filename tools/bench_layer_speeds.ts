@@ -119,7 +119,7 @@ function benchHops(batch: Batch) {
 function benchLedgerSpread() {
 	section(
 		"4. A divided 30-by-30 ledger sends a column back at about its own length",
-		"averaged over 200 draws the length comes back at 0.98 of what went in, individual draws between 0.71 and 1.30",
+		"averaged over 200 draws the length comes back at 0.99 of what went in, with the middle 90 percent of those draws between 0.80 and 1.19",
 	);
 	// The same draw the panel uses (a standard normal divided by sqrt of the
 	// input count), applied to one random unit column, measuring |W^T d| / |d|.

@@ -269,8 +269,10 @@ export function Module5() {
         30 hidden neurons, 10 digit outputs, and the 23,860 knobs counted with
         its gradient above. That is almost exactly double Module 2's 11,935,
         because doubling the hidden layer doubles everything except the ten
-        output biases. At the nudge method's price of two rescores per knob,
-        one step of descent here would cost 47,720 passes over the mini-batch.
+        output biases. At the nudge method's price of two rescores per knob, one step
+        of descent here would cost 47,720 passes over the mini-batch. (Module 4's
+        bill, 23,870, was this same arithmetic one network smaller: 11,935 knobs
+        times two rescores, and passes rather than knobs.)
         Your backward sweep replaces all of them.
       </p>
       <p>

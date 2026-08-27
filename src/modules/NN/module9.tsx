@@ -17,13 +17,14 @@ export function Module9() {
       />
       <ModuleToc />
 
-      <SectionHeader id="m9-loop" title="The part that was never yours" />
+      <SectionHeader id="m9-loop" title="The loop that was never yours" />
       <p>
-        Count what you have written. A squash and one neuron (Module 1). A whole
-        network's forward pass (Module 2). A descent step and the loop around it
-        (Module 3). The four equations (Module 5). A cost, a starting draw and an
-        update rule (Module 7). Every training run in this course has been made of
-        those functions.
+        Count what you have written: a squash and one neuron (Module 1), a whole
+        network's forward pass as one matrix multiplication per layer (Module 2),
+        and a descent step and the loop around it (Module 3). Then the four
+        equations that turn one forward pass into every knob's slope (Module 5), and
+        a cost, a starting draw and an update rule (Module 7). Every training run in
+        this course has been made of those functions.
       </p>
       <p>
         And every one of those runs was started by a panel. The panel loaded the
@@ -35,11 +36,13 @@ export function Module9() {
       <p>
         Module 3 is the exception that shows the shape of the gap. You wrote a loop
         there, <code>sgd</code>, and it is the right loop: shuffle, cut, step,
-        repeat. But it was written around the course's nudge-measured gradient, and
-        nothing since has re-walked it. Module 5 handed your backprop to an adapter
-        the course wrote. Module 7 swapped one function at a time inside panels the
-        course wrote. Your loop has never once run on your own gradient with your
-        own update.
+        repeat. It has been running on your own gradient since Module 5, where the
+        panel swapped its nudge-measured slopes for an adapter around your backprop,
+        and Module 7's first two panels ran it as well. But every one of those
+        panels called it with epochs set to 1, once per epoch, so the walk through
+        the epochs stayed the panel's. And your <code>sgd</code> has never drawn the
+        network it trains, never scored one, and never taken a decayed step: Module
+        7's decay panel called your <code>l2_step</code> from a loop of its own.
       </p>
       <p>
         So write it. The exercise below is two functions, and the second one is the
@@ -51,44 +54,75 @@ export function Module9() {
         <code>accuracy</code> takes a network and a batch of images and reports the
         share it reads correctly. Module 2 said how: ten output neurons, each
         answering its own yes-or-no question, and the network's verdict is whichever
-        one is most confident. That is one line of NumPy,{" "}
-        <M tex="\text{argmax}" /> down each column, and you have never written it,
-        because every accuracy figure in eight modules was computed for you.
+        one is most confident. In NumPy that is a single call,{" "}
+        <code>np.argmax(out, axis=0)</code>, which hands back the row number of the
+        largest value in each column (argmax is read "arg max", the argument at
+        which a maximum occurs, so what comes back is the row rather than the
+        confidence sitting in it). You have never written it, because every accuracy
+        figure in eight modules was computed for you.
       </p>
 
       <ExercisePage exercise={trainExercise} />
 
       <SectionHeader id="m9-run" title="Your program, on the digits" />
       <p>
-        The panel below runs it on the real thing: 5,000 training images, the
-        held-out thousand, 784-30-10, fifteen epochs, mini-batches of ten. Before
-        your loop starts, the course puts your Module 7 functions back where it
-        found them, so <code>init_network</code>, <code>l2_step</code> and{" "}
-        <code>cross_entropy_delta</code> inside your <code>train</code> are the ones
-        you wrote rather than the course's copies.
+        The panel below runs it on the real thing: 5,000 training images and the
+        held-out thousand, at the settings printed under its own button. Run it at
+        0.5 first, the middle of the three step sizes, and let all fifteen epochs
+        finish. The number worth reading is where the chart settles, not the best
+        single epoch. Your <code>train</code> imports <code>init_network</code>,{" "}
+        <code>l2_step</code> and <code>cross_entropy_delta</code> from{" "}
+        <code>course</code>, which carries its own copy of each, so that this
+        module's tests check one fixed set of numbers rather than whatever your
+        Module 7 code produces. Before this panel starts it overwrites those three
+        names with the versions you saved in Module 7, so the run is your loop
+        calling your own functions.
       </p>
       <p>
-        One function stays the course's, and it is the same one Module 7 borrowed:
-        backprop, carrying your Module 5 algorithm with BP1 lifted into an argument
-        so the cross-entropy blame can be passed in. Everything else in the run is
-        yours, including the loop and the score.
+        Your <code>train</code> imports five names from <code>course</code>, and the
+        two the panel does not overwrite stay the course's.{" "}
+        <code>batch_gradient</code> is the adapter Module 5's panel used on your
+        behalf, running a backprop once per column of a mini-batch and averaging the
+        slopes. The <code>backprop</code> it calls underneath is the one Module 7
+        handed back: your Module 5 algorithm with BP1 lifted into an argument, so
+        the cross-entropy blame can be passed in. And the <code>feedforward</code>{" "}
+        that your <code>accuracy</code> calls for the ten confidences is the
+        course's copy of your Module 2 loop. The starting draw, the blame, the
+        update, the walk through the epochs and the score are all yours.
       </p>
+      <Figure caption="Your program's call map, indented by who calls whom. Three names in it run the course's code rather than yours: the mini-batch adapter, the backprop underneath it, and the forward pass the score calls. Every other name runs the code saved in your editor.">
+        <div className="table-scroll scroll-x" tabIndex={0}>
+          <pre className="torch-listing">{`train(sizes, X, Y, X_test, y_test, ...)   yours, this module
+    init_network(sizes, rng)              yours, Module 7
+    each epoch: rng.permutation(n)        NumPy's shuffle
+        each mini-batch:
+            batch_gradient(...)           the course's adapter
+                backprop(...)             your Module 5 algorithm, course's copy
+                    cross_entropy_delta   yours, Module 7
+            l2_step(...)                  yours, Module 7
+        accuracy(w, b, X_test, y_test)    yours, this module
+            feedforward(w, b, X)          your Module 2 loop, course's copy`}</pre>
+        </div>
+      </Figure>
       <Figure caption="Your whole program on the digit reader, with the step size in your hands. Each epoch takes a few seconds, and Stop ends the run.">
         <FullTrainPanel />
       </Figure>
       <p>
         At a step size of 0.5 it averages about 90.4 percent over the last five
-        epochs. Module 7's run of the same network reported 92.1, and the gap is
-        worth a moment because nothing is wrong: the decay is switched on here
-        (lambda 1, which Module 7's run did not use), and one generator now does
-        both jobs, so the mini-batches fall in a different order than they did
-        there. Same program, same data, a different stream through it, a point or
-        two apart. That is the wobble Module 7 measured when it shuffled one
-        unchanged setting three times.
+        epochs, while Module 7's run of the same network reported 92.1. Did
+        assembling the program yourself cost you almost two points? No: the decay is
+        switched on here (lambda 1, which Module 7's run did not use), and one
+        generator now does both jobs, the draw and the shuffles, so the mini-batches
+        fall in a different order than they did there. Same program, same data, a
+        different stream through it. Module 7 measured what a different stream alone
+        is worth: three shuffles of one unchanged setting landed between 85.4 and
+        86.4 percent there, a point of wobble with nothing changed at all.
       </p>
+      <SectionHeader id="m9-step-size" title="The step size, from the inside" />
       <p>
-        The other two settings are Module 7's grid, run from the inside on one
-        row. At 0.1 the first epoch reads 77.2 percent against 0.5's 85.5, and by
+        The other two settings reach past Module 7's grid: 3.0 is one of its four
+        columns, and 0.1 is smaller than any step size that table tried. At 0.1 the
+        first epoch reads 77.2 percent against 0.5's 85.5, and by
         the end the two are level: a smaller step is not a worse answer here, only
         a slower start. At 3.0 the last five epochs average 86.6, and the per-epoch
         line stops being a curve: 80.9, then 89.3, then 85.1 on consecutive passes.
@@ -109,9 +143,9 @@ export function Module9() {
       <p>
         This course chose plain words on purpose. Blame, steepness, evidence, the
         wire ledger, the bill: each was picked so that a sentence could be read
-        without a glossary. The cost is that almost nobody else says them. Here is
-        the translation, so that the next thing you open is readable from the first
-        page.
+        without a glossary. Almost nobody else uses those words, and that becomes a
+        problem on the first page of the next thing you open. The table below gives
+        every one of them its field name, and the module where you first met it.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
@@ -136,6 +170,14 @@ export function Module9() {
             <tr>
               <td>a neuron's confidence, <M tex="a" /></td>
               <td>its activation, or its output</td>
+              <td>Module 1</td>
+            </tr>
+            <tr>
+              <td>the line a neuron cuts</td>
+              <td>
+                its decision boundary, or a hyperplane once there are more than two
+                inputs
+              </td>
               <td>Module 1</td>
             </tr>
             <tr>
@@ -268,8 +310,8 @@ export function Module9() {
 
       <SectionHeader id="m9-missing" title="What this course did not teach you" />
       <p>
-        Four things, named plainly, because each one is the next thing you will meet
-        and none of them is in the eight modules behind you.
+        Four things, named plainly, because each one is waiting in the next thing
+        you read, and none of the eight modules behind you made you do it yourself.
       </p>
       <p>
         <b>Nobody writes backprop by hand.</b> Every framework computes gradients by
@@ -293,24 +335,36 @@ export function Module9() {
       <p>
         <b>The data arrived prepared.</b> Pixels were already between 0 and 1,
         labels already one-hot, the split into training and held-out already made.
-        Doing that yourself is most of the work in a real problem, and one piece of
-        it is load-bearing for what you learned here: Module 7's argument for
+        Module 10 is the one item on this list that the course goes on to teach. It
+        points the functions you just assembled at a file with words in two of its
+        columns, holes in another, and two measurements 245 times apart in scale. A
+        real problem asks for that work again every time, in whatever shape the file
+        happens to arrive in. One part of that job is load-bearing for what you
+        learned here: Module 7's argument for
         dividing the weights by <M tex="\sqrt{n}" /> counted about a hundred lit
         pixels each contributing a value near 1. Inputs that run to the thousands
         would break that argument, and the usual fix is to scale the inputs rather
         than the weights.
       </p>
       <p>
-        <b>Accuracy is one number.</b> Your digit reader gets about eighty of a
-        thousand digits wrong and this course never showed you one of them. Which
-        digits it confuses, whether it is confidently wrong or barely wrong, and
-        what the misread images have in common are all answerable with the code you
-        have, and looking is the habit that improves a real model fastest.
+        <b>Accuracy is one number.</b> Your run above misreads about a hundred of
+        the thousand held-out digits, and this course has broken a score like that
+        apart exactly once: Module 5's panel put a per-digit row and the eight
+        mistakes the network was most confident about under its chart. Looking once
+        is a demonstration rather than a habit. Which digits it confuses, whether it
+        is confidently wrong or barely wrong, and what the misread images have in
+        common are all answerable with the code you have, and looking is what
+        improves a real model fastest. Module 10 makes it a step of its own, on a
+        smaller problem where a 73.5 percent score turns out to hide a class the
+        network never once answers.
       </p>
 
       <SectionHeader id="m9-next" title="Where to go next" />
       <p>
-        In rough order of how far each one is from where you now stand:
+        Module 10 is still ahead of you, and it is the shortest step of anything on
+        this list: the same program you just ran, pointed at a file that nobody
+        prepared for you. After that, in rough order of how far each one is from
+        where you now stand:
       </p>
       <ul className="m9-next-list">
         <li>

@@ -18,6 +18,12 @@ export function Module2() {
       />
       <ModuleToc />
 
+      <p>
+        Your code so far computes one neuron: a column of inputs in, one confidence
+        out. Reading a handwritten digit needs many neurons side by side, and a
+        second layer behind them reading their answers.
+      </p>
+
       <SectionHeader id="m2-layer" title="A layer is one formula" />
       <p>
         Module 1 ended with three neurons wired into a network, and one phrase did
@@ -141,19 +147,30 @@ export function Module2() {
 
       <p>
         And where did Module 1's geometry go? Nowhere: it scaled. A point in a
-        784-axis space sounds exotic, but it is nothing deeper than a list of 784
-        numbers, so every image is one point in that space (one axis per pixel;
-        moving along an axis brightens one pixel). The training images are labeled
-        dots scattered through it, exactly like the four dots in the plane, and
-        each hidden neuron still makes one straight cut through the space, yes on
-        one side, no on the other; it just takes 784 weights to aim the cut. Then
-        comes the move Module 1's hidden pair made, turning each input point into
-        a new point built from its reports; the move deserves a name,
-        re-description, because it happens in every network: the hidden layer's 15
-        outputs are themselves a list of 15 numbers, a new point in a new, much
-        smaller space. The output layer's ten neurons never
-        see pixels at all: they make their ten cuts in that 15-axis space, where
-        training will have arranged for the digit classes to finally be separable.
+        784-axis space sounds exotic, but it is nothing deeper than the column you
+        unrolled above: a list of 784 ink levels in order. So every image is one
+        point in that space, one axis per pixel (move along an axis and one pixel
+        brightens). The training images are dots scattered through that space, each
+        labeled with the digit it shows. Module 1's four concert dots were the same
+        thing in two axes, green for the go answers and gold for the stay answers. Each hidden neuron still makes one
+        straight cut through the space, yes on one side and no on the other. Aiming
+        that cut now takes 784 weights instead of two, one weight for every pixel
+        in the grid.
+      </p>
+      <p>
+        The hidden layer's 15 reports are themselves a list of numbers, one per
+        hidden neuron, exactly like the 784 pixels. Read that list the way you read
+        the pixels and each image becomes one point in a space of 15 axes instead
+        of 784. Module 1's two hidden neurons did this on a smaller scale. Their
+        pair of reports became the axes of a second plot, and on it the two go dots
+        ended up almost on top of each other. Trading each image's 784 numbers for
+        its 15 reports deserves a name, re-description, because every network does
+        it.
+      </p>
+      <p>
+        The ten output neurons never see pixels at all. They make their ten cuts in
+        that 15-axis space, on the re-described points, where training will have
+        arranged for each digit class to be separable from the rest.
       </p>
 
       <SectionHeader id="m2-weights" title="What learned weights look like" />

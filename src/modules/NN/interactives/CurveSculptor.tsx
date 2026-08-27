@@ -1,5 +1,20 @@
 import { useMemo, useRef, useState } from "react";
-import { scale, sigmoid } from "./utils";
+import { scale } from "./utils";
+import {
+  BAR_COUNTS,
+  DEFAULT_BARS,
+  DEFAULT_STEEP,
+  PRESETS,
+  STEEPNESS,
+  TN,
+  areaBetween,
+  clamp01,
+  clampV,
+  fitHeights,
+  netAt,
+  sampleTarget,
+  type PresetKind,
+} from "./bumpMath";
 
 // Module 6 interactive (b): the sculpting playground. The dial runs 0 to 1
 // across the chart; the reader sets a height for each slice of it, and each
@@ -16,74 +31,6 @@ const BASE = H - 48; // where a height of 0 sits
 const VMAX = 10.6;
 const px = (x: number) => scale(x, 0, 1, PAD_L, W - PAD_R);
 const py = (v: number) => scale(v, 0, VMAX, BASE, TOP);
-
-const TN = 161; // target samples, one every 1/160 of the dial
-const AG = 641; // grid the area is measured on
-const BAR_COUNTS = [2, 3, 4, 6, 8, 12, 16, 24];
-const STEEPNESS = [20, 50, 100, 200, 400, 700];
-const DEFAULT_BARS = 3; // index: 6 bars
-const DEFAULT_STEEP = 4; // index: weight 400
-
-const clampV = (v: number) => Math.max(0, Math.min(10, v));
-const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
-
-const PRESETS = {
-  mine: {
-    label: "your curve",
-    f: (x: number) => 1.2 + 8.0 * Math.exp(-Math.pow((x - 0.45) / 0.17, 2)),
-  },
-  friend: {
-    label: "your friend's curve",
-    f: (x: number) =>
-      0.8 +
-      6.6 * Math.exp(-Math.pow((x - 0.22) / 0.1, 2)) +
-      8.2 * Math.exp(-Math.pow((x - 0.68) / 0.14, 2)),
-  },
-};
-type Kind = keyof typeof PRESETS | "own";
-
-const sampleTarget = (f: (x: number) => number) =>
-  Array.from({ length: TN }, (_, j) => clampV(f(j / (TN - 1))));
-
-/** The target between its samples: straight lines, which is what drawing by
- * hand produces anyway. */
-function targetAt(t: number[], x: number): number {
-  const u = clamp01(x) * (TN - 1);
-  const i = Math.min(TN - 2, Math.floor(u));
-  return t[i] + (t[i + 1] - t[i]) * (u - i);
-}
-
-/** Each bar at the target's average height across its own slice. */
-function fitHeights(t: number[], k: number): number[] {
-  return Array.from({ length: k }, (_, i) => {
-    const S = 40;
-    let sum = 0;
-    for (let j = 0; j < S; j++) sum += targetAt(t, (i + (j + 0.5) / S) / k);
-    return clampV(sum / S);
-  });
-}
-
-/** The network's answer: one pair of sigmoid neurons per bar, the left one
- * switching on at the bar's left edge with output weight +h, the right one at
- * its right edge with output weight -h. */
-function netAt(hs: number[], k: number, w: number, x: number): number {
-  let sum = 0;
-  for (let i = 0; i < k; i++) {
-    if (hs[i] === 0) continue;
-    sum += hs[i] * (sigmoid(w * (x - i / k)) - sigmoid(w * (x - (i + 1) / k)));
-  }
-  return sum;
-}
-
-function areaBetween(t: number[], hs: number[], k: number, w: number): number {
-  let sum = 0;
-  for (let i = 0; i < AG; i++) {
-    const x = i / (AG - 1);
-    const weight = i === 0 || i === AG - 1 ? 0.5 : 1;
-    sum += weight * Math.abs(targetAt(t, x) - netAt(hs, k, w, x));
-  }
-  return sum / (AG - 1);
-}
 
 /** Write value v at index i, filling in every index skipped since the last
  * paint so that a fast drag leaves no gaps. Pure, because React may run a
@@ -106,7 +53,7 @@ function paint(
 }
 
 export function CurveSculptor() {
-  const [kind, setKind] = useState<Kind>("mine");
+  const [kind, setKind] = useState<PresetKind | "own">("mine");
   const [target, setTarget] = useState<number[]>(() => sampleTarget(PRESETS.mine.f));
   const [ki, setKi] = useState(DEFAULT_BARS);
   const [heights, setHeights] = useState<number[]>(() =>
@@ -168,7 +115,7 @@ export function CurveSculptor() {
     setKi(next);
   };
 
-  const pickTarget = (next: Kind) => {
+  const pickTarget = (next: PresetKind | "own") => {
     setKind(next);
     if (next === "own") {
       setMode("target");
@@ -244,7 +191,7 @@ export function CurveSculptor() {
     <div className="interactive">
       <div className="interactive-controls">
         <span className="sculpt-group-label">Curve to match</span>
-        {(["mine", "friend", "own"] as Kind[]).map((id) => (
+        {(["mine", "friend", "own"] as (PresetKind | "own")[]).map((id) => (
           <button
             key={id}
             className={`button-secondary chip ${kind === id ? "chip-active" : ""}`}
