@@ -1,9 +1,12 @@
 # Publish the static build to GitHub Pages.
 #
-# The repo has no remote yet, so nothing has run this. To turn it on: create
-# the repository, push this branch, then set Settings > Pages > Source to
-# "GitHub Actions". The first push after that publishes, and every push to
-# main republishes.
+# Every push to main republishes. configure-pages runs with enablement: true,
+# so the first run turns Pages on by itself rather than failing against a
+# repository where nobody has visited Settings > Pages yet. That was the first
+# run's failure: the build was green and "Get Pages site failed ... Not Found"
+# stopped it one step later. Setting Settings > Pages > Source to
+# "GitHub Actions" by hand does the same job; enablement: true just means
+# nobody has to.
 #
 # vite.config.ts sets base to "./", so the build works from a project subpath
 # (user.github.io/repo/) with no configuration here.
@@ -30,14 +33,18 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      # v5 of both actions for the Node 24 runtime: the v4 pair still works,
+      # but every run warns that the Node 20 they target is being removed.
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
       - run: npm ci
       - run: npm run build
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
