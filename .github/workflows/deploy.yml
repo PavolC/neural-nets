@@ -1,12 +1,14 @@
 # Publish the static build to GitHub Pages.
 #
-# Every push to main republishes. configure-pages runs with enablement: true,
-# so the first run turns Pages on by itself rather than failing against a
-# repository where nobody has visited Settings > Pages yet. That was the first
-# run's failure: the build was green and "Get Pages site failed ... Not Found"
-# stopped it one step later. Setting Settings > Pages > Source to
-# "GitHub Actions" by hand does the same job; enablement: true just means
-# nobody has to.
+# Every push to main republishes, once somebody has set Settings > Pages >
+# Source to "GitHub Actions". That toggle is a one-time manual step and there
+# is no way around it: creating the Pages site takes repository admin rights,
+# and GITHUB_TOKEN does not have them at any permission level. Granting
+# pages: write below buys the right to deploy to a site that already exists,
+# not the right to create one. configure-pages takes an enablement: true input
+# that sounds like the fix, and it was tried here: it turns the "Get Pages site
+# failed ... Not Found" error into "Create Pages site failed. Error: Resource
+# not accessible by integration", one step later and no further along.
 #
 # vite.config.ts sets base to "./", so the build works from a project subpath
 # (user.github.io/repo/) with no configuration here.
@@ -43,8 +45,6 @@ jobs:
       - run: npm ci
       - run: npm run build
       - uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
