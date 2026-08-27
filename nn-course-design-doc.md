@@ -169,6 +169,16 @@ Milestones 0 through 5 are complete. Departures from the plan above, all deliber
 
 - **Module 8 grew a payoff run and a second engine.** The design doc called for per-layer gradient bars with a depth slider and a sigmoid/ReLU toggle; that is `LayerSpeedBars` (TypeScript, so the bars move as fast as the slider does), and beside it `DepthTrainPanel` trains one hidden layer against four with the learner's own code in Pyodide. Two engines means two sets of numbers from two random generators: `tools/bench_layer_speeds.ts` and `tools/bench_depth.py` regenerate them, and CLAUDE.md records that a number from one must never be quoted for the other.
 - **The optional ReLU exercise was not built.** Module 8 swaps the squash inside its own panel instead, which gets the comparison without asking the learner to rewrite `backprop` after the course has already taken its summit.
+- **A tenth module was added, and with it a fourth goal.** The design doc's
+  non-goals said "not a production ML tool", and nothing in Modules 1 to 9 shows a
+  learner how to point the network at a problem of their own: every dataset in the
+  course arrives scaled, numeric, complete, labelled and split. Module 10 is that
+  goal made explicit. It bundles a second dataset (Palmer penguins, CC0) chosen for
+  its defects rather than despite them, and teaches preparation, baselines, per-class
+  evaluation, picking a first network, a diagnostic table, and a read-along PyTorch
+  listing beside the parts the learner wrote. The non-goal still holds for the
+  artifact; what changed is that the learner is now expected to leave able to apply
+  this, not only to have understood it.
 - **A ninth module was added** (not in the design doc), after a teaching review of
   the finished course found that the learner owned seven functions but had never
   assembled them: every training run was started by a course-written panel. Module 9

@@ -2804,3 +2804,25 @@ footer a {
   color: var(--loss);
   font-size: 0.85rem;
 }
+
+/* Module 10's PyTorch listing: the one code block in the course that is for
+   reading rather than running, so it is set like the test viewer's code
+   rather than like an editor. */
+.torch-listing {
+  background: var(--surface-sunken);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  padding: 0.8rem 1rem;
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  min-width: 520px;
+}
+
+.m10-credit {
+  font-size: 0.9rem;
+  color: var(--muted);
+  border-top: 1px solid var(--rule);
+  padding-top: 0.9rem;
+  margin-top: 2rem;
+}

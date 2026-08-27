@@ -61,4 +61,9 @@ export const MODULES: ModuleDef[] = [
     navLabel: "9 · Assembly",
     ...deferred(() => import("./module9").then((m) => ({ default: m.Module9 }))),
   },
+  {
+    id: "m10",
+    navLabel: "10 · Your own data",
+    ...deferred(() => import("./module10").then((m) => ({ default: m.Module10 }))),
+  },
 ];

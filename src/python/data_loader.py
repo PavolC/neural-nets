@@ -42,3 +42,19 @@ def one_hot(y, num_classes=10):
     Y = np.zeros((num_classes, y.size), dtype=np.float32)
     Y[y, np.arange(y.size)] = 1.0
     return Y
+
+
+def load_penguins(buf):
+    """Parse the bundled penguin file (public/data/penguins.json.gz).
+
+    Returns (columns, rows): the column names, and one list per penguin in
+    the file's own order, with None wherever a value is missing. Nothing is
+    scaled, encoded or split, because doing that is Module 10's exercise.
+
+    Data: Horst AM, Hill AP, Gorman KB (2020), palmerpenguins; collected by
+    Dr Kristen Gorman, Palmer Station Antarctica LTER. Released CC0.
+    """
+    import json
+
+    payload = json.loads(bytes(buf).decode("utf-8"))
+    return payload["columns"], payload["rows"]

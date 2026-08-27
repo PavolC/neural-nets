@@ -65,4 +65,10 @@ export const EXERCISES: ExerciseRef[] = [
     module: "m9",
     builds: "train and accuracy: the loop over every part, and the score",
   },
+  {
+    id: "prepare",
+    title: "Getting your own data ready",
+    module: "m10",
+    builds: "standardize, one_hot and split: a file turned into a matrix",
+  },
 ];

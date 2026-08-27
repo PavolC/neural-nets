@@ -83,8 +83,19 @@ sys.modules["course"] = _course
   return pyodidePromise;
 }
 
+/** The path a fetched dataset lands on inside Pyodide: the URL's own file
+ * name, with the .gz suffix dropped, at the root. So
+ * data/mnist_subset.bin.gz becomes /mnist_subset.bin, which is where every
+ * snippet in the course reads it from, and data/penguins.json.gz becomes
+ * /penguins.json without any of them having to say so. */
+function datasetPath(dataUrl: string): string {
+  const name = new URL(dataUrl).pathname.split("/").pop() || "dataset";
+  return `/${name.replace(/\.gz$/, "")}`;
+}
+
 async function fetchDataset(pyodide: Pyodide, dataUrl: string): Promise<void> {
-  status("Fetching MNIST subset...");
+  const path = datasetPath(dataUrl);
+  status(`Fetching ${path.slice(1)}...`);
   const resp = await fetch(dataUrl);
   if (!resp.ok) {
     throw new Error(`failed to fetch ${dataUrl}: HTTP ${resp.status}`);
@@ -98,8 +109,12 @@ async function fetchDataset(pyodide: Pyodide, dataUrl: string): Promise<void> {
     const stream = new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"));
     bytes = new Uint8Array(await new Response(stream).arrayBuffer());
   }
-  pyodide.FS.writeFile("/mnist_subset.bin", bytes);
-  logRuntime(`MNIST subset loaded (${(bytes.byteLength / 1e6).toFixed(1)} MB decompressed)`);
+  pyodide.FS.writeFile(path, bytes);
+  const size =
+    bytes.byteLength >= 1e6
+      ? `${(bytes.byteLength / 1e6).toFixed(1)} MB`
+      : `${Math.round(bytes.byteLength / 1e3)} kB`;
+  logRuntime(`${path.slice(1)} loaded (${size} decompressed)`);
 }
 
 async function train(msg: Extract<WorkerRequest, { type: "train" }>): Promise<void> {
