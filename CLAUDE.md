@@ -147,6 +147,12 @@ this floor after direct feedback; every later module must be written to it too.
   render at exactly natural scale, capped at their viewBox width and
   centered. On sub-720px screens the box family keeps min-width 620px and
   pans inside .figure-scroll. New diagrams join one of the two families.
+- **A score gets a breakdown.** Accuracy alone hides which class a network
+  fails at, and the course teaches the habit twice: Module 5's training panel
+  shows per-digit counts and the eight mistakes the network was surest about
+  (drawn from the test images it sent back), and Module 10 shows a 73.5 percent
+  score that never once answers the minority class. A new panel that reports one
+  number should report the breakdown beside it.
 - **Interactives must not jump.** Fixed-basis flex columns (wrap depends on window
   width, never content), reserved heights for changing status text (.status-fixed),
   statuses on their own full-width line inside control rows, range inputs allowed
@@ -260,6 +266,23 @@ this floor after direct feedback; every later module must be written to it too.
   (multiply by 1, add 0, gap of 0) teaches that nothing happened. Lead with an
   instance where the effect shows (the times-2 wire), then explain the no-op
   value as the special case it is.
+- **A module about a property, not a technique, must be motivated by the
+  learner's own number and cashed out on the learner's own artifact.** Module
+  6's first draft opened with "the question is what a network of these neurons
+  can express", posed a curve-fitting problem in a new world (continuous input,
+  a 0-to-10 rating, an unsquashed output, no training), and put its only
+  connection to the course in the closing beat. The learner stopped five
+  sections in: "we're just talking about curves..... why??". Modules 1-5 each
+  deliver a thing the learner then owns, so a module that delivers a fact has
+  to work harder, in this order: open with a number the learner produced
+  (Module 5's 89 percent), name the competing explanations for it, say which
+  one this page settles and which it leaves standing, and then, at the end,
+  spend the result back on the same artifact (the 7.8 million-neuron box
+  network against the trained 30). Anything that looks like a departure
+  (one input instead of 784, hand-placed weights instead of trained ones, no
+  exercise) gets named as a deliberate shrink in the opener, with the reason,
+  plus the sentence that the small case is a sub-case and not a detour: hold
+  783 pixels still, turn one, and the outputs trace curves.
 - **State what a section buys before proving it.** Module 4's factor
   paragraphs read to the learner as "simple math, overexplained" until the
   stakes came first: every factor is computable from the first run alone, so
@@ -292,6 +315,12 @@ this floor after direct feedback; every later module must be written to it too.
 - Housekeeping: learners paste rendered math as doubled text ("x1x1", "WW").
   That is a copy artifact of KaTeX's accessibility markup, not a rendering bug;
   do not chase it.
+- **Every new symbol goes in the notation reference.** The start page carries a
+  folded lookup (`NOTATION` in `src/start/StartPage.tsx`): symbol, one line of
+  meaning, and the module that introduced it, in the order a reader meets them.
+  The course's own rule is that weeks pass between modules, and a symbol defined
+  once four thousand words ago is not defined for that reader. Introducing
+  notation in a module means adding a row there in the same change.
 - **Skeleton docstrings freeze into saved code.** The editor persists the
   learner's copy, so improving a skeleton never reaches anyone who already
   opened the exercise. Anything essential to understanding the contract must

@@ -2826,3 +2826,81 @@ footer a {
   padding-top: 0.9rem;
   margin-top: 2rem;
 }
+
+/* The notation reference on the start page: a lookup, folded away so the
+   page still reads as a page. Its rows are symbols, so the first column is
+   set in the code face and given room. */
+.notation {
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--surface-card);
+  padding: 0.7rem 1rem;
+  margin: 1.2rem 0 2rem;
+}
+
+.notation summary {
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.notation-note {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0.7rem 0 0.3rem;
+}
+
+.notation-symbol {
+  white-space: nowrap;
+}
+
+.notation .truth-table td:nth-child(2) {
+  min-width: 22rem;
+}
+
+/* Module 5's error analysis: the digits the network was most confident about
+   while being wrong. The canvases are 28 by 28 and drawn up with no
+   smoothing, so the reader sees the same ink the network did. */
+.mistakes {
+  margin-top: 1.4rem;
+  border-top: 1px solid var(--rule);
+  padding-top: 0.8rem;
+}
+
+.mistakes h5 {
+  margin: 0 0 0.6rem;
+  font-size: 0.95rem;
+}
+
+.mistake-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin-top: 0.8rem;
+}
+
+.mistake {
+  margin: 0;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.mistake-canvas {
+  width: 64px;
+  height: 64px;
+  image-rendering: pixelated;
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-sm);
+  background: #fff;
+  display: block;
+}
+
+.mistake figcaption {
+  margin-top: 0.3rem;
+  line-height: 1.35;
+}
+
+.mistake-confidence {
+  display: block;
+  font-size: 0.75rem;
+}

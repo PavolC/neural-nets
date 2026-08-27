@@ -264,7 +264,7 @@ export function ExercisePage({ exercise }: { exercise: Exercise }) {
 				<p className="exercise-tip">
 					Two ways to run. "Run my code" just executes what is in the editor, so you can call your functions, print(...) values, and experiment. "Run tests" checks your work. Everything you
 					print appears in the Output panel below, as it happens. The editor is resizable (drag its bottom edge); Tab indents, and Escape then Tab moves keyboard focus out. Your code is
-					saved in this browser only.
+					saved in this browser only. A symbol you have forgotten is in the notation reference on the Start page.
 				</p>
 
 				<div className="exercise-controls">

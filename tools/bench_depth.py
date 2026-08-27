@@ -1,4 +1,4 @@
-"""Reproduce every Python-side number Module 8 quotes, on the browser's code path.
+"""Reproduce every Python-side number Modules 5, 7 and 8 quote, on the browser's code path.
 
 Module 8's prose reports measurements from two engines, and this script is the
 first of the two benches that regenerate them:
@@ -320,6 +320,50 @@ def bench_dead(b):
     print(f"  eta 0.5, full run: accuracy spans {pct(min(r['acc']))} to {pct(max(r['acc']))}")
 
 
+def bench_mistakes(b):
+    section(
+        "0. Module 5's run, and where its misses are",
+        "108 of the thousand are read wrong; 1 comes back at 122 of 126 and 0 at "
+        "82 of 85, while 8 manages 68 of 89; of the eight most confident mistakes, "
+        "three are 3s read as 5 and two are 4s read as 9, all above 98 percent",
+    )
+    # Module 5's panel exactly: the learner's backprop inside their sgd, the
+    # quadratic cost, eta 3.0, the undivided draw, init seed 8, shuffle seed 2.
+    bp = load_module(EX / "backprop" / "solution.py", "your_backprop")
+
+    def grad(w, bs, X, Y):
+        m = X.shape[1]
+        nw = [np.zeros_like(x) for x in w]
+        nb = [np.zeros_like(x) for x in bs]
+        for k in range(m):
+            dw, db = bp.backprop(w, bs, X[:, k:k + 1], Y[:, k:k + 1])
+            nw = [t + d for t, d in zip(nw, dw)]
+            nb = [t + d for t, d in zip(nb, db)]
+        return [t / m for t in nw], [t / m for t in nb]
+
+    sgd = load_sgd(b.course, grad)
+    r = np.random.default_rng(INIT_SEED)
+    weights = [r.standard_normal((30, 784)), r.standard_normal((10, 30))]
+    biases = [r.standard_normal((30, 1)), r.standard_normal((10, 1))]
+    rng = np.random.default_rng(SHUFFLE_SEED)
+    for _ in range(b.epochs):
+        weights, biases = sgd.sgd(weights, biases, b.X_train, b.Y_train, 3.0, 1, BATCH, rng)
+
+    out = b.course.feedforward(weights, biases, b.X_test)
+    guesses = np.argmax(out, axis=0)
+    print(f"  accuracy {pct(float((guesses == b.y_test).mean()))}, "
+          f"{int((guesses != b.y_test).sum())} of {b.y_test.size} read wrong")
+    for d in range(10):
+        mask = b.y_test == d
+        print(f"    {d}: {int(((guesses == b.y_test) & mask).sum())} of {int(mask.sum())}")
+    wrong = np.flatnonzero(guesses != b.y_test)
+    confidence = out[guesses[wrong], wrong]
+    worst = wrong[np.argsort(-confidence)][:8]
+    print("  the eight it was surest about, and wrong: "
+          + ", ".join(f"{int(b.y_test[k])} read as {int(guesses[k])} "
+                      f"({out[guesses[k], k]:.3f})" for k in worst))
+
+
 def bench_module7(b):
     section(
         "7. Module 7's numbers that Module 8 opens by quoting",
@@ -364,6 +408,7 @@ def bench_capstone(b):
 
 
 SECTIONS = {
+    "mistakes": bench_mistakes,
     "depth": bench_depth,
     "first-epoch": bench_first_epoch,
     "eta": bench_eta,

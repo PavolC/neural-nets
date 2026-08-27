@@ -537,6 +537,20 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         the cost function was ever asked.
       </p>
       <p>
+        Three words for the rest of the course, since this is where they all
+        become visible at once. Doing well on digits you were not trained on is
+        called generalizing, and it is the only thing anyone actually wants;
+        every score in this course is on held-out digits for that reason.
+        Overfitting is one way to fail at it, the one on the chart: the network
+        has capacity to spare and spends it on the particular thousand images in
+        front of it. The other way is underfitting, which is the network not
+        managing the training images either, and it looks completely different:
+        both lines poor, both still flat, no gap between them. The two failures
+        want opposite treatments, which is why it is worth being able to tell
+        them apart at a glance. A gap that keeps widening is too much capacity
+        for the data; two low flat lines are too little.
+      </p>
+      <p>
         Two things follow. The first is a habit rather than a technique: hold
         data out, and score on it. The 1,000 held-out digits in this course
         have never been trained on, in any module. Without them, the training

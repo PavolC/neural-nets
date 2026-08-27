@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { assetUrl } from "../../../runtime/assets";
 import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
 import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
@@ -89,7 +89,29 @@ for _e in range(1, _epochs + 1):
         "accuracy": _acc, "elapsed": time.time() - _t0}))
 _seconds = time.time() - _t0
 _steps = -(-X_train.shape[1] // 10) * _epochs
+
+# Where it is wrong, which the accuracy alone cannot say. Per digit, and then
+# the mistakes it was most sure about: a confident error is the interesting
+# kind, and the ones it nearly got right teach nothing.
+_out = feedforward(weights, biases, X_test)
+_guesses = np.argmax(_out, axis=0)
+_per_digit = [{"digit": int(_d),
+               "right": int(((_guesses == y_test) & (y_test == _d)).sum()),
+               "total": int((y_test == _d).sum())}
+              for _d in range(10)]
+
+_wrong = np.flatnonzero(_guesses != y_test)
+_confidence = _out[_guesses[_wrong], _wrong]
+_worst = _wrong[np.argsort(-_confidence)][:8]
+_mistakes = [{"truth": int(y_test[_k]), "guess": int(_guesses[_k]),
+              "confidence": float(_out[_guesses[_k], _k]),
+              "pixels": [int(round(_v * 255)) for _v in X_test[:, _k]]}
+             for _k in _worst]
+
 json.dumps({
+    "per_digit": _per_digit,
+    "mistakes": _mistakes,
+    "n_wrong": int(_wrong.size),
     "accuracy": _acc,
     "seconds": _seconds,
     "params": _n_params,
@@ -118,7 +140,18 @@ interface EpochReport {
   elapsed: number;
 }
 
+interface Mistake {
+  truth: number;
+  guess: number;
+  confidence: number;
+  /** 784 ink levels, 0 to 255, in the row-by-row order Module 2 unrolled. */
+  pixels: number[];
+}
+
 interface TrainResult {
+  per_digit: { digit: number; right: number; total: number }[];
+  mistakes: Mistake[];
+  n_wrong: number;
   accuracy: number;
   seconds: number;
   params: number;
@@ -249,7 +282,102 @@ export function BackpropTrainPanel() {
           only change is where the slopes come from.
         </p>
       )}
+      {result && <Mistakes result={result} />}
     </div>
+  );
+}
+
+/** What the accuracy does not say: which digits it misses, and what its most
+ * confident errors look like. The images are the test digits themselves,
+ * sent back as ink levels and drawn the way Module 2 drew them. */
+function Mistakes({ result }: { result: TrainResult }) {
+  const worst = result.per_digit.reduce((a, b) =>
+    b.right / b.total < a.right / a.total ? b : a,
+  );
+  return (
+    <div className="mistakes">
+      <h5>Where the misses are</h5>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>digit</th>
+              {result.per_digit.map((d) => (
+                <th key={d.digit}>{d.digit}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>read correctly</td>
+              {result.per_digit.map((d) => (
+                <td key={d.digit}>
+                  {d.right}/{d.total}
+                </td>
+              ))}
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p className="interactive-status">
+        {result.n_wrong} of the {result.n_test.toLocaleString()} held-out digits are
+        read wrong. The hardest is {worst.digit}, at {worst.right} of {worst.total}.
+        Below are the eight the network was most confident about while being wrong;
+        the number under each is what it answered, and how sure it was.
+      </p>
+      <div className="mistake-strip">
+        {result.mistakes.map((m, i) => (
+          <figure key={i} className="mistake">
+            <MistakeDigit pixels={m.pixels} truth={m.truth} guess={m.guess} />
+            <figcaption>
+              said <b>{m.guess}</b>, was {m.truth}
+              <span className="mistake-confidence">
+                {/* One decimal: these sit between 98 and 99.9, and rounding to
+                    whole percent prints a 100% that is not true. */}
+                {(m.confidence * 100).toFixed(1)}% sure
+              </span>
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MistakeDigit({
+  pixels,
+  truth,
+  guess,
+}: {
+  pixels: number[];
+  truth: number;
+  guess: number;
+}) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const img = ctx.createImageData(28, 28);
+    for (let i = 0; i < 784; i++) {
+      const v = 255 - pixels[i];
+      img.data[i * 4] = v;
+      img.data[i * 4 + 1] = v;
+      img.data[i * 4 + 2] = v;
+      img.data[i * 4 + 3] = 255;
+    }
+    ctx.putImageData(img, 0, 0);
+  }, [pixels]);
+  return (
+    <canvas
+      ref={ref}
+      width={28}
+      height={28}
+      className="mistake-canvas"
+      role="img"
+      aria-label={`A handwritten ${truth} that the network read as a ${guess}.`}
+    />
   );
 }
 

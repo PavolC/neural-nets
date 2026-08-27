@@ -88,6 +88,18 @@ export function Module5() {
           One example per call is the version that matches the four equations
           one for one, and that is the version worth writing by hand.
         </p>
+        <p>
+          Your forward pass, though, already runs a whole batch without being
+          asked. Hand your feedforward an <M tex="X" /> of shape (784, 10)
+          instead of a column and every step still works: the matrix product
+          takes (30, 784) times (784, 10) and gives (30, 10), one column of
+          evidence per image, and the bias column of shape (30, 1) is added to
+          all ten columns at once, since NumPy stretches a single column across
+          a matrix when the rows line up. So the same line computes one image or
+          ten thousand, and that is how every panel in this course has been
+          scoring the held-out set in one call. It is the backward half that
+          needs the loop here, because BP3 reads one blame column at a time.
+        </p>
       </Aside>
       <p>
         For a digit image, the right answer <M tex="y" /> is a column of ten
@@ -293,6 +305,30 @@ export function Module5() {
         activations computed by your feedforward, against a cost you first
         worked out by hand for four concert corners. Every function in that
         sentence is code you wrote.
+      </p>
+      <p>
+        Under the chart is the other half of that number. Eighty-nine percent
+        means 108 of the thousand held-out digits are read wrong, and a single
+        percentage cannot say which ones or why. The per-digit row can, and the
+        ten are not equal: 1 comes back at 122 of 126 and 0 at 82 of 85, while 8
+        manages 68 of 89. Three quarters for the 8s against nearly all of the
+        1s, inside one number that reads 89 percent.
+      </p>
+      <p>
+        The images beside it are the eight mistakes the network was most
+        confident about, every one of them answered at above 98 percent
+        certainty. Confidence is why those eight rather than the near misses: a
+        digit it got wrong while sure is one where its thirty detectors found
+        strong evidence for the wrong answer, and the picture usually shows what
+        they found. Three of the eight are 3s read as 5, which share the lower
+        loop and differ only at the top; two are 4s read as 9, which differ only
+        by whether the top is closed. Nothing in the network is broken. The ink
+        really is ambiguous, and it answered the way a hurried person would.
+      </p>
+      <p>
+        Getting into the habit of looking is worth more than it seems. A score
+        tells you whether to keep going; the mistakes tell you what to do next,
+        and Module 10 will make that a step of its own.
       </p>
 
       <Recap
