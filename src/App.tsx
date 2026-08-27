@@ -1,4 +1,6 @@
 import { Suspense, useEffect, useRef, useState } from "react";
+import { Masthead } from "./brand/Masthead";
+import { SeriesFooter } from "./brand/SeriesFooter";
 import { StartPage } from "./start/StartPage";
 import { MODULES } from "./modules/NN";
 
@@ -95,33 +97,29 @@ export default function App() {
 
   return (
     <div className="app">
-      <header>
-        <h1>Grokking Nets</h1>
-        <p className="tagline">
-          An interactive course on neural networks: read a little, play with live
-          visualizations, and implement the real thing in Python, right here in your
-          browser.
-        </p>
-        <nav className="tabs" aria-label="Course modules">
-          <button
-            className={`tab ${tab === START_TAB ? "tab-active" : ""}`}
-            aria-current={tab === START_TAB ? "page" : undefined}
-            onClick={() => selectTab(START_TAB)}
-          >
-            Start
-          </button>
-          {MODULES.map((m) => (
+      <Masthead
+        nav={
+          <nav className="tabs" aria-label="Course modules">
             <button
-              key={m.id}
-              className={`tab ${tab === m.id ? "tab-active" : ""}`}
-              aria-current={tab === m.id ? "page" : undefined}
-              onClick={() => selectTab(m.id)}
+              className={`tab ${tab === START_TAB ? "tab-active" : ""}`}
+              aria-current={tab === START_TAB ? "page" : undefined}
+              onClick={() => selectTab(START_TAB)}
             >
-              {m.navLabel}
+              Start
             </button>
-          ))}
-        </nav>
-      </header>
+            {MODULES.map((m) => (
+              <button
+                key={m.id}
+                className={`tab ${tab === m.id ? "tab-active" : ""}`}
+                aria-current={tab === m.id ? "page" : undefined}
+                onClick={() => selectTab(m.id)}
+              >
+                {m.navLabel}
+              </button>
+            ))}
+          </nav>
+        }
+      />
       <main>
         <div
           hidden={tab !== START_TAB}
@@ -157,7 +155,7 @@ export default function App() {
           );
         })}
       </main>
-      <footer>
+      <SeriesFooter>
         <p>
           Adapted from Michael A. Nielsen,{" "}
           <a href="http://neuralnetworksanddeeplearning.com/">
@@ -167,7 +165,7 @@ export default function App() {
           <a href="https://creativecommons.org/licenses/by-nc/3.0/">CC BY-NC 3.0</a>.
           This derivative work is non-commercial and inherits the same license.
         </p>
-      </footer>
+      </SeriesFooter>
     </div>
   );
 }

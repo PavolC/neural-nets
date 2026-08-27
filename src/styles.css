@@ -1,8 +1,16 @@
+/* The series brand layer: the accent family, the type roles, the masthead,
+   the tab strip and the footer. Loaded first so everything below can override
+   it; see src/brand/brand.css for what a sibling course changes. */
+@import "./brand/brand.css";
+
 :root {
   --ink: #1a1a1a;
   --muted: #5a5a5a;
-  --accent: #0b6e4f;
   --loss: #b3423a;
+  /* The accuracy line's hue, which happens to equal this course's accent
+     today. Kept as its own literal rather than aliased to --accent: one is a
+     brand colour and one names a quantity in a chart, and a sibling course
+     that picks a different accent must not silently repaint its charts. */
   --acc: #0b6e4f;
   --rule: #e2e2e2;
   /* For boundaries that identify a control (a quiz option, a digit
@@ -78,7 +86,7 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--ink);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-prose);
   line-height: 1.6;
 }
 
@@ -99,19 +107,9 @@ body {
   }
 }
 
-h1 {
-  font-size: 2rem;
-  margin: 0 0 0.25rem;
-}
-
 h2 {
   font-size: 1.3rem;
   margin: 2rem 0 0.5rem;
-}
-
-.tagline {
-  color: var(--muted);
-  margin-top: 0;
 }
 
 button {
@@ -145,33 +143,6 @@ button:disabled {
   color: var(--accent);
 }
 
-.tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 0.5rem;
-  margin-top: 1.25rem;
-  border-bottom: 1px solid var(--rule);
-}
-
-.tab {
-  background: transparent;
-  color: var(--muted);
-  border: none;
-  border-bottom: 2px solid transparent;
-  border-radius: 0;
-  /* Roomier than the prose needs, so the row clears the 44px touch target. */
-  padding: 0.6rem 0.25rem;
-  margin-right: 0.6rem;
-  font-size: 1rem;
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.tab-active {
-  color: var(--ink);
-  border-bottom-color: var(--accent);
-}
-
 .badge-done {
   display: inline-block;
   margin-left: 0.6rem;
@@ -180,7 +151,7 @@ button:disabled {
   background: var(--acc);
   color: var(--on-accent);
   font-size: 0.7rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   letter-spacing: 0.04em;
   text-transform: uppercase;
   vertical-align: middle;
@@ -279,7 +250,7 @@ button:disabled {
 
 .exercise-tip {
   font-size: 0.88rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   color: var(--muted);
   margin: -0.4rem 0 0.7rem;
 }
@@ -290,7 +261,7 @@ button:disabled {
 
 .output-panel h5 {
   font-size: 0.85rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--muted);
@@ -358,14 +329,14 @@ button:disabled {
 
 .test-stale-note {
   font-size: 0.85rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   color: var(--muted);
   margin: 0 0 0.3rem;
 }
 
 .test-also {
   font-size: 0.85rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   color: var(--muted);
   margin: 0.15rem 0 0;
 }
@@ -375,7 +346,7 @@ button:disabled {
 .flagship-banner {
   border: 2px solid var(--acc);
   border-radius: var(--radius-lg);
-  background: #eef7f2;
+  background: var(--accent-wash);
   color: var(--ink);
   padding: 0.8rem 1rem;
   margin: 0.6rem 0 0.8rem;
@@ -407,7 +378,7 @@ button:disabled {
 }
 
 .test-mark {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-weight: bold;
 }
 
@@ -600,7 +571,7 @@ button:disabled {
   border-collapse: collapse;
   margin: 0 auto;
   font-size: 0.9rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
 }
 
 .truth-table th,
@@ -618,14 +589,14 @@ button:disabled {
 
 .dataset-rule {
   font-size: 0.85rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   color: var(--muted);
   margin: 0 0 0.2rem;
 }
 
 .line-equation {
   font-size: 0.85rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   color: var(--muted);
   margin: 0 0 0.4rem;
   min-height: 1.5em; /* numbers change while dragging; keep the chart still */
@@ -722,7 +693,7 @@ button:disabled {
 }
 
 .concert-label {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 12.5px;
   fill: var(--muted);
 }
@@ -758,14 +729,14 @@ button:disabled {
 /* The italic label that names a quantity inside a diagram. */
 .tiny-net-label,
 .shape-name {
-  font-family: Georgia, serif;
+  font-family: var(--font-prose);
   font-style: italic;
   font-size: 17px;
   fill: var(--ink);
 }
 
 .tiny-net-caption {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 12px;
   fill: var(--muted);
 }
@@ -797,7 +768,7 @@ button:disabled {
 .interactive-status {
   font-size: 0.88rem;
   color: var(--muted);
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   margin: 0.4rem 0 0;
 }
 
@@ -844,7 +815,7 @@ button:disabled {
 .chart-tick,
 .chart-axis-label,
 .netdiag-label {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 11px;
   fill: var(--muted);
 }
@@ -974,7 +945,7 @@ button:disabled {
 
 .xor-space-label {
   font-size: 0.82rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   color: var(--muted);
   margin: 0.6rem 0 0.25rem;
 }
@@ -1001,7 +972,7 @@ button:disabled {
 }
 
 .axis-id {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 4.2px; /* viewBox units; the panel is square so this scales cleanly */
   font-weight: 600;
 }
@@ -1027,7 +998,7 @@ button:disabled {
 .xor-phase-controls legend {
   font-size: 0.85rem;
   color: var(--muted);
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   padding: 0 0.3rem;
 }
 
@@ -1036,7 +1007,7 @@ button:disabled {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.82rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   color: var(--muted);
   margin: 0.15rem 0;
   /* As a flex item (e.g. inside .interactive-controls), allow the whole row
@@ -1061,7 +1032,7 @@ button:disabled {
 }
 
 .xor-readout {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.8rem;
   color: var(--muted);
 }
@@ -1137,7 +1108,7 @@ button:disabled {
 
 .knob-group-label {
   flex: 0 0 9.5em;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.85rem;
   color: var(--muted);
 }
@@ -1194,13 +1165,13 @@ button:disabled {
 }
 
 .shape-op {
-  font-family: Georgia, serif;
+  font-family: var(--font-prose);
   font-size: 20px;
   fill: var(--ink);
 }
 
 .shape-dim {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 12.5px;
 }
 
@@ -1362,7 +1333,7 @@ button:disabled {
 
 .netdiag-hit:focus-visible {
   outline: none;
-  fill: rgba(11, 110, 79, 0.12);
+  fill: color-mix(in srgb, var(--accent) 12%, transparent);
   stroke: var(--accent);
   stroke-width: 2;
 }
@@ -1370,14 +1341,14 @@ button:disabled {
 .pred-ok {
   color: var(--acc);
   font-weight: 700;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.85rem;
 }
 
 .pred-bad {
   color: var(--loss);
   font-weight: 700;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.85rem;
 }
 
@@ -1496,18 +1467,6 @@ button:disabled {
   justify-content: flex-end;
 }
 
-footer {
-  margin-top: 3rem;
-  padding-top: 1rem;
-  border-top: 1px solid var(--rule);
-  font-size: 0.85rem;
-  color: var(--muted);
-}
-
-footer a {
-  color: inherit;
-}
-
 /* ---------- Module 4: backpropagation ---------- */
 
 /* The chain-ripple diagram (static, in module4.tsx). */
@@ -1515,11 +1474,11 @@ footer a {
   width: 100%;
   height: auto;
   display: block;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
 }
 
 .ripple-box {
-  fill: #f4f7f5;
+  fill: var(--accent-wash);
   stroke: var(--accent);
   stroke-width: 1.2;
 }
@@ -1571,7 +1530,7 @@ footer a {
 
 /* The step-through visualization. */
 .bp-step-count {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.85rem;
   color: var(--muted);
 }
@@ -1597,14 +1556,14 @@ footer a {
 
 .bp-step-title {
   margin: 0.2rem 0 0;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--accent);
 }
 
 .bp-stepper svg {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
 }
 
 .bp-name {
@@ -1692,7 +1651,7 @@ footer a {
 
 .bp-table {
   border-collapse: collapse;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.85rem;
 }
 
@@ -1728,7 +1687,7 @@ footer a {
   border: 1px dashed var(--rule);
   border-radius: var(--radius-lg);
   padding: 0.5rem 0.8rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.88rem;
 }
 
@@ -1798,7 +1757,7 @@ footer a {
 
 .quiz-correct {
   border-color: var(--acc);
-  background: #eef6f1;
+  background: var(--accent-wash);
   color: var(--ink);
 }
 
@@ -1824,7 +1783,7 @@ footer a {
   border-radius: var(--radius-sm);
   background: var(--acc);
   color: var(--on-accent);
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.68rem;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -1837,7 +1796,7 @@ footer a {
 
 .quiz-explain {
   font-size: 0.92rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   color: var(--ink);
   background: var(--surface-note);
   border-radius: var(--radius);
@@ -1856,7 +1815,7 @@ footer a {
 /* The ripple diagram's factor kinds (module 4): purple = a multiplication
    passing changes through, green = sigmoid steepness, red = the gap. */
 .ripple-kind-mult {
-  fill: #6a4fa3;
+  fill: var(--data-purple);
 }
 
 .ripple-kind-sig {
@@ -1872,7 +1831,7 @@ footer a {
 .ripple-slice {
   display: block;
   margin: 1.4rem auto 0.4rem;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
 }
 
 /* Asides: quick departures from the lesson (analogies, scope notes),
@@ -1886,7 +1845,7 @@ footer a {
 }
 
 .module-aside-label {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.72rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1928,7 +1887,7 @@ footer a {
   width: var(--toc-width);
   max-height: 80vh;
   overflow-y: auto;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
 }
 
 /* Below this there is no gutter beside the column, so the gutter toc gives way
@@ -1951,7 +1910,7 @@ footer a {
   margin: 0 -1.25rem 1rem;
   background: var(--bg);
   border-bottom: 1px solid var(--rule);
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
 }
 
 @media (max-width: 1199px) {
@@ -2059,8 +2018,8 @@ footer a {
 /* Neuron-ownership bands on the ripple log: which boxes live inside which
    neuron, tying the unrolled log back to the wiring diagram. */
 .ripple-neuron-band {
-  fill: rgba(11, 110, 79, 0.055);
-  stroke: rgba(11, 110, 79, 0.28);
+  fill: color-mix(in srgb, var(--accent) 5.5%, transparent);
+  stroke: color-mix(in srgb, var(--accent) 28%, transparent);
   stroke-width: 1;
 }
 
@@ -2110,7 +2069,7 @@ footer a {
 /* Module 5's backward-walk panels: a receipt slot read on this pass, and one
    left alone. */
 .ripple-box-read {
-  fill: #dbeade;
+  fill: var(--accent-panel);
   stroke: var(--accent);
   stroke-width: 1.4;
 }
@@ -2185,7 +2144,7 @@ footer a {
   list-style: none;
   margin: 0.5rem 0 0;
   padding: 0;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.82rem;
   color: var(--muted);
 }
@@ -2221,14 +2180,14 @@ footer a {
 }
 
 .sculpt-legend {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.82rem;
   color: var(--muted);
   margin: 0.5rem 0 0;
 }
 
 .sculpt-group-label {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.82rem;
   color: var(--muted);
 }
@@ -2240,7 +2199,7 @@ footer a {
   gap: 0.1rem 1.3rem;
   margin: 0.5rem 0 0.2rem;
   padding: 0;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.85rem;
   color: var(--muted);
 }
@@ -2306,7 +2265,7 @@ footer a {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.9rem;
   color: var(--muted);
   background: var(--surface-card);
@@ -2314,7 +2273,7 @@ footer a {
 
 .module-loading {
   color: var(--muted);
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.9rem;
   padding: 2rem 0;
 }
@@ -2384,7 +2343,7 @@ footer a {
   gap: 0.15rem 1.1rem;
   margin: 0.45rem 0 0;
   padding: 0;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.82rem;
   color: var(--muted);
 }
@@ -2411,7 +2370,7 @@ footer a {
 }
 
 .m7-choice legend {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.75rem;
   color: var(--muted);
   padding: 0 0.3rem;
@@ -2499,7 +2458,7 @@ footer a {
 /* The chart's own how-to-read key, above it rather than in the prose
    (CLAUDE.md: interactives carry their own keys). */
 .m8-key {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.82rem;
   line-height: 1.45;
   color: var(--muted);
@@ -2507,7 +2466,7 @@ footer a {
 }
 
 .m8-readout {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.88rem;
   color: var(--muted);
   margin: 0.45rem 0 0;
@@ -2519,7 +2478,7 @@ footer a {
 .m8-eta-note {
   flex-basis: 100%;
   min-width: 0;
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 0.8rem;
   color: var(--muted);
   margin: 0.1rem 0 0;
@@ -2587,7 +2546,7 @@ footer a {
 }
 
 .m8-conv-boxtext {
-  font-family: system-ui, sans-serif;
+  font-family: var(--font-ui);
   font-size: 12px;
   fill: var(--ink);
 }

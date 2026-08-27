@@ -29,6 +29,11 @@ no accounts, no backend, no analytics.
   and Deep Learning* (Determination Press, 2015). The derivative work inherits
   CC BY-NC 3.0 and cannot be commercialized.
 - **No em dashes in any user-facing prose.** Use commas, colons, or parentheses.
+- **`src/brand/` is shared with every other course in the series.** Four of its five
+  files are copied unchanged between courses, and `tools/check_brand.py` asserts that
+  `course-kit/brand/` still matches them. A change that belongs to this course belongs in
+  `src/styles.css`, which loads after the brand layer and can override any of it. Two
+  things a course does own inside the layer: `brand.ts` and the one `--accent` line.
 
 ## Global shape conventions (all Python must comply)
 
@@ -97,8 +102,8 @@ no accounts, no backend, no analytics.
   the course's invented vocabulary into the field's, names what the course did
   not teach (automatic differentiation, modern optimizers, data preparation,
   error analysis), and carries the where-to-go-next list that used to end Module
-  8. It is the one module with no Nielsen chapter, so it has no `<Recap>` and no
-  "Go deeper" link; everything else about a module page applies.
+  8. Neither it nor Module 10 follows a Nielsen chapter, so neither has a `<Recap>`
+  or a "Go deeper" link; everything else about a module page applies to both.
 - **`course_helpers.py` carries Module 7's three functions too** (`init_network`,
   `l2_step`, `cross_entropy_delta`), so Module 9's capstone can import the
   learner's earlier work the way every exercise does. Module 9's panel then
@@ -111,6 +116,31 @@ no accounts, no backend, no analytics.
   Module 7's three exercises one-line diffs instead of rewrites; `batch_gradient`
   beside it is the per-example-average adapter Module 5's panel used inline. Module 7's
   panels swap the delta rather than the algorithm, and say so in the prose.
+
+- **The visual identity is a shared series layer, not this course's stylesheet**
+  (added after the course was finished, when a second course became likely). `src/brand/`
+  holds an accent family of nine hues at one OKLCH lightness and chroma, four named type
+  roles, and the masthead, tab strip, link and footer chrome. A sibling course copies four
+  of the five files unchanged and edits `brand.ts` plus one `--accent` line. The
+  alternative was leaving each course to style itself, which is what makes a set of pages
+  look unrelated; the cost is that a change to the shared files has to be made in
+  `course-kit/brand/` too, which `tools/check_brand.py` enforces. See "Visual identity"
+  below and `course-kit/BRAND.md`.
+- **The method is extracted rather than described** (same change). `course-kit/` is this
+  file with the neural networks taken out, plus the process that produced it
+  (`METHOD.md`), the fifteen learner failures behind its rules (`CASEBOOK.md`), the design
+  doc template, the brand, and six slash commands. It is meant to be dropped into an empty
+  repo. Rejected: a second generic application scaffold, which would be a guess about a
+  topic that does not exist yet. What the kit says instead is which of this repo's ~2,900
+  topic-free lines to crib, and from where.
+- **The front page's module outline is rendered from the module registry, not from its own
+  list** (same change). Modules 9 and 10 were added after the outline was written and were
+  missing from it, under a heading that said ten, so the only page showing the whole course
+  showed eight of it. `COVERS` in `StartPage.tsx` is now a lookup keyed by module id, read
+  through `MODULES`, and the heading counts the registry. A module with no entry still
+  appears under its nav label, so the worst a gap can cost is a missing sentence.
+  `tools/check_exercises.py` checks the same seam from the other side: every exercise's
+  module id has to exist in the registry.
 
 ## Module authoring playbook (learned from the primary learner, follow it)
 
@@ -434,12 +464,48 @@ own storytelling. Concretely:
 - Exception: a module's final beat may carry one slightly hot sentence. Endings do
   gating work in a self-paced course, and they are the two-minute-demo moments.
 
+## Visual identity
+
+The series brand layer (`src/brand/`, documented in `course-kit/BRAND.md`) owns the accent
+family, the four type roles, the label idiom, the masthead, the tab strip, the links and
+the footer. Rules that follow from it:
+
+- **Anything derived from the accent is a token, never a literal.** Alpha tints are
+  `color-mix(in srgb, var(--accent) N%, transparent)`, which is what `rgba()` was doing;
+  surface tints are `--accent-wash` (6 percent), `--accent-panel` (14 percent) and
+  `--accent-rule` (30 percent), mixed in oklab. Neutral near-whites may stay literal,
+  because a sibling course changing its hue must not repaint them.
+- **The accent family is computed, not picked.** Nine hues at one OKLCH lightness and
+  chroma, so no course can be louder than its neighbours and none can fail contrast.
+  `python3 tools/brand_palette.py --check` fails if `brand.css` has drifted from what the
+  arithmetic gives.
+- **Faces are named, not spelled.** `var(--font-prose)` for anything read in sentences,
+  `var(--font-ui)` for chrome, `var(--font-display)` for the wordmark and labels,
+  `var(--font-mono)` for code. A literal font stack in `styles.css` is a bug: it makes
+  `--font-ui` a decoration rather than a switch.
+- **The mark exists in six places and one of them is a literal.** The masthead monogram
+  and the footer monogram render from `COURSE.glyph`, but `index.html`'s favicon and
+  `theme-color` have to be literals, because a tab needs its icon before any JavaScript
+  runs. `python3 tools/check_brand.py` is what keeps them equal.
+- Data hues (`--acc`, `--loss`, `--data-*`) are not brand colours and do not follow the
+  accent. They name quantities in charts, and a course that changes its accent must not
+  silently repaint its charts.
+
+Two things deliberately absent, so a future session does not treat them as oversights:
+there is no dark mode (every colour is a token, so it is a later drop-in rather than a
+rewrite, but the interactives carry dozens of hand-tuned SVG palettes that each need a
+second reading), and the type scale is named for the chrome only. Rewriting every
+`font-size` in this stylesheet is churn with no visible return; a new course uses the
+tokens from the start.
+
 ## Repo layout
 
 ```
 /                    README (what/why/how to run/license/attribution)
 /CLAUDE.md           this file
 /src/                React app
+/src/brand/          the series brand layer, shared with sibling courses
+/src/start/          the front door: what the course is, the outline, stored progress
 /src/modules/NN/     one folder per module: content, interactives/
 /src/exercises/      per exercise: skeleton.py, tests.py, solution.py, index.ts (prompt, hints)
 /src/python/         shared Python: harness, course helpers, gradient checker, data loader
@@ -449,6 +515,7 @@ own storytelling. Concretely:
 /src/m0/             Milestone 0 training demo UI
 /public/data/        mnist_subset.bin.gz, pretrained_weights.json.gz, penguins.json.gz
 /tools/              build-time scripts (MNIST preprocessing, weight pretraining)
+/course-kit/         this course's method with the neural networks taken out
 ```
 
 ## Commands
@@ -474,6 +541,12 @@ own storytelling. Concretely:
 - `npm run bench:speeds`: the same for the layer-speed and hop tables, by
   importing `deepNet.ts` (the panel's own arithmetic) into Node. No new
   dependency: it compiles through `tools/tsconfig.bench.json` into `.bench/`.
+- `python3 tools/check_brand.py`: the course's mark and hue agree in all six places
+  they appear (the two components, the favicon, the theme colour, and the kit's copy of
+  the shared brand files). Stdlib only.
+- `python3 tools/brand_palette.py`: print the accent family and every contrast ratio in
+  it; `--check` fails if `src/brand/brand.css` has drifted from what the OKLCH arithmetic
+  computes. Stdlib only.
 - `npm run bench:bumps`: every number Module 6 quotes (the bars-to-area table,
   the sharpness experiment, the bump's biases and peak), by importing
   `bumpMath.ts`, which is the arithmetic CurveSculptor and BumpBuilder both
