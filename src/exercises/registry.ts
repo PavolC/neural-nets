@@ -59,4 +59,10 @@ export const EXERCISES: ExerciseRef[] = [
     module: "m7",
     builds: "l2_step: the update rule with weight decay",
   },
+  {
+    id: "train",
+    title: "The whole program",
+    module: "m9",
+    builds: "train and accuracy: the loop over every part, and the score",
+  },
 ];

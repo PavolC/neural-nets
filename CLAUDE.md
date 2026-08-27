@@ -82,6 +82,19 @@ no accounts, no backend, no analytics.
   worker's `runPython` request: the snippet reads input via
   `json.loads(_args_json)`, may stream progress with `_js_report(json_string)`, and
   must evaluate to a JSON string. First-party snippets only.
+- **Module 9 is a closing page, not a chapter** (added after the teaching
+  review): it assembles the program the learner has been writing in pieces
+  (`train` and `accuracy`, the course's only assessment of assembly), translates
+  the course's invented vocabulary into the field's, names what the course did
+  not teach (automatic differentiation, modern optimizers, data preparation,
+  error analysis), and carries the where-to-go-next list that used to end Module
+  8. It is the one module with no Nielsen chapter, so it has no `<Recap>` and no
+  "Go deeper" link; everything else about a module page applies.
+- **`course_helpers.py` carries Module 7's three functions too** (`init_network`,
+  `l2_step`, `cross_entropy_delta`), so Module 9's capstone can import the
+  learner's earlier work the way every exercise does. Module 9's panel then
+  patches the learner's own saved versions over them before running their loop,
+  so the run really is theirs.
 - **`course.backprop` carries a seam for BP1** (added in Module 7): its signature is
   `backprop(weights, biases, x, y, output_delta=None)`, the learner's Module 5
   algorithm with the output layer's blame lifted into an argument (default

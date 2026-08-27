@@ -344,6 +344,25 @@ def bench_module7(b):
               f"share flatter than 0.01 {pct(float((steep < 0.01).mean()))}")
 
 
+def bench_capstone(b):
+    section(
+        "8. Module 9's panel: the learner's own loop on the digit reader",
+        "at 0.5 it lands near 90 percent; at 0.1 it is still climbing at the end; "
+        "at 3.0 it is worse than either",
+    )
+    # FullTrainPanel's exact configuration: ONE generator seeded at 8 draws the
+    # network and then shuffles every epoch, lambda is 1, and the loop is the
+    # capstone exercise's own.
+    prog = load_module(EX / "train" / "solution.py", "your_program")
+    for eta in (0.1, 0.5, 3.0):
+        _, _, history = prog.train(
+            [784, HIDDEN_SIZE, 10], b.X_train, b.Y_train, b.X_test, b.y_test,
+            b.epochs, eta, 1.0, BATCH, np.random.default_rng(INIT_SEED))
+        print(f"  eta {eta}: epoch 1 {pct(history[0])}, final {pct(history[-1])}, "
+              f"last 5 {pct(tail_mean(history))}, per-epoch "
+              + " ".join(pct(a) for a in history))
+
+
 SECTIONS = {
     "depth": bench_depth,
     "first-epoch": bench_first_epoch,
@@ -352,6 +371,7 @@ SECTIONS = {
     "relu": bench_relu,
     "dead": bench_dead,
     "module7": bench_module7,
+    "capstone": bench_capstone,
 }
 
 

@@ -156,6 +156,47 @@ def backprop(weights, biases, x, y, output_delta=None):
     return nabla_w, nabla_b
 
 
+def cross_entropy_delta(a, y, z):
+    """BP1 under the cross-entropy cost: the gap, with nothing multiplying it.
+
+    Built by the learner in Module 7. z is in the signature because backprop
+    passes it; this blame has no use for it.
+    """
+    return a - y
+
+
+def init_network(sizes, rng):
+    """A fresh network: weights divided by the square root of their inputs.
+
+    Built by the learner in Module 7. sizes runs front to back, so
+    [784, 30, 10] is the digit reader. Draw order is part of the contract:
+    every weight matrix first, front to back, then every bias column, so
+    that a given seed builds the same network here as it does there.
+
+    The 1/sqrt(n) scaling is from Nielsen's network2.py (MIT license).
+    """
+    weights = [
+        rng.standard_normal((sizes[i + 1], sizes[i])) / np.sqrt(sizes[i])
+        for i in range(len(sizes) - 1)
+    ]
+    biases = [rng.standard_normal((sizes[i + 1], 1)) for i in range(len(sizes) - 1)]
+    return weights, biases
+
+
+def l2_step(weights, biases, nabla_w, nabla_b, eta, lmbda, n):
+    """One descent step with weight decay.
+
+    Built by the learner in Module 7. Every weight is multiplied by
+    (1 - eta * lmbda / n) before the usual step; biases keep Module 3's
+    rule, since the regularization term does not mention them. n is the
+    size of the whole training set, not of this mini-batch.
+    """
+    decay = 1.0 - eta * lmbda / n
+    new_weights = [decay * w - eta * nw for w, nw in zip(weights, nabla_w)]
+    new_biases = [b - eta * nb for b, nb in zip(biases, nabla_b)]
+    return new_weights, new_biases
+
+
 def batch_gradient(weights, biases, X, Y, output_delta=None):
     """A mini-batch's gradient: backprop per column, slopes averaged.
 

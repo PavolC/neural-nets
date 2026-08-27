@@ -754,8 +754,8 @@ export function Module8() {
         reader, and the training run measured in months of many machines rather
         than seconds of one browser tab. One genuinely new ingredient sits in the middle of it, called
         attention, which lets each position in a sequence decide which other
-        positions to read from; this course does not cover it, and the closing
-        list below is where to go for it.
+        positions to read from; this course does not cover it, and Module 9's
+        closing list is where to go for it.
       </p>
       <p>
         The sentence to keep is the one that both halves of this section share.
@@ -763,92 +763,14 @@ export function Module8() {
         collected it. Embedding space is where the network chooses to think, and it
         learns that choice by the descent you wrote in Module 3.
       </p>
-
-      <SectionHeader id="m8-built" title="What you built" />
       <p>
-        In Module 1 a neuron was a picture on a page. Here is what is running in
-        your browser now, all of it written by you:
+        One thing is still missing before any of that is usable, and it is not
+        another idea. The functions this course had you write have never been
+        assembled: every training run so far was started by a panel that did the
+        loading, the looping and the scoring around them. Module 9 is where you
+        write that loop, and where this course's words get translated into the ones
+        everyone else uses.
       </p>
-      <ul className="m8-built-list">
-        <li>
-          <b>sigmoid and one neuron</b> (Module 1), the squash and the
-          weighted-sum-plus-bias every layer since has been made of.
-        </li>
-        <li>
-          <b>feedforward</b> (Module 2), a whole network as one matrix
-          multiplication per layer, running 784-30-10 on real digits.
-        </li>
-        <li>
-          <b>sgd_step and sgd</b> (Module 3), gradient descent with mini-batches
-          and a shuffle, which has driven every training run in the course since.
-        </li>
-        <li>
-          <b>backprop</b> (Module 5), BP1 to BP4 in about fifteen lines, checked
-          entry by entry against numerically measured gradients, and training
-          784-30-10 to 89 percent in seconds where Module 5's own timing put the
-          nudge-and-measure route at hours.
-        </li>
-        <li>
-          <b>cross_entropy_delta, init_network and l2_step</b> (Module 7), three
-          one-line changes worth about three points of accuracy and a great deal of
-          stability.
-        </li>
-      </ul>
-      <p>
-        That is the whole of Nielsen's Chapters 1 to 3 as working code, plus the
-        parts of Chapters 4 to 6 that are best understood by argument. The digit
-        reader in this browser is not a toy version of a real network. It is a small
-        real one.
-      </p>
-
-      <p>
-        Where to go next, in rough order of how far each one is from where you
-        now stand:
-      </p>
-      <ul className="m8-next-list">
-        <li>
-          <a href="http://neuralnetworksanddeeplearning.com/chap5.html">
-            Nielsen, Chapter 5
-          </a>{" "}
-          and{" "}
-          <a href="http://neuralnetworksanddeeplearning.com/chap6.html">Chapter 6</a>.
-          The two chapters this module summarized, at full length: the unstable
-          gradient argument with the algebra written out, then convolutional
-          networks built up to above 99 percent on MNIST. The book this course is
-          adapted from, and the smallest step from here.
-        </li>
-        <li>
-          <a href="https://karpathy.ai/zero-to-hero.html">
-            Andrej Karpathy, Neural Networks: Zero to Hero
-          </a>
-          . A video series that builds automatic differentiation from scratch, then
-          a language model, in the same implement-it-yourself spirit. It ends where
-          attention begins, which is exactly the gap this course leaves.
-        </li>
-        <li>
-          <a href="https://pytorch.org/tutorials/beginner/basics/intro.html">
-            The PyTorch tutorials
-          </a>
-          . What all of this looks like when the backward pass is written for you.
-          Worth doing once you can say what it is doing on your behalf, which you
-          now can.
-        </li>
-        <li>
-          <a href="https://jalammar.github.io/illustrated-transformer/">
-            Jay Alammar, The Illustrated Transformer
-          </a>
-          , and then the paper it explains,{" "}
-          <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a>.
-          The one ingredient this course named and did not cover.
-        </li>
-        <li>
-          <a href="https://www.deeplearningbook.org/">
-            Goodfellow, Bengio and Courville, Deep Learning
-          </a>
-          . The reference textbook, free online. Heavier on mathematics than
-          anything here, and the place to look up a technique properly.
-        </li>
-      </ul>
 
       <Recap
         items={[

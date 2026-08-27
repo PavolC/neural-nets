@@ -2605,14 +2605,14 @@ footer a {
   stroke-dasharray: 5 3;
 }
 
-.m8-built-list,
-.m8-next-list {
+.m9-built-list,
+.m9-next-list {
   margin: 0.4rem 0 0.9rem;
   padding-left: 1.2rem;
 }
 
-.m8-built-list li,
-.m8-next-list li {
+.m9-built-list li,
+.m9-next-list li {
   margin-bottom: 0.5rem;
 }
 

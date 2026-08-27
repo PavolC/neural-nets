@@ -725,6 +725,34 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         training images.
       </p>
       <p>
+        That last rule needs one more turn of the screw, and this section is
+        where it bites. The overfitting cycle showed what happens to a number
+        that descent is allowed to optimize: the training cost fell to 0.0093
+        and stopped meaning anything about unseen digits. A search does the same
+        thing by hand. Sixteen runs were scored on those thousand held-out
+        digits and the best was kept, so the winning 92.3 percent is the best of
+        sixteen tries against that particular thousand, not what the network
+        would score on a fresh one. Some of that number is the fix and some of
+        it is the choosing.
+      </p>
+      <p>
+        The standard repair is a third split. Hold out two sets rather than one:
+        a validation set you may look at as often as you like, because choosing
+        against it is what it is for, and a test set you look at once, at the
+        end, to report. Everything in the search above then happens on
+        validation data, and the test number is spent last and only once.
+      </p>
+      <p>
+        This course has one held-out thousand and uses it for both jobs, so its
+        quoted numbers are a little generous, and the overfitting section
+        measured how generous. Three shuffles of one unchanged setting landed
+        between 85.2 and 86.2 percent there: a point of wobble with nothing
+        changed at all. Picking the best of sixteen runs pockets some of that
+        wobble as if it were an improvement, which is why a repeated tenth of a
+        point is not worth chasing and why the number to trust is one scored on
+        digits nothing was chosen against.
+      </p>
+      <p>
         Four more techniques exist for the overfitting problem, named here and
         not implemented. More training data, which is the strongest of them and
         the reason this course's numbers sit below Nielsen's. Artificial data,

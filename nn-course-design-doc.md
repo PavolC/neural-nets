@@ -169,5 +169,12 @@ Milestones 0 through 5 are complete. Departures from the plan above, all deliber
 
 - **Module 8 grew a payoff run and a second engine.** The design doc called for per-layer gradient bars with a depth slider and a sigmoid/ReLU toggle; that is `LayerSpeedBars` (TypeScript, so the bars move as fast as the slider does), and beside it `DepthTrainPanel` trains one hidden layer against four with the learner's own code in Pyodide. Two engines means two sets of numbers from two random generators: `tools/bench_layer_speeds.ts` and `tools/bench_depth.py` regenerate them, and CLAUDE.md records that a number from one must never be quoted for the other.
 - **The optional ReLU exercise was not built.** Module 8 swaps the squash inside its own panel instead, which gets the comparison without asking the learner to rewrite `backprop` after the course has already taken its summit.
+- **A ninth module was added** (not in the design doc), after a teaching review of
+  the finished course found that the learner owned seven functions but had never
+  assembled them: every training run was started by a course-written panel. Module 9
+  is the loop, plus the glossary from this course's words to the field's and the
+  where-to-go-next list moved out of Module 8. The review also added the validation
+  split to Module 7, which had been tuning hyperparameters against the same held-out
+  thousand it reported.
 - **A start page was added** (not in the design doc): what the course is, how the machinery works, the eight modules, the training demo that used to sit on a tab of its own, and the stored progress with save, load and reset. It is where a bare link lands.
 - **Gating stayed softer than section 3 proposed.** Nothing locks a module; what an exercise gates is the panel that runs the learner's code, since there is nothing to run until the code exists.

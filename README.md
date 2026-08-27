@@ -27,7 +27,7 @@ site in `dist/` that any static host will serve.
 
 ## What you build
 
-Eight modules, each a few readings interleaved with figures, most ending in an exercise
+Nine modules, each a few readings interleaved with figures, most ending in an exercise
 whose output every later module uses.
 
 | # | Module | You write |
@@ -40,6 +40,7 @@ whose output every later module uses.
 | 6 | Universality (an interlude) | (a curve-sculpting playground) |
 | 7 | Making it actually work | `cross_entropy_delta`, `init_network`, `l2_step` |
 | 8 | Why deep is hard | (a depth and squash comparison) |
+| 9 | Assembling the program | `train`, `accuracy` |
 
 Module 5 is the summit: the learner's `backprop` is checked entry by entry against
 central-difference numerical gradients on a fixed 3-5-4-2 network, to one part in ten
@@ -47,6 +48,10 @@ million, and then trains 784-30-10 to about 89% of a held-out thousand in a few 
 Module 7's three one-line changes take that to about 92%. Module 8 takes the same
 network deeper and measures what breaks: four hidden layers of 30 score 12.6% after a
 full epoch, which is exactly the share of the held-out digits that are 1s.
+
+Module 9 is the capstone: the training loop itself, which the course's panels had been
+running around the learner's functions until then, plus a glossary translating this
+course's vocabulary into the field's and an honest list of what it did not teach.
 
 Nothing is locked. Every module is reachable at any time; what an exercise gates is the
 panel that trains with your own code. Nothing after Module 5 depends on your version of
@@ -98,7 +103,7 @@ code path the browser does, each section printing the prose sentence it backs. T
 exercises have a checker that runs the app's own harness outside the browser:
 
 ```
-python3 tools/check_exercises.py       # 37 tests: solutions pass, skeletons fail
+python3 tools/check_exercises.py       # 44 tests: solutions pass, skeletons fail
 python3 tools/bench_depth.py           # the Pyodide panels' numbers (needs NumPy)
 npm run bench:speeds                   # the layer-speed panel's numbers
 ```
