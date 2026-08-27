@@ -42,14 +42,36 @@ five commits within a few hours**, while the confusion is still articulable. The
 and most valuable stretch of course one was three commits in two hours, each from a live
 read-through of the same chapter.
 
-And the payoff for writing the rules down is measurable. Chapters written before the
-playbook existed absorbed 11 to 13 revision commits each (chapters 1 through 5: 11, 11, 12,
-13, 11). Chapters written after it absorbed 1 to 3 (chapters 6 through 10: 4, 3, 3, 1, 1).
+The payoff for writing the rules down looks large and mostly is not, and the difference
+matters enough to show the working. Chapters written before the playbook existed absorbed
+11 to 13 revision commits each (chapters 1 through 5: 11, 11, 12, 13, 11). Chapters written
+after it absorbed 1 to 4 (chapters 6 through 10: 4, 3, 3, 1, 1). That is a 4.8-fold gap and
+it is the number this file used to stop at.
 
-One honest caveat, and a prediction for your own build: those later chapters had also had
-less reading. The rules helped, but a chapter no one has read carefully is not a chapter
-known to work. Expect the back half of your course to owe revisions it has not yet been
-asked for.
+It does not survive the obvious control. The early chapters existed for most of the build
+and the late ones for a day or less, so they had wildly different amounts of time in which
+to be revised. Dividing each chapter's revisions by the days between its first and last
+commit:
+
+| chapters | mean revisions | days in existence | revisions per day |
+|---|---|---|---|
+| 1 to 5, before the playbook | 11.6 | 2.3 to 3.9 | 3.65 |
+| 6 to 10, after it | 2.4 | 0.4 to 1.4 | 3.08 |
+
+**A 4.8-fold gap becomes a 1.2-fold one.** Chapter 8 was revised faster per day than
+chapters 1, 2, 3 and 6. Whatever the rules bought, the commit history cannot show it,
+because the thing that actually differs between the two halves is how long each chapter sat
+in front of a reader.
+
+Two conclusions, and the second is the one worth carrying. The rules may well have helped;
+this measurement neither establishes it nor rules it out, and one course with one reader
+could not settle it either way. And the late chapters are not finished work: they are
+chapters that have not yet been read enough to know what is wrong with them. Expect the
+back half of your course to owe revisions it has not yet been asked for, and do not read a
+falling revision count as a rising quality curve.
+
+Run this control on your own build before quoting any ratio from it. `git log --format=%cI
+-- <chapter file>` gives the two timestamps, and the arithmetic is one division.
 
 ## Roles
 
