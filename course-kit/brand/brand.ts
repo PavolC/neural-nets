@@ -47,10 +47,12 @@ export const SERIES = {
    *  multiplied by the number of courses. Linking up means shipping a course
    *  edits exactly one repository, and nothing anywhere else can go stale.
    *
-   *  Set once when a course is created, then never touched. Null while the
-   *  index is not published yet, which leaves the wordmark as plain text
-   *  rather than as a link to a 404. FILL: the series index's URL. */
-  homeUrl: null as string | null,
+   *  Set once when a course is created, then never touched. Series-level
+   *  rather than course-level: every course in the series points at the same
+   *  index, so a sibling copies this line unchanged and never edits it again.
+   *  Null leaves the wordmark as plain text rather than a link to a 404, which
+   *  is where it should sit until the index is actually published. */
+  homeUrl: "https://pavolc.github.io/moving-parts/" as string | null,
 };
 
 export const COURSE = {
