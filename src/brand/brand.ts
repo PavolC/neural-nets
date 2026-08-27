@@ -23,14 +23,6 @@ export interface Glyph {
   strokeWidth: number;
 }
 
-export interface CourseRef {
-  id: string;
-  /** The subject alone. The series name is an imprint, not a prefix. */
-  subject: string;
-  /** Where it is published, or null for the course you are reading. */
-  url: string | null;
-}
-
 export const SERIES = {
   /** An imprint rather than a prefix: the courses are "Neural Networks" and
    *  "Ciphers", published under this name, not "Moving Parts Neural Networks".
@@ -41,14 +33,23 @@ export const SERIES = {
   note: "build-it-yourself courses",
   /** One sentence, in the footer. */
   what: "A series of courses you finish by building the thing they are about.",
-  /** An index page listing every course, once one exists. Null leaves the
-   *  wordmark as plain text rather than as a link to a 404. */
-  homeUrl: null as string | null,
-  /** Every course in the series, in the order they were written. The footer
-   *  turns this into sibling links, which is what makes a reader who lands on
-   *  one course discover the rest. Add a row here when a new course ships,
-   *  in every course's copy of this file. */
-  courses: [{ id: "nets", subject: "Neural Networks", url: null }] as CourseRef[],
+  /** The series index, which is the only place that knows what else exists.
+   *
+   *  A course links UP to it and never across to a sibling. The obvious design
+   *  was the other way round, with each course carrying the list and linking
+   *  to its siblings, and it is a trap: shipping the fourth course would mean
+   *  editing and redeploying four repositories, and any one of them forgotten
+   *  shows a stale list forever. This is the same hand-maintained-list failure
+   *  that once let the front page claim ten modules over a list of eight,
+   *  multiplied by the number of courses. Linking up means shipping a course
+   *  edits exactly one repository, and nothing anywhere else can go stale.
+   *
+   *  Set once when a course is created, then never touched. It is series-level
+   *  rather than course-level: every course in the series points at the same
+   *  index, so this line is identical in all of them and a sibling copies it
+   *  unchanged. Null would leave the wordmark as plain text rather than a link
+   *  to a 404, which is what it was until the index went live. */
+  homeUrl: "https://pavolc.github.io/moving-parts/" as string | null,
 };
 
 export const COURSE = {

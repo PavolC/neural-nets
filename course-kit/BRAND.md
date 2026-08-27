@@ -185,12 +185,28 @@ Step 6 is the one that goes stale, which is what `check_brand.py` is for: the fa
 the only copy of the mark that no component can generate, because a tab needs its icon
 before any JavaScript runs.
 
-## When a new course ships
+## When a new course ships: link up, never across
 
-Add its row to `SERIES.courses` **in every course's copy of `brand.ts`**, and redeploy them.
-That is what turns a reader who found one course into a reader who knows there are others.
-Set `SERIES.homeUrl` once an index page exists; until then it stays `null` and the wordmark
-is plain text rather than a link to a 404.
+**A course links up to the series index. It does not list its siblings.**
+
+The obvious design is the other way round: each course carries the list of courses and
+links across to the others. It is a trap. Shipping the fourth course then means editing and
+redeploying four repositories, and any one of them forgotten shows a stale list forever.
+That is the hand-maintained-list failure in its purest form, multiplied by the number of
+courses, and the first course in this series shipped a smaller version of the same bug: a
+front page claiming ten modules over a list of eight, because the list was written before
+two of them existed.
+
+So: `SERIES.homeUrl` is set once when a course is created and never touched again, and the
+index is the one thing that knows what exists. Shipping a course edits exactly one
+repository. Nothing anywhere else can go stale, because nothing anywhere else knows.
+
+The index is a single static page, one card per course, each card in that course's own hue.
+It wants no build step: with a handful of courses, a hand-maintained list in the one place
+that is allowed to have one is correct.
+
+`homeUrl` stays `null` until the index is actually published, which leaves the wordmark as
+plain text rather than as a link to a 404.
 
 ## Deliberately not here
 
