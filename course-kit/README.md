@@ -3,7 +3,7 @@
 Everything needed to build another interactive, self-contained course that teaches a
 technical topic to one named learner by making them build the thing.
 
-Extracted from the first one ([Grokking Nets](../README.md): five days, 64 commits, ten
+Extracted from the first one ([Grokking Nets](../README.md): five days, 70 commits, ten
 chapters, nine coding exercises, a real network training in the browser), and specifically
 from the parts of it that were not about neural networks.
 
@@ -49,7 +49,7 @@ A rule with no incident behind it gets bent; a rule with a quote behind it does 
 | `/house-style` | measure every chapter on countable prose features against the bands |
 | `/teaching-review` | read the finished course for what no single chapter can show |
 
-`/stuck` is the important one. Thirty-one percent of course one's commits exist because a
+`/stuck` is the important one. About a third of course one's commits exist because a
 real reader said something like "over my head" or "we're just talking about curves.....
 why??" and that got turned into a fix plus a rule in the same commit.
 
@@ -62,10 +62,12 @@ drive the revisions, and the revisions are the project.
 **You will read every chapter, in one sitting, and stop where you get lost.** Not push
 through to be polite. The stopping point is the data.
 
-**The rewriting is the work.** Course one built its whole machine and its first three
-chapters in 117 minutes, then spent five days making them teach. Of 64 commits, 10 added
-content and 38 rewrote content that already existed. Budget three revision passes for every
-unit of new content.
+**The rewriting is the work.** Course one committed its machine and first drafts of three
+chapters inside two hours, then spent five days making them teach. Of its 64 non-merge
+commits, 8 added a new chapter and 38 revised chapters that already existed: about five
+revision commits per new chapter. Those passes were mostly additive, so the chapters got
+three to four times longer rather than being replaced. Budget four or five revision passes
+for every unit of new content.
 
 ## Code worth copying, if the new course has code exercises
 
@@ -75,8 +77,11 @@ scaffold for a topic that does not exist yet is a guess. But roughly 2,900 of co
 (nothing in `components/`, `runtime/` or `state/` imports a chapter), so they lift cleanly.
 Worth cribbing from `../src/`:
 
-- `runtime/messages.ts` and `runtime/workerClient.ts`: the test protocol is two opaque code
-  strings in, one structured verdict out. It knows nothing about the language.
+- `runtime/messages.ts` and `runtime/workerClient.ts`: the run-tests exchange itself is two
+  opaque code strings in, one structured verdict out, and that shape transfers to any
+  language. The files around it do not: the same `messages.ts` also carries this course's
+  MNIST training protocol, and the client hardcodes the Pyodide worker and names Python in
+  its error strings. Copy the shape, delete the rest.
 - `python/harness.py` (98 lines): runs the learner's code as a `submission` module and
   collects `test_*` functions. The only place the Python assumption lives.
 - `components/ExercisePage.tsx` (467 lines): three couplings to Python, everything else

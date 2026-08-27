@@ -38,9 +38,11 @@ source text, anything with accounts or a backend).
 
 ## The learner floor
 
-FILL, as a list of what the learner does NOT know. "Knows Python; has never seen a
-grammar, a stack machine, or asymptotic notation." Not "intermediate programmer": a
-positive sketch cannot be checked against a paragraph, a negative list can.
+FILL: one short line for what the learner can already do, then the list of what they have
+never seen. "Knows Python and high-school algebra; has never seen a grammar, a stack
+machine, or asymptotic notation." The absences are the load-bearing half, because a
+paragraph can be checked against them; "intermediate programmer" cannot be checked against
+anything.
 
 The floor is binding on every chapter, including the last one. Everything above the floor
 is built here, in the order the story needs it and never before.

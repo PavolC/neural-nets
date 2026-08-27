@@ -1,7 +1,8 @@
 # The method
 
 How to build one of these. Written after finishing the first one (neural networks, five
-days, 64 commits), so the numbers below are measured rather than estimated.
+days, 70 commits), so the numbers below are measured rather than estimated. Where a number
+here is a count of commits, it was checked against the history rather than remembered.
 
 The short version: **you are not writing a course, you are debugging one against a
 reader.** Building the machine and the first draft is a morning's work. Making it teach is
@@ -15,13 +16,26 @@ Day one of course one, before lunch:
 
 | 08:40 | repo skeleton, CLAUDE.md, feasibility spike (a real network training in the browser) |
 | 09:17 | the exercise pipeline: editor, worker, tests, results, saved progress |
-| 10:37 | chapters 1 to 3, complete with content and interactives |
+| 10:37 | first drafts of chapters 1 to 3, with content and interactives |
 | 12:50 | **chapters 1 to 3 rewritten from scratch**, because the learner's actual floor was below what the plan assumed |
 
-Everything after 12:50 on day one was revision. Of 64 commits: 10 added chapter content,
-7 added infrastructure, 38 rewrote content that already existed, 9 were fixes. **Budget
-three revision passes for every unit of new content.** A plan that schedules only
-authoring is off by a factor of three.
+Read that as first drafts, not finished chapters, and note that it excludes the spike's own
+build time, since the clock starts at the commit that already contained a working trainer.
+Chapters 1 to 3 kept being reworked for four more days, and grew three to four times longer
+doing it (102, 80 and 104 lines at 10:37, against 446, 271 and 290 now). Chapter 3's
+centerpiece interactive was thrown away and replaced on day two.
+
+Of the 64 non-merge commits: **8 added a new chapter, 9 added infrastructure, 38 were
+revision passes over chapters that already existed, and 9 were fixes.** That is about five
+revision commits for every new chapter. **Budget four or five revision passes for every
+unit of new content.** A plan that schedules only authoring is off by a factor of five.
+
+One thing that ratio gets wrong, and it matters for what the passes feel like: the revision
+was overwhelmingly **additive**. Those 38 passes added 3.2 lines for every line they
+deleted, and 37 of the 38 were net-positive. Across the whole history, deletions are 12
+percent of additions. The chapters were not rewritten so much as thickened: figures added,
+worked examples inserted, compressed sentences unpacked, asides broken out. Expect to spend
+your revision budget making chapters longer and more concrete, not shorter and sharper.
 
 The productive unit is not a work session. It is **a reading session followed by two to
 five commits within a few hours**, while the confusion is still articulable. The tightest
@@ -29,8 +43,8 @@ and most valuable stretch of course one was three commits in two hours, each fro
 read-through of the same chapter.
 
 And the payoff for writing the rules down is measurable. Chapters written before the
-playbook existed absorbed 11 to 13 revision commits each. Chapters written after it
-absorbed 1 to 3.
+playbook existed absorbed 11 to 13 revision commits each (chapters 1 through 5: 11, 11, 12,
+13, 11). Chapters written after it absorbed 1 to 3 (chapters 6 through 10: 4, 3, 3, 1, 1).
 
 One honest caveat, and a prediction for your own build: those later chapters had also had
 less reading. The rules helped, but a chapter no one has read carefully is not a chapter
@@ -39,8 +53,9 @@ asked for.
 
 ## Roles
 
-**You are the learner, and the learner is the test suite.** Thirty-one percent of course
-one's commits would not exist without a real reader reporting real confusion. Do not
+**You are the learner, and the learner is the test suite.** About a third of course one's
+commits would not exist without a real reader reporting real confusion: 20 of the 64 either
+attribute their change to him in the message or record his words as a rule. Do not
 delegate that. If you already know the topic, this method is the wrong one: its whole
 engine is your own confusion, reported fast and quoted verbatim.
 
@@ -88,7 +103,10 @@ knowledge. Build them before the first chapter.
      reproducible;
    - the notation reference on the front page, empty, with the rule that adding notation
      means adding a row in the same change;
-   - the deploy path, green, before there is anything to deploy.
+   - the deploy path, green, before there is anything to deploy. Course one's own plan said
+     "deploy early so the demo link exists from milestone 1 onward" and then did not, until
+     day four, which is how its feasibility spike stayed in the shipping navigation as a
+     build artifact for three and a half days.
 
 Also decide, on day one, things that are nearly free now and cost a course-wide retrofit
 later: the component vocabulary (aside box, section header, figure families, recap), the
