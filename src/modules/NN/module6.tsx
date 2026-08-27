@@ -47,7 +47,9 @@ export function Module6() {
         Give a network this job. One number in, one number out: hand it the
         forecast, and it answers how much you want to go to the concert, from 0
         to 10. Module 1's weather input was a switch, 1 for good and 0 for bad.
-        This one is a dial, 0 at freezing and 1 at scorching.
+        This one is a dial, 0 at freezing and 1 at scorching, which is the kind
+        of input your digit reader has had all along: Module 2 fed it ink levels,
+        0 for blank paper and 1 for full ink.
       </p>
       <p>Your own answers, temperature by temperature, are the job.</p>
       <Figure caption="The curve to match (dashed) and two attempts by a single neuron (green). A neuron on the dial reports sigma(w x + b), and its outgoing wire carries one weight that scales the report: the neuron can climb and flatten, or fall and flatten.">
@@ -93,10 +95,16 @@ export function Module6() {
         Two numbers describe each panel, and both read off the neuron directly.
         The switchover sits where the evidence is exactly zero: solve{" "}
         <M tex="wx + b = 0" /> and it is at <M tex="x = -b/w" />, minus the bias
-        over the weight. Its width is <M tex="6/w" />, because the sigmoid needs
-        its evidence to run from about <M tex="-3" /> to <M tex="+3" /> to climb
-        from 0.05 to 0.95, and one unit of dial buys <M tex="w" /> units of
-        evidence.
+        over the weight. Module 1 solved the same equation with two inputs,{" "}
+        <M tex="w_1 x_1 + w_2 x_2 + b = 0" />, and got a straight line across the
+        concert plane, the frontier with go on one side and stay on the other.
+        With one input that frontier has nowhere to run, so it shrinks to the one
+        point on the dial where the neuron switches over.
+      </p>
+      <p>
+        The switchover's width is <M tex="6/w" />, because the sigmoid needs its
+        evidence to run from about <M tex="-3" /> to <M tex="+3" /> to climb from
+        0.05 to 0.95, and one unit of dial buys <M tex="w" /> units of evidence.
       </p>
       <p>
         Read the position rule the other way and it becomes the instruction used
@@ -183,6 +191,40 @@ export function Module6() {
         tex="\underbrace{2}_{\text{weights in}} + \underbrace{2}_{\text{biases}} + \underbrace{2}_{\text{weights out}} = 6"
         gloss="Six numbers per bump, set by three decisions: where it starts, where it ends, how tall it is. Both weights in are the shared steepness, both biases come from the edges, and the two weights out are one height with opposite signs. The output neuron's own bias stays 0 all through this page, so it is not one of the six."
       />
+      <p>
+        You have built this network before. Module 1's rule, go when exactly one
+        of the two things is good, came out as two hidden neurons with weights 6
+        and 6 and biases <M tex="-3" /> and <M tex="-9" />, feeding an output
+        through wires carrying <M tex="+8" /> and <M tex="-8" /> with a bias of{" "}
+        <M tex="-4" />. Both hidden neurons multiplied both inputs by 6, so both
+        cared about one number only: the total <M tex="x_1 + x_2" />, which is 0,
+        1 or 2 across the four dots. The first switched on once that total passed
+        0.5, the second once it passed 1.5.
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>the total <M tex="x_1 + x_2" /></th>
+              <th>first neuron</th>
+              <th>second neuron</th>
+              <th>evidence into the output: 8 times the first, −8 times the second, minus 4</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>below 0.5</td><td>0</td><td>0</td><td>−4</td></tr>
+            <tr><td>between 0.5 and 1.5</td><td>1</td><td>0</td><td>+4</td></tr>
+            <tr><td>above 1.5</td><td>1</td><td>1</td><td>−4</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Low, high, low: a bump, with its edges at 0.5 and 1.5 and its height set
+        by the weights on the two outgoing wires. Module 1 then squashed that total, and the bias{" "}
+        <M tex="-4" /> acted as a threshold, turning inside the bump into a yes.
+        This page leaves the squash off, so the height is the answer instead of a
+        verdict.
+      </p>
       <Aside>
         <p>
           One departure from the anatomy the course has used so far. In every
@@ -201,7 +243,14 @@ export function Module6() {
         A bump is a bar. Slice the dial into equal pieces, give each piece its
         own bump, and set each height to where the target runs over that piece:
         the curve, drawn as a bar chart. One pair of neurons per bar, so six
-        bars is a hidden layer of twelve.
+        bars is a hidden layer of twelve, against the 30 hidden neurons in the
+        network you trained, which is 15 bars' worth.
+      </p>
+      <p>
+        The weights now hold a lookup table. Module 1's truth table had four
+        rows, one per situation, with the answer written beside it. This one has
+        a row per slice of the dial, each row's answer is that bar's height, and
+        the network answers by looking up whichever slice the dial is in.
       </p>
       <p>
         The construction does not change as the bar count goes up. Each bar still
@@ -216,7 +265,9 @@ export function Module6() {
       <p>
         Here is what Fit it for me scores on the first curve, at the sharpness
         the playground starts with. The dial is one unit wide, so the area
-        between the curves is also the average miss in rating points.
+        between the curves is also the average miss in rating points: the same
+        kind of number as Module 3's cost, one score for the whole fit, though it
+        averages the plain gap rather than the squared one.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
@@ -270,8 +321,10 @@ export function Module6() {
       <p>
         One dial gave a curve. Two dials give a surface: Module 1's concert
         plane with both inputs turned continuous, the forecast across and how
-        keen your friend is up, and a rating at every point of the square.
-        Building a bump there takes one extra stage.
+        keen your friend is up, and a rating at every point of the square. The
+        four dots become every point of it, and the tinted region where one
+        neuron said go becomes the shaded band in the panels below. Building a
+        bump there takes one extra stage.
       </p>
       <Figure caption="Building a tower on the concert plane. Each square is the plane of two dials, forecast across and friend's keenness up. Four neurons make the two bands; the fifth thresholds their sum at 9, which only the crossing clears.">
         <TowerDiagram />
@@ -280,9 +333,11 @@ export function Module6() {
         Two neurons make a bump along the forecast: 6 inside a vertical band, 0
         outside. Two more make a bump along the friend: 6 inside a horizontal
         band. Added, the square reads 0 outside both bands, 6 in either band
-        alone, and 12 where they cross. Then one more neuron, with a large
-        weight and a bias of <M tex="-9" />. Nine sits between 6 and 12, so only
-        the crossing clears it, and that neuron reports 1 on a small rectangle
+        alone, and 12 where they cross. Then one more neuron, thresholding a sum
+        of hidden reports the way the XOR network's output neuron did with its
+        bias of <M tex="-4" />: give this one a large weight and a bias of{" "}
+        <M tex="-9" />. Nine sits between 6 and 12, so only the crossing clears
+        it, and that neuron reports 1 on a small rectangle
         and 0 everywhere else.
       </p>
       <p>
@@ -332,9 +387,12 @@ export function Module6() {
         gloss="Two neurons to fence each pixel's band, 784 pixels per box, one box per training image, plus one thresholding neuron per box. Your trained network does the job with 30 hidden neurons, so this construction is about 260,000 times the size of the network you trained."
       />
       <p>
-        And that network knows nothing between its boxes. Your 30-neuron network reads 89
-        percent of images it never saw, while this one answers 0 for anything
-        outside the 5,000 boxes it was built from. The box network proves that
+        And that network knows nothing between its boxes. The bar chart's lookup
+        table is back, one row per box, except that the rows no longer tile
+        anything: six bars covered every temperature on the dial, while 5,000
+        boxes leave almost all of 784 directions uncovered. Your 30-neuron
+        network reads 89 percent of images it never saw, while this one answers 0
+        for anything outside the 5,000 boxes it was built from. The box network proves that
         the parameters can express a perfect fit on the training set, and that is
         all it proves; it does not read digits.
       </p>
@@ -374,10 +432,12 @@ export function Module6() {
       </p>
       <p>
         The construction also wastes neurons: two per slice, and 7.8 million of
-        them for the box network, with nothing shared between slices, since each
-        pair knows its own slice and nothing else.
-        Deeper networks reuse their detectors across the input instead of tiling
-        it, which is Module 8's subject.
+        them for the box network. Module 2 called a hidden neuron a little
+        pattern-detector, and each of your trained network's 30 detectors helps
+        describe every image it sees. The box network's detectors each know one
+        image and share nothing, which is where the 260,000-fold difference in
+        size comes from. Deeper networks reuse their detectors across the input
+        instead of tiling it, which is Module 8's subject.
       </p>
       <p>
         So universality is not a technique you apply. It removes one explanation
