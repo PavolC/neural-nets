@@ -131,3 +131,35 @@ for (const k of BAR_COUNTS) {
   console.log(`  friend's curve, ${String(k).padStart(2)} bars   area ${area.toFixed(3)}`);
 }
 console.log();
+
+// ---------------------------------------------------------------- 7
+section(
+  "7. Module 1's XOR network, read as a bump (the m6-bump recognition table)",
+  "two hidden neurons with weights 6 and 6 and biases -3 and -9, wires out +8 and -8 " +
+    "and an output bias of -4, report 0.05/0.00, 0.95/0.05 and 1.00/0.95 at the totals " +
+    "0, 1 and 2, so the evidence into the output runs -3.6, +3.2, -3.6; the bump reaches " +
+    "about 7.2 rather than 8 because a weight of 6 makes each switchover 6/6 = 1 wide " +
+    "while the two steps sit 1 apart",
+);
+// The same bumpAt the playground draws with, at Module 1's arguments: height 8,
+// steepness 6, steps at 0.5 and 1.5 along the total x1 + x2. That the identity
+// checks out through the panel's own function is the point of the beat.
+const XOR = { w: 6, s1: 0.5, s2: 1.5, h: 8, outBias: -4 };
+const report = (bias: number, total: number) => 1 / (1 + Math.exp(-(XOR.w * total + bias)));
+for (const total of [0, 1, 2]) {
+  const first = report(-3, total);
+  const second = report(-9, total);
+  const bump = bumpAt(XOR.w, XOR.s1, XOR.s2, XOR.h, total);
+  const evidence = bump + XOR.outBias;
+  console.log(
+    `  total ${total}   first ${first.toFixed(2)}   second ${second.toFixed(2)}   ` +
+      `bump ${bump.toFixed(3)}   evidence ${evidence >= 0 ? "+" : ""}${evidence.toFixed(1)}   ` +
+      `squashed ${(1 / (1 + Math.exp(-evidence))).toFixed(3)}`,
+  );
+}
+console.log(
+  `  switchover 6/${XOR.w} = ${(6 / XOR.w).toFixed(2)} wide, steps ` +
+    `${(XOR.s2 - XOR.s1).toFixed(2)} apart, so no flat top: peak ` +
+    `${bumpAt(XOR.w, XOR.s1, XOR.s2, XOR.h, (XOR.s1 + XOR.s2) / 2).toFixed(2)} of ${XOR.h}`,
+);
+console.log();
