@@ -59,6 +59,20 @@ export default function App() {
   // browser clamps it into the new one: leaving Module 4 halfway through used to
   // land the reader on Module 2's closing recap. Start every module at its top,
   // which is what the Continue button already did.
+  // The tab strip is one panning row below 720px, so the active tab can sit
+  // off-screen: a link straight to Module 8 would show the row scrolled to
+  // Start. Nothing else moves, hence inline and nearest rather than a scroll
+  // into view that would also drag the page.
+  const tabStrip = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const active = tabStrip.current?.querySelector<HTMLElement>(".tab-active");
+    // Centred rather than nearest: nearest parks the active tab against the
+    // edge fade with no neighbours beside it, which loses the one thing the
+    // strip is for, namely where you are in the sequence. The first and last
+    // tabs clamp to their ends on their own.
+    active?.scrollIntoView({ inline: "center", block: "nearest" });
+  }, [tab]);
+
   const panels = useRef<Record<string, HTMLDivElement | null>>({});
   // The tab this effect last acted on. A boolean "have I mounted yet" flag does
   // not survive StrictMode, which runs the effect, cleans up, and runs it again:
@@ -99,7 +113,7 @@ export default function App() {
     <div className="app">
       <Masthead
         nav={
-          <nav className="tabs" aria-label="Course modules">
+          <nav className="tabs" ref={tabStrip} aria-label="Course modules">
             <button
               className={`tab ${tab === START_TAB ? "tab-active" : ""}`}
               aria-current={tab === START_TAB ? "page" : undefined}

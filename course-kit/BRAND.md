@@ -10,7 +10,7 @@ dependency a course has to install. The whole thing is five files and about 480 
 
 ## What makes it a set
 
-Four things, and only these four, have to hold across courses.
+Five things, and only these five, have to hold across courses.
 
 **1. The accent family.** Nine hues at one OKLCH lightness (0.478) and one chroma (0.0975),
 the values of the first course's green, held fixed while the hue turns 36 degrees at a time.
@@ -77,7 +77,17 @@ It marks the series wordmark, the aside and nav labels, the passed badge, and ev
 --label-size: 0.72rem;  --label-tracking: 0.09em;  --label-weight: 600;
 ```
 
-**4. The lockup.** A monogram tile, the series wordmark, and the course subject on the
+**4. The reading measure.** Prose runs to `--measure` (34rem, about 69 characters at a 19px
+root); figures, tables, panels and the editor keep the whole column. Display equations take
+`--measure-wide` (42rem) because they centre themselves and cannot re-wrap. The page then
+reads as a text column with wider illustrations beside it, which is the single change that
+does most for how designed it looks.
+
+Apply it with direct-child selectors on the reading column, never on `p` globally: in a
+stylesheet with two dozen interactives in it, a paragraph inside a panel or a control row
+must not inherit a prose measure.
+
+**5. The lockup.** A monogram tile, the series wordmark, and the course subject on the
 line below:
 
 ```
@@ -95,6 +105,38 @@ The monogram is the course's glyph in white on a rounded tile of its accent. **P
 something the course itself draws.** Nets uses the sigmoid curve, which is the first figure
 in chapter 1 and the shape every unit in the course is built from. A glyph that means
 nothing is worse than a letter.
+
+## Three details that carry more than they look like
+
+**A section title wears a short accent rule above it.** 26 by 2 pixels, in the course's
+hue. On a long single-scroll page it is the only thing that says a new section started, and
+because it is drawn from the accent it is the one piece of structural furniture a sibling
+course inherits already recoloured.
+
+**Hover is declared per variant, never on `button`.** A bare `button:hover` outranks
+`.tab:hover` and every other variant that sets its own transparent background, and fills
+them solid. The first course shipped that bug and had to revert the whole hover pass. The
+primary treatment is reached as `button:not([class])`: every variant carries a class, so
+the selector cannot reach one.
+
+**The nav strip is one panning row below 720px.** Eleven tabs wrap to six rows on a phone
+and take the entire first screen before the course starts. One row that pans, with the
+active tab scrolled to centre and an edge fade that says there is more, is the same
+information in a tenth of the height.
+
+## The code editor
+
+If the course has an in-page editor, theme it: a stock editor theme is the most visible
+surface on the page that nobody chose. Two halves, both in the editor component rather
+than the stylesheet, because the editor generates its own class names:
+
+- **Chrome** from the surfaces and the accent: the card surface behind the code, the sunken
+  surface behind the gutter, the accent as the caret, the 6 percent wash as the active line,
+  the 14 percent panel as the selection.
+- **Token colours from the accent family.** Do not hand-pick syntax colours. Every hue in
+  the family sits at the one lightness that clears 6:1 on the page ground, so taking
+  keywords from violet, strings from moss, numbers from oxide and definitions from blue
+  gives a syntax theme that is legible by construction and unmistakably the same brand.
 
 ## The files
 

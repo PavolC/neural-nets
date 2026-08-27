@@ -147,6 +147,11 @@ button:disabled {
   color: var(--accent);
 }
 
+/* Its own hover, at its own specificity, so nothing has to outrank anything. */
+.button-secondary:hover:not(:disabled) {
+  background: var(--accent-wash);
+}
+
 .badge-done {
   display: inline-block;
   margin-left: 0.6rem;
@@ -430,6 +435,42 @@ button:disabled {
   font-size: 0.9rem;
 }
 
+/* ---------- the reading measure ---------- */
+
+/* Prose takes --measure; figures, tables, panels and the editor keep the whole
+   column. The selectors are all direct-child, which is what makes this safe in
+   a stylesheet with twenty-five interactives in it: a paragraph inside a panel
+   or a figure caption is not a child of the article and never sees this.
+   Equations come along, because they centre themselves and would otherwise
+   centre on the column while the text sat left of it. */
+.module > p,
+.module > ul,
+.module > ol,
+.exercise > p,
+.after-this,
+.recap,
+.module-aside,
+.next-module {
+  max-width: var(--measure);
+}
+
+/* An equation is centred and cannot be re-wrapped, so at the prose measure the
+   short ones started scrolling sideways inside their own affordance. They take
+   the wider measure and keep the prose column's left edge. */
+.module > .eq {
+  max-width: var(--measure-wide);
+}
+
+/* The cards hold prose, so they take the measure plus the padding that sits
+   outside it. Without the correction their text is narrower than the
+   paragraphs above and below them, which reads as a mistake rather than as a
+   box. */
+.after-this,
+.recap,
+.module-aside {
+  max-width: calc(var(--measure) + 2.2rem);
+}
+
 /* ---------- module pages ---------- */
 
 /* Direct child only: the module's own title. A descendant selector here used
@@ -472,14 +513,30 @@ button:disabled {
   border-left: 3px solid var(--accent);
   border-radius: var(--radius-lg);
   padding: 0.2rem 1.1rem 0.8rem;
-  margin: 1.2rem 0;
+  margin: 1.6rem 0;
   background: var(--surface-card);
 }
 
+/* The opener is a promise and the recap is a summary, and they were the same
+   box. Tinting the opener in the accent is the cheapest way to tell a reader
+   arriving at the top of a module from one arriving at the bottom. */
+.after-this {
+  background: var(--accent-wash);
+  border-color: var(--accent-rule);
+}
+
+/* A card heading is chrome, not prose: it labels the box rather than
+   continuing the argument, so it takes the chrome face and the accent. Not the
+   uppercase label idiom, because "What you'll be able to do after this" is a
+   sentence and letterspaced capitals would wrap it into three lines. */
 .after-this h3,
 .recap h3 {
-  font-size: 0.95rem;
-  margin: 0.8rem 0 0.4rem;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--accent);
+  margin: 0.9rem 0 0.5rem;
 }
 
 .after-this li,
@@ -1868,8 +1925,46 @@ button:disabled {
 /* Section headers inside modules, and the floating on-this-page nav. */
 .module-section-title {
   font-size: 1.15rem;
-  margin: 2.6rem 0 0.6rem;
-  scroll-margin-top: 18px;
+  margin: 3.2rem 0 0.7rem;
+  scroll-margin-top: 24px;
+}
+
+/* A short accent rule above each section title. The page is a long single
+   scroll of prose and figures, and before this the only thing marking a new
+   section was a slightly larger line of the same serif. The mark is in the
+   course's own hue, so it is the one piece of structural furniture that a
+   sibling course inherits already recoloured. */
+.module-section-title::before {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 2px;
+  margin-bottom: 0.85rem;
+  border-radius: 1px;
+  background: var(--accent);
+}
+
+/* The first section follows the opener card, which already separates it. */
+.after-this + .module-section-title {
+  margin-top: 2.4rem;
+}
+
+/* The start page's sections are plain h3s rather than SectionHeaders, because
+   nothing scrollspies them, but a reader should not be able to tell that from
+   how they look. */
+.start-page > h3 {
+  font-size: 1.15rem;
+  margin: 3.2rem 0 0.7rem;
+}
+
+.start-page > h3::before {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 2px;
+  margin-bottom: 0.85rem;
+  border-radius: 1px;
+  background: var(--accent);
 }
 
 /* Tracks the text column rather than the window's right edge, which is what

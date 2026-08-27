@@ -490,6 +490,30 @@ the footer. Rules that follow from it:
 - Data hues (`--acc`, `--loss`, `--data-*`) are not brand colours and do not follow the
   accent. They name quantities in charts, and a course that changes its accent must not
   silently repaint its charts.
+- **Prose takes `--measure`, everything else takes the column.** A line of prose runs to
+  34rem (about 69 characters at the 19px root); figures, tables, panels and the editor keep
+  the full 920px. The selectors that apply it are all direct-child of the reading column
+  (`.module > p`, `.exercise > p`), which is what makes it safe in a stylesheet with
+  twenty-five interactives: a paragraph inside a panel is not a child of the article and
+  never sees it. Display equations take `--measure-wide` (42rem) because they centre
+  themselves and cannot re-wrap; two of the course's 51 equations still scroll inside their
+  own affordance, both of them wide `\underbrace` tallies.
+- **A section title carries a short accent rule above it.** It is the one piece of
+  structural furniture a sibling course inherits already recoloured, and the start page's
+  plain h3s wear it too, so a reader cannot tell which sections are scrollspied.
+- **Hover is declared per variant, never on `button`.** A bare `button:hover` has higher
+  specificity than `.tab:hover` or `.module-toc-item:hover`, so it fills every variant that
+  sets its own transparent background: that is a bug this course has already shipped once.
+  The primary treatment is reached as `button:not([class])`, which cannot match a variant,
+  because every variant here carries a class.
+- **The editor is themed from brand tokens, in `CodeEditor.tsx`.** Its chrome comes from
+  the surfaces and the accent; its token colours come from the accent family, so syntax
+  highlighting is legible by construction (every hue in that family clears 6:1 on the page
+  ground) rather than by eye. Do not hand-pick a syntax colour: take one of the nine.
+- **KaTeX keeps its own face, and that is a choice.** Computer Modern is what mathematics
+  is set in, and matching it to the prose serif would make the notation harder to read, not
+  more consistent. It is the one type system on the page that is deliberately not the
+  brand's.
 
 Two things deliberately absent, so a future session does not treat them as oversights:
 there is no dark mode (every colour is a token, so it is a later drop-in rather than a
