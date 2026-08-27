@@ -212,6 +212,33 @@ this floor after direct feedback; every later module must be written to it too.
   wonder about, state it where they will wonder: the XOR playground's dots ARE
   the contrarian's dataset; "Show a solution" sets exactly the table's numbers,
   with h1 as the at-least-one detector.
+- **Recognize, do not rebuild.** The primary learner asked how the course gets
+  from "a neuron is a straight line trying to divide data up" to "pairs of them
+  with sigmoids making bars", and the answer was that Module 6 had been
+  rebuilding three things he already owned. The switchover at -b/w is Module 1's
+  decision boundary with one input removed (the line has nowhere to run, so it
+  shrinks to a point). The bump is Module 1's XOR network with the squash taken
+  off: two hidden neurons stepping at 0.5 and 1.5 along the total x1 + x2, wires
+  out carrying +8 and -8, low then high then low. The tower's thresholding
+  neuron is Module 1's output neuron doing what its bias of -4 did. A module
+  that re-derives an artifact the learner built by hand says so, with the
+  numbers restated, because a reader who is not told sees new machinery and asks
+  why the ground moved. Watch for silent axis swaps in the same way: Module 1
+  plots input space with a second input up the page, Module 6 plots one input
+  with the output up, and the identical-looking square means two different
+  things.
+- **A callback earns prose only if it removes work or carries the argument.**
+  Removing work means the reader has nothing new to learn because it is the same
+  object (the three identities above). Carrying the argument means the page's
+  conclusion depends on it: Module 6's bars, towers and boxes are one lookup
+  table growing in dimension, which is why the box network fits every training
+  image and reads nothing new, so "the weights now hold a lookup table" belongs
+  in the bars section and pays off at the boxes. A callback that only says
+  "remember this from before" costs attention and returns nothing; cut it. Two
+  callbacks to the same earlier figure inside one section are clutter. Density
+  check: callbacks per paragraph across Modules 2 to 8 runs 0.4 to 1.2, so a
+  module below that band is under-connected rather than at risk of pointing
+  backwards too often.
 - **One anatomy, stated everywhere ownership comes up.** Weights live on wires
   (exactly one per wire into a neuron: the wire is where the multiplication
   happens); biases live in neurons (the adding, the bias, and the squash are
