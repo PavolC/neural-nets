@@ -92,26 +92,27 @@ line below:
 
 ```
 [▮]  MOVING PARTS  |  BUILD-IT-YOURSELF COURSES
-Nets
+Neural Networks
 An interactive course on neural networks: read a little, ...
 ```
 
-**The series name is an imprint, not a prefix.** The courses are "Nets" and "Ciphers",
-published under one name, so the wordmark sits above the heading rather than in front of
-it and a sibling reads the same two lines with only the heading changed. Pick a series
-name that works this way: a name that has to be prefixed ("Grokking Nets") stops being
-grammatical the moment the subject is a plural or a noun phrase, and it forces the heading
-to carry two words where one is what the reader needs.
+**The series name is an imprint, not a prefix.** The courses are "Neural Networks" and
+"Ciphers", published under one name, so the wordmark sits above the heading rather than in
+front of it, and a sibling reads the same two lines with only the heading changed. Pick a
+series name that works this way. A name that has to be prefixed stops being grammatical
+the moment the subject is a plural or a noun phrase ("Grokking Neural Networks" is a
+phrase, not a title), and it puts a word in front of the heading that every page in the
+series already carries.
 
 The heading needs no hidden prefix, because the wordmark right above it is text: a screen
 reader reaches the series name first and then the course. The document title reverses them
-("Nets · Moving Parts"), since the subject is the word that has to survive being one tab
-of eight.
+("Neural Networks · Moving Parts"), since the subject is the word that has to survive being
+one tab of eight.
 
 The monogram is the course's glyph in white on a rounded tile of its accent. **Pick
-something the course itself draws.** Nets uses the sigmoid curve, which is the first figure
-in chapter 1 and the shape every unit in the course is built from. A glyph that means
-nothing is worse than a letter.
+something the course itself draws.** The first course uses the sigmoid curve, which is the
+first figure in its chapter 1 and the shape every unit in the course is built from. A glyph
+that means nothing is worse than a letter.
 
 ## Three details that carry more than they look like
 

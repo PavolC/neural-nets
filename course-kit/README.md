@@ -3,9 +3,9 @@
 Everything needed to build another interactive, self-contained course that teaches a
 technical topic to one named learner by making them build the thing.
 
-Extracted from the first one ([Nets](../README.md), in the Moving Parts series: five days, 70 commits, ten
-chapters, nine coding exercises, a real network training in the browser), and specifically
-from the parts of it that were not about neural networks.
+Extracted from the first one ([Neural Networks](../README.md), in the Moving Parts series:
+five days, 70 commits, ten chapters, nine coding exercises, a real network training in the
+browser), and specifically from the parts of it that were not about neural networks.
 
 ## Start here
 

@@ -1,4 +1,4 @@
-# Nets
+# Neural Networks
 
 A course in the **Moving Parts** series.
 

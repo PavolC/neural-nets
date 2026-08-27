@@ -12,7 +12,7 @@
  * One path so the three can never drift apart; tools/check_brand.py asserts
  * that the favicon still carries this exact path.
  *
- * Pick something the course itself draws. Nets uses the sigmoid curve, which
+ * Pick something the course itself draws. This course uses the sigmoid curve, which
  * is the first figure in Module 1 and the shape every neuron in the course is
  * built from. A glyph that means nothing is worse than a letter.
  */
@@ -32,10 +32,10 @@ export interface CourseRef {
 }
 
 export const SERIES = {
-  /** An imprint rather than a prefix: the courses are "Nets" and "Ciphers",
-   *  published under this name, not "Moving Parts Nets". That is why the
-   *  masthead puts the wordmark above the title instead of in front of it, and
-   *  why COURSE_TITLE below reads subject first. */
+  /** An imprint rather than a prefix: the courses are "Neural Networks" and
+   *  "Ciphers", published under this name, not "Moving Parts Neural Networks".
+   *  That is why the masthead puts the wordmark above the title instead of in
+   *  front of it, and why COURSE_TITLE below reads subject first. */
   name: "Moving Parts",
   /** Uppercased into the masthead beside the wordmark. Keep it to four words. */
   note: "build-it-yourself courses",
@@ -48,15 +48,20 @@ export const SERIES = {
    *  turns this into sibling links, which is what makes a reader who lands on
    *  one course discover the rest. Add a row here when a new course ships,
    *  in every course's copy of this file. */
-  courses: [{ id: "nets", subject: "Nets", url: null }] as CourseRef[],
+  courses: [{ id: "nets", subject: "Neural Networks", url: null }] as CourseRef[],
 };
 
 export const COURSE = {
+  /** The slug, not the display name. It is the key in SERIES.courses and the
+   *  stem of the progress file's name, so it stays put when the subject above
+   *  is reworded. */
   id: "nets",
-  subject: "Nets",
+  subject: "Neural Networks",
+  /** Under the title, which now carries the topic itself, so this says what the
+   *  reader does here rather than repeating the subject back at them. */
   tagline:
-    "An interactive course on neural networks: read a little, play with live " +
-    "visualizations, and implement the real thing in Python, right here in your browser.",
+    "Read a little, play with live visualizations, and implement feedforward, " +
+    "gradient descent and backpropagation in Python, right here in your browser.",
   /** The sigmoid curve: flat, steepest in the middle, flat. Two cubics
    *  meeting at the tile's centre, each horizontal at its outer end and
    *  sharing the same slope where they join, which is the one property that

@@ -119,10 +119,12 @@ export interface ProgressFile {
   entries: Record<string, string>;
 }
 
-// What a new export writes. The old spelling carried the series name, which
-// has since changed, so it is no longer a good tag; but files exported under it
-// are on people's disks, and importProgress accepts both. A tag naming the
-// course rather than the series cannot go stale the same way again.
+// What a new export writes, as a frozen literal: a tag computed from anything
+// upstream would stop matching every file already exported the moment that
+// thing was reworded. The old spelling carried the series name, which has since
+// changed, so it is no longer a good tag; but files exported under it are on
+// people's disks, and importProgress accepts both. "nets" here is the course's
+// slug, not its title, and does not move when the title is reworded.
 const FORMAT = "nets-course-progress-v1";
 const ACCEPTED_FORMATS = [FORMAT, "grokking-nets-progress-v1"];
 

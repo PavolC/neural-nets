@@ -35,10 +35,10 @@ export interface CourseRef {
 }
 
 export const SERIES = {
-  /** An imprint rather than a prefix: the courses are "Nets" and "Ciphers",
-   *  published under this name, not "Moving Parts Nets". That is why the
-   *  masthead puts the wordmark above the title instead of in front of it, and
-   *  why COURSE_TITLE below reads subject first. */
+  /** An imprint rather than a prefix: the courses are "Neural Networks" and
+   *  "Ciphers", published under this name, not "Moving Parts Neural Networks".
+   *  That is why the masthead puts the wordmark above the title instead of in
+   *  front of it, and why COURSE_TITLE below reads subject first. */
   name: "Moving Parts",
   /** Uppercased into the masthead beside the wordmark. Keep it to four words. */
   note: "build-it-yourself courses",
@@ -52,7 +52,7 @@ export const SERIES = {
    *  one course discover the rest. Add a row here when a new course ships,
    *  in every course's copy of this file. */
   courses: [
-    { id: "nets", subject: "Nets", url: "https://pavolc.github.io/neural-nets/" },
+    { id: "nets", subject: "Neural Networks", url: "https://pavolc.github.io/neural-nets/" },
     // FILL: this course, with url: null.
   ] as CourseRef[],
 };

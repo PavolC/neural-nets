@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { TrainingDemo } from "../m0/TrainingDemo";
+import { COURSE } from "../brand/brand";
 import { MODULES } from "../modules/NN";
 import { M } from "../components/Math";
 import { EXERCISES } from "../exercises/registry";
@@ -133,7 +134,11 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
   { id: "baseline", symbol: <code>baseline</code>, means: "the score of always answering the commonest class: what any real score has to beat", from: "Module 10" },
 ];
 
-const FILE_NAME = "nets-course-progress.json";
+// From the course's slug rather than its display name, which is a wording and
+// has already changed once. The format tag inside the file is a frozen literal
+// in progress.ts for the opposite reason: a computed tag would break every
+// file already exported the moment anything upstream of it was reworded.
+const FILE_NAME = `${COURSE.id}-course-progress.json`;
 
 export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
   const [, bump] = useState(0);

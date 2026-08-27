@@ -2,7 +2,7 @@
 
 ## What this project is
 
-"Nets", the first course in the **Moving Parts** series: a self-contained,
+"Neural Networks", the first course in the **Moving Parts** series: a self-contained,
 browser-based interactive course that teaches neural
 networks from first principles. The learner reads short original explanations, manipulates
 live visualizations, and writes real Python (NumPy) in an in-browser editor. Code is

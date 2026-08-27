@@ -8,8 +8,8 @@ import { Monogram } from "./Monogram";
  * navigation the course passes in.
  *
  * The wordmark sits above the title rather than in front of it, because the
- * series name is an imprint and not a prefix: the courses are "Nets" and
- * "Ciphers", published under one name, so a sibling reads the same two lines
+ * series name is an imprint and not a prefix: the courses are "Neural Networks"
+ * and "Ciphers", published under one name, so a sibling reads the same two lines
  * with only the heading changed. The heading is the subject alone, and needs no
  * hidden prefix: the wordmark immediately above it is text, so a screen reader
  * reaches the series name first and then the course.
