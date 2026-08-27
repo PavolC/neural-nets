@@ -52,9 +52,26 @@ is built here, in the order the story needs it and never before.
 - **Never write solution logic into a skeleton file.** Solutions live only in
   `solution.py` (or its equivalent). Skeletons hold stubs, docstrings and contracts.
 - FILL: the attribution and licence obligations, naming every surface that carries them
-  (app footer, README, LICENSE), and the licence this derivative inherits. If the
-  sequence is adapted from a book, a paper series or a curriculum, its terms are an
-  unremovable hard rule.
+  (app footer, README, LICENSE). If the sequence is adapted from a book, a paper series or
+  a curriculum, its terms are an unremovable hard rule.
+  **Scope the restriction to the material it actually covers, and write that scope down
+  before the first chapter.** A course adapted from a NonCommercial source contains two
+  kinds of material: the content, which carries the source's terms, and the engine, the
+  brand layer and the tooling, which contain none of the source and carry none of its
+  terms. Course one shipped saying "this project" inherits CC BY-NC, in the README, the
+  app footer and LICENSE, which gave away rights over the one asset that transfers to
+  every later course in the series. Note also that BY-NC and BY have no ShareAlike clause,
+  so matching a source's licence in the adapted content is a choice rather than an
+  obligation that spreads.
+  **Prefer a source that is CC0, CC BY, MIT or public domain.** Check before committing to
+  a spine, because the licence is chosen once and lived with forever, and BY-NC-ND forbids
+  derivatives outright. A NonCommercial spine is survivable if the goal is reach; it is
+  fatal if the goal ever becomes revenue.
+  **If any source code is redistributed, its notice ships with the build.** A permissive
+  licence like MIT asks that the copyright and permission notice travel with the code, and
+  a bundler will happily inline the code and leave the notice in the repository. Emit the
+  licence file into the build output and link it from the footer. Course one shipped this
+  defect.
 - **No em dashes in any user-facing prose.** Commas, colons or parentheses.
 - **No number is written from memory.** See "Numbers" below.
 
