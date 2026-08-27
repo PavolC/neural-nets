@@ -1,4 +1,6 @@
 import { Suspense, useEffect, useRef, useState } from "react";
+import { Masthead } from "./brand/Masthead";
+import { SeriesFooter } from "./brand/SeriesFooter";
 import { StartPage } from "./start/StartPage";
 import { MODULES } from "./modules/NN";
 
@@ -57,6 +59,20 @@ export default function App() {
   // browser clamps it into the new one: leaving Module 4 halfway through used to
   // land the reader on Module 2's closing recap. Start every module at its top,
   // which is what the Continue button already did.
+  // The tab strip is one panning row below 720px, so the active tab can sit
+  // off-screen: a link straight to Module 8 would show the row scrolled to
+  // Start. Nothing else moves, hence inline and nearest rather than a scroll
+  // into view that would also drag the page.
+  const tabStrip = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const active = tabStrip.current?.querySelector<HTMLElement>(".tab-active");
+    // Centred rather than nearest: nearest parks the active tab against the
+    // edge fade with no neighbours beside it, which loses the one thing the
+    // strip is for, namely where you are in the sequence. The first and last
+    // tabs clamp to their ends on their own.
+    active?.scrollIntoView({ inline: "center", block: "nearest" });
+  }, [tab]);
+
   const panels = useRef<Record<string, HTMLDivElement | null>>({});
   // The tab this effect last acted on. A boolean "have I mounted yet" flag does
   // not survive StrictMode, which runs the effect, cleans up, and runs it again:
@@ -95,33 +111,29 @@ export default function App() {
 
   return (
     <div className="app">
-      <header>
-        <h1>Grokking Nets</h1>
-        <p className="tagline">
-          An interactive course on neural networks: read a little, play with live
-          visualizations, and implement the real thing in Python, right here in your
-          browser.
-        </p>
-        <nav className="tabs" aria-label="Course modules">
-          <button
-            className={`tab ${tab === START_TAB ? "tab-active" : ""}`}
-            aria-current={tab === START_TAB ? "page" : undefined}
-            onClick={() => selectTab(START_TAB)}
-          >
-            Start
-          </button>
-          {MODULES.map((m) => (
+      <Masthead
+        nav={
+          <nav className="tabs" ref={tabStrip} aria-label="Course modules">
             <button
-              key={m.id}
-              className={`tab ${tab === m.id ? "tab-active" : ""}`}
-              aria-current={tab === m.id ? "page" : undefined}
-              onClick={() => selectTab(m.id)}
+              className={`tab ${tab === START_TAB ? "tab-active" : ""}`}
+              aria-current={tab === START_TAB ? "page" : undefined}
+              onClick={() => selectTab(START_TAB)}
             >
-              {m.navLabel}
+              Start
             </button>
-          ))}
-        </nav>
-      </header>
+            {MODULES.map((m) => (
+              <button
+                key={m.id}
+                className={`tab ${tab === m.id ? "tab-active" : ""}`}
+                aria-current={tab === m.id ? "page" : undefined}
+                onClick={() => selectTab(m.id)}
+              >
+                {m.navLabel}
+              </button>
+            ))}
+          </nav>
+        }
+      />
       <main>
         <div
           hidden={tab !== START_TAB}
@@ -157,7 +169,7 @@ export default function App() {
           );
         })}
       </main>
-      <footer>
+      <SeriesFooter>
         <p>
           Adapted from Michael A. Nielsen,{" "}
           <a href="http://neuralnetworksanddeeplearning.com/">
@@ -167,7 +179,7 @@ export default function App() {
           <a href="https://creativecommons.org/licenses/by-nc/3.0/">CC BY-NC 3.0</a>.
           This derivative work is non-commercial and inherits the same license.
         </p>
-      </footer>
+      </SeriesFooter>
     </div>
   );
 }

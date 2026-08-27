@@ -3,20 +3,24 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Grokking Nets</title>
+    <title>Neural Networks · Moving Parts</title>
     <meta
       name="description"
       content="An interactive course on neural networks from first principles: read a little, play with live visualizations, and implement feedforward, gradient descent and backpropagation in Python in your browser."
     />
     <meta name="theme-color" content="#0b6e4f" />
-    <!-- Inline so the tab has an icon without costing a request: the sigmoid
-         curve the whole course is built on. -->
+    <!-- The series monogram, inline so the tab has an icon without costing a
+         request: the course's glyph in white on a tile of its accent hue,
+         which is the same mark the masthead and the footer draw. The path and
+         the two colours are checked against src/brand/brand.ts and
+         src/brand/brand.css by tools/check_brand.py, because a favicon is
+         the one copy of the mark that no component can generate. -->
     <link
       rel="icon"
-      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%23fdfdfb'/%3E%3Cpath d='M3 25C10 25 11 7 18 7c5 0 6 0 11 0' fill='none' stroke='%230b6e4f' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b6e4f'/%3E%3Cpath d='M5 24C12 24 15 19 16 16C17 13 20 8 27 8' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"
     />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Grokking Nets" />
+    <meta property="og:title" content="Neural Networks · Moving Parts" />
     <meta
       property="og:description"
       content="Build a neural network from first principles in your browser. No installs, no accounts."
@@ -35,14 +39,29 @@
           color: #1a1a1a;
         "
       >
-        <h1 style="font-size: 2rem; margin: 0 0 0.25rem">Grokking Nets</h1>
-        <p style="color: #5a5a5a">Loading the course...</p>
+        <p
+          style="
+            margin: 0;
+            font-family: system-ui, sans-serif;
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.09em;
+            text-transform: uppercase;
+            color: #0b6e4f;
+          "
+        >
+          Moving Parts
+        </p>
+        <h1 style="font-size: 2.5rem; line-height: 1.08; margin: 0.35rem 0 0.3rem">
+          Neural Networks
+        </h1>
+        <p style="color: #5a5a5a; font-style: italic">Loading the course...</p>
       </div>
     </div>
     <noscript>
       <p style="max-width: 40em; margin: 2rem auto; font-family: Georgia, serif">
-        Grokking Nets runs its visualizations and its Python entirely in the browser, so
-        it needs JavaScript enabled.
+        This course runs its visualizations and its Python entirely in the browser, so it
+        needs JavaScript enabled.
       </p>
     </noscript>
     <script type="module" src="/src/main.tsx"></script>

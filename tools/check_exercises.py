@@ -26,6 +26,7 @@ skeleton or a solution.
 import argparse
 import json
 import pathlib
+import re
 import sys
 import types
 
@@ -51,6 +52,45 @@ def exercises():
     for d in sorted(EX.iterdir()):
         if (d / "tests.py").exists():
             yield d
+
+
+def check_registry():
+    """The registry's ids against the exercises and the modules.
+
+    src/exercises/registry.ts lists every exercise by id, title, module and
+    what it builds, and deliberately imports nothing, because importing an
+    exercise pulls its skeleton, tests and solution into the first chunk the
+    reader downloads. That is the right trade, and it means the file cannot
+    check itself: an id that drifts from an exercise folder silently loses a
+    learner's saved work, and a module id that drifts from the module registry
+    silently drops the exercise off the front page's outline. Both are checked
+    here, from outside the bundle, where importing costs nothing.
+    """
+    problems = []
+    registry = (ROOT / "src" / "exercises" / "registry.ts").read_text()
+    modules = (ROOT / "src" / "modules" / "NN" / "index.ts").read_text()
+
+    listed = re.findall(r'\bid: "([a-z0-9-]+)"', registry)
+    module_of = dict(zip(listed, re.findall(r'\bmodule: "([a-z0-9]+)"', registry)))
+    known_modules = set(re.findall(r'\bid: "([a-z0-9]+)"', modules))
+
+    for ex_id in listed:
+        index = EX / ex_id / "index.ts"
+        if not index.exists():
+            problems.append(f"registry lists {ex_id}, which has no folder in src/exercises")
+        elif f'id: "{ex_id}"' not in index.read_text():
+            problems.append(f"registry's id {ex_id} does not match the id in its own index.ts")
+        if module_of.get(ex_id) not in known_modules:
+            problems.append(
+                f"registry files {ex_id} under module {module_of.get(ex_id)!r}, "
+                "which src/modules/NN/index.ts does not define")
+
+    for d in exercises():
+        if d.name not in listed:
+            problems.append(
+                f"src/exercises/{d.name} exists but the registry does not list it, "
+                "so it is invisible on the front page")
+    return problems
 
 
 def main():
@@ -99,6 +139,9 @@ def main():
                 "something other than the skeleton's NotImplementedError")
         print(f"{' ':16} skeleton: {len(got['tests']) - len(passed_anyway)}/{len(got['tests'])} "
               f"fail as expected")
+
+    problems += check_registry()
+    print(f"{' ':16} registry: {len(list(exercises()))} exercises listed, ids and module ids match")
 
     print()
     if problems:

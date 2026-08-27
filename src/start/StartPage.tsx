@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { TrainingDemo } from "../m0/TrainingDemo";
+import { COURSE } from "../brand/brand";
+import { MODULES } from "../modules/NN";
 import { M } from "../components/Math";
 import { EXERCISES } from "../exercises/registry";
 import {
@@ -15,66 +17,71 @@ import {
 
 // The course's front door, and the only page that talks about the course
 // rather than about neural networks: what it is, how the machinery works,
-// what the eight modules cover, the training run that shows where it ends up,
+// what every module covers, the training run that shows where it ends up,
 // and what this browser has stored. Reachable at #start, which is where a
 // bare link lands.
 
-interface Outline {
-  id: string;
-  title: string;
-  covers: string;
-}
-
-const OUTLINE: Outline[] = [
-  {
-    id: "m1",
+/** What each module covers, for the outline below.
+ *
+ * Keyed by module id and read through the module registry rather than
+ * iterated directly. The outline used to be its own list, and Modules 9 and 10
+ * were added after it was written: they were missing from the only page that
+ * shows the whole course, under a heading that counted ten of them. A module
+ * with no entry here still appears now, under its nav label, so the worst a
+ * gap can cost is a missing sentence rather than a missing module.
+ */
+const COVERS: Record<string, { title: string; covers: string }> = {
+  m1: {
     title: "From neurons to networks",
     covers:
       "One neuron as a weighted decision, why one straight cut cannot answer every question, and the sigmoid as a step with a slope.",
   },
-  {
-    id: "m2",
+  m2: {
     title: "Feedforward",
     covers:
       "A layer as one matrix multiplication, shape discipline, and pretrained weights reading real digits through your own code.",
   },
-  {
-    id: "m3",
+  m3: {
     title: "Learning as descent",
     covers:
       "Cost as a landscape, slopes measured by nudging, step size, mini-batches, and what measuring 11,935 slopes that way costs.",
   },
-  {
-    id: "m4",
+  m4: {
     title: "Backpropagation, the idea",
     covers:
       "Where a gradient comes from: factors along a chain, blame flowing backward, and the four equations, stepped through one number at a time.",
   },
-  {
-    id: "m5",
+  m5: {
     title: "Backpropagation, for real",
     covers:
       "The four equations as fifteen lines of NumPy, checked entry by entry against numerically measured gradients, then training the digit reader.",
   },
-  {
-    id: "m6",
+  m6: {
     title: "Universality (an interlude)",
     covers:
       "Why a big enough hidden layer can imitate any curve, built by hand out of sigmoid pairs. No code, no gate.",
   },
-  {
-    id: "m7",
+  m7: {
     title: "Making it actually work",
     covers:
       "Three one-line changes, each measured: the cross-entropy cost, a scaled starting draw, and weight decay against overfitting.",
   },
-  {
-    id: "m8",
+  m8: {
     title: "Why deep is hard (and what came next)",
     covers:
       "What breaks when the same network goes deeper, why it follows from BP2, and where convolutions, ReLU and embedding spaces fit.",
   },
-];
+  m9: {
+    title: "Assembling the program",
+    covers:
+      "The training loop itself, which the panels had been running around your functions until now, a glossary from this course's words to the field's, and what the course did not teach.",
+  },
+  m10: {
+    title: "Your own problem",
+    covers:
+      "A second dataset that arrives the way data does, with words, holes, unequal classes and measurements 245 times apart in scale, and what one missing step costs.",
+  },
+};
 
 /** The lookup the course's own rule asks for: modules are written assuming
  * weeks pass between them, and every symbol below is defined once, thousands
@@ -106,7 +113,7 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
   { id: "partial", symbol: <M tex="\partial C / \partial w" />, means: "one parameter's slope, read as a single name", from: "Module 4" },
   { id: "receipts", symbol: <code>zs, activations</code>, means: "the receipts: every evidence and answer the forward pass computed", from: "Module 5" },
   { id: "neg", symbol: <code>a[-1]</code>, means: "the last entry of a list; a[-2] the one before it", from: "Module 5" },
-  { id: "onehot", symbol: <code>one-hot</code>, means: "a column that is 1 in the right answer's slot and 0 everywhere else", from: "Module 5" },
+  { id: "onehot", symbol: <code>one-hot</code>, means: "a column that is 1 in one slot and 0 everywhere else: a label in Module 5, an input category in Module 10", from: "Module 5" },
   { id: "zeroslike", symbol: <code>np.zeros_like(w)</code>, means: "an array of zeros shaped exactly like w", from: "Module 5" },
   { id: "universality", symbol: <code>universality</code>, means: "one hidden layer, made wide enough, can express any relationship to any accuracy", from: "Module 6" },
   { id: "ln", symbol: <M tex="\ln a" />, means: "the natural logarithm, np.log: the power of e that gives a", from: "Module 7" },
@@ -122,10 +129,16 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
   { id: "hop", symbol: <code>the hop</code>, means: "what one backward step of BP2 does to the size of a blame column", from: "Module 8" },
   { id: "relu", symbol: <code>ReLU</code>, means: "max(0, z): a squash with no ceiling, read as ray-loo", from: "Module 8" },
   { id: "argmax", symbol: <code>np.argmax(A, axis=0)</code>, means: "which row holds the largest value, down each column", from: "Module 9" },
+  { id: "derivative", symbol: <code>derivative</code>, means: "the field's word for the slope you have been nudging and measuring since Module 3", from: "Module 9" },
   { id: "standardize", symbol: <code>standardize</code>, means: "shift and scale a feature to sit near 0 and about 1 wide", from: "Module 10" },
+  { id: "baseline", symbol: <code>baseline</code>, means: "the score of always answering the commonest class: what any real score has to beat", from: "Module 10" },
 ];
 
-const FILE_NAME = "grokking-nets-progress.json";
+// From the course's slug rather than its display name, which is a wording and
+// has already changed once. The format tag inside the file is a frozen literal
+// in progress.ts for the opposite reason: a computed tag would break every
+// file already exported the moment anything upstream of it was reworded.
+const FILE_NAME = `${COURSE.id}-course-progress.json`;
 
 export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
   const [, bump] = useState(0);
@@ -281,21 +294,24 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
           <b>Module 5 is the summit, and nothing after it depends on your version.</b>{" "}
           A training panel needs the exercises in its own module, plus Module 3's
           sgd, which drives all of them. Module 5's backprop is the exception:
-          Modules 7 and 8 run on the course's own copy, so an exercise you never
-          finish costs you that module's panel and nothing later.
+          every module after it runs on the course's own copy, so an exercise you
+          never finish costs you that module's panel and nothing later.
         </li>
       </ul>
 
-      <h3 id="start-modules">The ten modules</h3>
+      {/* Counted from the registry rather than written out, so the heading
+          cannot claim a number the list does not contain. */}
+      <h3 id="start-modules">The {MODULES.length} modules</h3>
       <ol className="start-outline">
-        {OUTLINE.map((m, i) => {
-          const here = EXERCISES.filter((e) => e.module === m.id);
+        {MODULES.map((mod, i) => {
+          const entry = COVERS[mod.id];
+          const here = EXERCISES.filter((e) => e.module === mod.id);
           return (
-            <li key={m.id}>
-              <button className="start-outline-title" onClick={() => onGoTo(m.id)}>
-                {i + 1}. {m.title}
+            <li key={mod.id}>
+              <button className="start-outline-title" onClick={() => onGoTo(mod.id)}>
+                {i + 1}. {entry?.title ?? mod.navLabel}
               </button>
-              <p>{m.covers}</p>
+              {entry && <p>{entry.covers}</p>}
               {here.length > 0 && (
                 <p className="start-outline-writes">
                   You write:{" "}

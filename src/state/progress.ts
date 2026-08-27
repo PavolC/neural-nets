@@ -2,6 +2,10 @@
 // exercise: the learner's editor code, the hint reveal stage (0 to 3), and
 // a completion flag. No accounts, no backend (see design doc).
 
+// Not renamed with the series. Every learner's saved code, revealed hints and
+// passed marks live under this prefix in their own browser, and changing it
+// orphans all of it silently: they would open the course to empty editors with
+// no way to get their work back. The name it is short for is history.
 const PREFIX = "gn:v1:";
 
 function get(key: string): string | null {
@@ -115,7 +119,14 @@ export interface ProgressFile {
   entries: Record<string, string>;
 }
 
-const FORMAT = "grokking-nets-progress-v1";
+// What a new export writes, as a frozen literal: a tag computed from anything
+// upstream would stop matching every file already exported the moment that
+// thing was reworded. The old spelling carried the series name, which has since
+// changed, so it is no longer a good tag; but files exported under it are on
+// people's disks, and importProgress accepts both. "nets" here is the course's
+// slug, not its title, and does not move when the title is reworded.
+const FORMAT = "nets-course-progress-v1";
+const ACCEPTED_FORMATS = [FORMAT, "grokking-nets-progress-v1"];
 
 /** The whole of this browser's progress, as a JSON string to keep or move. */
 export function exportProgress(): string {
@@ -149,9 +160,10 @@ export function importProgress(text: string): number {
     throw new Error("that file does not hold a progress record");
   }
   const file = parsed as Partial<ProgressFile>;
-  if (file.format !== FORMAT) {
+  if (typeof file.format !== "string" || !ACCEPTED_FORMATS.includes(file.format)) {
     throw new Error(
-      `that file says its format is ${JSON.stringify(file.format ?? "missing")}, not ${FORMAT}`,
+      `that file says its format is ${JSON.stringify(file.format ?? "missing")}, and this ` +
+        `course reads ${ACCEPTED_FORMATS.join(" or ")}`,
     );
   }
   if (typeof file.entries !== "object" || file.entries === null) {

@@ -148,7 +148,7 @@ def main():
 
     section(
         "3. Fewer features, and errors worth looking at",
-        "with only bill depth and body mass the score falls to about 70 percent, "
+        "with only bill depth and body mass the score falls to 73.5 percent, "
         "and the mistakes are Adelie and Chinstrap",
     )
     X, Y, y, tr, va, te = build(prep, columns, rows, JUST_TWO, True)[:6]

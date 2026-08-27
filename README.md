@@ -1,4 +1,8 @@
-# Grokking Nets
+# Neural Networks
+
+A course in the **Moving Parts** series.
+
+**[Open the course](https://pavolc.github.io/neural-nets/)**
 
 A self-contained, browser-based course that teaches neural networks by having you build
 one. You read short explanations, manipulate live visualizations, and write real Python
@@ -38,7 +42,7 @@ whose output every later module uses.
 | 4 | Backpropagation, the idea | (a step-through visualization and a quiz) |
 | 5 | Backpropagation, for real | `backprop` |
 | 6 | Universality (an interlude) | (a curve-sculpting playground) |
-| 7 | Making it actually work | `cross_entropy_delta`, `init_network`, `l2_step` |
+| 7 | Making it actually work | `cross_entropy_cost`, `cross_entropy_delta`, `init_network`, `l2_step` |
 | 8 | Why deep is hard | (a depth and squash comparison) |
 | 9 | Assembling the program | `train`, `accuracy` |
 | 10 | Your own problem | `standardize`, `one_hot`, `split` |
@@ -60,7 +64,8 @@ baseline and a 73.5% score turns out to contain a species it never once predicts
 
 Nothing is locked. Every module is reachable at any time; what an exercise gates is the
 panel that trains with your own code. Nothing after Module 5 depends on your version of
-`backprop` either, so a learner who never finishes it still gets Modules 6 to 8 in full.
+`backprop` either, so a learner who never finishes it still gets every module after it in
+full.
 
 Progress (editor contents, revealed hints, passed marks) lives in this browser's local
 storage. The start page can save it to a file and load it back, which is how you move it
@@ -69,15 +74,18 @@ between browsers.
 ## Publishing it
 
 `.github/workflows/deploy.yml` builds and publishes to GitHub Pages on every push to
-`main`. It has never run: this repo has no remote yet. To turn it on, create the
-repository, push, and set **Settings > Pages > Source** to **GitHub Actions**. The build
-is subpath-safe (`base: "./"`), so a project page under `user.github.io/repo/` needs no
-further configuration.
+`main`, and it is on: seven runs so far, the first failed and the six since have succeeded,
+so the course is live at
+[pavolc.github.io/neural-nets](https://pavolc.github.io/neural-nets/). The build is
+subpath-safe (`base: "./"`), so a project page under `user.github.io/repo/` needs no
+configuration beyond setting **Settings > Pages > Source** to **GitHub Actions**, which is
+a one-time manual step for the reason the workflow file records.
 
 ## Repo layout
 
 ```
 /src/                React app
+/src/brand/          the series brand layer: accent family, masthead, series footer
 /src/start/          the start page: what the course is, the outline, stored progress
 /src/modules/NN/     one file per course module, plus interactives/
 /src/exercises/      per exercise: skeleton.py, tests.py, solution.py, index.ts
@@ -86,17 +94,21 @@ further configuration.
 /src/components/     shared UI: CodeEditor (CodeMirror), ExercisePage, KaTeX wrappers
 /src/state/          localStorage progress persistence
 /src/m0/             the training demo shown on the start page
-/public/data/        mnist_subset.bin.gz, pretrained_weights.json.gz
-/tools/              build-time scripts and the benches below
+/public/data/        mnist_subset.bin.gz, pretrained_weights.json.gz, penguins.json.gz
+/tools/              build-time scripts, the benches, and the consistency checkers
+/course-kit/         the portable version of all of this, for a course on another topic
 ```
 
 `CLAUDE.md` holds the working conventions: shape conventions all Python obeys, the
 exercise and test contract, the module authoring playbook, and the voice rules.
-`nn-course-design-doc.md` is the original design.
+`nn-course-design-doc.md` is the original design. `course-kit/` is the transferable part,
+extracted after this course was finished: the rules with the neural networks taken out, the
+process that produced them, the incidents behind them, and the shared visual identity, for
+building a course like this one on a different topic.
 
 ## Regenerating the data and checking the numbers
 
-The two data files are committed, so these are only needed to change them:
+The three data files are committed, so these are only needed to change them:
 
 ```
 python3 tools/make_mnist_subset.py     # public/data/mnist_subset.bin.gz, stdlib only
@@ -113,6 +125,9 @@ python3 tools/check_exercises.py       # 52 tests: solutions pass, skeletons fai
 python3 tools/bench_depth.py           # Modules 7 and 8's Pyodide numbers (needs NumPy)
 python3 tools/bench_penguins.py        # Module 10's numbers (needs NumPy)
 npm run bench:speeds                   # the layer-speed panel's numbers
+npm run bench:bumps                    # Module 6's numbers
+python3 tools/check_brand.py           # the mark agrees in all six places it appears
+python3 tools/brand_palette.py --check # the accent family matches what OKLCH computes
 ```
 
 ## Measured envelope
