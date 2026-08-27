@@ -198,8 +198,8 @@ export function Module6() {
         through wires carrying <M tex="+8" /> and <M tex="-8" /> with a bias of{" "}
         <M tex="-4" />. Both hidden neurons multiplied both inputs by 6, so both
         cared about one number only: the total <M tex="x_1 + x_2" />, which is 0,
-        1 or 2 across the four dots. The first switched on once that total passed
-        0.5, the second once it passed 1.5.
+        1 or 2 across the four dots. The first has its switchover at 0.5, the
+        second at 1.5, and here is what each one reports at the three totals:
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
@@ -212,18 +212,25 @@ export function Module6() {
             </tr>
           </thead>
           <tbody>
-            <tr><td>below 0.5</td><td>0</td><td>0</td><td>−4</td></tr>
-            <tr><td>between 0.5 and 1.5</td><td>1</td><td>0</td><td>+4</td></tr>
-            <tr><td>above 1.5</td><td>1</td><td>1</td><td>−4</td></tr>
+            <tr><td>0, neither good</td><td>0.05</td><td>0.00</td><td>−3.6</td></tr>
+            <tr><td>1, exactly one good</td><td>0.95</td><td>0.05</td><td>+3.2</td></tr>
+            <tr><td>2, both good</td><td>1.00</td><td>0.95</td><td>−3.6</td></tr>
           </tbody>
         </table>
       </div>
       <p>
-        Low, high, low: a bump, with its edges at 0.5 and 1.5 and its height set
-        by the weights on the two outgoing wires. Module 1 then squashed that total, and the bias{" "}
-        <M tex="-4" /> acted as a threshold, turning inside the bump into a yes.
-        This page leaves the squash off, so the height is the answer instead of a
-        verdict.
+        Low, high, low: a bump, with its edges at 0.5 and 1.5 and its height
+        coming from the two outgoing wires. The bump falls short of the 8 those
+        wires would allow, reaching about 7.2 before the bias is subtracted,
+        because a weight of 6 makes each switchover <M tex="6/6 = 1" /> wide
+        while the two steps sit 1 apart. The switchovers overlap, so the corners
+        come out round instead of square. Lower the steepness in the playground
+        above and you are looking at Module 1's version of this bump.
+      </p>
+      <p>
+        Module 1 then squashed that total, and the bias <M tex="-4" /> acted as a
+        threshold, turning inside the bump into a yes. This page leaves the
+        squash off, so the height is the answer instead of a verdict.
       </p>
       <Aside>
         <p>
