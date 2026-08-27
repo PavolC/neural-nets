@@ -26,14 +26,6 @@ export interface Glyph {
   strokeWidth: number;
 }
 
-export interface CourseRef {
-  id: string;
-  /** The subject alone. The series name is an imprint, not a prefix. */
-  subject: string;
-  /** Where it is published, or null for the course you are reading. */
-  url: string | null;
-}
-
 export const SERIES = {
   /** An imprint rather than a prefix: the courses are "Neural Networks" and
    *  "Ciphers", published under this name, not "Moving Parts Neural Networks".
@@ -44,27 +36,33 @@ export const SERIES = {
   note: "build-it-yourself courses",
   /** One sentence, in the footer. */
   what: "A series of courses you finish by building the thing they are about.",
-  /** An index page listing every course, once one exists. Null leaves the
-   *  wordmark as plain text rather than as a link to a 404. */
+  /** The series index, which is the only place that knows what else exists.
+   *
+   *  A course links UP to it and never across to a sibling. The obvious design
+   *  was the other way round, with each course carrying the list and linking
+   *  to its siblings, and it is a trap: shipping the fourth course would mean
+   *  editing and redeploying four repositories, and any one of them forgotten
+   *  shows a stale list forever. This is the same hand-maintained-list failure
+   *  that once let the front page claim ten modules over a list of eight,
+   *  multiplied by the number of courses. Linking up means shipping a course
+   *  edits exactly one repository, and nothing anywhere else can go stale.
+   *
+   *  Set once when a course is created, then never touched. Null while the
+   *  index is not published yet, which leaves the wordmark as plain text
+   *  rather than as a link to a 404. FILL: the series index's URL. */
   homeUrl: null as string | null,
-  /** Every course in the series, in the order they were written. The footer
-   *  turns this into sibling links, which is what makes a reader who lands on
-   *  one course discover the rest. Add a row here when a new course ships,
-   *  in every course's copy of this file. */
-  courses: [
-    { id: "nets", subject: "Neural Networks", url: "https://pavolc.github.io/neural-nets/" },
-    // FILL: this course, with url: null.
-  ] as CourseRef[],
 };
 
 export const COURSE = {
-  /** FILL: matches this course's id in SERIES.courses above. */
+  /** FILL: the slug, not the display name. It is the stem of the progress
+   *  file's name and the series index's key for this course, so pick one that
+   *  survives the subject being reworded. */
   id: "FILL",
-  /** FILL: the subject, one word where possible. It is the page's heading and
-   *  the first word of the document title. */
+  /** FILL: the subject. It is the page's heading and the first word of the
+   *  document title, so it should be the words a reader would search for. */
   subject: "FILL",
   /** FILL: one sentence, in the masthead under the title. What the reader does
-   *  here, not what the topic is. */
+   *  here, not what the topic is: the heading already carries the topic. */
   tagline: "FILL",
   /** FILL: see the Glyph docstring above. The default below is the first
    *  course's sigmoid: flat, steepest in the middle, flat. */

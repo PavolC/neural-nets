@@ -499,6 +499,11 @@ the footer. Rules that follow from it:
   never sees it. Display equations take `--measure-wide` (42rem) because they centre
   themselves and cannot re-wrap; two of the course's 51 equations still scroll inside their
   own affordance, both of them wide `\underbrace` tallies.
+- **A course links up to the series index, never across to a sibling.** `SERIES.homeUrl`
+  is set once and never touched; the index is the only thing that knows what else exists.
+  There is deliberately no list of courses in `brand.ts`: carrying one would mean editing
+  and redeploying every course's repository on each new course, which is the same
+  hand-maintained-list failure as the front page's module outline, once per repository.
 - **A section title carries a short accent rule above it.** It is the one piece of
   structural furniture a sibling course inherits already recoloured, and the start page's
   plain h3s wear it too, so a reader cannot tell which sections are scrollspied.
