@@ -88,6 +88,18 @@
   --monogram-size: 30px;
 }
 
+/* The mono role, actually applied. Without this, code in the prose falls to the
+   browser's own default monospace, which is a different face on every platform
+   and on several of them a poor one: a type role that is declared and never
+   used is a decoration. Only the family is set here, because the sizes are
+   already handled at every place code appears in a figure or a table. */
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
+}
+
 /* Links, which had no rule of their own at all: every link in the prose was
    the browser's default blue, on a warm-white page with a green accent, which
    made it the loudest off-brand colour in the product. The accent already

@@ -30,14 +30,18 @@
   --scroll-surface: var(--bg);
 
   /* Ink for text sitting on a saturated fill (--accent, --acc, --loss).
-     Deliberately not shared with the #fff used as a *surface*: one is ink,
-     one is a ground, and they would move for different reasons. */
+     The #fff used as a *surface* is still a literal, at thirteen sites, so
+     this is a note to whoever tokenizes those rather than a separation the
+     sheet already holds: one is ink, one is a ground, and they would move for
+     different reasons. Do not point the new surface token at this one. */
   --on-accent: #fff;
 
   /* Figure and data hues, each naming one thing in one diagram family.
-     Aliases of the values already in use, at those values: they are NOT
-     merged with each other even where two are nearly identical, because
-     each identifies a different quantity and they move independently.
+     Aliases of the values already in use, at those values. They are well
+     apart from each other (the closest pair, gold and orange, is sixteen
+     times the just-noticeable difference), so the risk here is not a merge:
+     it is repainting them from the brand accent. Each names a different
+     quantity and they move independently of the accent and of each other.
      Module 1's two hidden neurons keep their identity colours across the
      wiring diagram, the plots and the legend swatches. */
   --data-purple: #6a51a3; /* h1 */
