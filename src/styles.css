@@ -2904,3 +2904,15 @@ footer a {
   display: block;
   font-size: 0.75rem;
 }
+
+/* The switchover band in Module 6's three-weight figure: the picture of
+   6 / w, so the widths are read off a shape instead of a table. */
+.step-band {
+  fill: var(--accent);
+  opacity: 0.1;
+}
+
+.step-mark {
+  stroke: var(--rule-strong);
+  stroke-dasharray: 3 3;
+}

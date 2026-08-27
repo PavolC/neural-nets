@@ -22,7 +22,7 @@ function curve(f: (x: number) => number): string {
 }
 
 export function BumpBuilder() {
-  const [wi, setWi] = useState(2);
+  const [wi, setWi] = useState(5); // weight 400: the step regime the module builds in
   const [s1, setS1] = useState(0.4);
   const [s2, setS2] = useState(0.6);
   const [h, setH] = useState(6);
@@ -105,12 +105,12 @@ export function BumpBuilder() {
           </g>
         ))}
         {[0, 0.25, 0.5, 0.75, 1].map((x) => (
-          <text key={x} x={px(x)} y={H - 14} className="chart-tick" textAnchor="middle">
+          <text key={x} x={px(x)} y={H - 20} className="chart-tick" textAnchor="middle">
             {x}
           </text>
         ))}
-        <text x={px(0)} y={H - 2} className="chart-tick" textAnchor="start">freezing</text>
-        <text x={px(1)} y={H - 2} className="chart-tick" textAnchor="end">scorching</text>
+        <text x={px(0)} y={H - 5} className="chart-tick" textAnchor="start">freezing</text>
+        <text x={px(1)} y={H - 5} className="chart-tick" textAnchor="end">scorching</text>
 
         <path d={curve(up)} className="bump-part" />
         <path d={curve(down)} className="bump-part" />

@@ -10,132 +10,131 @@ export function Module6() {
       <h2>Module 6: Universality (an interlude)</h2>
       <AfterThis
         items={[
-          "Say why one neuron cannot trace a hump, and build one out of two neurons that can.",
-          "Read a step's position and sharpness off its bias and weight, and place a bump where you want it.",
+          "Say which of the three candidates for your digit reader's 89 percent this module rules out, and which two it leaves standing.",
+          "Build a bump out of two neurons, and place it anywhere on an input's range by choosing two biases.",
           "Fit any curve you can draw with a hidden layer of bumps, and price the accuracy in neurons.",
         ]}
       />
       <ModuleToc />
 
       <p>
-        Module 5 finished the machinery: your feedforward, your sgd, your
-        backprop, and a digit reader trained by all three. This module spends
-        none of it. There is no code here and no exercise, just one question
-        and a playground. The question is what a network of these neurons can
-        express at all, and the answer is the reason people bother with hidden
-        layers: given enough hidden neurons, a network can trace any curve you
-        can draw, as closely as you ask. That claim is called universality.
-        Everything below builds the machine behind it out of neurons you
-        already know, by hand, with no training involved.
+        Module 5 left your digit reader at about 89 percent, where Nielsen's
+        Chapter 1 reports about 95 on the same 784-30-10 shape with ten times
+        the data. Three things could be capping it. The data: 5,000 training
+        images instead of 50,000. The training: one learning rate, 15 epochs,
+        the quadratic cost. Or the shape itself, meaning that one hidden layer
+        of sigmoid neurons feeding ten outputs cannot express the
+        pixels-to-digit rule at all, however wide you make it.
+      </p>
+      <p>
+        This page rules out the third, and only the third. The result is called
+        universality: one hidden layer, made wide enough, can express any
+        relationship between its inputs and its outputs, to any accuracy you
+        name. Width is what has to grow, not the number of layers. So a wide
+        enough hidden layer can express a function that gets every training
+        image right, which leaves the data and the training to explain the 89
+        percent. The data is fixed here so the run fits in a browser tab. That
+        leaves the training, and the training is Module 7.
+      </p>
+      <p>
+        The network below has one input, one output, and weights placed by hand
+        instead of trained: the smallest version where the argument fits in a
+        picture. Later sections carry it to two inputs, and then to 784. There
+        is no code and no exercise here, and the playground in the middle is the
+        argument.
       </p>
 
-      <SectionHeader id="m6-ask" title="A curve, not a verdict" />
+      <SectionHeader id="m6-ask" title="The question, shrunk to one dial" />
       <p>
-        Every network so far answered yes-or-no questions. Module 1's neuron
-        decided go or stay; Module 5's digit reader answered ten such questions
-        at once, one per digit. Change the question.
+        The claim is about relationships. Your digit reader holds one: 784 pixel
+        values in, ten confidences out, and every setting of its 23,860 numbers
+        picks a different one. Which relationships can be reached that way, and
+        which cannot? At 784 inputs the question has no picture, so shrink it to
+        one input and one output, where a relationship is a curve you can draw.
       </p>
       <p>
-        Keep the concert, and turn its first input from a switch into a dial.
-        Module 1's weather input was 1 for good and 0 for bad. Make it the
-        forecast high instead, running from 0 at freezing to 1 at scorching, so
-        0.45 on the dial is about 18 degrees. And ask for a quantity instead of
-        a verdict: rate how much you want to go, from 0 to 10.
+        Shrinking keeps the question intact. Hold 783 of the digit reader's
+        pixels still and turn the remaining one: each of its ten outputs traces
+        a curve over that pixel. A curve out of reach here is out of reach
+        there.
       </p>
       <p>
-        Your answer is a curve over the dial now. Near freezing you would
-        rather stay in, so the rating starts near 1. It climbs through the mild
-        middle to about 9. In a heatwave with no shade it drops back to about
-        1. No formula produced that curve. It is just what you would say,
-        temperature by temperature.
+        So: one dial, one answer. Module 1's weather input was 1 for good
+        weather and 0 for bad, so make it the forecast high instead, 0 at
+        freezing to 1 at scorching. And ask for a rating out of 10 rather than a
+        verdict. Your own ratings, temperature by temperature, are the dashed
+        curve below.
       </p>
-      <Figure caption="The curve to match (dashed) and two attempts by a single neuron (green). A neuron on the dial reports sigma(w x + b), scaled by one output weight: it can climb and flatten, or fall and flatten. Neither one comes back down, so neither can trace a hump.">
+      <Figure caption="The curve to match (dashed) and two attempts by a single neuron (green). A neuron on the dial reports sigma(w x + b), scaled by one output weight: it can climb and flatten, or fall and flatten.">
         <TargetCurveFigure />
       </Figure>
       <p>
-        One neuron cannot trace that curve, and the reason has nothing to do
-        with picking better numbers. A neuron on this dial computes its
-        evidence <M tex="z = wx + b" />, one weight and one bias, and reports{" "}
-        <M tex="\sigma(z)" />. Turn the dial up and <M tex="z" /> moves in one
-        direction only: up if <M tex="w" /> is positive, down if it is
-        negative. So the report climbs and then flattens, or falls and then
-        flattens. It never turns around. The far side of the hump is out of
-        reach for every choice of <M tex="w" /> and <M tex="b" />.
+        Mild weather rates about 9 there, and both ends about 1. No formula
+        produced that curve; it is what you would say, temperature by
+        temperature.
       </p>
       <p>
-        Module 1 hit the same kind of wall: no single straight line could cut
-        the contrarian's four dots apart (the rule that says go when exactly
-        one of two things is good). The fix there was a hidden layer of two
-        neurons. The fix here is a hidden layer too, and this time it gets
-        built by hand rather than trained.
+        The two green curves are single neurons trying to match it, and no
+        choice of numbers does better. A neuron on the dial computes its
+        evidence <M tex="z = wx + b" />, one weight and one bias, and reports{" "}
+        <M tex="\sigma(z)" />. Turn the dial up and <M tex="z" /> moves one way
+        only: up if <M tex="w" /> is positive, down if it is negative. So the
+        report climbs and flattens, or falls and flattens. It never turns
+        around, which leaves the far side of the hump out of reach.
+      </p>
+      <p>
+        Module 1 hit this kind of wall before: no single straight line could
+        separate the four concert dots when the rule was go when exactly one of
+        the two things is good. The fix was a hidden layer. Same fix here, built
+        by hand instead of trained.
       </p>
 
       <SectionHeader id="m6-steps" title="Turn the steepness up" />
       <p>
-        Start from what one neuron does do, and push it to an extreme. Two
-        questions about <M tex="\sigma(wx + b)" />: where does it switch over,
-        and how sharply?
+        A hidden layer needs parts to build from, and one kind of part will do:
+        something that acts on one stretch of the dial and does nothing outside
+        it, so that many of them add up without interfering. This section makes
+        a sharp edge; the next turns two edges into that part.
+      </p>
+      <p>Start with one neuron on the dial, and turn its weight up.</p>
+      <Figure caption="The same neuron at three weights, each bias chosen to put its switchover at 0.40 of the dial. A bigger weight does not move the switchover, it narrows it: the shaded band is where the report is on its way from 0 to 1. At 400 the neuron is a step.">
+        <StepSharpnessFigure />
+      </Figure>
+      <p>
+        Two numbers describe each panel, and both read off the neuron directly.
+        The switchover sits where the evidence is exactly zero: solve{" "}
+        <M tex="wx + b = 0" /> and it is at <M tex="x = -b/w" />, minus the bias
+        over the weight. Its width is <M tex="6/w" />, because the sigmoid needs
+        its evidence to run from about <M tex="-3" /> to <M tex="+3" /> to climb
+        from 0.05 to 0.95, and one unit of dial buys <M tex="w" /> units of
+        evidence.
       </p>
       <p>
-        Where: at the dial setting whose evidence is exactly zero. Solve{" "}
-        <M tex="wx + b = 0" /> and the switchover sits at{" "}
-        <M tex="x = -b/w" />, read as minus the bias divided by the weight.
-        Module 1 did this same rearrangement with two inputs and got a line;
-        with one input it gives a single point on the dial.
+        Read the position rule the other way and it becomes the instruction used
+        from here on: <M tex="b = -ws" /> puts a step at <M tex="s" />. The third
+        panel is that rule with <M tex="w = 400" /> and <M tex="s = 0.40" />.
       </p>
       <p>
-        How sharply: Module 1's slider showed the sigmoid climbing from about
-        0.05 to about 0.95 while its evidence runs from <M tex="-3" /> to{" "}
-        <M tex="+3" />, a span of 6. On the dial that span is <M tex="6/w" />{" "}
-        wide, because one unit of dial buys <M tex="w" /> units of evidence. So
-        the weight alone sets the sharpness, and it sets it upside down: the
-        bigger the weight, the narrower the switchover.
-      </p>
-        <div className="table-scroll scroll-x" tabIndex={0}>
-          <table className="truth-table">
-          <thead>
-            <tr>
-              <th>weight</th>
-              <th>switchover width (6 / w)</th>
-              <th>bias for a switchover at 0.40</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td>10</td><td>0.600 of the dial</td><td>−4</td></tr>
-            <tr><td>50</td><td>0.120</td><td>−20</td></tr>
-            <tr><td>400</td><td>0.015</td><td>−160</td></tr>
-          </tbody>
-          </table>
-        </div>
-      <p>
-        With a weight of 400 the neuron is a step: 0 below 0.40 of the dial, 1
-        above it, and a switchover too narrow to see. The bias is what places
-        the step, and placing it takes one multiplication:{" "}
-        <M tex="b = -w s" /> puts the step at <M tex="s" />, which is the{" "}
-        <M tex="x = -b/w" /> rule read the other way.
-      </p>
-      <p>
-        Module 1 drew the sigmoid next to the perceptron's hard step and argued
-        for the smooth one, because a step's slope is zero everywhere and
-        leaves learning nothing to work with. Nothing here contradicts that.
-        These networks are built by hand rather than trained, so flat parts
-        cost nothing, and a large weight makes a sigmoid behave like a step
-        without ever quite being one.
+        Module 1 argued for the sigmoid over the perceptron's hard step, because
+        a step's slope is zero everywhere and leaves learning nothing to work
+        with. That still holds. Nothing on this page is trained, so flat parts
+        cost nothing here, and a large weight only makes a sigmoid behave like a
+        step, never quite become one.
       </p>
 
       <SectionHeader id="m6-bump" title="Two steps make a bump" />
       <p>
-        One step still only goes one way. Two of them, subtracted, do not.
+        One step acts on everything to its right, which is the opposite of what
+        the part needs. Two steps fix that, if the second undoes the first. Put
+        a step at 0.40 and another at 0.60, both with weight 400, and give the
+        output neuron the weights <M tex="+6" /> and <M tex="-6" /> on them.
       </p>
-      <p>
-        Take two neurons on the dial, both with weight 400. The first switches
-        on at 0.40 (bias <M tex="-160" />), the second at 0.60 (bias{" "}
-        <M tex="-240" />). Send both into the output neuron, with output weight{" "}
-        <M tex="+6" /> on the first and <M tex="-6" /> on the second, and
-        follow the total across the dial:
-      </p>
-        <div className="table-scroll scroll-x" tabIndex={0}>
-          <table className="truth-table">
+      <Figure caption="Two step neurons added with opposite output weights. Each dashed curve is one neuron's report times its own output weight: one rises to +6 at 0.40, the other falls to −6 at 0.60. The solid curve is their total, which is what the network answers. Lower the steepness to see that both edges are sigmoids, and drag the right step past the left one to turn the bump into a dip.">
+        <BumpBuilder />
+      </Figure>
+      <p>The total is 0, then 6, then 0 again, and the three rows say why:</p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
           <thead>
             <tr>
               <th>the dial</th>
@@ -149,61 +148,56 @@ export function Module6() {
             <tr><td>between 0.40 and 0.60</td><td>1</td><td>0</td><td>+6</td></tr>
             <tr><td>above 0.60</td><td>1</td><td>1</td><td>6 − 6 = 0</td></tr>
           </tbody>
-          </table>
-        </div>
+        </table>
+      </div>
       <p>
-        A bump: 6 tall, from 0.40 to 0.60, zero on both sides. Two hidden
-        neurons, one bump, and every feature of it is a number you set. The two
-        edges are the two biases. The height is the pair of output weights.
+        A bump, 6 tall, from 0.40 to 0.60. The two edges are the two biases, the
+        height is the pair of output weights, and the zero outside is what makes
+        the part usable: a step never stops acting, so anything placed to its
+        right has to be chosen around it, while two bumps on different slices
+        cannot reach each other at all. Their heights can be set one at a time,
+        in any order.
       </p>
-      <Figure caption="One bump out of two neurons. The dashed curves are the two hidden neurons' reports, each already scaled by its output weight (+h and −h); the solid curve is their total, which is what the network answers. The steepness starts at 40, low enough to see that the edges are sigmoids; raise it to 400 and the picture becomes the table above. Drag the right step past the left one and the bump becomes a dip.">
-        <BumpBuilder />
-      </Figure>
       <Eq
         tex="\underbrace{2}_{\text{weights in}} + \underbrace{2}_{\text{biases}} + \underbrace{2}_{\text{output weights}} = 6"
-        gloss="Six numbers per bump. The construction sets them from three decisions: where the bump starts, where it ends, and how tall it is. Both weights in are the shared steepness, both biases come from the edges, and the two output weights are one height with opposite signs."
+        gloss="Six numbers per bump, set by three decisions: where it starts, where it ends, how tall it is. Both weights in are the shared steepness, both biases come from the edges, and the two output weights are one height with opposite signs."
       />
       <Aside>
         <p>
           One departure from the anatomy the course has used so far. In every
           earlier module the last neuron squashed its total with{" "}
           <M tex="\sigma" />, because the answer was a confidence between 0 and
-          1. Here the answer is a rating from 0 to 10, so the last neuron
-          reports its total as it stands, with no squash. Networks that predict
-          a quantity rather than a class are built exactly this way. Nielsen's
-          chapter keeps the squash and aims the total at the un-squashed
-          version of the target instead; the construction underneath is the
-          same either way.
+          1. Here the answer is a rating out of 10, so the last neuron reports
+          its total unsquashed, which is how networks that predict a quantity
+          are built. Nielsen's chapter keeps the squash and aims the total at the
+          un-squashed version of the target instead; underneath, the
+          construction is the same.
         </p>
       </Aside>
 
       <SectionHeader id="m6-sculpt" title="Sculpt any curve" />
       <p>
-        A bump is a bar. So slice the dial into equal pieces, give each piece
-        its own bump, and set each bump's height to where the target runs over
-        that piece: the target curve, drawn as a bar chart. Each bar is one
-        pair of hidden neurons, so a six-bar approximation is a network with
-        twelve hidden neurons, and its answer is the sum of its bars.
+        A bump is a bar. Slice the dial into equal pieces, give each piece its
+        own bump, and set each height to where the target runs over that piece:
+        the curve, drawn as a bar chart. One pair of neurons per bar, so six
+        bars is a hidden layer of twelve.
       </p>
       <p>
-        The playground below is that network, with the bar count in your hands.
-        Nothing else about the construction changes as that number goes up:
-        same two neurons per bar, same edges, same heights. Only the slices get
-        narrower.
+        Nothing about the construction changes as the bar count goes up. Same
+        two neurons per bar, same edges, same heights, narrower slices.
       </p>
-      <Figure caption="Sculpting a curve out of bumps. Press Fit it for me to put every bar at the target's average height across its own slice, then move the bar count and watch the shaded area between the curves. The second target is a friend's curve, which has an extra peak down at the cold end for the crisp winter shows; the third setting lets you draw a curve of your own and fit that one instead.">
+      <Figure caption="Sculpting a curve out of bumps. Press Fit it for me to put every bar at the target's average height across its own slice, then move the bar count and watch the shaded area between the curves. The second curve is a friend's, with an extra peak at the cold end for the crisp winter shows; the third setting lets you draw your own and fit that.">
         <CurveSculptor />
       </Figure>
 
       <SectionHeader id="m6-price" title="What accuracy costs" />
       <p>
-        Here is what Fit it for me scores on the first curve, at the step
-        sharpness the playground starts with. The area between the curves is
-        the score, and since the dial is one unit wide, it is also the average
-        miss in rating points.
+        Here is what Fit it for me scores on the first curve, at the sharpness
+        the playground starts with. The dial is one unit wide, so the area
+        between the curves is also the average miss in rating points.
       </p>
-        <div className="table-scroll scroll-x" tabIndex={0}>
-          <table className="truth-table">
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
           <thead>
             <tr>
               <th>bars</th>
@@ -219,106 +213,142 @@ export function Module6() {
             <tr><td>16</td><td>32</td><td>96</td><td>0.204</td></tr>
             <tr><td>24</td><td>48</td><td>144</td><td>0.118</td></tr>
           </tbody>
-          </table>
-        </div>
+        </table>
+      </div>
       <p>
-        Every doubling of the bars cuts the area by slightly more than half,
-        and the picture says why. A bar is flat where the target is not, so the
-        miss inside one slice is at most how far the target drifts across that
-        slice. Halve the slice's width and the target has half as far to drift,
-        so the worst miss inside it halves too, in every slice at once.
+        Each doubling of the bars cuts the area by slightly more than half, and
+        the picture says why. A bar is flat where the target is not, so the miss
+        inside one slice is at most how far the target drifts across that slice.
+        Halve the slice and the target has half as far to drift.
       </p>
       <p>
-        Nothing in that argument stops anywhere. Name an accuracy, and slicing
-        the dial finely enough reaches it, which is the universality claim for
-        one input. The price is the rest of the table: two neurons per bar, six
-        numbers per bar, and 144 of them to trace one curve of one input.
+        Nothing in that argument stops anywhere: name an accuracy, slice finely
+        enough, reach it. That is universality for one input, and its price is
+        the rest of the table, two neurons and six numbers per bar. One
+        experiment before moving on: at 16 bars, lower the sharpness from 400 to
+        100, and the area falls from 0.204 to 0.110, because rounded shoulders
+        follow a smooth curve better than square steps do. The bar chart is the
+        version whose accuracy is easy to argue about, not the closest fit these
+        neurons can make.
       </p>
       <p>
-        One more experiment, because it says what bars are for. Set 16 bars,
-        fit them, and then lower the step sharpness from 400 to 100. The area
-        falls from 0.204 to 0.110. The edges stop being vertical, and rounded
-        shoulders follow a smooth curve better than square steps do. So the bar
-        chart is not the closest fit these neurons can produce; it is the
-        version whose accuracy is easy to argue about.
+        That settles one input. Two sections left: the same argument at two
+        inputs, and then at 784.
       </p>
 
       <SectionHeader id="m6-inputs" title="More than one input" />
       <p>
-        The dial was one input. Module 1's concert plane had two, and there the
-        construction gains one step. Make both inputs dials: the forecast
-        across, how keen your friend is up, each running 0 to 1. The answer is
-        a rating at every point of that square.
-      </p>
-      <p>
-        Two neurons give a bump along the forecast axis: 6 inside a vertical
-        band, 0 outside it. Two more give a bump along the friend axis: 6
-        inside a horizontal band. Add all four together and the square has
-        three levels, 6 in each band alone, 12 where the bands cross, 0
-        elsewhere. Now pass that total through one more neuron with a large
-        weight and a bias of <M tex="-9" />. Nine sits between 6 and 12, so
-        only the crossing clears the threshold: the neuron reports 1 on a small
-        rectangle of the square and 0 everywhere else.
+        One dial gave a curve. Two dials give a surface: Module 1's concert
+        plane with both inputs turned continuous, the forecast across and how
+        keen your friend is up, and a rating at every point of the square. The
+        construction gains one step there, and the four panels are it.
       </p>
       <Figure caption="Building a tower on the concert plane. Each square is the plane of two dials, forecast across and friend's keenness up, and the numbers are what the running total reads in each region. Four neurons make the two bands; the fifth thresholds their sum at 9, which only the crossing clears.">
         <TowerDiagram />
       </Figure>
       <p>
-        That rectangle is a tower, and it is the two-input version of the bar.
-        Everything after it repeats the one-input story: give each tower its
-        height with an output weight, tile the square with towers, and any
-        surface over the square comes within reach as the tiling gets finer.
-        More inputs work the same way with more bands per tower. More outputs
-        need no new idea at all, since each output neuron reads the same hidden
-        layer through its own weights.
+        Two neurons make a bump along the forecast: 6 inside a vertical band, 0
+        outside. Two more make a bump along the friend: 6 inside a horizontal
+        band. Added, the square reads 0 outside both bands, 6 in either band
+        alone, and 12 where they cross. Then one more neuron, with a large
+        weight and a bias of <M tex="-9" />. Nine sits between 6 and 12, so only
+        the crossing clears it, and that neuron reports 1 on a small rectangle
+        and 0 everywhere else.
       </p>
       <p>
-        One honest note on the wiring: the thresholding neuron sits between the
-        bump neurons and the output, so this two-input construction uses two
-        hidden layers rather than one. A single hidden layer is enough for two
-        inputs as well, which is the version Nielsen's chapter proves, at the
-        cost of a picture this clean.
+        That rectangle is a tower, the two-input version of the bar. The rest
+        repeats: an output weight sets each tower's height, towers tile the
+        square, and finer tiles bring any surface within reach. More inputs need
+        more bands per tower and nothing else. More outputs need nothing at all,
+        since every output neuron reads the same hidden layer through its own
+        weights.
+      </p>
+      <p>
+        One honest note on the wiring, and on the layer count from the opener:
+        the thresholding neuron sits between the bump neurons and the output, so
+        this two-input construction uses two hidden layers, where the one-input
+        construction used one. A single hidden layer is enough for two inputs as
+        well, and that is how the theorem is usually stated, but this picture
+        does not show it, and neither does Nielsen's chapter. He states the
+        theorem for one hidden layer, proves the two-layer version drawn here
+        because it is the one that can be drawn, and sets the one-layer version
+        as a problem with the route sketched: make steps in slanted directions
+        instead of along the two axes, add those into towers that are round
+        rather than rectangular, and tile with the round ones.
+      </p>
+
+      <SectionHeader id="m6-digits" title="Back to the digit reader" />
+      <p>
+        Now the question this page opened with. Towers work at any number of
+        inputs: two neurons fence a band along each input, one more thresholds
+        their sum, and the tower becomes a box. Put one box around each training
+        image, tight enough to hold one image each, and give each box an output
+        weight that reports that image's digit.
+      </p>
+      <Figure caption="That construction used as a digit reader, drawn with two pixels so it fits on paper. At 784 pixels the boxes are boxes in 784 directions, and the white space is the same.">
+        <BoxesFigure />
+      </Figure>
+      <p>
+        At 784 inputs instead of 2, that network gets all 5,000 training images
+        right. It spends two hidden layers doing it, bands then thresholds, as
+        the last section noted, and one layer would do by the route sketched
+        there. Price it:
+      </p>
+      <Eq
+        tex="\underbrace{2}_{\text{neurons per band}} \times \underbrace{784}_{\text{pixels}} \times \underbrace{5{,}000}_{\text{training images}} = 7{,}840{,}000"
+        gloss="Two neurons to fence each pixel's band, 784 pixels per box, one box per training image, plus one thresholding neuron per box. Your trained network does the job with 30 hidden neurons, so this construction is about 260,000 times the size of the network you trained."
+      />
+      <p>
+        And it knows nothing between its boxes. Your 30-neuron network reads 89
+        percent of images it never saw; this one answers 0 for anything outside
+        the 5,000 boxes it was built from. It proves that the parameters can
+        express a perfect fit on the training set. It does not read digits.
+      </p>
+      <p>
+        Which is the split worth keeping. The architecture was never the cap: a
+        wide enough hidden layer can express a function that fits every training
+        image, and can approximate any pixels-to-digit rule you could write
+        down. What the argument does not provide is a way to find such a
+        function by descent, or a reason for the one you find to work on images
+        it has not seen. Finding is Module 7's first subject, and working on
+        unseen images is its second. One thing it leaves genuinely open: whether
+        30 hidden neurons in particular are enough. Universality is about the
+        family of these networks, not one size of one of them, and Module 2
+        already put the hidden layer's size down as a free choice with a
+        trade-off.
       </p>
 
       <SectionHeader id="m6-limits" title="What universality does not say" />
-      <p>
-        Four limits, because the claim is easy to over-read.
-      </p>
+      <p>Four limits, because the claim is easy to over-read.</p>
       <p>
         It covers continuous curves. Sums of sigmoids move a little when the
-        input moves a little, always. A target that jumps, answering 2 just
-        below 0.5 of the dial and 9 just above, cannot be matched exactly by
-        any network of these neurons. It can be matched everywhere except a
-        narrow strip around the jump, which for most purposes is the same
-        thing. What the claim really covers is any curve you could draw without
-        lifting the pen.
+        input moves a little, always, so a target that jumps, answering 2 just
+        below 0.5 of the dial and 9 just above, cannot be matched exactly. It
+        can be matched everywhere except a narrow strip at the jump, which for
+        most purposes is the same thing. What the claim covers is any curve you
+        could draw without lifting the pen.
       </p>
       <p>
-        It promises approximation, not equality. The claim is that you name an
-        accuracy and a network exists that meets it, not that some network
-        reproduces the target exactly. The table above is the promise in its
+        It promises approximation, not equality. You name an accuracy and a
+        network exists that meets it. The table above is that promise in its
         honest form: every row buys a smaller number, and no row reaches zero.
       </p>
       <p>
-        It says can, not will. Every number in this module was placed by hand:
-        the biases from the edges, the output weights from the heights. Nothing
-        here says gradient descent would find weights like these, and it does
-        not: the pretrained network in Module 2 had weights that looked like
-        blurry strokes of ink, nothing like bar edges. Universality is about
-        what a set of parameters can express. Training is about what descent
-        finds, and Modules 7 and 8 are about that.
+        It says can, not will. Every number on this page was placed by hand, and
+        nothing about descent would produce weights like these: Module 2's
+        pretrained network had weights that looked like blurry strokes of ink,
+        nothing like bar edges, and no training run would land on the box
+        network.
       </p>
       <p>
-        And it is wasteful. The bar chart spends two neurons per slice and
-        shares nothing between slices: each pair knows its own strip of the
-        dial and nothing else. Between the points it was fitted to it says
-        whatever its bar says, which is a poor way to guess about inputs it has
-        not seen. That is Module 7's subject. Deeper networks reuse their
-        detectors instead of tiling, which is Module 8's.
+        And it is wasteful: two neurons per slice, 7.8 million of them for the
+        box network, and nothing shared between slices, since each pair knows
+        its own strip and nothing else. Deeper networks reuse their detectors
+        across the input instead of tiling it, which is Module 8's subject.
       </p>
       <p>
-        So universality is not a technique to use. It is a constraint removed:
-        the shape of a problem is not what stops a network, so everything that
+        So universality is not a technique. It is a constraint removed: the
+        shape of the problem is not what stops a network, so everything that
         goes wrong from here is about finding the weights, not about whether
         they exist.
       </p>
@@ -328,7 +358,8 @@ export function Module6() {
           "One neuron on one input can only climb and flatten, or fall and flatten. A hump needs at least two, and two large-weight neurons with opposite output weights make a bump whose edges are its biases and whose height is its output weights.",
           "A neuron's switchover sits at minus its bias over its weight, and is 6/w of the input range wide, so a large weight turns a sigmoid into a step.",
           "Slice the input, give each slice a bump, and the network traces the target as a bar chart. Doubling the bars roughly halves the area between the curves, at two neurons and six numbers per bar. Two inputs replace bars with towers, built by thresholding a pair of crossed bumps.",
-          "Universality says the weights exist. It does not say descent finds them, that they are efficient, or that they generalize. Module 7 returns to training the digit reader and makes it work better.",
+          "Universality settles one of the three candidates for your digit reader's 89 percent: not the architecture. A wide enough hidden layer can express a function that fits every training image, so the shortfall is in the data and the training, and Module 7 goes after the training.",
+          "What it does not say: that descent finds those weights, that they are efficient (7.8 million hidden neurons for the box network against your 30), or that a function fitting the training images reads new ones.",
         ]}
         chapter="Chapter 4 (a visual proof that neural nets can compute any function)"
         href="http://neuralnetworksanddeeplearning.com/chap4.html"
@@ -502,6 +533,151 @@ function TowerDiagram() {
       >
         friend ↑
       </text>
+    </svg>
+  );
+}
+
+// Static small-multiple: one neuron on the dial at three weights, each bias
+// chosen to hold the switchover at 0.40. Replaces a table of widths and
+// biases: the shaded band IS the width, so the numbers are read off a
+// picture instead of asserted in prose.
+function StepSharpnessFigure() {
+  const PW = 140; // panel width
+  const X0 = 16;
+  const GAP = 16;
+  const TOP = 34;
+  const BASE = 140;
+  const panels = [
+    { w: 10, width: "0.600", bias: "−4" },
+    { w: 50, width: "0.120", bias: "−20" },
+    { w: 400, width: "0.015", bias: "−160" },
+  ];
+  const STEP_AT = 0.4;
+  const px = (i: number, x: number) => X0 + i * (PW + GAP) + 6 + x * (PW - 12);
+  const py = (v: number) => scale(v, 0, 1.06, BASE, TOP);
+  return (
+    <svg
+      viewBox="0 0 480 208"
+      className="curve-figure"
+      role="img"
+      aria-label="Three panels of one neuron on the dial, at weights 10, 50 and 400, each switching over at 0.40. The band where its report climbs from 0 to 1 shrinks from 0.600 of the dial to 0.120 and then to 0.015, where the curve is a step."
+    >
+      {panels.map((p, i) => {
+        const band = 6 / p.w;
+        const curve = Array.from({ length: 121 }, (_, k) => {
+          const x = k / 120;
+          return `${k === 0 ? "M" : "L"}${px(i, x).toFixed(1)},${py(sigmoid(p.w * (x - STEP_AT))).toFixed(1)}`;
+        }).join(" ");
+        return (
+          <g key={p.w}>
+            <text x={px(i, 0.5)} y={16} textAnchor="middle" className="ripple-title">
+              weight {p.w}
+            </text>
+            {[0, 1].map((v) => (
+              <line
+                key={v}
+                x1={px(i, 0)} x2={px(i, 1)} y1={py(v)} y2={py(v)}
+                className="curve-grid"
+              />
+            ))}
+            <rect
+              x={px(i, Math.max(0, STEP_AT - band / 2))}
+              y={py(1.06)}
+              width={px(i, Math.min(1, STEP_AT + band / 2)) - px(i, Math.max(0, STEP_AT - band / 2))}
+              height={BASE - py(1.06)}
+              className="step-band"
+            />
+            <line
+              x1={px(i, STEP_AT)} x2={px(i, STEP_AT)} y1={py(1.06)} y2={BASE}
+              className="step-mark"
+            />
+            <path d={curve} className="curve-net" />
+            <line x1={px(i, 0)} x2={px(i, 1)} y1={BASE} y2={BASE} className="axis-line" />
+            <text x={px(i, STEP_AT)} y={BASE + 15} textAnchor="middle" className="chart-tick">
+              0.40
+            </text>
+            <text x={px(i, 0.5)} y={BASE + 36} textAnchor="middle" className="chart-tick">
+              bias {p.bias}
+            </text>
+            <text x={px(i, 0.5)} y={BASE + 52} textAnchor="middle" className="chart-tick">
+              band {p.width} wide
+            </text>
+          </g>
+        );
+      })}
+      <text x={px(0, 0) - 4} y={py(1) + 4} textAnchor="end" className="chart-tick">1</text>
+      <text x={px(0, 0) - 4} y={py(0) + 4} textAnchor="end" className="chart-tick">0</text>
+    </svg>
+  );
+}
+
+// Static figure: the tower construction used as a classifier, at two pixels
+// so it can be drawn. One box per training image, and white space everywhere
+// else, which is the whole objection to it in one picture. The key sits on
+// the figure, so the caption stays one sentence.
+function BoxesFigure() {
+  const S = 236;
+  const X0 = 22;
+  const Y0 = 24;
+  const sx = (f: number) => X0 + f * S;
+  const sy = (f: number) => Y0 + (1 - f) * S;
+  const BOX = 38;
+  const KEY_X = 286;
+  const shown = [
+    { x: 0.18, y: 0.74, label: "3" },
+    { x: 0.42, y: 0.84, label: "7" },
+    { x: 0.72, y: 0.66, label: "0" },
+    { x: 0.26, y: 0.28, label: "1" },
+    { x: 0.6, y: 0.16, label: "8" },
+    { x: 0.88, y: 0.42, label: "4" },
+  ];
+  return (
+    <svg
+      viewBox="0 0 480 292"
+      className="curve-figure"
+      role="img"
+      aria-label="A square of two pixel values holding six training images, each fenced inside its own small box labelled with that image's digit. A seventh image sits in the empty middle, inside no box, where the network answers zero."
+    >
+      <rect x={X0} y={Y0} width={S} height={S} className="tower-plane" />
+      {shown.map((d) => (
+        <g key={d.label}>
+          <rect
+            x={sx(d.x) - BOX / 2} y={sy(d.y) - BOX / 2}
+            width={BOX} height={BOX}
+            className="tower-tower"
+          />
+          <circle cx={sx(d.x)} cy={sy(d.y)} r={3} className="pt-class1" />
+          <text x={sx(d.x)} y={sy(d.y) - BOX / 2 - 5} textAnchor="middle" className="tower-num">
+            {d.label}
+          </text>
+        </g>
+      ))}
+      <circle cx={sx(0.5)} cy={sy(0.5)} r={4.5} className="pt-wrong" />
+
+      <text x={X0} y={Y0 + S + 18} className="chart-tick">pixel 1 →</text>
+      <text
+        x={X0 - 12} y={Y0 + S / 2}
+        transform={`rotate(-90 ${X0 - 12} ${Y0 + S / 2})`}
+        textAnchor="middle"
+        className="chart-tick"
+      >
+        pixel 2 ↑
+      </text>
+
+      {/* the key, in the space the square does not use */}
+      <rect x={KEY_X} y={54} width={20} height={20} className="tower-tower" />
+      <circle cx={KEY_X + 10} cy={64} r={3} className="pt-class1" />
+      {["one tower per training", "image, reporting the", "digit of the dot inside"].map((line, i) => (
+        <text key={line} x={KEY_X + 30} y={58 + i * 14} className="chart-tick">
+          {line}
+        </text>
+      ))}
+      <circle cx={KEY_X + 10} cy={140} r={4.5} className="pt-wrong" />
+      {["an image no box holds:", "every tower reports 0,", "so the answer is 0"].map((line, i) => (
+        <text key={line} x={KEY_X + 30} y={134 + i * 14} className="chart-tick">
+          {line}
+        </text>
+      ))}
     </svg>
   );
 }
