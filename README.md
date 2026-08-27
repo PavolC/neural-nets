@@ -1,4 +1,6 @@
-# Grokking Nets
+# Nets
+
+A course in the **Moving Parts** series.
 
 **[Open the course](https://pavolc.github.io/neural-nets/)**
 

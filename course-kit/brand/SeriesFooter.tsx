@@ -29,9 +29,7 @@ export function SeriesFooter({ children }: { children: ReactNode }) {
             {siblings.map((c, i) => (
               <span key={c.id}>
                 {i > 0 && ", "}
-                <a href={c.url!}>
-                  {SERIES.name} {c.subject}
-                </a>
+                <a href={c.url!}>{c.subject}</a>
               </span>
             ))}
           </span>

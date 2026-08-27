@@ -25,14 +25,18 @@ export interface Glyph {
 
 export interface CourseRef {
   id: string;
-  /** The subject alone: the series name is prepended for the full title. */
+  /** The subject alone. The series name is an imprint, not a prefix. */
   subject: string;
   /** Where it is published, or null for the course you are reading. */
   url: string | null;
 }
 
 export const SERIES = {
-  name: "Grokking",
+  /** An imprint rather than a prefix: the courses are "Nets" and "Ciphers",
+   *  published under this name, not "Moving Parts Nets". That is why the
+   *  masthead puts the wordmark above the title instead of in front of it, and
+   *  why COURSE_TITLE below reads subject first. */
+  name: "Moving Parts",
   /** Uppercased into the masthead beside the wordmark. Keep it to four words. */
   note: "build-it-yourself courses",
   /** One sentence, in the footer. */
@@ -49,7 +53,6 @@ export const SERIES = {
 
 export const COURSE = {
   id: "nets",
-  /** The series name plus this: "Grokking Nets". */
   subject: "Nets",
   tagline:
     "An interactive course on neural networks: read a little, play with live " +
@@ -65,6 +68,11 @@ export const COURSE = {
   } as Glyph,
 };
 
-/** "Grokking Nets". One place, so the document title, the masthead's
- *  accessible name and the footer cannot disagree. */
-export const COURSE_TITLE = `${SERIES.name} ${COURSE.subject}`;
+/** The document title. Subject first, because that is the word a reader needs
+ *  when eight tabs are open, then the series as the imprint.
+ *
+ *  This is the canonical spelling, and index.html has to repeat it as a
+ *  literal, because a tab needs its title before any JavaScript runs.
+ *  tools/check_brand.py asserts that the two agree, which is what stops a
+ *  rename from reaching the masthead and leaving the tab behind. */
+export const COURSE_TITLE = `${COURSE.subject} · ${SERIES.name}`;

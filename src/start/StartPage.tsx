@@ -133,7 +133,7 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
   { id: "baseline", symbol: <code>baseline</code>, means: "the score of always answering the commonest class: what any real score has to beat", from: "Module 10" },
 ];
 
-const FILE_NAME = "grokking-nets-progress.json";
+const FILE_NAME = "nets-course-progress.json";
 
 export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
   const [, bump] = useState(0);

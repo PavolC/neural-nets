@@ -91,15 +91,22 @@ must not inherit a prose measure.
 line below:
 
 ```
-[▮]  GROKKING  |  BUILD-IT-YOURSELF COURSES
+[▮]  MOVING PARTS  |  BUILD-IT-YOURSELF COURSES
 Nets
 An interactive course on neural networks: read a little, ...
 ```
 
-The name reads down the page, so a sibling reads `GROKKING / Ciphers` with nothing else
-moved. The heading carries the whole name for a screen reader (the series half is
-`sr-only`), because a heading that announces "Nets" alone leaves a listener without the
-series it belongs to.
+**The series name is an imprint, not a prefix.** The courses are "Nets" and "Ciphers",
+published under one name, so the wordmark sits above the heading rather than in front of
+it and a sibling reads the same two lines with only the heading changed. Pick a series
+name that works this way: a name that has to be prefixed ("Grokking Nets") stops being
+grammatical the moment the subject is a plural or a noun phrase, and it forces the heading
+to carry two words where one is what the reader needs.
+
+The heading needs no hidden prefix, because the wordmark right above it is text: a screen
+reader reaches the series name first and then the course. The document title reverses them
+("Nets · Moving Parts"), since the subject is the word that has to survive being one tab
+of eight.
 
 The monogram is the course's glyph in white on a rounded tile of its accent. **Pick
 something the course itself draws.** Nets uses the sigmoid curve, which is the first figure

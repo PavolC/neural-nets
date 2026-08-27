@@ -2,7 +2,8 @@
 
 ## What this project is
 
-"Grokking Nets": a self-contained, browser-based interactive course that teaches neural
+"Nets", the first course in the **Moving Parts** series: a self-contained,
+browser-based interactive course that teaches neural
 networks from first principles. The learner reads short original explanations, manipulates
 live visualizations, and writes real Python (NumPy) in an in-browser editor. Code is
 validated by automated tests (including numerical gradient checking) and trains a real

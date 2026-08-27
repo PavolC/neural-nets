@@ -97,6 +97,33 @@ def main() -> int:
             got = favicon_stroke.group(1) if favicon_stroke else "(none)"
             fail(problems, f"the favicon glyph is stroked {got}, but --on-accent is {want_ink}")
 
+    # The title, which a rename reaches in brand.ts and leaves behind in the two
+    # places the HTML has to spell it out before any JavaScript runs.
+    title = re.search(r"COURSE_TITLE\s*=\s*`([^`]+)`", ts)
+    if not title:
+        fail(problems, "could not find COURSE_TITLE in brand.ts")
+    else:
+        wanted = (
+            title.group(1)
+            .replace("${COURSE.subject}", re.search(r'subject:\s*"([^"]+)"', ts).group(1))
+            .replace("${SERIES.name}", re.search(r'name:\s*"([^"]+)"', ts).group(1))
+        )
+        for label, pattern in [
+            ("<title>", r"<title>([^<]+)</title>"),
+            ('og:title', r'property="og:title"\s+content="([^"]+)"'),
+        ]:
+            got = re.search(pattern, html)
+            if not got:
+                fail(problems, f"index.html has no {label}")
+            elif got.group(1) != wanted:
+                fail(problems, f"index.html's {label} is {got.group(1)!r}, but COURSE_TITLE is {wanted!r}")
+
+        # The pre-mount skeleton spells the wordmark out too, because it has to
+        # paint before the masthead component exists.
+        series = re.search(r'name:\s*"([^"]+)"', ts).group(1)
+        if f">\n          {series}\n        </p>" not in html.replace("\r\n", "\n"):
+            fail(problems, f"index.html's loading skeleton does not carry the wordmark {series!r}")
+
     theme = re.search(r'name="theme-color"\s+content="(#[0-9a-fA-F]{6})"', html)
     if not theme:
         fail(problems, "index.html has no theme-color meta tag")
@@ -130,7 +157,7 @@ def main() -> int:
         return 1
 
     print(f"Brand agrees: accent --hue-{hue_name} ({accent}), one glyph in "
-          f"{len(SHARED) + 2} places, kit in step.")
+          f"{len(SHARED) + 2} places, the title in 3, kit in step.")
     return 0
 
 

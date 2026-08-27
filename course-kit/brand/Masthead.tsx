@@ -7,12 +7,12 @@ import { Monogram } from "./Monogram";
  * on body), the series row, the course title, its tagline, and whatever
  * navigation the course passes in.
  *
- * The title is split across two lines on purpose. The wordmark carries the
- * series half of the name and the heading carries the subject, so
- * "Grokking / Nets" reads down the page and a sibling course reads
- * "Grokking / Ciphers" with nothing else moved. A screen reader is given the
- * whole name in the heading, because a heading that announces "Nets" alone
- * would leave a listener without the series it belongs to.
+ * The wordmark sits above the title rather than in front of it, because the
+ * series name is an imprint and not a prefix: the courses are "Nets" and
+ * "Ciphers", published under one name, so a sibling reads the same two lines
+ * with only the heading changed. The heading is the subject alone, and needs no
+ * hidden prefix: the wordmark immediately above it is text, so a screen reader
+ * reaches the series name first and then the course.
  */
 export function Masthead({ nav }: { nav?: ReactNode }) {
   const wordmark = (
@@ -33,10 +33,7 @@ export function Masthead({ nav }: { nav?: ReactNode }) {
         )}
         <span className="brand-series-note">{SERIES.note}</span>
       </p>
-      <h1 className="masthead-title">
-        <span className="sr-only">{SERIES.name} </span>
-        {COURSE.subject}
-      </h1>
+      <h1 className="masthead-title">{COURSE.subject}</h1>
       <p className="masthead-tagline">{COURSE.tagline}</p>
       {nav}
     </header>
