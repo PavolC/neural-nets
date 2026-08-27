@@ -10,9 +10,9 @@ one. You read short explanations, manipulate live visualizations, and write real
 numerical gradient check, and then trains a network that reads handwritten digits.
 
 Nothing to install and no account: Python runs in the page through Pyodide (CPython
-compiled to WebAssembly), in a Web Worker so a training run never freezes the tab. The
-only thing that leaves your machine is the runtime download, about 10 MB, on the first
-run.
+compiled to WebAssembly), in a Web Worker so a training run never freezes the tab. Your
+code and your progress never leave the browser, and the only download is the runtime
+itself, about 10 MB, on the first run.
 
 The sequence follows Michael Nielsen's *Neural Networks and Deep Learning*, with the
 explanations rewritten around the interactive parts. It assumes Python and high-school
@@ -126,7 +126,8 @@ python3 tools/bench_depth.py           # Modules 7 and 8's Pyodide numbers (need
 python3 tools/bench_penguins.py        # Module 10's numbers (needs NumPy)
 npm run bench:speeds                   # the layer-speed panel's numbers
 npm run bench:bumps                    # Module 6's numbers
-python3 tools/check_brand.py           # the mark agrees in all six places it appears
+python3 tools/check_brand.py           # the mark, the title and the social card agree
+bash tools/make_og_image.sh            # redraw public/og-image.png (needs a Chromium)
 python3 tools/brand_palette.py --check # the accent family matches what OKLCH computes
 ```
 
@@ -144,6 +145,27 @@ are not ancient are `DecompressionStream` (Safari 16.4+, Firefox 113+) for the g
 data files and `IntersectionObserver` for deferring the editor; `requestIdleCallback` and
 `navigator.clipboard` are both used behind a fallback. So both should work at those
 versions and up, but that is inference, not a test.
+
+## Counting readers
+
+The course ships with no analytics and sets no cookie, so out of the box a deploy tells
+its author nothing about who reached it. That was the right default while the course had
+one reader who could simply be asked, and it is the wrong one for a course meant to be
+found: "two hundred people opened Module 1 and stopped" and "nobody arrived" are opposite
+problems with opposite fixes, and an uninstrumented build cannot tell them apart.
+
+`src/analytics.ts` will load [GoatCounter](https://www.goatcounter.com/) if, and only if,
+`VITE_GOATCOUNTER` names a site at build time:
+
+```
+VITE_GOATCOUNTER=https://yourcode.goatcounter.com/count npm run build
+```
+
+With the variable unset the module compiles away and the bundle contains no reference to
+it, which is verifiable: `grep -r gc.zgo.at dist/` finds nothing. With it set, a page view
+is counted. It never sends the editor's contents, the stored progress, or anything a
+learner typed; it sets no cookie, stores no personal data, skips the dev server, and
+honours `navigator.doNotTrack`. GoatCounter is free for non-commercial use, which this is.
 
 ## License and attribution
 

@@ -208,6 +208,31 @@ that is allowed to have one is correct.
 `homeUrl` stays `null` until the index is actually published, which leaves the wordmark as
 plain text rather than as a link to a 404.
 
+## The social card
+
+A course with no `og:image` is invisible in every place a link is pasted: Slack, Discord,
+LinkedIn, X, iMessage and Bluesky all render it as a line of grey text, which is the
+weakest possible showing for work whose whole argument is that it is worth looking at.
+The card is the one piece of the identity that is seen by people who have not arrived yet.
+
+Course one draws it as a rendered HTML page (`tools/og_card.html`, screenshotted to
+`public/og-image.png` by `tools/make_og_image.sh`) rather than as a drawn image, for the
+same reason the rest of the identity is tokens: the card is then made of the accent, the
+monogram path and the type roles, and a rebrand reaches it. Copy both files, change the
+subject line and the three chips, and run the script.
+
+Two things a sibling course must get right, because both fail silently:
+
+- **Every URL in the card's meta tags is absolute.** `base: "./"` makes the build
+  subpath-safe for the browser, and does nothing for a crawler, which has no page to
+  resolve `./og-image.png` against. The deployed origin is a literal in `index.html`,
+  alongside the favicon and the theme colour, and for the same reason.
+- **The image is 1200x630.** That is the slot both `summary_large_image` and Open Graph
+  render. Anything else is letterboxed or cropped, usually through the title.
+
+`check_brand.py` carries the check: the four URLs name one origin, the file they name
+exists in `public/`, and it is the size the tags declare.
+
 ## Deliberately not here
 
 - **Dark mode.** Every colour is already a token, so a dark palette is a later drop-in

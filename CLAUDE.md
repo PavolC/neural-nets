@@ -484,10 +484,21 @@ the footer. Rules that follow from it:
   `var(--font-ui)` for chrome, `var(--font-display)` for the wordmark and labels,
   `var(--font-mono)` for code. A literal font stack in `styles.css` is a bug: it makes
   `--font-ui` a decoration rather than a switch.
-- **The mark exists in six places and one of them is a literal.** The masthead monogram
-  and the footer monogram render from `COURSE.glyph`, but `index.html`'s favicon and
-  `theme-color` have to be literals, because a tab needs its icon before any JavaScript
-  runs. `python3 tools/check_brand.py` is what keeps them equal.
+- **The mark exists in seven places and three of them are literals.** The masthead
+  monogram and the footer monogram render from `COURSE.glyph`, but `index.html`'s favicon
+  and `theme-color` have to be literals, because a tab needs its icon before any
+  JavaScript runs, and `tools/og_card.html` draws the monogram again because the social
+  card is rendered to a PNG at author time rather than in the page.
+  `python3 tools/check_brand.py` is what keeps them equal.
+- **The social card is a rendered page, and its URLs are absolute.** A share is unfurled
+  by a crawler that has no page to resolve a relative path against, so `og:image`,
+  `og:url`, `twitter:image` and the canonical link all spell out the deployed origin,
+  which is the one place `base: "./"` cannot save. `tools/og_card.html` is the card's
+  source, built from the same accent, monogram and type roles as the site, so a rebrand
+  reaches it; `bash tools/make_og_image.sh` redraws it and `check_brand.py` fails if the
+  four URLs disagree, if the image named is missing from `public/`, or if it is not the
+  1200x630 the tags declare. A course that ships without this is not unstyled, it is
+  invisible: every share of it renders as a line of grey text.
 - Data hues (`--acc`, `--loss`, `--data-*`) are not brand colours and do not follow the
   accent. They name quantities in charts, and a course that changes its accent must not
   silently repaint its charts.
@@ -571,9 +582,15 @@ tokens from the start.
 - `npm run bench:speeds`: the same for the layer-speed and hop tables, by
   importing `deepNet.ts` (the panel's own arithmetic) into Node. No new
   dependency: it compiles through `tools/tsconfig.bench.json` into `.bench/`.
-- `python3 tools/check_brand.py`: the course's mark and hue agree in all six places
-  they appear (the two components, the favicon, the theme colour, and the kit's copy of
-  the shared brand files). Stdlib only.
+- `python3 tools/check_brand.py`: the course's mark and hue agree everywhere they
+  appear (the two components, the favicon, the theme colour, the social card and its
+  source, and the kit's copy of the shared brand files), the title agrees in four places,
+  and the social tags name one origin and an image that exists at the size they declare.
+  Stdlib only.
+- `bash tools/make_og_image.sh`: redraw `public/og-image.png` from `tools/og_card.html`.
+  The card is a rendered HTML page rather than a drawn image so it is made of the same
+  tokens as the site; `check_brand.py` fails if its accent or monogram drift. Needs a
+  Chromium.
 - `python3 tools/brand_palette.py`: print the accent family and every contrast ratio in
   it; `--check` fails if `src/brand/brand.css` has drifted from what the OKLCH arithmetic
   computes. Stdlib only.
