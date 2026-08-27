@@ -82,16 +82,28 @@ Worth cribbing from `../src/`:
   language. The files around it do not: the same `messages.ts` also carries this course's
   MNIST training protocol, and the client hardcodes the Pyodide worker and names Python in
   its error strings. Copy the shape, delete the rest.
-- `python/harness.py` (98 lines): runs the learner's code as a `submission` module and
-  collects `test_*` functions. The only place the Python assumption lives.
-- `components/ExercisePage.tsx` (467 lines): three couplings to Python, everything else
-  generic. Its accumulated UX fixes are the expensive part.
+- `python/harness.py` (98 lines of pure stdlib): runs the learner's code as a `submission`
+  module, collects every `test_*` callable in definition order, titles each from its
+  docstring's first line, and returns a JSON verdict. A second entry point runs the editor
+  with no tests at all. It carries no topic vocabulary, but it is not free of the course
+  either: it hardcodes the exercise contract (the module name, the filename, the `test_*`
+  convention, the result shape), and it cannot run this repo's own tests until the caller
+  registers the shared-helpers module first. It is the one place the Python assumption
+  lives, which is what a non-Python course reimplements.
+- `components/ExercisePage.tsx` (467 lines, the largest file in `components/`): no
+  reference to MNIST, neurons, digits or the source text anywhere in it. Its couplings are
+  a handful of small named seams: two Python-side names in the run-my-code snippet, the
+  exception name a skeleton raises, three spots of Python-flavored copy, a pointer at the
+  notation reference, and the flagship-test banner. Its accumulated UX fixes are the
+  expensive part, and none of them are topic-bound.
 - `components/CodeEditor.tsx`: three lines couple it to Python. Swap one language package.
 - `components/ModuleBits.tsx`: the chapter building blocks, including a table of contents
   that discovers its own sections from the DOM and needs no configuration.
-- `state/progress.ts` (172 lines): no chapter ids, no exercise ids, no topic knowledge.
-  Progress export and import come along free.
-- `exercises/types.ts` (19 lines) and the per-exercise folder convention.
+- `state/progress.ts` (172 lines) and `exercises/types.ts` (19 lines): the two files with
+  no chapter ids, no exercise ids and no topic knowledge at all, which makes them the
+  cleanest lift in the repo. Progress export and import come along free.
+- The per-exercise folder convention: one directory per exercise holding the skeleton, the
+  tests, the reference solution and the prompt metadata.
 - `tools/check_exercises.py` (115 lines): the invariant is the reusable part. Solutions
   pass; untouched skeletons fail for their own reason.
 - `App.tsx` and the `ModuleDef` registry: a complete tabbed course shell with lazy chapters
