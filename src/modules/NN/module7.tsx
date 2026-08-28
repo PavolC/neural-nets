@@ -85,16 +85,18 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       <p>
         Start with one neuron, because the effect is easiest to see there and
         it is the same effect in the digit reader. One input, pinned at 1. One
-        weight, one bias. The right answer is 0, so the neuron's job is to
-        answer 0, and at the moment it answers 0.982.
+        weight and one bias, both set to 2. The right answer is 0.
       </p>
+      <Eq
+        tex="\begin{gathered} z = \underbrace{2}_{\text{the weight}} \times \underbrace{1}_{\text{the input}} + \underbrace{2}_{\text{the bias}} = 4 \\[0.8em] a = \sigma(4) = 0.982 \end{gathered}"
+        gloss="The input never moves, so the evidence is just the weight plus the bias, and the squash turns that 4 into an answer of 0.982."
+      />
       <p>
-        Set both knobs to 2, so with the input pinned at 1 the evidence is 4
-        and the answer is <M tex="\sigma(4) = 0.982" />. Now train by descent,
-        the same rule as everywhere else: measure both knobs' slopes, step
-        against them at <M tex="\eta = 0.15" /> (eta, Module 3's step size),
-        repeat. Here is the log, one line per checkpoint, and the figure below
-        walks the same run at those settings.
+        The neuron answers 0.982 when its job is to answer 0. Now train by
+        descent, the same rule as everywhere else: measure both knobs' slopes,
+        step against them at <M tex="\eta = 0.15" /> (eta, Module 3's step
+        size), repeat. Here is the log, one line per checkpoint, and the figure
+        below walks the same run at those settings.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
