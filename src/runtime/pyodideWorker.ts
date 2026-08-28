@@ -94,7 +94,7 @@ import sys
 _course = sys.modules["course"]
 # The two dataset loaders live in the worker's own globals, so a snippet run
 # through the scratch pad cannot see them. Hang them on \`course\` as well, so
-# "Run my code" can open the bundled data the way a play snippet says it can.
+# a scratch run can open the bundled data the way a play snippet says it can.
 # Never one_hot: the loader's one_hot(y, num_classes=10) and the learner's
 # Module 10 one_hot(values, levels) are different functions with one name, and
 # this is the only place the two could meet.

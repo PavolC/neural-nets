@@ -42,7 +42,8 @@ export type WorkerRequest =
       spec: RunSpec;
       dataUrl?: string;
     }
-  // "Run my code": the whole document, then the scratch pad, in one namespace.
+  // The scratch pad's run: the whole document, then the scratch pad, in one
+  // namespace.
   | {
       type: "runDocumentScratch";
       id: number;

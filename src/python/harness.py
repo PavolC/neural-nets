@@ -243,7 +243,7 @@ def run_document(document, tests_code, spec_json):
 def run_document_scratch(document, scratch_code, spec_json):
     """Run the whole workbench, then the scratch pad, in one namespace.
 
-    "Run my code" is how a learner prints things and tries an experiment, so
+    The scratch pad is how a learner prints things and tries an experiment, so
     it sees the library and everything lent to it, and the scratch pad is a
     separate compile so its line numbers are its own.
     """

@@ -42,7 +42,7 @@ export const prepareExercise: Exercise = {
       "is sorted by species, so cutting it unshuffled would train on two " +
       "species and test on a third.",
     "Once the tests pass, look at what scaling does to the file you are about " +
-      "to use. Send this to the scratch pad and press Run my code:",
+      "to use. Send this to the scratch pad and run it:",
     {
       code:
         "with open('/penguins.json', 'rb') as f:\n" +

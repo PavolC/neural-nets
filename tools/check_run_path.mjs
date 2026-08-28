@@ -114,7 +114,7 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
     await p.locator(".cm-content").click();
     await p.keyboard.press("Control+Enter");
   } else {
-    await p.locator(".wb-bar button", { hasText: "Run tests" }).click();
+    await p.locator(".wb-head button", { hasText: "Run tests" }).click();
   }
   await p.waitForSelector(".test-results", { timeout: 30000 }).catch(() => {});
   await p.waitForTimeout(1200);
@@ -131,7 +131,9 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
     output: document.querySelector(".output-panel pre")?.textContent?.trim().slice(0, 30) ?? null,
     // The bar is panel chrome, outside the one scroll region, so it is on
     // screen however far down the file the reader is.
-    barAlwaysVisible: !document.querySelector(".wb-flow").contains(document.querySelector(".wb-bar")),
+    runAlwaysVisible: !document.querySelector(".wb-flow").contains(
+      document.querySelector(".wb-run"),
+    ),
     scrollRegions: [...document.querySelectorAll(".wb *")].filter((e) => {
       const cs = getComputedStyle(e);
       return (cs.overflowY === "auto" || cs.overflowY === "scroll") && e.scrollHeight > e.clientHeight + 2;

@@ -127,6 +127,10 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
   /** Where the panel should scroll to next. Consumed by the panel, then
    * cleared, so a second click on the same chip scrolls again. */
   const [revealRequest, setRevealRequest] = useState<{ id: string; at: number } | null>(null);
+  /** Bumped when a prompt sends a snippet across, so the panel can open the
+   * scratch pad and scroll to it. Sending code somewhere the reader cannot see
+   * is the same as not sending it. */
+  const [scratchRequest, setScratchRequest] = useState(0);
 
   const bumpRevision = useCallback(() => setRevision((r) => r + 1), []);
 
@@ -390,6 +394,7 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
       const existing = loadScratch().replace(/\s+$/, "");
       saveScratch(existing ? `${existing}\n\n\n${code}\n` : `${code}\n`);
       bumpRevision();
+      setScratchRequest((n) => n + 1);
       if (dockState === "closed") open();
     },
     [bumpRevision, dockState, open],
@@ -457,6 +462,7 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
         editorReady={editorReady}
         ranFor={ranFor}
         revealRequest={revealRequest}
+        scratchRequest={scratchRequest}
         onEditorReady={setEditorReady}
         onDocumentChange={setDocument}
         onScratchChange={saveScratch}

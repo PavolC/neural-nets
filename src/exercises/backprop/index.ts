@@ -42,7 +42,7 @@ export const backpropExercise: Exercise = {
       "million. Passing it means your backpropagation is correct. Last, " +
       "your slopes drive a descent that retrains Module 1's XOR network.",
     "Once the tests pass, point your code at Module 4's by-hand numbers, " +
-      "the two-neuron chain. Send this to the scratch pad and press Run my code:",
+      "the two-neuron chain. Send this to the scratch pad and run it:",
     {
       code:
         "\n" +

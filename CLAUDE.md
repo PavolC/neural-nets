@@ -729,16 +729,26 @@ the footer. Rules that follow from it:
   a finished run scrolls its results into view, because the answer would
   otherwise land at the bottom of a column thousands of pixels long. Nothing
   else in the panel is allowed to move the reader.
-- **The panel's controls are one row, and a passing check is one line.**
-  The run buttons were the course's prose buttons, 51px each, over a reserved
-  status line and a sentence naming the section: 95px of chrome before any
-  output. They are one compact row now, with the section name and whatever the
-  run is saying sharing a single text slot, so nothing reserves a line that is
-  empty most of the time. Passing checks fold into "N checks passed": six of
-  them at full size pushed the failures and the output most of a screen down,
-  and a receipt is not a finding. Failures never fold. Output is one pool,
-  headed with the section the run was for, because one run execs the whole
-  file and pretending otherwise would be a lie about what just happened.
+- **One chrome row, one Run button, and a passing check on one line.** The
+  panel's chrome was three rows: a title with Download and Close, the section
+  rail, and a controls row. It is two now, 104px against 151: the file's name,
+  the one button the loop uses, what that button is pointed at, and a More
+  disclosure holding Download, Reset and Undo, above the rail.
+  **The second run button moved onto the scratch pad**, which is the thing it
+  actually runs. "Run my code" sat beside "Run tests" as if the two were a
+  choice to make every time, when one is the loop and the other is an aside;
+  the name also implied the other button did not run your code. They are not
+  merged, and should not be: the tests are the expensive path (Module 5's
+  gradient check nudges 54 parameters twice), so making every print-a-value
+  experiment pay for them would be a real regression. A cell owning its own run
+  button is the notebook habit worth copying. Sending a snippet from a prompt
+  opens the scratch pad and scrolls to it, because code sent somewhere the
+  reader cannot see was not sent.
+  Passing checks fold into "N checks passed": six of them at full size pushed
+  the failures and the output most of a screen down, and a receipt is not a
+  finding. Failures never fold. Output is one pool, headed with the section the
+  run was for, because one run execs the whole file and pretending otherwise
+  would be a lie about what just happened.
 - **The workbench borrows three things from a notebook, and not the fourth.**
   Mod-Enter runs the tests and Shift-Enter runs the scratch pad, because that is
   what anybody who has used a notebook reaches for first; both need

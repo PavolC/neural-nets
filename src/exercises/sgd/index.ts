@@ -44,8 +44,7 @@ export const sgdExercise: Exercise = {
       "matrix of just those columns. Use the rng for nothing else.",
     "A satisfying experiment once sgd_step works: let it repair Module 1's " +
       "slider network from its starting position, the one the module scored " +
-      "by hand at cost 0.0875. Send this to the scratch pad, then press " +
-      "Run my code:",
+      "by hand at cost 0.0875. Send this to the scratch pad and run it:",
     {
       code:
         "\n" +

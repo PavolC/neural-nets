@@ -54,6 +54,8 @@ interface Props {
   /** The section the last finished run was for, so the output can say. */
   ranFor: string | null;
   revealRequest: { id: string; at: number } | null;
+  /** Bumped when a prompt sends a snippet to the scratch pad. */
+  scratchRequest: number;
   onEditorReady(ready: boolean): void;
   onDocumentChange(text: string): void;
   onScratchChange(text: string): void;
@@ -94,6 +96,7 @@ export function Workbench(props: Props) {
     editorReady,
     ranFor,
     revealRequest,
+    scratchRequest,
   } = props;
 
   const editorRef = useRef<CodeEditorHandle | null>(null);
@@ -103,6 +106,7 @@ export function Workbench(props: Props) {
   const resultsRef = useRef<HTMLDivElement>(null);
   const outputRef = useRef<HTMLPreElement>(null);
   const [scratchOpen, setScratchOpen] = useState(false);
+  const scratchDetailsRef = useRef<HTMLDetailsElement>(null);
   const [spliceNote, setSpliceNote] = useState<string | null>(null);
   const [flagship, setFlagship] = useState<{ test: string; note: string } | undefined>();
   // The editor chunk is fetched on the first open and never unmounted after.
@@ -174,6 +178,19 @@ export function Workbench(props: Props) {
     lastResult.current = result;
     resultsRef.current?.scrollIntoView({ block: "nearest" });
   }, [result]);
+
+  // A snippet arriving from a prompt opens the scratch pad and brings it into
+  // view: it sits at the foot of a column that can be thousands of pixels
+  // long, and code sent somewhere the reader cannot see was not sent.
+  useEffect(() => {
+    if (!scratchRequest) return;
+    setScratchOpen(true);
+    const id = window.setTimeout(
+      () => scratchDetailsRef.current?.scrollIntoView({ block: "nearest" }),
+      60,
+    );
+    return () => window.clearTimeout(id);
+  }, [scratchRequest]);
 
   // Follow the tail while a run streams, unless the reader has scrolled up.
   useEffect(() => {
@@ -275,18 +292,48 @@ export function Workbench(props: Props) {
       aria-modal={dockState === "sheet" ? true : undefined}
       aria-busy={running}
     >
+      {/* One row of chrome, not two. The file's name, the one button the loop
+          uses, what that button is pointed at, and the things you reach for
+          once a session. The second run button moved to the scratch pad,
+          which is the thing it actually runs. */}
       <div className="wb-head">
         <h2 className="wb-title" tabIndex={-1}>
-          Your library <code>nn.py</code>
+          <span className="sr-only">Your library </span>
+          <code>nn.py</code>
         </h2>
-        <div className="wb-head-buttons">
-          <button className="button-secondary wb-download" onClick={download}>
-            Download
+        <button className="wb-run" onClick={() => props.onRunTests()} disabled={!canRun || !current}>
+          {busy === "tests" ? "Running..." : "Run tests"}
+        </button>
+        {running && (
+          <button className="button-secondary wb-stop" onClick={props.onStop}>
+            Stop
           </button>
-          <button className="button-secondary wb-close" onClick={props.onClose}>
-            Close
-          </button>
-        </div>
+        )}
+        <span className={error ? "wb-target wb-target-error" : "wb-target"}>{barText}</span>
+        <details className="wb-more">
+          <summary aria-label="More actions">More</summary>
+          <div className="wb-more-menu">
+            <button className="button-secondary" onClick={download}>
+              Download my nn.py
+            </button>
+            <button className="button-secondary" onClick={resetCurrent} disabled={!def}>
+              Reset this section
+            </button>
+            <button className="button-secondary" onClick={undo} disabled={!canUndo()}>
+              Undo that
+            </button>
+            <p className="wb-more-tip">
+              <b>Run tests</b> runs your whole file and then checks the section the caret is in;
+              Ctrl or Cmd with Enter does the same, and the triangle beside a section line runs
+              that section. The scratch pad at the bottom has its own Run, for trying things and
+              printing values; Shift with Enter runs it from anywhere. Tab indents, and Escape
+              then Tab moves keyboard focus out. Your file is saved in this browser only.
+            </p>
+          </div>
+        </details>
+        <button className="button-secondary wb-close" onClick={props.onClose}>
+          Close
+        </button>
       </div>
 
       <div className="wb-rail scroll-x" role="list" aria-label="Sections of your file">
@@ -322,44 +369,8 @@ export function Workbench(props: Props) {
         </div>
       )}
 
-      {/* One scroll for the whole panel. It used to be two: the editor had
-          its own scroller and the results had theirs, so the panel showed two
-          keyholes and two scrollbars and neither half could use the other's
-          space. Now the chrome sits at the top and everything below it, code
-          and output and verdict, flows down one column the way a page does. */}
-      <div className="wb-bar">
-        <button className="wb-run" onClick={() => props.onRunTests()} disabled={!canRun || !current}>
-          {busy === "tests" ? "Running..." : "Run tests"}
-        </button>
-        <button className="button-secondary" onClick={props.onRunScratch} disabled={!canRun}>
-          {busy === "scratch" ? "Running..." : "Run my code"}
-        </button>
-        {running && (
-          <button className="button-secondary wb-stop" onClick={props.onStop}>
-            Stop
-          </button>
-        )}
-        <span className={error ? "wb-target wb-target-error" : "wb-target"}>{barText}</span>
-        <details className="wb-more">
-          <summary>More</summary>
-          <div className="wb-more-menu">
-            <button className="button-secondary" onClick={resetCurrent} disabled={!def}>
-              Reset this section
-            </button>
-            <button className="button-secondary" onClick={undo} disabled={!canUndo()}>
-              Undo that
-            </button>
-            <p className="wb-more-tip">
-              <b>Run tests</b> runs your whole file and then checks the section the caret is in.{" "}
-              <b>Run my code</b> runs your whole file and then the scratch pad, so you can call
-              your functions and print(...) values. Ctrl or Cmd with Enter runs the tests; Shift
-              with Enter runs your code. The triangle beside a section line runs that section.
-              Tab indents, and Escape then Tab moves keyboard focus out. Your file is saved in
-              this browser only.
-            </p>
-          </div>
-        </details>
-      </div>
+      {/* One scroll below the chrome: the code, what it printed and the
+          verdict flow down a single column the way a page does. */}
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {liveMessage}
       </p>
@@ -457,13 +468,14 @@ export function Workbench(props: Props) {
 
           <details
             className="wb-scratch"
+            ref={scratchDetailsRef}
             open={scratchOpen}
             onToggle={(e) => setScratchOpen((e.currentTarget as HTMLDetailsElement).open)}
           >
             <summary>Scratch pad</summary>
             <p className="wb-scratch-note">
               Anything here runs after your library, with every name in it available, and is never
-              part of it. This is where a "Run my code" experiment goes.
+              part of it. This is where you try things and print values.
             </p>
             {scratchOpen && (
               <Suspense fallback={<EditorPlaceholder />}>
@@ -471,9 +483,18 @@ export function Workbench(props: Props) {
                   className="code-editor wb-scratch-editor"
                   initialDoc={loadScratch()}
                   onChange={props.onScratchChange}
+                  onRun={() => props.onRunScratch()}
                   handleRef={scratchRef}
                 />
               </Suspense>
+            )}
+            {scratchOpen && (
+              <div className="wb-scratch-controls">
+                <button className="button-secondary" onClick={props.onRunScratch} disabled={!canRun}>
+                  {busy === "scratch" ? "Running..." : "Run the scratch pad"}
+                </button>
+                <span className="wb-scratch-hint">or Shift with Enter, from anywhere</span>
+              </div>
             )}
           </details>
         </div>

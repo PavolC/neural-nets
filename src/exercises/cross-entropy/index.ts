@@ -41,8 +41,7 @@ export const crossEntropyExercise: Exercise = {
       "the slopes YOUR delta produces through backprop. Passing it means " +
       "the delta you wrote really is the slope of the cost you wrote.",
     "Once the tests pass, put the old blame and the new one side by side on " +
-      "Module 5's own fixture network. Send this to the scratch pad and press " +
-      "Run my code:",
+      "Module 5's own fixture network. Send this to the scratch pad and run it:",
     {
       code:
         "from course import quadratic_output_delta\n" +

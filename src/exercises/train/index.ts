@@ -40,7 +40,7 @@ export const trainExercise: Exercise = {
       "thing actually learns, to the exact weights after four epochs.",
     "Once they pass, run the program on a problem of your own before pointing " +
       "it at the digits. This is the same three-band problem the tests use, " +
-      "trained for longer. Send it to the scratch pad and press Run my code:",
+      "trained for longer. Send it to the scratch pad and run it:",
     {
       code:
         "import numpy as np\n" +

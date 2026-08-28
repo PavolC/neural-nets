@@ -3233,7 +3233,8 @@ button:disabled {
   .start-progress-link,
   .exercise-launcher-open,
   .wb-chip,
-  .wb-bar button,
+  .wb-head button,
+  .wb-scratch-controls button,
   .chip {
     min-height: 44px;
   }
@@ -3367,44 +3368,41 @@ button:disabled {
   display: none;
 }
 
+/* The one chrome row: the file's name, the button the loop uses, what that
+   button is pointed at, and the things reached for once a session. Two rows
+   were the name-and-buttons row over a controls row, 101px of chrome above a
+   panel that is mostly meant to be code. */
 .wb-head {
   flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.5rem;
   min-height: var(--bar-h);
   padding: 0 0.9rem;
   border-bottom: 1px solid var(--rule);
 }
 
+.wb-head button {
+  font-size: 0.82rem;
+  padding: 0.28rem 0.7rem;
+  white-space: nowrap;
+}
+
 .wb-title {
-  font-family: var(--font-display);
-  font-size: 0.95rem;
+  flex: 0 0 auto;
+  font-size: 0.85rem;
   margin: 0;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .wb-title code {
-  font-size: 0.85em;
+  font-family: var(--font-mono);
   color: var(--muted);
 }
 
 .wb-title:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
-}
-
-.wb-head-buttons {
-  margin-left: auto;
-  display: flex;
-  gap: 0.4rem;
-}
-
-.wb-head-buttons button {
-  font-size: 0.78rem;
-  padding: 0.25rem 0.6rem;
 }
 
 /* The rail: every section of the file, including the ones not written yet, so
@@ -3523,31 +3521,6 @@ button:disabled {
   padding: 0.4rem 0.9rem 2rem;
 }
 
-/* The action bar: one row for the controls, what they point at, and whatever
-   the run has to say. Sticky at the top of the scrolling half, because the
-   results under it can run for hundreds of pixels and the button you want next
-   should never be a scroll away. */
-.wb-bar {
-  flex: 0 0 auto;
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.4rem 0.9rem;
-  background: var(--bg);
-  border-bottom: 1px solid var(--rule);
-}
-
-/* Compact, unlike the prose buttons this course sets elsewhere: a 51px button
-   is right in a paragraph and wrong in a panel where it is one of five things
-   competing for the same 300px. The 44px touch floor still applies in the
-   sheet, through the narrow-screen block at the end of this file. */
-.wb-bar button {
-  font-size: 0.82rem;
-  padding: 0.28rem 0.7rem;
-}
-
 .wb-target {
   flex: 1 1 0;
   min-width: 0;
@@ -3566,6 +3539,7 @@ button:disabled {
 .wb-more {
   flex: 0 0 auto;
   position: relative;
+  font-family: var(--font-ui);
 }
 
 .wb-more-menu {
@@ -3588,11 +3562,33 @@ button:disabled {
   color: var(--muted);
 }
 
+/* Dressed as the secondary buttons beside it, so the right end of the row
+   reads as two controls rather than a control and a line of text. */
 .wb-more > summary {
+  display: inline-block;
+  padding: 0.28rem 0.7rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
   font-family: var(--font-ui);
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   color: var(--muted);
+  white-space: nowrap;
   cursor: pointer;
+  list-style: none;
+}
+
+.wb-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.wb-more > summary::after {
+  content: " \25be";
+}
+
+.wb-more > summary:hover,
+.wb-more[open] > summary {
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 /* An explicit display on a child of a closed <details> is laid out anyway in
@@ -3749,3 +3745,20 @@ button:disabled {
 /* CodeMirror's own spacer element, the one that reserves the column's width,
    already carries visibility: hidden, so nothing is needed here for it. Noted
    because the obvious rule to add is dead code. */
+
+/* The scratch pad's own Run. A cell owns its run button, which is the one
+   notebook habit worth copying here: "Run my code" sat in the chrome row
+   beside "Run tests" as if the two were a choice to make every time, when one
+   is the loop and the other is an aside about the block of code just below
+   this button. */
+.wb-scratch-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.wb-scratch-hint {
+  font-size: 0.76rem;
+  color: var(--muted);
+}

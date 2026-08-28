@@ -35,7 +35,7 @@ export const feedforwardExercise: Exercise = {
       "file: call it by name, there is nothing to import.",
     "A satisfying way to play before (or after) the tests: rebuild Module 1's " +
       "XOR solution with your own function, and ask it about the corners. " +
-      "Send this to the scratch pad, then press Run my code:",
+      "Send this to the scratch pad and run it:",
     {
       code:
         "weights = [np.array([[6., 6.], [6., 6.]]),   # h1 and h2, stacked\n" +
