@@ -134,13 +134,13 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         is where it is most wrong.
       </p>
       <p>
-        Start it closer to the answer instead, at 0.818 rather than 0.982, and
-        it reaches 0.1 in 273 steps: being more wrong at the start made the
-        first stretch slower. That is the complaint, and the figure is where to
-        check it. Its two chips are exactly these two starts (a gentle start
-        sets w = 0.6 and b = 0.9, a saturated start w = 2.0 and b = 2.0). The
-        last column of its table counts the steps to 0.1 for whatever weight
-        and bias you drag to.
+        Start it closer to the answer instead: set the weight to 0.6 and the
+        bias to 0.9, so the evidence is 1.5 and the answer is{" "}
+        <M tex="\sigma(1.5) = 0.818" /> rather than 0.982. It reaches 0.1 in
+        273 steps, so being more wrong at the start made the first stretch
+        slower. That is the complaint, and the figure is where to check it. Its
+        two chips are exactly these two starts. The last column of its table
+        counts the steps to 0.1 for whatever weight and bias you drag to.
       </p>
       <Figure caption="One neuron learning to answer 0, with the input pinned at 1. The two lines are the same descent under two different costs; the second one is defined later in this module, so for now the quadratic line is the one to follow. Press Play to walk the run, and drag w and b to start it somewhere else: the further the starting answer is from 0, the longer the flat stretch at the beginning.">
         <SlowNeuron />
