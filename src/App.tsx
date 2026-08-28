@@ -73,6 +73,18 @@ export default function App() {
     active?.scrollIntoView({ inline: "center", block: "nearest" });
   }, [tab]);
 
+  // Both navigations read the same list: the strip that wraps to two rows on a
+  // wide screen, and the picker that replaces it below 880px.
+  const navItems = [
+    { id: START_TAB, label: "Start" },
+    ...MODULES.map((m) => ({ id: m.id, label: m.navLabel })),
+  ];
+  const current = navItems.find((n) => n.id === tab) ?? navItems[0];
+  const [navOpen, setNavOpen] = useState(false);
+  // A module switch from the picker closes it; one from anywhere else (the
+  // Continue button, a deep link) leaves it as it was, which is closed.
+  useEffect(() => setNavOpen(false), [tab]);
+
   const panels = useRef<Record<string, HTMLDivElement | null>>({});
   // The tab this effect last acted on. A boolean "have I mounted yet" flag does
   // not survive StrictMode, which runs the effect, cleans up, and runs it again:
@@ -112,26 +124,56 @@ export default function App() {
   return (
     <div className="app">
       <Masthead
+        compact={tab !== START_TAB}
         nav={
-          <nav className="tabs" ref={tabStrip} aria-label="Course modules">
-            <button
-              className={`tab ${tab === START_TAB ? "tab-active" : ""}`}
-              aria-current={tab === START_TAB ? "page" : undefined}
-              onClick={() => selectTab(START_TAB)}
-            >
-              Start
-            </button>
-            {MODULES.map((m) => (
+          <>
+            <nav className="tabs" ref={tabStrip} aria-label="Course modules">
+              {navItems.map((n) => (
+                <button
+                  key={n.id}
+                  className={`tab ${tab === n.id ? "tab-active" : ""}`}
+                  aria-current={tab === n.id ? "page" : undefined}
+                  onClick={() => selectTab(n.id)}
+                >
+                  {n.label}
+                </button>
+              ))}
+            </nav>
+            {/* Below 880px the strip cannot show eleven tabs without panning,
+                and dragging a row sideways to find Module 9 is the worst way to
+                offer a list of eleven things. The same list, folded: one line
+                that names where you are and opens the rest vertically. Only one
+                of the two is ever displayed, and the other is display: none, so
+                a screen reader is not read the course twice. */}
+            <nav className="module-picker" aria-label="Course modules">
               <button
-                key={m.id}
-                className={`tab ${tab === m.id ? "tab-active" : ""}`}
-                aria-current={tab === m.id ? "page" : undefined}
-                onClick={() => selectTab(m.id)}
+                className="module-picker-toggle"
+                aria-expanded={navOpen}
+                onClick={() => setNavOpen((o) => !o)}
               >
-                {m.navLabel}
+                <span className="module-picker-where">Module</span>
+                <span className="module-picker-title">{current.label}</span>
+                <span className="module-picker-caret" aria-hidden="true">
+                  {navOpen ? "\u25b2" : "\u25bc"}
+                </span>
               </button>
-            ))}
-          </nav>
+              {navOpen && (
+                <ul className="module-picker-list">
+                  {navItems.map((n) => (
+                    <li key={n.id}>
+                      <button
+                        className={`module-picker-item ${tab === n.id ? "module-picker-current" : ""}`}
+                        aria-current={tab === n.id ? "page" : undefined}
+                        onClick={() => selectTab(n.id)}
+                      >
+                        {n.label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </nav>
+          </>
         }
       />
       <main>

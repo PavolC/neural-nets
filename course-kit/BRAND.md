@@ -139,6 +139,40 @@ between them, so a line running through a label still reads through it. Move the
 clear, remembering that an offset moves the *baseline* while the glyphs stand above it, and
 draw every label in a pass after every line or a later line paints over an earlier label.
 
+**Phones: the header is the thing to cut.** Measured on the first course at 390x844, the
+masthead and tab strip came to 329px and the first line of prose sat at 892px, past the
+bottom of the screen. Three changes, in order of what they bought:
+
+- **A picker instead of a panning strip.** A row of tabs that does not fit is usually made
+  to pan sideways, and that is the worst way to offer a list: the active tab is centred, so
+  a phone shows three of them and the reader has to discover that the rest exist. Fold the
+  same list into one line that names where you are and opens the rest vertically. Wrapping
+  is not the alternative it looks like: eleven tabs wrap to six rows on a 390px screen.
+- **A compact masthead on inner pages.** Give the masthead a `compact` flag and let the
+  application pass it for every page but the front door. On a phone, compact drops the
+  tagline and sizes the title to a running head. The tagline is the pitch, and the pitch is
+  what the front door is for.
+- **Fold the page's opening card.** Anything that sits between the title and the first
+  sentence is a wall on a phone. A `<details>`, open above the phone breakpoint and closed
+  below it, keeps the promise and gives back a third of the screen. Read the state once at
+  mount rather than watching the media query, so a reader who opens it is not shut out by a
+  rotation.
+
+**Touch, and two traps.** 44px is the smaller of the two platform minimums and a good floor
+below the width where a phone layout takes over. An unstyled `input[type="range"]` is 16px
+tall: `min-height` grows its box while the browser keeps the track centred, so the
+affordance looks unchanged and the whole box is live. And a `<summary>` is
+`display: list-item`; setting `display: flex` on it to centre it in a taller target removes
+the disclosure marker, which is the one thing saying the block folds.
+
+**In-page jumps should be instant.** A browser's smooth scroll animates toward the offset it
+computed when it started. If the page mounts anything as it comes into view, the document
+grows in flight and the jump overshoots: measured at 971px of growth and a heading 189px
+above the viewport, repeatably, on a phone, while the same jump on a desktop was exact.
+Nothing is lost, because a jump of thousands of pixels animates a blur with nothing readable
+in it. Sections also need `scroll-margin-top` clearing whatever sticky bar is on screen, or
+the heading lands behind the bar it was chosen from.
+
 **5. The lockup.** A monogram tile, the series wordmark, and the course subject on the
 line below:
 
