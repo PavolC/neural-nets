@@ -1,4 +1,4 @@
-import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader, fig } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { BumpBuilder } from "./interactives/BumpBuilder";
 import { CurveSculptor } from "./interactives/CurveSculptor";
@@ -485,7 +485,7 @@ function TargetCurveFigure() {
     }).join(" ");
   return (
     <svg
-      viewBox={`0 0 ${W} ${H}`}
+      {...fig(-11, -6, 492, 261)}
       className="curve-figure"
       role="img"
       aria-label="A hump-shaped target curve rising from about 1 at the freezing end of the dial to about 9 in the middle and back to 1 at the scorching end, with two single-neuron curves that each rise or fall once and then stay flat."
@@ -562,7 +562,7 @@ function TowerDiagram() {
   ];
   return (
     <svg
-      viewBox="0 0 812 274"
+      {...fig(-2, -3, 797, 268)}
       className="chain-ripple"
       role="img"
       aria-label="Four panels of the same square plane. First, a vertical band worth 6. Second, a horizontal band worth 6. Third, both bands added: 6 in each band alone and 12 where they cross. Fourth, a neuron with a bias of minus nine keeps only the crossing, a tower."
@@ -663,7 +663,7 @@ function StepSharpnessFigure() {
   const py = (v: number) => scale(v, 0, 1.06, BASE, TOP);
   return (
     <svg
-      viewBox="0 0 480 208"
+      {...fig(-1, -8, 476, 215)}
       className="curve-figure"
       role="img"
       aria-label="Three panels of one neuron on the dial, at weights 10, 50 and 400, each switching over at 0.40. The switchover, where its report climbs from 0 to 1, shrinks from 0.600 of the dial to 0.120 and then to 0.015, where the curve is a step."
@@ -754,7 +754,7 @@ function BumpNetDiagram() {
     ));
   return (
     <svg
-      viewBox="-50 0 490 276"
+      {...fig(-24, 4, 458, 269)}
       className="tiny-net"
       role="img"
       aria-label="Diagram: the dial feeds two hidden neurons through wires of weight 400 each. The first has bias minus 160, so it steps at 0.40; the second has bias minus 240, so it steps at 0.60. Their two wires into the output neuron carry plus 6 and minus 6, and the output neuron adds without squashing."
@@ -825,7 +825,7 @@ function BoxesFigure() {
   ];
   return (
     <svg
-      viewBox="0 0 480 292"
+      {...fig(-11, 11, 467, 280)}
       className="curve-figure"
       role="img"
       aria-label="A square of two pixel values holding six training images, each fenced inside its own small box labelled with that image's digit. A seventh image sits in the empty middle, inside no box, where the network answers zero."

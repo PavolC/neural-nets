@@ -1,4 +1,4 @@
-import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader, fig } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { ExercisePage } from "../../components/ExercisePage";
 import { feedforwardExercise } from "../../exercises/feedforward";
@@ -141,7 +141,7 @@ export function Module2() {
         counted Module 1's nine:
       </p>
       <Eq
-        tex="\begin{aligned} &\underbrace{15 \times 784}_{\text{hidden } W} + \underbrace{15}_{\text{hidden } b} + \underbrace{10 \times 15}_{\text{output } W} + \underbrace{10}_{\text{output } b} \\[0.7em] &= 11{,}760 + 15 + 150 + 10 = 11{,}935 \end{aligned}"
+        tex="\begin{aligned} &\underbrace{15 \times 784}_{\text{hidden } W} + \underbrace{15}_{\text{hidden } b} + \underbrace{10 \times 15}_{\text{output } W} + \underbrace{10}_{\text{output } b} \\[0.8em] &= 11{,}760 + 15 + 150 + 10 = 11{,}935 \end{aligned}"
         gloss="The hidden layer's W has one row per neuron (15) and one column per input (784), plus one bias per neuron; the output layer reads the 15 hidden activations the same way. Nearly twelve thousand knobs, far too many to set by hand; Module 3 is about finding them automatically."
       />
 
@@ -228,7 +228,7 @@ function ShapesDiagram() {
   const ROW_TOP = 107; // the shaded "neuron j" band
   const ROW_H = 30;
   return (
-    <svg viewBox="0 0 500 240" className="shapes-diagram" role="img"
+    <svg {...fig(8, 13, 455, 213)} className="shapes-diagram" role="img"
          aria-label="The shapes in a' = sigma(W a + b): W is m by n, a is n by 1, b and a' are m by 1">
       {/* a' */}
       <rect x={20} y={77} width={28} height={90} className="shape-m" />

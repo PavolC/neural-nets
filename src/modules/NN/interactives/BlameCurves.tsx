@@ -1,4 +1,5 @@
 import { scale } from "./utils";
+import { fig } from "../../../components/ModuleBits";
 
 // Static figure: how big the output layer's blame is, plotted against how
 // wrong the answer is. Rendered twice in Module 7, first with the quadratic
@@ -25,8 +26,10 @@ export function BlameCurves({ showCrossEntropy = false }: { showCrossEntropy?: b
     }).join(" ");
 
   return (
+    // The box is sized for the showCrossEntropy state, whose dot at a = 1
+    // reaches 23 units further right than the quadratic curve alone.
     <svg
-      viewBox={`0 0 ${W} ${H}`}
+      {...fig(9, -6, 508, 277)}
       className="curve-figure blame-figure"
       role="img"
       aria-label={

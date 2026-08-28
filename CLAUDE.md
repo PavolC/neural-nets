@@ -188,14 +188,53 @@ this floor after direct feedback; every later module must be written to it too.
 - **Succeed before failing.** The learner solves OR and AND before meeting XOR;
   "press Show a solution, break it one slider at a time, then rebuild" is a valid
   on-ramp for a fiddly interactive.
-- **Diagram widths are standardized, two families.** Box-and-arrow diagrams
-  (chain-ripple / chain-net classes, the stepper's diagram, Module 5's
-  receipts) share one 812-unit-wide viewBox rendered at full column width:
-  pad a narrower layout by lowering the viewBox min-x to center it, never by
-  scaling. Plot-family figures (concert-plot, tiny-net, shapes-diagram)
-  render at exactly natural scale, capped at their viewBox width and
-  centered. On sub-720px screens the box family keeps min-width 620px and
-  pans inside .figure-scroll. New diagrams join one of the two families.
+- **Diagram widths are standardized, two families, and every viewBox is tight
+  to its ink.** A figure's viewBox comes from `fig(x, y, w, h)` in ModuleBits,
+  which also hands `w` to CSS as `--fig-units`; every figure width in the
+  stylesheet is derived from that, so no rule repeats a number that lives in
+  the markup. Box-and-arrow diagrams (chain-ripple / chain-net / bp-diagram /
+  ripple-slice) render at one scale for the whole course, `--fig-scale`,
+  calibrated so the widest of them fills the column exactly (Module 4's ripple
+  log, 817 units across 873px): a diagram with fewer boxes in it is narrower,
+  never differently drawn. Plot-family figures (concert-plot, tiny-net,
+  shapes-diagram, curve-figure, m8-conv, m8-spaces) render at natural scale,
+  one unit to one pixel, capped at their own width. Below 720px the box family
+  stops shrinking at `--fig-scale-min` times its units and pans inside
+  `.figure-scroll`.
+  Padding a viewBox to center a narrower layout, which is what this rule used
+  to say, is what made five diagrams claim up to 37 percent more column than
+  they drew in: the ink was centered, but the figure reserved the width of the
+  widest diagram in the course and started shrinking as if it were that wide,
+  and a phone panned across the empty margins. Tight viewBoxes cost nothing on
+  a wide screen and draw 35 figures larger at 700px, up to 44 percent.
+  Measure a candidate with `svg.getBBox()` against its viewBox: the two should
+  differ by 8 units a side. New diagrams join one of the two families.
+- **A figure or an equation drawn on a card takes the card's ground, not the
+  page's.** `--fig-ground` is the surface a figure sits on; the sideways-scroll
+  covers and the SVG label halos read it, so anything with a background of its
+  own (`.interactive`, `.module-aside`, `.bp-eqcard`, the cards) declares it to
+  match. Two traps. A custom property that references another is substituted
+  where it is **declared**, so `--x: var(--fig-ground)` at `:root` freezes the
+  page's ground and inherits that down; read `var(--fig-ground)` on the element
+  that paints. And an invalid `var()` makes the whole declaration invalid at
+  computed-value time, so a `width` built that way silently becomes `auto`,
+  which for an SVG with a viewBox is 100 percent: that scaled every plot-family
+  figure to twice its drawn size, and only a before-and-after measurement of
+  drawn width caught it.
+- **A label on a wire needs clearance, not just a halo.** The halo (`paint-order:
+  stroke`) covers the line beside each glyph and not in the gaps between them,
+  so a line running through a label still reads through it: Module 4's fork
+  diagram showed "w = =4:0". Put the label clear of the line (the offset moves
+  the text's *baseline*, and its digits stand about 9 units above that, so a
+  label below a line needs roughly 15 units and one above it needs 6), and draw
+  every label in a pass after every line, or a later wire paints over an
+  earlier label. Where wires cross there is no position that clears them all,
+  and the halo has to carry it: give it the width of the thickest wire.
+- **A box drawn around a label has to fit the label with room to spare.**
+  `tools`-style checks live in the session, not the repo, but the measurement is
+  cheap: compare each `<text>`'s bbox against the `<rect>` its centre falls in
+  and require 4 units of room. Five box captions were 1 to 3 units wider than
+  their own boxes, and a caption that merely fits still reads as clipped.
 - **A score gets a breakdown.** Accuracy alone hides which class a network
   fails at, and the course teaches the habit twice: Module 5's training panel
   shows per-digit counts and the eight mistakes the network was surest about

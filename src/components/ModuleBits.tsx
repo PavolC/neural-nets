@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 // Shared building blocks for module pages (conventions in CLAUDE.md):
 // opener with "What you'll be able to do after this", figures with
@@ -141,6 +141,19 @@ export function Aside({ children }: { children: ReactNode }) {
       {children}
     </aside>
   );
+}
+
+/* A figure's viewBox, with its width handed to CSS as --fig-units.
+   Every figure width in the stylesheet is derived from this, so a rule never
+   repeats a number that lives in the markup and the two cannot drift apart.
+   Keep the viewBox tight to the ink: whitespace inside it is whitespace the
+   figure reserves in the column, and on a narrow screen it is whitespace the
+   reader has to scroll past. */
+export function fig(x: number, y: number, w: number, h: number) {
+  return {
+    viewBox: `${x} ${y} ${w} ${h}`,
+    style: { "--fig-units": w } as CSSProperties,
+  };
 }
 
 export function Figure({ children, caption }: { children: ReactNode; caption: string }) {
