@@ -142,7 +142,7 @@ export function Module4() {
         Subtract old from new:
       </p>
       <Eq
-        tex="\underbrace{2.0\,(a_1 + 0.00235) + b_2}_{\text{new } z_2} - \underbrace{(2.0\,a_1 + b_2)}_{\text{old } z_2} = 2.0 \times 0.00235 = 0.00470"
+        tex="\begin{aligned} &\underbrace{2.0\,(a_1 + 0.00235) + b_2}_{\text{new } z_2} - \underbrace{(2.0\,a_1 + b_2)}_{\text{old } z_2} \\[0.7em] &= 2.0 \times 0.00235 = 0.00470 \end{aligned}"
         gloss="The b2's cancel, the 2.0-times-a1 parts cancel, and what remains is the wiggle times the wire. A change riding into a multiplication comes out multiplied: that is the whole mechanism."
       />
       <p>
@@ -276,7 +276,7 @@ export function Module4() {
         A's is built from neuron B's:
       </p>
       <Eq
-        tex="\delta_B = \underbrace{0.2463}_{\text{own } \sigma'} \times \underbrace{(-0.4391)}_{\text{gap}} = -0.1081, \qquad \delta_A = \underbrace{0.2350}_{\text{own } \sigma'} \times \underbrace{2.0}_{\text{wire}} \times \underbrace{(-0.1081)}_{\delta_B} = -0.0508"
+        tex="\begin{aligned} \delta_B &= \underbrace{0.2463}_{\text{own } \sigma'} \times \underbrace{(-0.4391)}_{\text{gap}} = -0.1081 \\[0.8em] \delta_A &= \underbrace{0.2350}_{\text{own } \sigma'} \times \underbrace{2.0}_{\text{wire}} \times \underbrace{(-0.1081)}_{\delta_B} = -0.0508 \end{aligned}"
         gloss="Neuron B touches the cost directly, so its blame is its own steepness times the gap. Neuron A's blame arrives from downstream: delta-B, carried back through the connecting wire, scaled by A's own steepness. Blame flows backward, one cheap step per neuron."
       />
       <p>
