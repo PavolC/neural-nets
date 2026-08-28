@@ -43,7 +43,17 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # Reading the counter's address from a repository variable rather than
+      # hardcoding it means turning measurement on is a settings change, not a
+      # commit. Unset, this is the empty string, startAnalytics() returns
+      # immediately and the bundle carries no reference to it: the private
+      # build and the measured one differ by one variable and nothing else.
+      # Set it at Settings > Secrets and variables > Actions > Variables, as
+      # VITE_GOATCOUNTER, to something like
+      # https://yourcode.goatcounter.com/count
       - run: npm run build
+        env:
+          VITE_GOATCOUNTER: ${{ vars.VITE_GOATCOUNTER }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

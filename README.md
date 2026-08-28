@@ -140,8 +140,9 @@ doc set, so no dataset or architecture shrinking was needed. Accuracy plateaus j
 90% because of the subsampled data and the quadratic cost; Module 7 reaches about 92%
 once the cross-entropy cost is paired with weights scaled by 1/sqrt(inputs).
 
-Firefox and Safari have not been run against this build. The web APIs it depends on that
-are not ancient are `DecompressionStream` (Safari 16.4+, Firefox 113+) for the gzipped
+The course has been opened in Firefox and Safari and it runs; that is a smoke test rather
+than a sweep, so an interactive somewhere may still misbehave. The web APIs it depends on
+that are not ancient are `DecompressionStream` (Safari 16.4+, Firefox 113+) for the gzipped
 data files and `IntersectionObserver` for deferring the editor; `requestIdleCallback` and
 `navigator.clipboard` are both used behind a fallback. So both should work at those
 versions and up, but that is inference, not a test.

@@ -171,6 +171,13 @@ export default function App() {
       </main>
       <SeriesFooter>
         <p>
+          Built by <a href="https://github.com/PavolC">Pavol Chvala</a>. Corrections and
+          questions are welcome in{" "}
+          <a href="https://github.com/PavolC/neural-nets/discussions">the discussions</a>,
+          and the course is open source at{" "}
+          <a href="https://github.com/PavolC/neural-nets">PavolC/neural-nets</a>.
+        </p>
+        <p>
           Adapted from Michael A. Nielsen,{" "}
           <a href="http://neuralnetworksanddeeplearning.com/">
             <em>Neural Networks and Deep Learning</em>
