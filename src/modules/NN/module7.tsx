@@ -17,7 +17,7 @@ export function Module7() {
       <h2>Module 7: Making it actually work</h2>
       <AfterThis
         items={[
-          "Read the two factors in BP1 that leave a badly wrong output neuron barely learning, and pick a cost that removes one of them.",
+          "Read one descent step as two links, find the one that goes slack when an output neuron is confidently wrong, and pick a scoring rule that covers for it.",
           "Change three lines of your own network (the output blame, the scale of the starting weights, the weight update) and measure what each one buys.",
           "Tell learning from memorizing by watching four numbers, and say what regularization does and does not fix.",
         ]}
@@ -145,28 +145,111 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       <Figure caption="One neuron learning to answer 0, with the input pinned at 1, under the quadratic cost. Press Play to walk the run, and drag w and b to start it somewhere else: the further the starting answer is from 0, the longer the flat stretch at the beginning.">
         <SlowNeuron />
       </Figure>
+      <SectionHeader id="m7-flat" title="The land under the knobs" />
       <p>
-        The reason is in BP1, the equation that starts the backward sweep. It
-        is a product of two factors:
+        That run was a walk on a landscape, and it pays to be exact about what
+        the landscape is. Module 3 drew it as a hiking map: the floor is every
+        possible setting of the knobs, and the height above a spot is the
+        score. To find the height at one spot, freeze the knobs there, run the
+        images through the network as it stands, and add up the penalties. The
+        land is already there at every setting, including the ones you will
+        never visit. Descent does not build it. Descent walks on it.
+      </p>
+      <p>
+        So measure it in two places. One neuron, the input pinned at 1, so the
+        evidence is <M tex="w + b" />, and the score for an answer{" "}
+        <M tex="a" /> against a right answer of 0 is <M tex="\tfrac12 a^2" />.
+        Take the same step in both places: add 0.25 to each knob, which raises
+        the evidence by 0.5.
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>where the neuron stands</th>
+              <th>w</th>
+              <th>b</th>
+              <th>evidence z</th>
+              <th>answer</th>
+              <th>score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>somewhere unsure</td><td>0</td><td>0</td><td>0</td><td>0.500</td><td>0.125</td></tr>
+            <tr><td>after the step</td><td>0.25</td><td>0.25</td><td>0.5</td><td>0.622</td><td>0.194</td></tr>
+            <tr><td>confidently wrong</td><td>1.946</td><td>1.946</td><td>3.892</td><td>0.980</td><td>0.480</td></tr>
+            <tr><td>after the same step</td><td>2.196</td><td>2.196</td><td>4.392</td><td>0.988</td><td>0.488</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The same step raises the land by 0.069 in the first place and by 0.008
+        in the second, nine times less. That second spot is nearly the panel's
+        saturated start, so the flat opening of the run above is this: the walk
+        begins on a shelf.
+      </p>
+      <p>
+        Which half of the step went slack? A step reaches the score through two
+        links. Turning the knobs moves the answer, and the answer moves the
+        score. Module 4's chain has this shape, and its rule holds here too:
+        what each link passes on multiplies.
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>starting from</th>
+              <th>the knobs move</th>
+              <th>so the answer moves</th>
+              <th>so the score moves</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>somewhere unsure</td><td>+0.5</td><td>+0.122</td><td>+0.069</td></tr>
+            <tr><td>confidently wrong</td><td>+0.5</td><td>+0.008</td><td>+0.008</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        The first link took the same push both times and passed on fifteen
+        times less out at the extreme, 0.008 against 0.122. The second link
+        cannot be read that way, because what arrives at it differs. Ask
+        instead what fraction of its input it passes on. Where the neuron is
+        unsure it turns 0.122 of answer into 0.069 of score, 56 percent. Where
+        the neuron is confidently wrong it turns 0.008 into 0.008, 98 percent.
+        The second link is not weak out there. It passes on more than it does
+        in the middle.
+      </p>
+      <p>
+        So the shelf is the first link's doing, and the first link is the
+        sigmoid's own shape: steep in the middle, nearly level at both ends,
+        which is what squashing means. Its rate is the squash's slope, which
+        Module 4 wrote <M tex="\sigma'(z)" /> and gave the formula{" "}
+        <M tex="a(1-a)" />: 0.25 at an answer of 0.5, and 0.0196 at 0.98.
+      </p>
+      <p>
+        Multiply the two rates together and you have the number BP1 computes.
+        That is what blame is: how steeply the land rises under one neuron's
+        knobs.
       </p>
       <Eq
-        tex="\delta^L = \underbrace{(a - y)}_{\text{the gap}} \odot \underbrace{\sigma'(z^L)}_{\text{the steepness}}"
-        gloss="Module 4's BP1. The gap is how wrong the answer is; the steepness is how much the answer moves when the evidence moves, which for a sigmoid is a(1-a). The circled dot is the elementwise product, NumPy's plain star. Every slope in the network is built from this number, so whatever happens to it happens to all of them."
+        tex="\delta^L = \underbrace{(a - y)}_{\text{the gap}} \odot \underbrace{\sigma'(z^L)}_{\text{the squash's slope}}"
+        gloss="Module 4's BP1, read as the two links multiplied. The gap does double duty here: it is how wrong the answer is, and under the quadratic cost it is also what the score charges for one more unit of answer. The squash's slope is what the first link passes on. The circled dot is the elementwise product, NumPy's plain star. Every slope in the network is built from this number, so whatever happens to it happens to all of them."
       />
       <p>
-        Both factors depend on the answer <M tex="a" />, and they pull in
-        opposite directions. The gap grows as the answer gets worse. The
-        steepness shrinks, because a sigmoid at 0.98 is nearly flat. Multiply
-        them and read the product across the range:
+        Both rates depend on the answer, and they pull in opposite directions.
+        The gap grows as the answer gets worse. The squash's slope shrinks,
+        because a sigmoid at 0.98 is nearly level. Multiply them and read the
+        product across the range:
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
           <thead>
             <tr>
               <th>the answer</th>
-              <th>the gap</th>
-              <th>the steepness a(1 − a)</th>
-              <th>the blame, gap × steepness</th>
+              <th>the gap (what the score charges)</th>
+              <th>the squash's slope a(1 − a)</th>
+              <th>the blame, the two multiplied</th>
             </tr>
           </thead>
           <tbody>
@@ -180,26 +263,26 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       </div>
       <p>
         The blame peaks at 0.148, when the answer is two thirds wrong, and
-        falls away on both sides. Past that peak the steepness shrinks faster
+        falls away on both sides. Past that peak the squash's slope shrinks faster
         than the gap grows, so the worse the answer, the smaller the blame,
         and the smaller every slope the backward sweep produces from it. At an
         answer of 0.999 the blame is 0.001: as wrong as a sigmoid can be, with
         a blame 148 times smaller than the 0.148 the table peaks at.
       </p>
-      <Figure caption="The blame the output layer receives, against how wrong its answer is (right answer 0, so the answer is also the gap). The dots mark three rows of the table. Everything right of the peak is the complaint: more wrong, less blame, slower learning.">
+      <Figure caption="How steeply the land rises under the output neuron's knobs, against how wrong its answer is (right answer 0, so the answer is also the gap). The dots mark three rows of the table. Everything right of the peak is the complaint: more wrong, less blame, slower learning.">
         <BlameCurves />
       </Figure>
       <p>
-        The same two factors predict the log at the top of this section. The
-        neuron starts at 0.98201, so the gap is 0.98201 and the steepness is
-        the gap times 0.01799, or 0.01766 (not the 0.0196 in the table's
-        rounded 0.980 row: the fourth decimal of the answer moves the
-        steepness by a tenth). Both knobs then take the same step, because the
+        The same two rates predict the log in the last section. The
+        neuron starts at 0.98201, so the gap is 0.98201 and the squash's slope
+        is the gap times 0.01799, or 0.01766 (not the 0.0196 in the table's
+        rounded 0.980 row: the fourth decimal of the answer moves it by a
+        tenth). Both knobs then take the same step, because the
         input pinned at 1 makes the evidence just <M tex="w + b" />, and the
-        figure's step size is 0.15.
+        run's step size is 0.15.
       </p>
       <Eq
-        tex="\begin{gathered} \underbrace{0.98201}_{\text{the gap}} \times \underbrace{0.01766}_{\text{the steepness}} = \underbrace{0.0173}_{\text{the blame}} \\[0.8em] 0.15 \times \underbrace{0.0173}_{\text{the blame}} = \underbrace{0.0026}_{\text{per knob}} \\[0.8em] \underbrace{0.0052}_{\text{the drop in } z} \times \underbrace{0.01766}_{\text{the steepness}} = 0.00009 \end{gathered}"
+        tex="\begin{gathered} \underbrace{0.98201}_{\text{the gap}} \times \underbrace{0.01766}_{\text{the squash's slope}} = \underbrace{0.0173}_{\text{the blame}} \\[0.8em] 0.15 \times \underbrace{0.0173}_{\text{the blame}} = \underbrace{0.0026}_{\text{per knob}} \\[0.8em] \underbrace{0.0052}_{\text{the drop in } z} \times \underbrace{0.01766}_{\text{the squash's slope}} = 0.00009 \end{gathered}"
         gloss="In order: the blame, the step each knob takes against it, and how far the answer moves once the evidence has fallen by both steps together. The log's first step takes the answer from 0.9820 to 0.9819, a drop of 0.00009, and 500 steps at that rate would leave the answer above 0.93. The walk finishes in 469 because the blame grows as the answer falls back toward two thirds, not because that first rate holds."
       />
       <p>
@@ -211,71 +294,44 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
 
       <SectionHeader id="m7-ce" title="A cost that notices" />
       <p>
-        Which factor should change? Not the steepness. That factor is a fact
-        about the neuron: nudge the evidence <M tex="z" /> of a saturated
-        sigmoid and its answer really does barely move, and any correct
-        gradient has to say so. The other factor is where the choice is. The
-        gap is not a law of nature; it is what the quadratic cost happens to
-        charge for a wrong answer, and that cost was picked in Module 3
-        because squared gaps were the obvious way to score.
+        The first link is not yours to change. It is what a sigmoid neuron
+        does, and squashing is also what you want at the output, where the
+        answer has to be a confidence between 0 and 1. The second link is not
+        part of the network at all. It is the cost, the yardstick you grade
+        answers with, chosen in Module 3 as half the squared gap because
+        squaring was the obvious way to score. Swap the yardstick and every
+        weight, wire and neuron stays exactly as it was, while the land
+        underneath them is replaced. The replacement is the cross-entropy
+        cost.
       </p>
       <p>
-        So look at what the quadratic cost charges. Per output neuron it is{" "}
-        <M tex="\tfrac12 (a - y)^2" />, and with a right answer of 0 that is
-        half the answer squared:
-      </p>
-      <div className="table-scroll scroll-x" tabIndex={0}>
-        <table className="truth-table">
-          <thead>
-            <tr>
-              <th>the answer (right answer 0)</th>
-              <th>0.500</th>
-              <th>0.900</th>
-              <th>0.980</th>
-              <th>0.999</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>what the quadratic cost charges</td>
-              <td>0.125</td>
-              <td>0.405</td>
-              <td>0.480</td>
-              <td>0.499</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p>
-        The charge is capped at 0.5, and almost all of it is spent by the time
-        the answer reaches 0.9. Between 0.9 and 0.999 the network gets much
-        more wrong and its bill rises by 0.094. The blame descent acts on is
-        built out of that bill, so a cost that hardly distinguishes those two
-        answers hands descent hardly any reason to prefer one over the other.
+        Put a number on what it has to do. At an answer of 0.98 the first link
+        passes on 0.0196. For the two rates multiplied to come out at the gap,
+        0.98, the second link's rate has to be 50, because 50 times 0.0196 is
+        0.98. Module 3's rule charges 0.98 there. So the new yardstick has to
+        charge about fifty times more for the same movement of the answer,
+        exactly where the neuron is most confident and most wrong.
       </p>
       <p>
-        So name the target. The output layer should get a blame equal to the
-        gap on its own, <M tex="a - y" />, so that a worse answer always brings
-        a bigger correction (the last section's blame table lists answers whose
-        corrections shrink instead, once they pass two thirds wrong). Module 4
-        found that every factor along a nudge's path is a slope, and BP1's two
-        factors are both slopes: how much the cost changes per unit of answer,
-        and how much the answer changes per unit of evidence, which is the
-        steepness. Their product is the blame, so their product has to come out
-        as the gap. At an answer of 0.98 the steepness is 0.0196 and the
-        gap is 0.98, so the cost's slope there has to be 50, because 50 times
-        0.0196 is 0.98. In general it has to be{" "}
-        <M tex="(a - y) / (a(1-a))" />: the gap divided by the steepness, so
-        that the steepness cancels when the two are multiplied.
+        Module 3's rule cannot charge that, and the obstacle is a ceiling. The
+        most one output can ever cost under half the squared gap is 0.5,
+        reached by answering 1 when the right answer is 0. At an answer of 0.98
+        it has already charged 0.48, so the whole rule has 0.02 points left in
+        it for every remaining degree of wrongness. Nudging the answer from
+        0.98 to 0.99 spends 0.0099 of that. For that one nudge to cost 0.5
+        instead, and the next nudge to cost more again, the charge has to keep
+        rising with no upper limit.
       </p>
+      <Figure caption="How steeply the land rises, against how wrong the answer is (right answer 0, so the answer is also the gap). The hump is the quadratic cost, the curve from the last section. The straight line is what a yardstick with no ceiling gives: the land's slope equal to the gap, so a worse answer always brings a bigger correction. The two dots at an answer of 0.98 are 0.0192 and 0.98, a factor of 51 apart.">
+        <BlameCurves showCrossEntropy />
+      </Figure>
       <p>
-        A cost with that slope exists, and writing it down needs one function
-        the course has not used yet. Module 1 met <M tex="e" />, the number
-        2.718, inside the sigmoid. The natural logarithm{" "}
-        <M tex="\ln a" /> is the reverse question: the power you have to raise{" "}
-        <M tex="e" /> to in order to get <M tex="a" />. For answers between 0
-        and 1 it is negative, and it dives without limit as the answer
-        approaches 0:
+        A charge that rises without limit needs one function the course has not
+        used yet. Module 1 met <M tex="e" />, the number 2.718, inside the
+        sigmoid. The natural logarithm <M tex="\ln a" /> is the reverse
+        question: the power you have to raise <M tex="e" /> to in order to get{" "}
+        <M tex="a" />. For answers between 0 and 1 it is negative, and it dives
+        without limit as the answer approaches 0:
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
@@ -321,28 +377,61 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         gloss="The cross-entropy cost, for one output neuron. With y = 1 the second term vanishes and the charge is -ln a; with y = 0 the first vanishes and the charge is -ln(1-a). A network's cost is this summed over the output neurons and averaged over the examples, the same shape of bookkeeping as the quadratic cost, with no bookkeeping half."
       />
       <p>
-        Now check that slope, by nudging. At an answer of 0.98
-        with a right answer of 0 the charge is{" "}
+        Check its rate by nudging, the way Module 3 measured every rate. At an
+        answer of 0.98 against a right answer of 0 the charge is{" "}
         <M tex="-\ln(0.02) = 3.912" />. Nudge the answer up by 0.001 and the
         charge becomes <M tex="-\ln(0.019) = 3.963" />. The rise is 0.051, and
-        the prediction was 50 times 0.001, so 0.050. The charge really does
-        rise by about 50 per unit of answer at that spot, where the quadratic
-        cost was rising by 0.98.
+        50 times 0.001 is 0.050. The new yardstick does charge about 50 per
+        unit of answer at that spot, where the old one charged 0.98.
       </p>
       <p>
-        And that is the whole fix, because the two factors multiply:
+        Now set that rate beside the first link's rate, which has not moved,
+        because nothing about the neuron has changed:
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>the answer</th>
+              <th>the squash's slope</th>
+              <th>what the new yardstick charges</th>
+              <th>the two multiplied</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>0.500</td><td>0.250000</td><td>2</td><td>0.500</td></tr>
+            <tr><td>0.980</td><td>0.019600</td><td>50</td><td>0.980</td></tr>
+            <tr><td>0.999</td><td>0.000999</td><td>1000</td><td>0.999</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Wherever the first link goes slack, the second link's rate rises by
+        exactly the amount needed to undo it, and the two multiplied come out
+        at the gap every time. In symbols, the squash's slope divides out of
+        the yardstick's rate and multiplies back in at the neuron:
       </p>
       <Eq
-        tex="\delta^L = \underbrace{\frac{a - y}{a(1-a)}}_{\text{the cost's slope}} \times \underbrace{a(1-a)}_{\text{the steepness}} = a - y"
-        gloss="The steepness appears once in the numerator's denominator and once as itself, so it cancels: the output layer's blame is the gap alone. At an answer of 0.98 against a right answer of 0 that is 50 times 0.0196, which is 0.98. Module 4's identity that sigma-prime equals a(1-a) is what makes the cancellation exact rather than approximate."
+        tex="\delta^L = \underbrace{\frac{a - y}{a(1-a)}}_{\text{the yardstick's rate}} \times \underbrace{a(1-a)}_{\text{the squash's slope}} = a - y"
+        gloss="The squash's slope sits once in the yardstick's denominator and once as itself, so it divides out: the output layer's blame is the gap alone. At an answer of 0.98 against a right answer of 0 that is 50 times 0.0196, which is 0.98. Module 4's identity that sigma-prime equals a(1-a) is what makes the cancellation exact rather than approximate."
       />
       <p>
-        Put both blames on the same axes. The quadratic curve is the one from
-        the last section; the cross-entropy line runs straight to 1.
+        The land has changed shape. Under Module 3's rule it climbs away from
+        the bottom and then levels off at 0.5 in every wrong direction, so a
+        network far enough out stands on a tabletop with no downhill left to
+        find. Under the new rule it keeps climbing, at a rate that approaches 1
+        and never flattens. Same floor, same bottom where the answers are
+        right, no shelf anywhere in between.
       </p>
-      <Figure caption="The same axes as before, with cross-entropy's blame added. It is the diagonal: blame equals gap, so a worse answer always means a bigger correction. The quadratic curve is unchanged, and the two dots at an answer of 0.98 are 0.0192 and 0.98, a factor of 51 apart.">
-        <BlameCurves showCrossEntropy />
-      </Figure>
+      <p>
+        In the code, one line changes. BP1 was{" "}
+        <code>delta = (a - y) * sigmoid_prime(z)</code> and becomes{" "}
+        <code>delta = a - y</code>. Nothing has been struck out: the squash's
+        slope is divided out by the yardstick and multiplied back in by the
+        neuron, so computing both would be doing a thing and then undoing it.
+        The short line is the full slope of the new land. BP2, BP3 and BP4 are
+        untouched, and so is the forward pass.
+      </p>
       <p>
         Swap the blame and run the same neuron again. From the saturated start
         it is below 0.1 in 50 steps instead of 469.
@@ -351,19 +440,14 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         <SlowNeuron showCrossEntropy />
       </Figure>
       <p>
-        In the code, one line changes. BP1 was{" "}
-        <code>delta = (a - y) * sigmoid_prime(z)</code> and becomes{" "}
-        <code>delta = a - y</code>. BP2, BP3 and BP4 are untouched, and so is
-        the forward pass.
-      </p>
-      <p>
         BP2 keeping its <M tex="\sigma'" /> is worth a sentence, because it
         looks like an oversight. It is not. The <M tex="\sigma'" /> in BP1 was
-        multiplying a badly chosen charge; the <M tex="\sigma'" /> in BP2
-        answers a real question, namely how much a hidden neuron's evidence
-        moves its own activation. No choice of cost changes that. So
-        this fix covers the output layer only, and a flat hidden neuron still
-        swallows the blame passing through it. Thirty flat hidden neurons are
+        the output neuron's own first link, and the new yardstick was built to
+        cover for that one. Every hidden neuron has a first link of its own,
+        and no choice of yardstick reaches inside it: the score is a function
+        of what comes out of the network, so only the last link into it can be
+        cancelled this way. A flat hidden neuron still swallows the blame
+        passing through it. Thirty flat hidden neurons are
         the second complaint, and they can be measured before training takes a
         single step.
       </p>
@@ -383,9 +467,9 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         </p>
       </Aside>
       <p>
-        One consequence before the code: the step size has to change with the
-        cost. The quadratic blame never exceeds 0.148 and the cross-entropy
-        blame reaches 1, so at their largest the new blames are about seven
+        One consequence: the step size has to change with the yardstick. The
+        old land never rose faster than 0.148 per unit of evidence and the new
+        one approaches 1, so at their steepest the new slopes are about seven
         times the old ones (1 divided by 0.148 is 6.8). Module 5 trained at{" "}
         <M tex="\eta = 3.0" />, found by trying; the runs below use{" "}
         <M tex="\eta = 0.5" />, found the same way. Trying landed on a factor
@@ -428,7 +512,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         Measure the hidden layer of Module 5's network before it takes a single
         step. Thirty neurons, 5,000 training images, so 150,000 readings of
         one neuron's evidence <M tex="z" /> on one image. Here is how they are
-        spread, and what the sigmoid's steepness is where they land.
+        spread, and what the squash's slope is where they land.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
@@ -455,7 +539,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         </table>
       </div>
       <p>
-        The typical distance is 7.43, and the median steepness is 0.0020,
+        The typical distance is 7.43, and the squash's slope has a median of 0.0020,
         against the 0.25 a neuron has at its steepest. Almost 62 percent of
         the readings are flatter than 0.01. A hidden neuron in that state
         passes almost nothing backward and moves almost nowhere, and it is in
@@ -500,7 +584,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       />
       <p>
         Measured on the same 150,000 readings, the typical distance from zero
-        falls from 7.43 to 0.78, and the median steepness rises from 0.0020 to
+        falls from 7.43 to 0.78, and the median of the squash's slope rises from 0.0020 to
         0.2203, close to the sigmoid's maximum of 0.25. Nothing is flatter than
         0.01 any more.
       </p>
@@ -849,8 +933,8 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
 
       <Recap
         items={[
-          "BP1 multiplies the gap by the output's steepness, so under the quadratic cost a confidently wrong neuron gets a blame near zero: at an answer of 0.999 against a right answer of 0 the blame is 0.001. The blame peaks at 0.148 and falls away past two thirds wrong.",
-          "The cross-entropy cost charges -ln of the confidence in the right answer, which rises without limit, and its charge rises by exactly the gap divided by the steepness. The steepness cancels and BP1 becomes delta = a - y, one line. BP2 keeps its own sigma-prime, which is a fact about hidden neurons rather than a choice of cost.",
+          "A descent step reaches the score through two links: the knobs move the answer, and the answer moves the score. BP1 multiplies their two rates, the squash's slope and the gap, which is why blame is just how steeply the land rises under a neuron's knobs. Where an output neuron is confidently wrong the first link goes slack: the blame peaks at 0.148 two thirds of the way wrong and falls away past it, and at an answer of 0.999 it is 0.001.",
+          "The first link is the neuron's own machinery and is not open to change; the second is the yardstick, and it is. The quadratic yardstick has a ceiling of 0.5 per output, so its rate can never grow enough to cover for a slack first link. The cross-entropy cost charges -ln of the confidence in the right answer, which rises without limit, at a rate of exactly the gap divided by the squash's slope. The two multiply out to the gap everywhere, so BP1 becomes delta = a - y with nothing struck out. BP2 keeps its own sigma-prime, which is a hidden neuron's own first link and out of the yardstick's reach.",
           "Weights drawn at spread 1 pile up over about a hundred lit pixels to an evidence spread of 9.3, leaving 62 percent of hidden neurons flatter than 0.01 before training starts. Dividing each layer's weights by the square root of its input count puts the typical evidence within 1 of zero, with no neuron below 0.01, and is worth 4.3 points of accuracy against the same cost started undivided.",
           "Training on 1,000 images reaches 100 percent on those images while the held-out accuracy stops improving and the held-out cost turns around and rises: the network is buying confidence, not recognition. Weight decay multiplies every weight by a factor just under 1 each step, which reliably holds the weights and the held-out cost down, and buys accuracy only where something else left the weights too large.",
           "Every constant here was found by trying, and the grid shows the step size mattering more than the cost. Module 8 takes the four equations into deep networks and finds a limit that no choice of cost fixes.",

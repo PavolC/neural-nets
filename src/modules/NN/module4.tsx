@@ -91,7 +91,7 @@ export function Module4() {
         go (the last digit drifts by one here and there, because the log is
         rounded to five decimals).
       </p>
-      <Figure caption="The nudge's whole path. w1 moves by +0.01, and the change ripples through z1, a1, z2, a2 into the cost, multiplied at every arrow by that arrow's local factor. The green bands mark which boxes live inside which neuron; the arrow crossing between bands is the wire. The factor colors sort the arrows into their three kinds. Purple: whatever the wiggling quantity is multiplied by (the input, the wire). Green: sigmoid's steepness where that neuron sits. Red: the gap between output and right answer. The product of all five factors is the slope of the cost for w1.">
+      <Figure caption="The nudge's whole path. w1 moves by +0.01, and the change ripples through z1, a1, z2, a2 into the cost, multiplied at every arrow by that arrow's local factor. The green bands mark which boxes live inside which neuron; the arrow crossing between bands is the wire. The factor colors sort the arrows into their three kinds. Purple: whatever the wiggling quantity is multiplied by (the input, the wire). Green: the squash's slope where that neuron sits. Red: the gap between output and right answer. The product of all five factors is the slope of the cost for w1.">
         <ChainRippleDiagram />
       </Figure>
 
@@ -162,7 +162,7 @@ export function Module4() {
         Module 1's slider. How much a neuron's confidence moves when its evidence moves
         depends on where the neuron currently sits on the curve: eager on the
         steep middle, nearly deaf out on the flat ends. The booth's rate is the
-        steepness at that exact spot. Steepness has a shorthand,{" "}
+        squash's slope at that exact spot. It has a shorthand,{" "}
         <M tex="\sigma'(z)" /> (the tick mark is read "prime" and means "the slope
         of"), and a convenient formula:
       </p>
@@ -277,7 +277,7 @@ export function Module4() {
       </p>
       <Eq
         tex="\begin{aligned} \delta_B &= \underbrace{0.2463}_{\text{own } \sigma'} \times \underbrace{(-0.4391)}_{\text{gap}} = -0.1081 \\[0.8em] \delta_A &= \underbrace{0.2350}_{\text{own } \sigma'} \times \underbrace{2.0}_{\text{wire}} \times \underbrace{(-0.1081)}_{\delta_B} = -0.0508 \end{aligned}"
-        gloss="Neuron B touches the cost directly, so its blame is its own steepness times the gap. Neuron A's blame arrives from downstream: delta-B, carried back through the connecting wire, scaled by A's own steepness. Blame flows backward, one cheap step per neuron."
+        gloss="Neuron B touches the cost directly, so its blame is its own squash slope times the gap. Neuron A's blame arrives from downstream: delta-B, carried back through the connecting wire, scaled by A's own squash slope. Blame flows backward, one cheap step per neuron."
       />
       <p>
         And once a neuron's blame is known, its knobs read their slopes straight
@@ -327,7 +327,7 @@ export function Module4() {
         <M tex="\delta = -0.108" />. Collect along each wire, add, multiply by your
         own <M tex="\sigma'" />: that is the whole upgrade.
       </p>
-      <Figure caption="Blame collection at a fork. The hidden neuron feeds two output neurons whose blames are already priced (the red numbers under them). Each red dashed arrow carries its receiver's blame back along the wire, multiplied by the wire's weight, the purple rule read backward. The arrivals add at the neuron, and its own steepness scales the sum: 0.15 x (-0.72) = -0.108, its delta.">
+      <Figure caption="Blame collection at a fork. The hidden neuron feeds two output neurons whose blames are already priced (the red numbers under them). Each red dashed arrow carries its receiver's blame back along the wire, multiplied by the wire's weight, the purple rule read backward. The arrivals add at the neuron, and its own squash slope scales the sum: 0.15 x (-0.72) = -0.108, its delta.">
         <ForkDiagram />
       </Figure>
 
@@ -393,11 +393,11 @@ export function Module4() {
       </p>
       <Eq
         tex="\delta^3 = (a^3 - y) \odot \sigma'(z^3) \tag{BP1}"
-        gloss="Blame starts at the output layer: the gap in each output entry, times that neuron's current steepness (the circled dot means multiply matching entries, NumPy's plain *, no adding). Steepness is named by position on the curve, sigma-prime at z3, but sigmoid lets you compute it from the height instead: a3 times (1 minus a3), same number through either door. A saturated neuron has sigma-prime near zero and soaks up almost no blame, even when it is wrong."
+        gloss="Blame starts at the output layer: the gap in each output entry, times that neuron's current squash slope (the circled dot means multiply matching entries, NumPy's plain *, no adding). The squash slope is named by position on the curve, sigma-prime at z3, but sigmoid lets you compute it from the height instead: a3 times (1 minus a3), same number through either door. A saturated neuron has sigma-prime near zero and soaks up almost no blame, even when it is wrong."
       />
       <Eq
         tex="\delta^2 = \big( (w^3)^T \, \delta^3 \big) \odot \sigma'(z^2) \tag{BP2}"
-        gloss="Blame flows backward: each hidden neuron collects blame along its outgoing wires and adds, then scales by its own steepness. The raised T (transpose) regroups Module 2's wire ledger by sender instead of receiver, so each row becomes one neuron's outgoing wires, exactly what collecting needs; the shapes agree by the inner-numbers-touch rule: (3, 1) times (1, 1) gives (3, 1), one collected blame per hidden neuron."
+        gloss="Blame flows backward: each hidden neuron collects blame along its outgoing wires and adds, then scales by its own squash slope. The raised T (transpose) regroups Module 2's wire ledger by sender instead of receiver, so each row becomes one neuron's outgoing wires, exactly what collecting needs; the shapes agree by the inner-numbers-touch rule: (3, 1) times (1, 1) gives (3, 1), one collected blame per hidden neuron."
       />
       <Eq
         tex="\frac{\partial C}{\partial b^2} = \delta^2, \qquad \frac{\partial C}{\partial b^3} = \delta^3 \tag{BP3}"
@@ -411,7 +411,7 @@ export function Module4() {
         And each equation is a receipt for work already done, twice over: once
         in the chain, by hand, and once in the stepper you just walked (its
         numbers are still on screen above; the BP2 and BP4 entries follow{" "}
-        <M tex="h_1" />, whose activation is 0.818 and whose steepness is
+        <M tex="h_1" />, whose activation is 0.818 and whose squash slope is
         0.818 × 0.182 = 0.149):
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
@@ -427,13 +427,13 @@ export function Module4() {
         <tbody>
           <tr>
             <td>BP1</td>
-            <td>the last stretch's price: own steepness × the gap</td>
+            <td>the last stretch's price: own squash slope × the gap</td>
             <td><M tex="\delta_B = 0.2463 \times (-0.4391) = -0.1081" /></td>
             <td><M tex="\delta^3 = (0.593 - 1) \times 0.241 = -0.098" /></td>
           </tr>
           <tr>
             <td>BP2</td>
-            <td>collect along outgoing wires, add, × own steepness</td>
+            <td>collect along outgoing wires, add, × own squash slope</td>
             <td><M tex="\delta_A = 0.2350 \times 2.0 \times (-0.1081) = -0.0508" /></td>
             <td><M tex="4.0 \times (-0.098) \times 0.149 \approx -0.059" /></td>
           </tr>
@@ -775,11 +775,11 @@ function NetworkAnatomyDiagram() {
 // Static diagram: blame collecting at a fork. One hidden neuron feeds two
 // output neurons whose blames are already priced; blame flows backward along
 // each wire multiplied by the wire's weight, the arrivals add, and the
-// neuron's own steepness scales the sum. The upgrade BP2 generalizes.
+// neuron's own squash slope scales the sum. The upgrade BP2 generalizes.
 function ForkDiagram() {
   return (
     <svg {...fig(47, 17, 518, 229)} className="chain-net" role="img"
-         aria-label="A hidden neuron feeds two output neurons with blames −0.10 and +0.08 through wires of weight 4.0 and −4.0; blame flows backward along each wire multiplied by its weight, the arrivals −0.40 and −0.32 add to −0.72, and times the neuron's own steepness 0.15 gives δ = −0.108">
+         aria-label="A hidden neuron feeds two output neurons with blames −0.10 and +0.08 through wires of weight 4.0 and −4.0; blame flows backward along each wire multiplied by its weight, the arrivals −0.40 and −0.32 add to −0.72, and times the neuron's own squash slope 0.15 gives δ = −0.108">
       <defs>
         <marker id="fork-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6"
                 markerHeight="6" orient="auto">
@@ -892,7 +892,7 @@ const RIPPLE_BOXES = [
 ];
 // kind groups the arrows for the prose's three explanations:
 // mult = a multiplication passes the change through scaled,
-// sig = sigmoid's steepness where the neuron sits, gap = the current miss.
+// sig = the squash's slope where the neuron sits, gap = the current miss.
 const RIPPLE_FACTORS = [
   { f: "× 1.0", why: "the input x", kind: "mult" },
   { f: "× 0.235", why: "σ′ at z₁", kind: "sig" },

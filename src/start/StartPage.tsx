@@ -105,7 +105,7 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
   { id: "nablacode", symbol: <code>nabla_w, nabla_b</code>, means: "that same list in code, split into the weights' and biases' halves", from: "Module 3" },
   { id: "epoch", symbol: <code>epoch</code>, means: "one full pass through the training data", from: "Module 3" },
   { id: "batch", symbol: <code>mini-batch</code>, means: "the handful of examples one step is scored on", from: "Module 3" },
-  { id: "sigprime", symbol: <M tex="\sigma'(z)" />, means: "sigma-prime: the sigmoid's steepness at z, equal to a(1 - a)", from: "Module 4" },
+  { id: "sigprime", symbol: <M tex="\sigma'(z)" />, means: "sigma-prime: the squash's slope at z, how much the answer moves when the evidence moves, equal to a(1 - a)", from: "Module 4" },
   { id: "delta", symbol: <M tex="\delta" />, means: "delta, a neuron's blame: how much the cost cares about its evidence", from: "Module 4" },
   { id: "odot", symbol: <M tex="\odot" />, means: "multiply matching entries, NumPy's plain *. No adding", from: "Module 4" },
   { id: "sup", symbol: <M tex="w^2,\; a^3" />, means: "a superscript is the layer number, never a power", from: "Module 4" },
