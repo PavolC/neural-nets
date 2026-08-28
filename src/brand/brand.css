@@ -183,6 +183,14 @@ body {
   margin-bottom: 0.4rem;
 }
 
+/* The masthead sits on the text's axis, not the column's: left at the column
+   edge its title started 113px to the left of the first paragraph, and because
+   a title is the same kind of thing as body text (left-aligned, same serif)
+   the offset read as a misalignment rather than as a wider header. The three
+   rules that carry it are below, each next to the rest of its own properties,
+   because each sets a margin shorthand that would otherwise reset the
+   horizontal auto. */
+
 /* A paragraph rather than a div so the row has the prose margins the rest of
    the masthead is measured against, with the top one removed: it is the first
    thing on the page. */
@@ -190,7 +198,8 @@ body {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  margin: 0;
+  max-width: var(--measure);
+  margin: 0 auto;
 }
 
 /* The series row: monogram, wordmark, and what the series is. Reads as one
@@ -259,15 +268,16 @@ a.brand-mark:hover .brand-wordmark {
   font-size: 2.5rem;
   line-height: 1.08;
   letter-spacing: -0.015em;
-  margin: 0.35rem 0 0.3rem;
+  max-width: var(--measure);
+  margin: 0.35rem auto 0.3rem;
 }
 
 .masthead-tagline {
   font-family: var(--font-prose);
   font-style: italic;
   color: var(--muted);
-  max-width: 34em;
-  margin: 0;
+  max-width: var(--measure);
+  margin: 0 auto;
 }
 
 @media (max-width: 560px) {
@@ -288,11 +298,21 @@ a.brand-mark:hover .brand-wordmark {
 /* Set in the chrome face rather than the prose face. The switch is doing
    work: navigation and prose look like two different kinds of text, so the
    eye stops reading at the rule under the tabs. */
+/* The one place the two widths are both wanted. The strip starts on the text's
+   axis, because the left edge is where alignment is read; it runs on to the
+   column's right edge, because nothing else needs that room and eleven tabs
+   inset on both sides wrap to three rows instead of two. The rule under it
+   spans the whole column and closes the header.
+
+   Padding rather than a max-width, so the border belongs to the element and
+   the inset to its content. The max() collapses it to nothing once the column
+   is narrower than the measure, which is also where the row starts panning. */
 .tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 0 0.5rem;
   margin-top: 1.25rem;
+  padding-left: max(0px, calc((100% - var(--measure)) / 2));
   border-bottom: 1px solid var(--rule);
   font-family: var(--font-display);
 }
@@ -329,9 +349,13 @@ a.brand-mark:hover .brand-wordmark {
 
 /* Eleven tabs wrap to two rows at reading width and to six on a phone, where
    they used to take the whole first screen before the course started. One row
-   that pans is the same information in a tenth of the height; the nav element
-   carries .scroll-x, which supplies the edge fade that says there is more. */
-@media (max-width: 720px) {
+   that pans is the same information in a fraction of the height.
+
+   880 rather than 720, which is where the third row appears: below that the
+   strip is inset by less than the measure's gutter, so it loses width faster
+   than the labels shrink. Two rows is the most the header spends on
+   navigation. */
+@media (max-width: 880px) {
   .tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -371,8 +395,11 @@ a.brand-mark:hover .brand-wordmark {
 
 /* ---------- the series footer ---------- */
 
+/* Same treatment as the tab strip, and for the same reason: the rule closes
+   the page across the column, the text inside it stays on the text's axis. */
 .series-footer {
   margin-top: 3.5rem;
+  padding-inline: max(0px, calc((100% - var(--measure)) / 2));
   border-top: 1px solid var(--rule);
   font-size: 0.85rem;
   color: var(--muted);
