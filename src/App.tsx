@@ -171,6 +171,13 @@ export default function App() {
       </main>
       <SeriesFooter>
         <p>
+          Built by <a href="https://github.com/PavolC">Pavol Chvala</a>. Corrections and
+          questions are welcome in{" "}
+          <a href="https://github.com/PavolC/neural-nets/discussions">the discussions</a>,
+          and the course is open source at{" "}
+          <a href="https://github.com/PavolC/neural-nets">PavolC/neural-nets</a>.
+        </p>
+        <p>
           Adapted from Michael A. Nielsen,{" "}
           <a href="http://neuralnetworksanddeeplearning.com/">
             <em>Neural Networks and Deep Learning</em>
@@ -178,8 +185,8 @@ export default function App() {
           , Determination Press, 2015, licensed{" "}
           <a href="https://creativecommons.org/licenses/by-nc/3.0/">CC BY-NC 3.0</a>.
           This course's content follows its source and is non-commercial. Reference
-          implementations are adapted from Nielsen's MIT-licensed code; the software
-          around them is separate original work. Full terms in{" "}
+          implementations are adapted from Nielsen's MIT-licensed code, and the software
+          around them is MIT too. Full terms in{" "}
           <a href="./LICENSE.txt">LICENSE</a>.
         </p>
       </SeriesFooter>

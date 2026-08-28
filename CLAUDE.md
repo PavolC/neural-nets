@@ -36,6 +36,13 @@ no accounts, no backend, no analytics.
   Pyodide worker, the brand layer, `tools/` and `course-kit/` contain none of Nielsen's
   material, so nothing reaches them. Saying otherwise gives away rights over the one
   asset that transfers to every future course in the series.
+  The split is now made rather than pending: the software is **MIT**
+  (`LICENSE-MIT`), the kit's documents are **CC BY 4.0**, the course content stays
+  CC BY-NC 3.0, and the series name and glyph are granted by neither. Chosen over
+  Apache-2.0 because the repository already carries MIT code and all seven dependencies
+  are MIT, so one licence covers every line and there is no compatibility surface; the
+  patent grant Apache adds buys nothing on a test harness. Chosen over copyleft because
+  reuse is the point.
   Nielsen's reference code is **MIT**, which requires its copyright and permission notice
   to travel with the code. That code is inlined into the Pyodide worker at build time, so
   `vite.config.ts` emits `LICENSE.txt` into `dist/` and the footer links it. A build that

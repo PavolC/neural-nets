@@ -1,11 +1,30 @@
 Neural Networks (Moving Parts): license and attribution
 =======================================================
 
-This project contains two kinds of material with two different licenses, and
-the distinction matters to anyone reusing it. The course content is adapted
-from a NonCommercial source and carries that restriction. The application that
-runs it, the series brand layer and course-kit/ are original work, contain none
-of Nielsen's material, and are not covered by the grant below.
+This project contains several kinds of material under different terms,
+because only some of it is adapted from a NonCommercial source. In short:
+
+    Code                       MIT
+      the application (src/, except the two exclusions below), the brand
+      layer, tools/, and course-kit/brand/. Full text in LICENSE-MIT.
+
+    The method kit's documents  CC BY 4.0
+      course-kit/*.md and course-kit/.claude/commands/.
+
+    Course content             CC BY-NC 3.0
+      src/modules/ and the exercise prompts and hints in
+      src/exercises/*/index.ts, following their source.
+
+    Reference implementations  MIT, Michael Nielsen's copyright retained
+      src/python/reference_network.py, two functions in
+      src/python/course_helpers.py, and the exercise solution.py files.
+
+    The series name and mark   not licensed. See below.
+
+The reason for the split is that the course content is adapted from a
+NonCommercial source and carries that restriction, while the application that
+runs it, the brand layer and course-kit/ are original work containing none of
+Nielsen's material, so nothing reaches them.
 
 Course content (prose, pedagogical sequence, visualizations)
 ------------------------------------------------------------
@@ -25,25 +44,69 @@ the source rather than an obligation to. What does bind is narrower: no use of
 Nielsen's material for commercial advantage, and no granting of rights in his
 material beyond those held.
 
-The application, the brand layer, and course-kit
-------------------------------------------------
+The software: the application, the brand layer, tools, course-kit/brand
+----------------------------------------------------------------------
 
-Everything under src/ other than src/modules/, together with src/brand/,
-tools/ and course-kit/, is original work by the author. It contains none of
-Nielsen's prose and none of his code, and the CC BY-NC grant above does not
-extend to it.
+Copyright (c) 2026 Pavol Chvala, and licensed under the MIT License, whose
+full text is in LICENSE-MIT beside this file.
 
-No license is granted for it yet. That is a decision still to be made, not a
-refusal, and until it is made these files are all rights reserved. Anyone who
-wants to reuse the exercise harness, the Pyodide worker, the brand layer or
-the kit should ask.
+This covers everything under src/ except two things: the module prose in
+src/modules/, and the exercise prompts and hints in src/exercises/*/index.ts,
+both of which are course content under CC BY-NC 3.0 above. So the MIT grant
+reaches the Pyodide worker and its protocol, the exercise harness and its UI,
+the editor, the progress layer, the start page, the stylesheet, the app shell,
+and each exercise's skeleton.py and tests.py, which are original work rather
+than adapted from anything. It also covers the series brand layer in
+src/brand/, everything in tools/, and course-kit/brand/.
+
+The exercise solution.py files are the exception inside the exception: they
+are MIT as well, but adapted from Nielsen, so his notice travels with them.
+See "Reference code" below.
+
+None of the MIT-covered files contain Nielsen's prose or his code, so the
+CC BY-NC grant does not reach them. Take the harness, take the worker, take
+the brand layer, and build something else with them.
+
+The two files with a foot in both camps are named explicitly under "Reference
+code" below: they are MIT as well, and Nielsen's copyright notice travels with
+them.
+
+
+The method kit's documents
+--------------------------
+
+course-kit/CLAUDE.md, METHOD.md, CASEBOOK.md, BRAND.md, DESIGN-DOC-TEMPLATE.md,
+README.md and the files in course-kit/.claude/commands/ are licensed under the
+Creative Commons Attribution 4.0 International License (CC BY 4.0):
+https://creativecommons.org/licenses/by/4.0/
+
+Share and adapt them for any purpose, including commercially, with attribution.
+They are documents rather than software, which is why they carry a Creative
+Commons licence rather than the MIT one above; adapting a rules file into your
+own project is exactly the intended use.
+
+course-kit/brand/ is code and is MIT, as stated above.
+
+
+The series name and mark
+------------------------
+
+Not licensed by any grant in this file: the name "Moving Parts", the names of
+courses published under it, and the sigmoid glyph used as the series mark.
+
+The MIT grant covers the code that draws the mark. It does not grant the mark.
+Copy the brand layer, change the accent and the glyph in brand.ts, and publish
+under your own name; that is what the layer is built for.
 
 
 Reference code
 --------------
 
-Reference implementations (e.g. the reference network used in the training
-demo and exercise solutions) are adapted from Michael Nielsen's code at
+Some reference implementations are adapted from Michael Nielsen's code, and
+they remain MIT with his copyright notice attached. They are:
+src/python/reference_network.py; the backprop and init_network functions in
+src/python/course_helpers.py; and the solution.py file of every exercise
+except prepare. Each says so in its own header. The originals are at
 https://github.com/mnielsen/neural-networks-and-deep-learning, which is
 distributed under the MIT license:
 
