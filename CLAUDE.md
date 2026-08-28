@@ -714,6 +714,20 @@ the footer. Rules that follow from it:
   sets its own transparent background: that is a bug this course has already shipped once.
   The primary treatment is reached as `button:not([class])`, which cannot match a variant,
   because every variant here carries a class.
+- **The section bar and the panel head share one height, `--bar-h`.** Both sit
+  at the top of the screen when the panel is docked, so their bottom rules have
+  to land on one line. They were 53.4px and 57.1px, and four pixels apart reads
+  as a misalignment rather than as two different things. The in-page jump
+  offset is keyed to the same token, so the offset that clears the bar cannot
+  drift from the bar.
+- **A row that pans draws no scrollbar of its own.** The tab strip's rule
+  applies to the workbench's section rail for the same reason: a thin thumb
+  lands a second grey bar directly under a row of chips and reads as a
+  mis-drawn underline, so the `.scroll-x` edge fades carry the affordance
+  alone. The rail is also `flex: 0 0 auto`, along with the head and the repair
+  strip. Left shrinkable, in a column whose editor wants every pixel, Firefox
+  collapsed it to the height of its own scrollbar with no chips visible at all;
+  Chromium did not, which is why the rule is written down rather than trusted.
 - **The workbench is the one thing allowed to move the column, and only because
   the reader moved it.** `.shell` holds the reading column away from a fixed panel
   with `padding-right: var(--dock-w)`. Padding, not a grid track: a `1fr` track

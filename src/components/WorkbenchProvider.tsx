@@ -136,18 +136,29 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
     saveUiFlag("dock", next !== "closed");
   }, []);
 
+  /** The section to point at when the panel is opened from the edge tab, which
+   * says nothing about which one is wanted. The last one worked on, else the
+   * first one in the file, else the first of the course. Never nothing: with
+   * no section chosen Run tests is disabled, which is a poor thing to hand
+   * somebody who has just opened the panel. */
+  const defaultSection = useCallback((): string => {
+    const stored = loadUi("section");
+    if (stored && SECTION_BY_ID.has(stored)) return stored;
+    const present = currentDoc().sections.find((s) => s.def?.kind === "exercise");
+    return present?.id ?? SECTION_ORDER[0];
+  }, []);
+
   const open = useCallback(
     (sectionId?: string) => {
-      if (sectionId) {
-        ensureSection(sectionId);
-        setCurrent(sectionId);
-        saveUi("section", sectionId);
-        setRevealRequest({ id: sectionId, at: Date.now() });
-        bumpRevision();
-      }
+      const target = sectionId ?? current ?? defaultSection();
+      ensureSection(target);
+      setCurrent(target);
+      saveUi("section", target);
+      setRevealRequest({ id: target, at: Date.now() });
+      bumpRevision();
       setDock(window.innerWidth >= DOCK_MIN_VIEWPORT ? "dock" : "sheet");
     },
-    [bumpRevision, setDock],
+    [bumpRevision, current, defaultSection, setDock],
   );
 
   const close = useCallback(() => setDock("closed"), [setDock]);

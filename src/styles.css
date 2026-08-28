@@ -90,6 +90,12 @@
   /* The reading column and the gutter table of contents beside it. The toc's
      position is computed from these rather than hardcoded, so moving the
      column cannot silently leave the toc behind. */
+  /* The sticky section bar, and with it the workbench's head: the two sit at
+     the same top when the panel is docked, so their bottom rules have to land
+     on one line. They were 53.4 and 57.1, and four pixels apart reads as a
+     misalignment rather than as two different things. Also what the in-page
+     jump offset clears, keyed to it so the two cannot drift. */
+  --bar-h: 54px;
   --col-width: 920px;
   --toc-width: 190px;
   --toc-gap: 28px;
@@ -2059,7 +2065,7 @@ button:disabled {
    they had asked for. */
 @media (max-width: 1399px) {
   .module-section-title {
-    scroll-margin-top: 68px;
+    scroll-margin-top: calc(var(--bar-h) + 14px);
   }
 }
 
@@ -2078,7 +2084,7 @@ button:disabled {
 }
 
 .shell[data-toc="bar"] .module-section-title {
-  scroll-margin-top: 68px;
+  scroll-margin-top: calc(var(--bar-h) + 14px);
 }
 
 /* A short accent rule above each section title. The page is a long single
@@ -2163,6 +2169,7 @@ button:disabled {
   top: 0;
   z-index: 20;
   display: none;
+  min-height: var(--bar-h);
   margin: 0 -1.25rem 1rem;
   background: var(--bg);
   border-bottom: 1px solid var(--rule);
@@ -3307,7 +3314,13 @@ button:disabled {
   position: fixed;
   right: 0;
   top: 50%;
-  transform: translateY(-50%) rotate(180deg);
+  transform: translateY(-50%);
+  /* vertical-rl and nothing else. A rotate(180deg) on top of it was both
+     wrong ways round: it set the text bottom to top, which is the less
+     familiar of the two vertical settings for Latin type, and it turned the
+     whole box over, so the rounded corners authored for the left edge came
+     out on the right and the border left open against the screen edge came
+     out facing the page. */
   writing-mode: vertical-rl;
   z-index: 29;
   padding: 1rem 0.35rem;
@@ -3350,10 +3363,12 @@ button:disabled {
 }
 
 .wb-head {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.55rem 0.9rem;
+  min-height: var(--bar-h);
+  padding: 0 0.9rem;
   border-bottom: 1px solid var(--rule);
 }
 
@@ -3389,12 +3404,25 @@ button:disabled {
 
 /* The rail: every section of the file, including the ones not written yet, so
    the shape of the course is visible from Module 1. */
+/* Eleven chips, so it pans on a narrow dock. Two things it must not do.
+   It must not shrink: it is a flex item in a column whose editor wants every
+   pixel, and left shrinkable it collapsed in Firefox to the height of its own
+   scrollbar, with no chips visible at all. And it must not draw that
+   scrollbar, for the reason the tab strip does not: a thin thumb lands a
+   second grey bar directly under a row of chips and reads as a mis-drawn
+   underline. The .scroll-x edge fades carry the affordance alone, the way a
+   native phone tab strip does. */
 .wb-rail {
+  flex: 0 0 auto;
   display: flex;
   gap: 0.3rem;
   padding: 0.45rem 0.9rem;
   border-bottom: 1px solid var(--rule);
-  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.wb-rail::-webkit-scrollbar {
+  display: none;
 }
 
 .wb-chip {
@@ -3442,6 +3470,7 @@ button:disabled {
 }
 
 .wb-repair {
+  flex: 0 0 auto;
   padding: 0.6rem 0.9rem;
   border-bottom: 1px solid var(--rule);
   background: var(--accent-wash);
