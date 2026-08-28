@@ -68,7 +68,8 @@ export function Module7() {
       <p>
         Each fix is one line, and each one comes with a measurement of what it
         bought. To keep them one-liners, the course now hands your Module 5
-        algorithm back to you with a seam in it:
+        algorithm back to you with one step lifted out of it: the output
+        layer's blame, BP1, is now something you pass in.
       </p>
       <div className="play-snippet">
         <pre>{`from course import backprop
@@ -76,10 +77,8 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       </div>
       <p>
         Same four equations, same forward pass keeping receipts, same backward
-        sweep. The one difference is the last argument: a function that
-        supplies the output layer's blame, the quantity BP1 computes. Leave it
-        out and you get exactly what you wrote in Module 5. The first exercise
-        below writes a different one.
+        sweep. Leave that last argument out and you get exactly what you wrote
+        in Module 5. The first exercise below writes a different one.
       </p>
 
       <SectionHeader id="m7-slowdown" title="Badly wrong, barely learning" />
