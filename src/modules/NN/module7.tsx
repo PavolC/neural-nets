@@ -1,6 +1,6 @@
 import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
-import { ExercisePage } from "../../components/ExercisePage";
+import { ExerciseCard } from "../../components/ExerciseCard";
 import { crossEntropyExercise } from "../../exercises/cross-entropy";
 import { smartInitExercise } from "../../exercises/smart-init";
 import { l2Exercise } from "../../exercises/l2";
@@ -496,7 +496,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         reminder that eta and the cost are not independent choices.
       </p>
 
-      <ExercisePage exercise={crossEntropyExercise} />
+      <ExerciseCard exercise={crossEntropyExercise} />
       <p>
         The panel below trains the digit reader three times from the same
         starting parameters, the same ones Module 5 used: 5,000 images, 8
@@ -619,7 +619,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         </p>
       </Aside>
 
-      <ExercisePage exercise={smartInitExercise} />
+      <ExerciseCard exercise={smartInitExercise} />
       <p>
         The comparison below is as controlled as this course gets. Same
         wiring, same cross-entropy blame, same sgd, same step size of 0.5,
@@ -780,7 +780,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         the thousand is not pulled back hard enough.
       </p>
 
-      <ExercisePage exercise={l2Exercise} />
+      <ExerciseCard exercise={l2Exercise} />
       <p>
         Both runs in the panel go through your l2_step, one with{" "}
         <M tex="\lambda = 0" />, which is your Module 3 update exactly, and one

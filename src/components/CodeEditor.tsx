@@ -1,10 +1,10 @@
 import { useEffect, useRef } from "react";
 import { basicSetup, EditorView } from "codemirror";
-import { keymap } from "@codemirror/view";
+import { Decoration, keymap, type DecorationSet } from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import { HighlightStyle, indentUnit, syntaxHighlighting } from "@codemirror/language";
 import { python } from "@codemirror/lang-python";
-import { Prec } from "@codemirror/state";
+import { EditorState, Prec, RangeSetBuilder, StateEffect, StateField } from "@codemirror/state";
 import { tags } from "@lezer/highlight";
 
 /* The editor's own look, which used to be CodeMirror's stock light theme:
@@ -49,6 +49,12 @@ const chrome = EditorView.theme(
       backgroundColor: "var(--accent-panel)",
       outline: "none",
     },
+    // The section the Run buttons are pointed at, marked the way a section
+    // title is marked elsewhere in the course: a short accent rule.
+    ".cm-line.cm-section-here": {
+      backgroundColor: "var(--accent-wash)",
+      boxShadow: "inset 3px 0 0 var(--accent)",
+    },
     ".cm-foldPlaceholder": {
       backgroundColor: "var(--surface-sunken)",
       border: "1px solid var(--rule)",
@@ -77,8 +83,46 @@ const highlight = HighlightStyle.define([
 
 export interface CodeEditorHandle {
   getDoc(): string;
+  /** Replace the whole document. Builds a fresh state rather than dispatching
+   * a change, so the undo history goes with it: one Mod-Z after a switch used
+   * to paste the previous document back in whole. */
   setDoc(doc: string): void;
+  /** Scroll a range into view and put the caret at its start. */
+  reveal(from: number, to: number): void;
+  /** Highlight the lines of the section the Run buttons are pointed at. */
+  markSection(from: number, to: number): void;
+  focus(): void;
+  /** Remeasure after the panel has been shown or resized: a CodeMirror that
+   * was laid out inside a hidden box has stale geometry. */
+  remeasure(): void;
 }
+
+/** Which character range is the current section, as editor state, so the
+ * decoration survives every document change without a React render. */
+const setSectionRange = StateEffect.define<{ from: number; to: number }>();
+
+const sectionMark = Decoration.line({ class: "cm-section-here" });
+
+const sectionField = StateField.define<DecorationSet>({
+  create: () => Decoration.none,
+  update(marks, tr) {
+    let range: { from: number; to: number } | null = null;
+    for (const effect of tr.effects) if (effect.is(setSectionRange)) range = effect.value;
+    if (range === null) return marks.map(tr.changes);
+    const doc = tr.state.doc;
+    const from = Math.max(0, Math.min(range.from, doc.length));
+    const to = Math.max(from, Math.min(range.to, doc.length));
+    const builder = new RangeSetBuilder<Decoration>();
+    for (let pos = from; pos <= to; ) {
+      const line = doc.lineAt(pos);
+      builder.add(line.from, line.from, sectionMark);
+      if (line.to >= to) break;
+      pos = line.to + 1;
+    }
+    return builder.finish();
+  },
+  provide: (f) => EditorView.decorations.from(f),
+});
 
 // Thin CodeMirror 6 wrapper. Uncontrolled: the editor owns its document;
 // the parent reads/writes through the handle and gets onChange callbacks.
@@ -87,6 +131,8 @@ export function CodeEditor({
   onChange,
   handleRef,
   onReady,
+  onSelection,
+  className,
 }: {
   initialDoc: string;
   onChange: (doc: string) => void;
@@ -94,39 +140,68 @@ export function CodeEditor({
   /** Called once the view exists and the handle is usable. The parent loads
    * this component lazily, so until then there is no document to run. */
   onReady?: (ready: boolean) => void;
+  /** Where the caret is, so the panel can follow it from section to section. */
+  onSelection?: (pos: number) => void;
+  className?: string;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
   const onReadyRef = useRef(onReady);
   onReadyRef.current = onReady;
+  const onSelectionRef = useRef(onSelection);
+  onSelectionRef.current = onSelection;
 
   useEffect(() => {
-    const view = new EditorView({
-      doc: initialDoc,
-      parent: hostRef.current!,
-      extensions: [
-        basicSetup,
-        // After basicSetup, and at raised precedence: basicSetup ships
-        // CodeMirror's own highlight style, and the facet applies the first
-        // matching rule it finds rather than the last one added.
-        chrome,
-        Prec.high(syntaxHighlighting(highlight)),
-        python(),
-        indentUnit.of("    "), // Python convention: 4 spaces
-        // Tab indents (Shift-Tab dedents). CodeMirror leaves this off by
-        // default for keyboard accessibility; Escape then Tab moves focus.
-        keymap.of([indentWithTab]),
-        EditorView.updateListener.of((update) => {
-          if (update.docChanged) onChangeRef.current(update.state.doc.toString());
-        }),
-      ],
-    });
+    // Named, because setDoc rebuilds the whole state to drop the undo history
+    // and has to hand the same extensions back.
+    const extensions = [
+      basicSetup,
+      // After basicSetup, and at raised precedence: basicSetup ships
+      // CodeMirror's own highlight style, and the facet applies the first
+      // matching rule it finds rather than the last one added.
+      chrome,
+      Prec.high(syntaxHighlighting(highlight)),
+      python(),
+      indentUnit.of("    "), // Python convention: 4 spaces
+      sectionField,
+      // The panel is narrower than a page-width editor ever was, so a long
+      // line has to wrap rather than scroll sideways: a horizontal scrollbar
+      // inside a docked column is the one thing that would make reading and
+      // coding at once worse than not.
+      EditorView.lineWrapping,
+      // Tab indents (Shift-Tab dedents). CodeMirror leaves this off by
+      // default for keyboard accessibility; Escape then Tab moves focus.
+      keymap.of([indentWithTab]),
+      EditorView.updateListener.of((update) => {
+        if (update.docChanged) onChangeRef.current(update.state.doc.toString());
+        if (update.selectionSet || update.docChanged) {
+          onSelectionRef.current?.(update.state.selection.main.head);
+        }
+      }),
+    ];
+    const view = new EditorView({ doc: initialDoc, parent: hostRef.current!, extensions });
     handleRef.current = {
       getDoc: () => view.state.doc.toString(),
       setDoc: (doc: string) => {
-        view.dispatch({ changes: { from: 0, to: view.state.doc.length, insert: doc } });
+        if (doc === view.state.doc.toString()) return;
+        view.setState(EditorState.create({ doc, extensions }));
       },
+      reveal: (from: number, to: number) => {
+        const length = view.state.doc.length;
+        const start = Math.max(0, Math.min(from, length));
+        const end = Math.max(start, Math.min(to, length));
+        view.dispatch({
+          selection: { anchor: start },
+          effects: EditorView.scrollIntoView(start, { y: "start", yMargin: 24 }),
+        });
+        view.dispatch({ effects: setSectionRange.of({ from: start, to: end }) });
+      },
+      markSection: (from: number, to: number) => {
+        view.dispatch({ effects: setSectionRange.of({ from, to }) });
+      },
+      focus: () => view.focus(),
+      remeasure: () => view.requestMeasure(),
     };
     onReadyRef.current?.(true);
     return () => {
@@ -138,5 +213,5 @@ export function CodeEditor({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div className="code-editor" ref={hostRef} />;
+  return <div className={className ?? "code-editor"} ref={hostRef} />;
 }

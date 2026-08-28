@@ -258,6 +258,14 @@ def run_document_scratch(document, scratch_code, spec_json):
             "lent": lent,
         })
     if scratch_code.strip():
+        # The bundled datasets, so a play snippet can open one. Never one_hot:
+        # the loader's one_hot(y, num_classes=10) and the learner's Module 10
+        # one_hot(values, levels) are different functions with the same name,
+        # and this is the one place the two could meet.
+        import course
+        for name in ("load_mnist_subset", "load_penguins"):
+            if hasattr(course, name) and name not in submission.__dict__:
+                setattr(submission, name, getattr(course, name))
         try:
             exec(compile(scratch_code, SCRATCH_FILENAME, "exec"),
                  submission.__dict__)

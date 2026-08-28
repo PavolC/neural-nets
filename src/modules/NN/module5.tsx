@@ -1,6 +1,6 @@
 import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader, fig } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
-import { ExercisePage } from "../../components/ExercisePage";
+import { ExerciseCard } from "../../components/ExerciseCard";
 import { backpropExercise } from "../../exercises/backprop";
 import { BackpropTrainPanel } from "./interactives/BackpropTrainPanel";
 
@@ -261,7 +261,7 @@ export function Module5() {
       </Figure>
 
       <SectionHeader id="m5-exercise" title="Write backprop" />
-      <ExercisePage exercise={backpropExercise} />
+      <ExerciseCard exercise={backpropExercise} />
 
       <SectionHeader id="m5-train" title="The real training run" />
       <p>

@@ -1,6 +1,6 @@
 import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
-import { ExercisePage } from "../../components/ExercisePage";
+import { ExerciseCard } from "../../components/ExerciseCard";
 import { sgdExercise } from "../../exercises/sgd";
 import { CostVsKnob } from "./interactives/CostVsKnob";
 import { Descent1D, Descent2D } from "./interactives/DescentPlayground";
@@ -250,7 +250,7 @@ export function Module3() {
         after the exercise measures how slow.
       </p>
 
-      <ExercisePage exercise={sgdExercise} />
+      <ExerciseCard exercise={sgdExercise} />
 
       <SectionHeader id="m3-bill" title="The bill" />
       <p>

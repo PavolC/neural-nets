@@ -15,7 +15,8 @@ export const sgdExercise: Exercise = {
     "sgd_step(weights, biases, X, Y, eta) takes one step of descent on " +
       "one mini-batch: X holds that batch's inputs as columns and Y the " +
       "right answers in matching columns, the packing the module just " +
-      "showed. Call course.gradient(weights, biases, X, Y) to get the " +
+      "showed. Call gradient(weights, biases, X, Y), which is written for you " +
+      "in the section just above yours, to get the " +
       "slopes: it takes the same inputs as quadratic_cost, and where " +
       "quadratic_cost returns the score, gradient returns (nabla_w, " +
       "nabla_b). Those two names are the module's ∇C: nabla is how that " +
@@ -43,11 +44,10 @@ export const sgdExercise: Exercise = {
       "matrix of just those columns. Use the rng for nothing else.",
     "A satisfying experiment once sgd_step works: let it repair Module 1's " +
       "slider network from its starting position, the one the module scored " +
-      "by hand at cost 0.0875. Append this below your code, then press " +
+      "by hand at cost 0.0875. Send this to the scratch pad, then press " +
       "Run my code:",
     {
       code:
-        "from course import feedforward\n" +
         "\n" +
         "weights = [np.array([[2., 2.], [2., 2.]]),   # the sliders' start position\n" +
         "           np.array([[4., -4.]])]\n" +

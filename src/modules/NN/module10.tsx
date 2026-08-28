@@ -1,6 +1,6 @@
 import { AfterThis, Aside, Figure, ModuleToc, SectionHeader } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
-import { ExercisePage } from "../../components/ExercisePage";
+import { ExerciseCard } from "../../components/ExerciseCard";
 import { prepareExercise } from "../../exercises/prepare";
 import { PenguinsPanel } from "./interactives/PenguinsPanel";
 
@@ -287,7 +287,7 @@ export function Module10() {
         </p>
       </Aside>
 
-      <ExercisePage exercise={prepareExercise} />
+      <ExerciseCard exercise={prepareExercise} />
 
       <SectionHeader id="m10-run" title="What the preparation was worth" />
       <p>

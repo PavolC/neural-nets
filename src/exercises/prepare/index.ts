@@ -1,3 +1,4 @@
+import { assetUrl } from "../../runtime/assets";
 import type { Exercise } from "../types";
 import skeleton from "./skeleton.py?raw";
 import tests from "./tests.py?raw";
@@ -6,6 +7,9 @@ import solution from "./solution.py?raw";
 export const prepareExercise: Exercise = {
   id: "prepare",
   title: "Getting your own data ready",
+  // The play snippet below opens /penguins.json, so a run from this
+  // exercise fetches the bundled file into the runtime first.
+  dataUrl: assetUrl("data/penguins.json.gz"),
   prompt: [
     "Three functions, and not one of them is a network. This is the work that " +
       "sits between a file somebody hands you and the (features, examples) " +
@@ -38,11 +42,9 @@ export const prepareExercise: Exercise = {
       "is sorted by species, so cutting it unshuffled would train on two " +
       "species and test on a third.",
     "Once the tests pass, look at what scaling does to the file you are about " +
-      "to use. Append this and press Run my code:",
+      "to use. Send this to the scratch pad and press Run my code:",
     {
       code:
-        "import numpy as np\n" +
-        "\n" +
         "with open('/penguins.json', 'rb') as f:\n" +
         "    columns, rows = load_penguins(f.read())\n" +
         "\n" +

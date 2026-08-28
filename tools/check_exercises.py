@@ -268,10 +268,15 @@ def check_round_trip(problems):
         return
     lines = doc.splitlines()
     for entry in found:
-        body = "\n".join(lines[entry["start"]: entry["end"]]).strip("\n").rstrip()
+        # Byte for byte, not stripped: a body that comes back with one more
+        # blank line than it went in with is exactly the drift this catches,
+        # and a strip() on both sides hides it.
+        raw = "\n".join(lines[entry["start"]: entry["end"]])
+        body = raw[1:] if raw.startswith("\n") else raw
+        body = body.rstrip()
         kind = "seam" if entry["id"] == "backprop" else "solution"
         want = wb.body(entry["id"], kind if wb.BY_ID[entry["id"]]["kind"] == "exercise" else "solution")
-        if body.strip() != want.strip():
+        if body != want.rstrip():
             problems.append(
                 f"I: {entry['id']} does not come back byte for byte after a split; "
                 "the splice operations the editor performs are built on this")

@@ -1,6 +1,6 @@
 import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader, fig } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
-import { ExercisePage } from "../../components/ExercisePage";
+import { ExerciseCard } from "../../components/ExerciseCard";
 import { feedforwardExercise } from "../../exercises/feedforward";
 import { NetworkDiagram } from "./interactives/NetworkDiagram";
 import { PixelsInteractive } from "./interactives/PixelsInteractive";
@@ -205,7 +205,7 @@ export function Module2() {
         function.
       </p>
 
-      <ExercisePage exercise={feedforwardExercise} />
+      <ExerciseCard exercise={feedforwardExercise} />
 
       <Recap
         items={[

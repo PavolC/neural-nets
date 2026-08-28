@@ -34,12 +34,10 @@ export const smartInitExercise: Exercise = {
     "Once the tests pass, measure the thing this exercise is for: how far " +
       "from zero the hidden layer's evidence lands under each start. The " +
       "inputs here are stand-in digits, 103 pixels lit and the rest dark, " +
-      "103 being the bundled images' average. Append this and press Run my " +
-      "code:",
+      "103 being the bundled images' average. Send this to the scratch pad " +
+      "and press Run my code:",
     {
       code:
-        "from course import sigmoid\n" +
-        "\n" +
         "pixels = np.random.default_rng(0)\n" +
         "X = np.zeros((784, 200))                       # 200 stand-in digits\n" +
         "for k in range(200):\n" +

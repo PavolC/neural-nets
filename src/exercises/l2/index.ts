@@ -29,7 +29,7 @@ export const l2Exercise: Exercise = {
       "same function, so that case has to be right), and that a weight left " +
       "with no gradient at all shrinks by the same fraction every step.",
     "Once the tests pass, watch a weight decay on its own, with the data " +
-      "silent. Append this and press Run my code:",
+      "silent. Send this to the scratch pad and press Run my code:",
     {
       code:
         "w = [np.array([[1.0]])]\n" +

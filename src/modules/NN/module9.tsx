@@ -1,6 +1,6 @@
 import { AfterThis, Aside, Figure, ModuleToc, SectionHeader } from "../../components/ModuleBits";
 import { M } from "../../components/Math";
-import { ExercisePage } from "../../components/ExercisePage";
+import { ExerciseCard } from "../../components/ExerciseCard";
 import { trainExercise } from "../../exercises/train";
 import { FullTrainPanel } from "./interactives/FullTrainPanel";
 
@@ -62,7 +62,7 @@ export function Module9() {
         figure in eight modules was computed for you.
       </p>
 
-      <ExercisePage exercise={trainExercise} />
+      <ExerciseCard exercise={trainExercise} />
 
       <SectionHeader id="m9-run" title="Your program, on the digits" />
       <p>

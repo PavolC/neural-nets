@@ -1,8 +1,9 @@
 /// <reference lib="webworker" />
-// Pyodide worker: runs Python + NumPy off the main thread. Serves two kinds
-// of requests: "train" (the Milestone 0 reference training run) and
-// "runTests" (execute learner code against an exercise's test suite).
-// Requests are processed sequentially; every response echoes the request id.
+// Pyodide worker: runs Python + NumPy off the main thread. Serves the
+// Milestone 0 reference training run, the workbench (one document against one
+// section's tests, or against the scratch pad), first-party snippets from the
+// interactives, and the older single-file test path. Requests are processed
+// sequentially; every response echoes the request id.
 
 import dataLoaderSource from "../python/data_loader.py?raw";
 import referenceNetworkSource from "../python/reference_network.py?raw";
@@ -38,6 +39,22 @@ interface Pyodide {
   FS: { writeFile(path: string, data: Uint8Array): void };
 }
 
+/** Put the `course` module back the way it was booted.
+ *
+ * Several panels swap a name on it (course.gradient, course.backprop) so the
+ * learner's own function is what their earlier code calls. The worker outlives
+ * every request, so those assignments used to persist: running Module 5's
+ * panel and then scrolling up to Module 3's made the deliberately slow SGD
+ * panel finish fast while still printing its sentence about 360 forward
+ * passes. A snapshot at boot, restored before every request, ends that.
+ */
+const RESET_COURSE = `
+import sys
+_course = sys.modules["course"]
+_course.__dict__.clear()
+_course.__dict__.update(_course_snapshot)
+`;
+
 let pyodidePromise: Promise<Pyodide> | null = null;
 
 function getPyodide(): Promise<Pyodide> {
@@ -71,6 +88,19 @@ _course = types.ModuleType("course")
 _course.__file__ = "course_helpers.py"
 exec(compile(_course_src, "course_helpers.py", "exec"), _course.__dict__)
 sys.modules["course"] = _course
+`);
+      await pyodide.runPythonAsync(`
+import sys
+_course = sys.modules["course"]
+# The two dataset loaders live in the worker's own globals, so a snippet run
+# through the scratch pad cannot see them. Hang them on \`course\` as well, so
+# "Run my code" can open the bundled data the way a play snippet says it can.
+# Never one_hot: the loader's one_hot(y, num_classes=10) and the learner's
+# Module 10 one_hot(values, levels) are different functions with one name, and
+# this is the only place the two could meet.
+_course.load_mnist_subset = load_mnist_subset
+_course.load_penguins = load_penguins
+_course_snapshot = dict(_course.__dict__)
 `);
       await pyodide.runPythonAsync(harnessSource);
       bootDone = true;
@@ -156,6 +186,36 @@ json.dumps(_result)
   post({ type: "trainDone", id: msg.id, result: JSON.parse(resultJson) });
 }
 
+async function runDocument(
+  msg: Extract<WorkerRequest, { type: "runDocument" }>,
+): Promise<void> {
+  const pyodide = await getPyodide();
+  if (msg.dataUrl) await fetchDataset(pyodide, msg.dataUrl);
+  status("Running tests...");
+  pyodide.globals.set("_document", msg.document);
+  pyodide.globals.set("_tests_code", msg.testsCode);
+  pyodide.globals.set("_spec_json", JSON.stringify(msg.spec));
+  const resultJson = (await pyodide.runPythonAsync(
+    "run_document(_document, _tests_code, _spec_json)",
+  )) as string;
+  post({ type: "testsDone", id: msg.id, result: JSON.parse(resultJson) });
+}
+
+async function runDocumentScratch(
+  msg: Extract<WorkerRequest, { type: "runDocumentScratch" }>,
+): Promise<void> {
+  const pyodide = await getPyodide();
+  if (msg.dataUrl) await fetchDataset(pyodide, msg.dataUrl);
+  status("Running your code...");
+  pyodide.globals.set("_document", msg.document);
+  pyodide.globals.set("_scratch_code", msg.scratchCode);
+  pyodide.globals.set("_spec_json", JSON.stringify(msg.spec));
+  const resultJson = (await pyodide.runPythonAsync(
+    "run_document_scratch(_document, _scratch_code, _spec_json)",
+  )) as string;
+  post({ type: "pythonDone", id: msg.id, result: JSON.parse(resultJson) });
+}
+
 async function runTests(msg: Extract<WorkerRequest, { type: "runTests" }>): Promise<void> {
   const pyodide = await getPyodide();
   status("Running tests...");
@@ -178,11 +238,28 @@ async function runPython(msg: Extract<WorkerRequest, { type: "runPython" }>): Pr
   post({ type: "pythonDone", id: msg.id, result: JSON.parse(resultJson) });
 }
 
+function dispatch(msg: WorkerRequest): Promise<void> {
+  switch (msg.type) {
+    case "train":
+      return train(msg);
+    case "runTests":
+      return runTests(msg);
+    case "runDocument":
+      return runDocument(msg);
+    case "runDocumentScratch":
+      return runDocumentScratch(msg);
+    default:
+      return runPython(msg);
+  }
+}
+
 self.onmessage = (event: MessageEvent<WorkerRequest>) => {
   const msg = event.data;
   currentId = msg.id;
-  const job =
-    msg.type === "train" ? train(msg) : msg.type === "runTests" ? runTests(msg) : runPython(msg);
+  // Whatever the last request did to `course`, this one starts from boot.
+  const job = getPyodide()
+    .then((pyodide) => pyodide.runPythonAsync(RESET_COURSE))
+    .then(() => dispatch(msg));
   job.catch((err) =>
     post({
       type: "error",

@@ -1,43 +1,39 @@
-// Progress persistence (localStorage, versioned key prefix). Stores per
-// exercise: the learner's editor code, the hint reveal stage (0 to 3), and
-// a completion flag. No accounts, no backend (see design doc).
+// Progress persistence (localStorage, versioned key prefix). Stores the
+// learner's one Python file, the hint reveal stage per exercise (0 to 3), and
+// a completion flag per exercise. No accounts, no backend (see design doc).
+//
+// The code used to be nine separate documents under code:<id>. Those keys are
+// still written, and still hold runnable Python, but they are now derived: the
+// prefix of the workbench up to and including that section. A build that
+// predates the workbench, and an export opened in one, therefore still find
+// what they expect where they expect it.
 
-// Not renamed with the series. Every learner's saved code, revealed hints and
-// passed marks live under this prefix in their own browser, and changing it
-// orphans all of it silently: they would open the course to empty editors with
-// no way to get their work back. The name it is short for is history.
-const PREFIX = "gn:v1:";
+import { get, keysUnder, remove, set } from "./storage";
+import {
+  NOT_EXPORTED,
+  clearBackup,
+  demote,
+  ensureLibrary,
+  loadDocument,
+  parsed,
+  projectionFor,
+  putSection,
+  refreshProjections,
+  resetSection,
+  saveDocument,
+  sectionDefines,
+  sectionPresent,
+} from "./workbench";
+import { SECTION_BY_ID } from "./workbenchDoc";
 
-function get(key: string): string | null {
-  try {
-    return localStorage.getItem(PREFIX + key);
-  } catch {
-    return null; // storage disabled: the course still works, nothing persists
-  }
-}
-
-function set(key: string, value: string): void {
-  try {
-    localStorage.setItem(PREFIX + key, value);
-  } catch {
-    // ignore: see above
-  }
-}
-
-function remove(key: string): void {
-  try {
-    localStorage.removeItem(PREFIX + key);
-  } catch {
-    // ignore
-  }
-}
-
+/** The prefix of the whole file up to and including this exercise's section.
+ *
+ * Every payoff panel runs this, so what it runs really is the learner's own
+ * earlier work rather than the course's copies of it.
+ */
 export function loadCode(exerciseId: string): string | null {
-  return get(`code:${exerciseId}`);
-}
-
-export function saveCode(exerciseId: string, code: string): void {
-  set(`code:${exerciseId}`, code);
+  if (!sectionPresent(exerciseId)) return get(`code:${exerciseId}`);
+  return projectionFor(exerciseId);
 }
 
 /** 0 = nothing revealed, 1 = hint 1, 2 = hint 2, 3 = full solution. */
@@ -65,7 +61,7 @@ export function saveCompleted(exerciseId: string): void {
 // changes. It has never gated navigation: every module is reachable always.
 const PROGRESS_EVENT = "gn:progress";
 
-function emitProgress(): void {
+export function emitProgress(): void {
   window.dispatchEvent(new CustomEvent(PROGRESS_EVENT));
 }
 
@@ -74,42 +70,31 @@ export function subscribeProgress(fn: () => void): () => void {
   return () => window.removeEventListener(PROGRESS_EVENT, fn);
 }
 
-/** Passed, and the code that passed is still stored.
+/** Passed, and the code that passed is still in the file.
  *
- * The panels that train with the learner's own code need both, and the two
- * can come apart: a progress file that carries the passed marks without the
- * editor contents, or storage cleared halfway. Gating on the pass alone gave
- * those panels an unlocked button that quietly did nothing, because every one
- * of them returns early when the code turns out to be missing.
+ * The panels that train with the learner's own code need all three. The
+ * checks can come apart: a progress file that carries the passed marks
+ * without the code, storage cleared halfway, or a function deleted out of a
+ * section that has already passed. Gating on the pass alone gave those panels
+ * an unlocked button that quietly did nothing.
  */
 export function codeReady(exerciseId: string): boolean {
-  return loadCompleted(exerciseId) && loadCode(exerciseId) !== null;
+  return loadCompleted(exerciseId) && sectionPresent(exerciseId) && sectionDefines(exerciseId);
 }
 
-export function resetExercise(exerciseId: string): void {
-  remove(`code:${exerciseId}`);
-  remove(`reveal:${exerciseId}`);
-  remove(`done:${exerciseId}`);
-  emitProgress();
+/** Put one section back to its starting text, and clear its marks. */
+export function resetExercise(exerciseId: string): { ok: boolean; reason?: string } {
+  const result = resetSection(exerciseId);
+  if (result.ok) emitProgress();
+  return result;
 }
 
-/** Every stored key, without the prefix. Empty when storage is unavailable. */
-function keys(): string[] {
-  try {
-    const out: string[] = [];
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key?.startsWith(PREFIX)) out.push(key.slice(PREFIX.length));
-    }
-    return out;
-  } catch {
-    return [];
-  }
-}
-
-/** Forget everything: all saved code, hints and passes, for every exercise. */
+/** Forget everything: the file, every hint stage, every pass, and the copies
+ * kept from before the exercises became one file. */
 export function resetAll(): void {
-  for (const key of keys()) remove(key);
+  for (const key of keysUnder()) remove(key);
+  clearBackup();
+  ensureLibrary(true);
   emitProgress();
 }
 
@@ -130,8 +115,10 @@ const ACCEPTED_FORMATS = [FORMAT, "grokking-nets-progress-v1"];
 
 /** The whole of this browser's progress, as a JSON string to keep or move. */
 export function exportProgress(): string {
+  refreshProjections();
   const entries: Record<string, string> = {};
-  for (const key of keys()) {
+  for (const key of keysUnder()) {
+    if (NOT_EXPORTED.has(key)) continue;
     const value = get(key);
     if (value !== null) entries[key] = value;
   }
@@ -143,23 +130,39 @@ export function exportProgress(): string {
   return JSON.stringify(file, null, 2);
 }
 
+// Only the shapes this course writes, so a hand-edited file cannot fill the
+// browser's storage with anything else under our prefix. Frozen: widening it
+// would let a file reach keys the app does not expect. Every key the workbench
+// added was chosen to fit it already (code:workbench, code:scratch,
+// code:passhash-backprop).
+const VALID_KEY = /^(code|reveal|done):[a-z0-9-]+$/;
+
+export interface ImportReport {
+  written: number;
+  /** How the file was shaped, and what happened to the current file. */
+  shape: "workbench" | "merged" | "built";
+  /** Sections whose text came out of the file rather than out of this
+   * browser, when an older file was merged into an existing workbench. */
+  merged: string[];
+}
+
 /** Load an exported file over the current progress.
  *
  * Additive by key: an exercise present in the file replaces the one in this
- * browser, and one absent from the file is left alone. Returns how many keys
- * were written, or throws with a message worth showing the reader.
+ * browser, and one absent from the file is left alone. Returns what happened,
+ * or throws with a message worth showing the reader.
  */
-export function importProgress(text: string): number {
-  let parsed: unknown;
+export function importProgress(text: string): ImportReport {
+  let parsedFile: unknown;
   try {
-    parsed = JSON.parse(text);
+    parsedFile = JSON.parse(text);
   } catch {
     throw new Error("that file is not JSON, so it is not a progress file this course wrote");
   }
-  if (typeof parsed !== "object" || parsed === null) {
+  if (typeof parsedFile !== "object" || parsedFile === null) {
     throw new Error("that file does not hold a progress record");
   }
-  const file = parsed as Partial<ProgressFile>;
+  const file = parsedFile as Partial<ProgressFile>;
   if (typeof file.format !== "string" || !ACCEPTED_FORMATS.includes(file.format)) {
     throw new Error(
       `that file says its format is ${JSON.stringify(file.format ?? "missing")}, and this ` +
@@ -169,16 +172,75 @@ export function importProgress(text: string): number {
   if (typeof file.entries !== "object" || file.entries === null) {
     throw new Error("that progress file has no entries");
   }
-  let written = 0;
+
+  const incoming = new Map<string, string>();
   for (const [key, value] of Object.entries(file.entries)) {
-    // Only the three shapes this course writes, so a hand-edited file cannot
-    // fill the browser's storage with anything else under our prefix.
-    if (!/^(code|reveal|done):[a-z0-9-]+$/.test(key)) continue;
+    if (!VALID_KEY.test(key)) continue;
     if (typeof value !== "string") continue;
-    set(key, value);
-    written++;
+    if (NOT_EXPORTED.has(key)) continue;
+    incoming.set(key, value);
   }
-  if (written === 0) throw new Error("that progress file holds nothing this course can read");
+  if (incoming.size === 0) throw new Error("that progress file holds nothing this course can read");
+
+  const hadDocument = get("code:workbench") !== null;
+  // Per-exercise code is handled separately: whether it is the file's own
+  // section text or a whole standalone document decides where it lands.
+  const perExercise = new Map<string, string>();
+  for (const [key, value] of incoming) {
+    const id = key.startsWith("code:") ? key.slice(5) : null;
+    if (id && SECTION_BY_ID.has(id)) {
+      perExercise.set(id, value);
+      continue;
+    }
+    set(key, value);
+  }
+
+  let shape: ImportReport["shape"] = "workbench";
+  const merged: string[] = [];
+
+  if (incoming.has("code:workbench")) {
+    // A file written by this build. It is already stored; rebuild what is
+    // derived from it.
+    refreshProjections();
+  } else if (!hadDocument) {
+    // An older file into a browser that has never built the workbench. The
+    // per-exercise documents are what it holds, so write them and merge.
+    for (const [id, value] of perExercise) set(`code:${id}`, value);
+    remove("code:workbench");
+    ensureLibrary(true);
+    shape = "built";
+  } else {
+    // An older file into a browser that already has the workbench. Without
+    // this branch the incoming work is written to keys that are about to be
+    // overwritten by the projection refresh, and is silently lost.
+    set("code:undo-workbench", loadDocument());
+    for (const [id, value] of perExercise) {
+      const body = extractBody(value, id);
+      if (body === null) continue;
+      const result = putSection(id, body);
+      if (result.ok) merged.push(id);
+    }
+    refreshProjections();
+    shape = "merged";
+  }
+
   emitProgress();
-  return written;
+  return { written: incoming.size, shape, merged };
 }
+
+/** One section's body out of whatever a progress file stored for it.
+ *
+ * A file written by this build stores a projection, which carries markers, so
+ * the section can be lifted straight out. An older file stores a standalone
+ * document with its own imports, which have to come off or they would rebind
+ * a name an earlier section defines.
+ */
+function extractBody(stored: string, id: string): string | null {
+  const doc = parsed(stored);
+  const section = doc.byId.get(id);
+  if (section) return section.body;
+  if (doc.sections.length) return null; // a projection that stops short of it
+  return demote(stored);
+}
+
+export { ensureLibrary, loadDocument, saveDocument };

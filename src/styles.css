@@ -42,9 +42,15 @@
      the family renders at this scale and is centred, so one with fewer boxes
      in it is smaller rather than differently drawn: same stroke weight, same
      label size, whatever it contains. Each carries its own width as
-     --fig-units, set by fig() in ModuleBits. If a diagram is ever drawn wider
-     than 817 units it will be clamped by the column and drop below this
-     scale, which tools/../figcheck reports as a broken family. */
+     --fig-units, set by fig() in ModuleBits.
+
+     The literal below is the value for a column at its full width, and it is
+     what paints before any script runs. Once the shell has measured the
+     article it publishes the real one on the root, as --col-content / 817,
+     because the workbench can be dragged wider than the room beside the
+     column and the column then narrows. The calibration is the same
+     statement it always was; it is computed now rather than assumed, which
+     is what lets it stay true at more than one column width. */
   --fig-scale: 1.0685px;
   /* The floor it stops shrinking at on a phone, where it pans instead: the
      same 620px the widest one used to take, in the same proportion. */
@@ -195,38 +201,6 @@ button:disabled {
 .code-editor .cm-editor.cm-focused {
   outline: 2px solid var(--accent);
   outline-offset: -1px;
-}
-
-/* Fullscreen workbench: editor + run controls + output + results */
-.workbench-fullscreen {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background: var(--bg);
-  padding: 1rem 1.2rem;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
-.workbench-fullscreen .code-editor {
-  flex: 1 0 45vh;
-  height: auto;
-  resize: none;
-  margin: 0 0 0.6rem;
-}
-
-.workbench-fullscreen .exercise-tip {
-  display: none;
-}
-
-.workbench-fullscreen .output-panel pre {
-  max-height: 24vh;
-  overflow: auto;
-}
-
-.workbench-expand {
-  margin-left: auto;
 }
 
 /* A row of controls, under the editor or beside an interactive. */
@@ -2089,6 +2063,24 @@ button:disabled {
   }
 }
 
+/* The same three rules again, on the one predicate the shell computes, which
+   is what the media queries above were approximating. They asked the window
+   how wide it is; what decides whether the gutter nav fits is how much room
+   is left beside the column, and the workbench takes some of it. Keyed
+   together so the bar and the offset that clears it can never disagree,
+   which is how a heading ends up behind the bar it was chosen from. */
+.shell[data-toc="bar"] .module-toc {
+  display: none;
+}
+
+.shell[data-toc="bar"] .module-jump {
+  display: block;
+}
+
+.shell[data-toc="bar"] .module-section-title {
+  scroll-margin-top: 68px;
+}
+
 /* A short accent rule above each section title. The page is a long single
    scroll of prose and figures, and before this the only thing marking a new
    section was a slightly larger line of the same serif. The mark is in the
@@ -2139,8 +2131,11 @@ button:disabled {
      The min() is the guard rail: 190 wide plus a 14px margin is 204, so it can
      never be pushed off the right edge. */
   left: min(
-    calc((100% - var(--col-width)) / 2 + var(--col-width) + var(--toc-gap)),
-    calc(100% - var(--toc-width) - 14px)
+    calc(
+      (100% - var(--dock-w, 0px) - var(--col-width)) / 2 + var(--col-width) +
+        var(--toc-gap)
+    ),
+    calc(100% - var(--dock-w, 0px) - var(--toc-width) - 14px)
   );
   width: var(--toc-width);
   max-height: 80vh;
@@ -2308,14 +2303,15 @@ button:disabled {
    .scroll-x class on the same element supplies the overflow and the affordance
    that says it scrolls. */
 
-@media (max-width: 720px) {
-  .chain-ripple,
-  .chain-net,
-  .bp-diagram,
-  .ripple-slice {
-    min-width: calc(var(--fig-units) * var(--fig-scale-min));
-  }
-
+/* Unconditional, because the column can now narrow without the window
+   narrowing: dragging the workbench wider does to a figure exactly what a
+   phone does. Below the floor the diagram keeps its size and pans inside
+   .figure-scroll rather than shrinking its labels into illegibility. */
+.chain-ripple,
+.chain-net,
+.bp-diagram,
+.ripple-slice {
+  min-width: calc(var(--fig-units) * var(--fig-scale-min));
 }
 
 /* Module 5's pipeline picture: the implementation being superseded. */
@@ -3223,6 +3219,9 @@ button:disabled {
   .button-secondary,
   .start-outline-title,
   .start-progress-link,
+  .exercise-launcher-open,
+  .wb-chip,
+  .wb-controls button,
   .chip {
     min-height: 44px;
   }
@@ -3236,3 +3235,401 @@ button:disabled {
     padding-block: 0.5rem;
   }
 }
+
+/* ---------- the workbench ---------- */
+
+/* One panel, one editor, one file, for the whole course. Docked beside the
+   reading column on a wide screen and a full-screen sheet below 1360px.
+   Everything here lives in this stylesheet rather than in src/brand/, which
+   the sibling courses share: the panel is this course's, and the brand layer
+   loads first so anything below can override it.
+
+   The shell holds the reading column away from the panel. Padding rather than
+   a grid track, for two reasons: a 1fr track takes a min-content floor from
+   the widest table in the course, so minmax(0, 1fr) would be mandatory, and a
+   grid item stretches by default, which silently defeats position: sticky on
+   the section bar inside it. */
+.shell {
+  padding-right: var(--dock-w, 0px);
+}
+
+/* The tab strip folds to the picker when the COLUMN is narrow, which is not
+   the same question as whether the window is. brand.css asks the window,
+   because a sibling course has no panel; this asks the column, and wins by
+   loading after it. */
+.shell[data-narrow="1"] .tabs {
+  display: none;
+}
+
+.shell[data-narrow="1"] .module-picker {
+  display: block;
+}
+
+/* The drag handle between the column and the panel. Wider than it looks: the
+   line is 1px and the grab area is 11, because a 1px target is not one. */
+.wb-grip {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: calc(var(--dock-w, 0px) - 5px);
+  width: 11px;
+  z-index: 31;
+  cursor: col-resize;
+  background: transparent;
+  touch-action: none;
+}
+
+.wb-grip::after {
+  content: "";
+  position: absolute;
+  inset: 0 5px;
+  background: var(--rule);
+}
+
+.wb-grip:hover::after,
+.wb-grip-dragging::after,
+.wb-grip:focus-visible::after {
+  background: var(--accent);
+}
+
+.wb-grip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* The tab that opens the panel when it is shut. Only where the panel can
+   dock: below that width it would open a full-screen sheet out of nowhere,
+   and the exercise cards are the way in. */
+.wb-handle {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%) rotate(180deg);
+  writing-mode: vertical-rl;
+  z-index: 29;
+  padding: 1rem 0.35rem;
+  border: 1px solid var(--rule);
+  border-right: none;
+  border-radius: var(--radius) 0 0 var(--radius);
+  background: var(--surface-card);
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.wb-handle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.wb {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--dock-w, 0px);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border-left: 1px solid var(--rule);
+  /* Anything inside painting the shared scroll affordance covers its own
+     ground, and the panel's ground is the page's here. Declared rather than
+     inherited: a custom property that references another is substituted where
+     it is declared, so reading it from :root would freeze the page's value. */
+  --fig-ground: var(--bg);
+}
+
+.wb[hidden] {
+  display: none;
+}
+
+.wb-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+.wb-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wb-title code {
+  font-size: 0.85em;
+  color: var(--muted);
+}
+
+.wb-title:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.wb-head-buttons {
+  margin-left: auto;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.wb-head-buttons button {
+  font-size: 0.78rem;
+  padding: 0.25rem 0.6rem;
+}
+
+/* The rail: every section of the file, including the ones not written yet, so
+   the shape of the course is visible from Module 1. */
+.wb-rail {
+  display: flex;
+  gap: 0.3rem;
+  padding: 0.45rem 0.9rem;
+  border-bottom: 1px solid var(--rule);
+  overflow-x: auto;
+}
+
+.wb-chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.74rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.wb-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.wb-chip-missing {
+  border-style: dashed;
+}
+
+.wb-chip-passing {
+  background: var(--accent-panel);
+  border-color: var(--accent);
+  color: var(--ink);
+}
+
+.wb-chip-stale {
+  border-left: 3px solid var(--loss);
+}
+
+.wb-chip-current {
+  box-shadow: inset 0 -2px 0 var(--accent);
+  color: var(--ink);
+}
+
+.wb-chip-mark {
+  font-size: 0.9em;
+}
+
+.wb-repair {
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--accent-wash);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+}
+
+.wb-repair p {
+  margin: 0 0 0.4rem;
+}
+
+.wb-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.wb-editor-slot {
+  flex: 0 0 var(--wb-split, 60%);
+  min-height: 120px;
+  display: flex;
+}
+
+.wb-editor-slot .code-editor {
+  flex: 1 1 auto;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  resize: none;
+}
+
+.wb-splitter {
+  flex: 0 0 auto;
+  height: 7px;
+  cursor: row-resize;
+  background: var(--rule);
+  touch-action: none;
+}
+
+.wb-splitter:hover,
+.wb-splitter:focus-visible {
+  background: var(--accent);
+}
+
+.wb-lower {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0.7rem 0.9rem 2rem;
+}
+
+.wb-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+}
+
+.wb-more {
+  margin-left: auto;
+}
+
+.wb-more > summary {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+/* An explicit display on a child of a closed <details> is laid out anyway in
+   Chromium, so the menu showed with the disclosure shut. Hide it on the same
+   selector that gives it a display, rather than relying on the UA. */
+.wb-more:not([open]) .wb-more-menu {
+  display: none;
+}
+
+.wb-more-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding-top: 0.4rem;
+}
+
+.wb-where {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin: 0 0 0.4rem;
+}
+
+.wb-lent {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+  border-left: 3px solid var(--rule);
+  padding-left: 0.6rem;
+  margin: 0.6rem 0;
+}
+
+/* The card that says the failure is not in the section being looked at. An
+   AssertionError carries no line number, so this is the only thing that can
+   point at the section that is really wrong. */
+.wb-blame {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--loss);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.75rem;
+  margin: 0.6rem 0;
+  font-size: 0.88rem;
+}
+
+.wb-blame p {
+  margin: 0.3rem 0;
+}
+
+.wb-blame-message {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.wb-goto {
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+}
+
+.wb-scratch,
+.wb-tip {
+  margin: 0.7rem 0;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.wb-scratch > summary,
+.wb-tip > summary {
+  cursor: pointer;
+}
+
+.wb-scratch-note {
+  margin: 0.4rem 0;
+}
+
+.wb-scratch-editor {
+  height: 180px;
+  margin: 0.4rem 0 0;
+}
+
+/* Below the dock threshold the panel is a sheet: the one place in the course
+   where reading and coding cannot happen at once, because there is no width
+   in which both fit. Said plainly rather than dressed up. */
+.wb[data-dock="sheet"] {
+  inset: 0;
+  width: auto;
+  border-left: none;
+  z-index: 50;
+}
+
+/* The splitter is a pointer-only affordance and there is no room for it under
+   the editor on a phone; the sheet gives the editor a fixed share instead. */
+.wb[data-dock="sheet"] .wb-splitter {
+  display: none;
+}
+
+.wb[data-dock="sheet"] .wb-editor-slot {
+  flex: 0 0 45vh;
+}
+
+/* The exercise's launcher: what is left in the module page where the editor
+   used to be. Rendered as a <p> so it is a direct child of .exercise and
+   inherits the prose measure through the rule that is already there, rather
+   than needing a selector of its own in the measure list. */
+.exercise-launcher {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin: 1rem auto 0.8rem;
+}
+
+.exercise-launcher-open {
+  flex: 0 0 auto;
+}
+
+.exercise-launcher-state {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+

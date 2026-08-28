@@ -117,7 +117,16 @@ export function parseDocument(text: string): ParsedDoc {
   for (let m = MARKER_RE.exec(text); m !== null; m = MARKER_RE.exec(text)) {
     const from = m.index;
     const after = from + m[0].length;
-    hits.push({ id: m[1], from, bodyFrom: after + (text[after] === "\n" ? 1 : 0) });
+    // Past the marker's own newline, and past the blank line the join rule
+    // puts under it. Without the second step every parsed body starts with a
+    // newline that sectionText would then add again: a section would grow a
+    // blank line on every splice, and no body would ever compare equal to the
+    // text it was seeded with, so nothing would ever count as untouched.
+    let bodyFrom = after + (text[after] === "\n" ? 1 : 0);
+    while (/^[ \t]*\n/.test(text.slice(bodyFrom, bodyFrom + 40))) {
+      bodyFrom += text.slice(bodyFrom).indexOf("\n") + 1;
+    }
+    hits.push({ id: m[1], from, bodyFrom });
     // A zero-length match would spin forever; the pattern cannot produce one
     // (it needs "[section:" at minimum), but lastIndex is shared state.
     if (MARKER_RE.lastIndex === from) MARKER_RE.lastIndex = from + 1;
