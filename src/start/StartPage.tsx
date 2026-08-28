@@ -28,6 +28,14 @@ import nielsenNotice from "../python/nielsen_notice.txt?raw";
 // and what this browser has stored. Reachable at #start, which is where a
 // bare link lands.
 
+/** How each section of the file reads in the list below. */
+const STATE_WORDS = {
+  missing: "not in your file yet",
+  written: "written, not passing yet",
+  passing: "passing",
+  stale: "passed, changed since",
+} as const;
+
 /** What each module covers, for the outline below.
  *
  * Keyed by module id and read through the module registry rather than
@@ -37,14 +45,6 @@ import nielsenNotice from "../python/nielsen_notice.txt?raw";
  * with no entry here still appears now, under its nav label, so the worst a
  * gap can cost is a missing sentence rather than a missing module.
  */
-/** How each section of the file reads in the list below. */
-const STATE_WORDS = {
-  missing: "not in your file yet",
-  written: "written, not passing yet",
-  passing: "passing",
-  stale: "passed, changed since",
-} as const;
-
 const COVERS: Record<string, { title: string; covers: string }> = {
   m1: {
     title: "From neurons to networks",
@@ -103,6 +103,13 @@ const COVERS: Record<string, { title: string; covers: string }> = {
  * of words before a reader comes back wanting it. In the order they are met.
  */
 const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[] = [
+  {
+    id: "section-line",
+    symbol: <code>{"# ---- [section:...] ----"}</code>,
+    means:
+      "a section line in your file: the course reads the name in the brackets to find where each piece starts, and everything else on it is yours",
+    from: "Module 1",
+  },
   { id: "z", symbol: <M tex="z" />, means: "a neuron's evidence: its inputs times its weights, plus its bias", from: "Module 1" },
   { id: "a", symbol: <M tex="a" />, means: "a neuron's answer, the squash applied to its evidence", from: "Module 1" },
   { id: "sigma", symbol: <M tex="\sigma(z)" />, means: "the sigmoid, which squashes any number into 0 to 1", from: "Module 1" },
@@ -246,10 +253,13 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
       <p>
         This is a course on neural networks that you finish by building one. Each
         module is a few short readings interleaved with figures you can drag, and
-        most of them end with Python you write in the page. Your code is checked by
-        tests, kept, and used by every module after it: by Module 5 it is training a
-        network that reads handwritten digits, and by Module 8 it is the thing being
-        measured when depth stops working.
+        most of them add a piece of Python to one file that you write across the
+        whole course. It opens in a panel beside the reading, so the explanation
+        stays on screen while you type. Each piece is checked by tests and then used
+        by every piece after it: by Module 5 the file is training a network that
+        reads handwritten digits, by Module 8 it is the thing being measured when
+        depth stops working, and at the end you can download it and run it anywhere
+        NumPy is installed.
       </p>
       <p>
         The sequence follows Michael Nielsen's <em>Neural Networks and Deep
@@ -329,9 +339,10 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
           download.
         </li>
         <li>
-          <b>Your work lives in this browser.</b> Editor contents, revealed hints
-          and passed marks are stored in this browser's local storage, per browser
-          and per device. The progress section below is how you move or clear them.
+          <b>Your work lives in this browser.</b> Your file, the hints you have
+          opened and the sections that have passed are stored in this browser's
+          local storage, per browser and per device. The progress section below is
+          how you move or clear them.
         </li>
         <li>
           <b>Nothing is locked.</b> Every module is open from the tabs at any time,
@@ -341,14 +352,19 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
         <li>
           <b>Each exercise shows its work.</b> The tests are readable in the page,
           hints come in three stages that you choose to open, and the reference
-          solution is one of them.
+          solution is one of them. When a run fails, the panel says whether the
+          cause is the section you are looking at or one further up your file, and
+          names it.
         </li>
         <li>
-          <b>Module 5 is the summit, and nothing after it depends on your version.</b>{" "}
-          A training panel needs the exercises in its own module, plus Module 3's
-          sgd, which drives all of them. Module 5's backprop is the exception:
-          every module after it runs on the course's own copy, so an exercise you
-          never finish costs you that module's panel and nothing later.
+          <b>Later modules run on your earlier code, really.</b> Everything is one
+          file, in the order you write it, so Module 9's program calls the backprop
+          you wrote in Module 5, which calls the sigmoid you wrote in Module 1. A
+          section you have not written yet is filled in from the course's copy for
+          the run, and the panel names what it borrowed; once you have written it,
+          yours is what runs. The bill for that is real and worth knowing: a wrong
+          sign in Module 1 can surface as a failure in Module 9, which is why the
+          panel goes looking upstream before it blames the section in front of you.
         </li>
       </ul>
 

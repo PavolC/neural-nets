@@ -124,6 +124,12 @@ export function DockShell({
     <div
       className="shell"
       ref={shellRef}
+      // The sheet covers the page and locks its scroll, so the page behind it
+      // has to be genuinely out of reach: without this a screen reader swipes
+      // straight past the panel into the module underneath, and Tab walks the
+      // whole course. The dock is deliberately not inert, which is the point
+      // of a dock.
+      inert={dockState === "sheet" ? true : undefined}
       data-dock={dockState}
       data-toc={tocMode}
       data-narrow={open && columnWidth < COLUMN_FLOOR + 128 ? "1" : undefined}

@@ -493,9 +493,11 @@ export function Module8() {
       <p>
         The panel below trains both depths with your own code: your init_network
         builds them, your sgd walks them, and with the sigmoid chosen it is your
-        backprop computing every gradient. ReLU cannot be, because your BP2 has{" "}
+        backprop computing every gradient, reached through the adapter written for
+        you in Module 5. ReLU cannot be, because your BP2 has{" "}
         <code>sigmoid_prime</code> written into it. With ReLU chosen the gradient
-        is the course's copy of your backprop with two lines swapped. Its forward
+        comes from a copy of your backprop with two lines swapped, written into the
+        panel. Its forward
         pass squashes each hidden layer with <code>np.maximum(0.0, z)</code>{" "}
         instead of <code>sigmoid(z)</code>, and its BP2 line multiplies by{" "}
         <code>(zs[-l] &gt; 0)</code> instead of{" "}

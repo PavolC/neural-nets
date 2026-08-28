@@ -65,7 +65,15 @@ copy it into `CLAUDE.md`. Drift between chapters is a bug.
 
 Per exercise: the skeleton's contract, the tests, the reference solution, the hint ladder.
 State the invariants: deterministic, hardcoded fixtures, teaching failure messages, no
-solution logic in skeletons, earlier chapters supplied as an importable library.
+solution logic in skeletons.
+
+Then decide, and write down which: are the exercises **many isolated files** or **one file
+the learner grows**? Many means each chapter is handed its predecessors' work as a library,
+and a bug in chapter 1 can never block chapter 9. One file means the learner's own earlier
+code is what the later code calls, and at the end they hold something. Retrofitting either
+way is a course-wide change, and one file adds three invariants the other does not need:
+the untouched file must implement nothing, no section may rebind a name an earlier one
+owns, and a section that has not been written yet must still let the chapter run.
 
 Name **the flagship automated proof** that the learner's implementation is right, and say
 where it is celebrated in the UI.

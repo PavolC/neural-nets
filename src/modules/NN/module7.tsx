@@ -67,18 +67,33 @@ export function Module7() {
       </div>
       <p>
         Each fix is one line, and each one comes with a measurement of what it
-        bought. To keep them one-liners, the course now hands your Module 5
-        algorithm back to you with one step lifted out of it: the output
-        layer's blame, BP1, is now something you pass in.
+        bought. To keep them one-liners, one step comes out of the algorithm you
+        wrote in Module 5: the output layer's blame, BP1, becomes something you
+        pass in.
       </p>
       <div className="play-snippet">
-        <pre>{`from course import backprop
-nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
+        <pre>{`nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       </div>
       <p>
         Same four equations, same forward pass keeping receipts, same backward
-        sweep. Leave that last argument out and you get exactly what you wrote
-        in Module 5. The first exercise below writes a different one.
+        sweep. What changes is two lines of your own backprop, and this is the
+        first time the course asks you to go back and change working code. Add
+        the fifth argument to its signature, and let it supply BP1 when it is
+        given:
+      </p>
+      <div className="play-snippet">
+        <pre>{`def backprop(weights, biases, x, y, output_delta=None):
+    ...
+    if output_delta is None:
+        delta = (activations[-1] - y) * sigmoid_prime(zs[-1])
+    else:
+        delta = output_delta(activations[-1], y, zs[-1])`}</pre>
+      </div>
+      <p>
+        Leave the argument out at a call and your function does exactly what it
+        did in Module 5, so every test it passed then it passes now. The first
+        exercise below checks that edit before anything else, because everything
+        in this module and the three after it swaps a BP1 through that opening.
       </p>
 
       <SectionHeader id="m7-slowdown" title="Badly wrong, barely learning" />

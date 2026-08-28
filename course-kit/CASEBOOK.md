@@ -1,6 +1,6 @@
 # Casebook
 
-Fifteen incidents from course one (neural networks), each a place where a chapter failed a
+Sixteen incidents from course one (neural networks), each a place where a chapter failed a
 real reader, and each the reason a rule exists in `CLAUDE.md`. Read this once. The rules
 are what you follow; these are what makes them credible, and what tells you whether a rule
 you are tempted to bend is load-bearing.
@@ -283,7 +283,45 @@ mechanically.
 
 ---
 
-## The pattern behind all fifteen
+## 16. Nine editors, and nothing to hold at the end
+
+**What was wrong.** The learner, after finishing most of the course: "it would be awesome
+for there to be a side panel/workbench where every exercise simply allows me to add on code
+so that by the end of it i have a single piece that i understand and have built up ... might
+feel more cohesive throughout instead of a random embedded window on each module."
+
+Two complaints in one sentence, and the second is the sharper. The editor sat several
+thousand pixels into each chapter, so reading the prompt and typing the answer meant
+scrolling between them. And the nine exercises were nine isolated files: each opened with a
+line handing it the previous chapters' work out of a shared library, so the learner's own
+function was never what their next function called. By the last chapter, the capstone's own
+call map had to admit in a caption that three of the names in it ran the course's code.
+
+**The fix.** One panel docked beside the reading column, and one growing file: a section per
+exercise, in course order, plus two marked "written for you" so the file needs nothing but
+the language's array library. A section the learner has not written yet is filled in from
+the course's copy for the run, and the panel names what it borrowed, so a reader who opens
+the last chapter first still gets a run.
+
+**What made it expensive was not the panel.** It was that the isolated model had been
+hiding a live bug. Concatenating the nine untouched skeletons in their old state passed
+**19 of 52 tests**: the library import in a later section rebound a name an earlier section
+defined, and the harness executes the whole document before the tests import from it, so the
+last binding won retroactively for every suite. A learner pressing Run tests before writing
+anything would have been told five functions were already finished. Running the suites
+cannot detect this, because everything is green. Only a mutation check can: sabotage a
+provider, require its consumer's suite to notice.
+
+**Cost to fix:** a course-wide change touching the exercises, the harness, the worker
+protocol, every payoff panel, the stylesheet, the app shell, both checkers and the prose in
+seven chapters. Deciding it on day one costs nothing.
+
+**The rule it bought.** Decide in the design doc whether the exercises are one file or many,
+and if one file, write down the three invariants it needs from the first commit: the
+untouched file implements nothing, no section rebinds an earlier section's name, and an
+unwritten section still lets its chapter run.
+
+## The pattern behind all sixteen
 
 Four of them (2, 6, 7, 12) are the same chapter, and it is the one chapter authored outside
 the playbook, in a single 25-file commit that also touched the stylesheet, the app shell and

@@ -199,10 +199,12 @@ export function Module2() {
       <SectionHeader id="m2-code" title="Implement feedforward" />
       <p>
         Now implement feedforward yourself; the exercise below spells out the plan
-        and the two NumPy tools it needs. When the tests pass, come back up to the
-        diagram: the button there runs your code on real digits with the trained
-        weights, and every activation it lights up will have been computed by your
-        function.
+        and the two NumPy tools it needs. It goes into the same file as Module 1's
+        work, under its own section line, so the sigmoid you call is the one you
+        wrote a module ago rather than a copy of it. When the tests pass, come back
+        up to the diagram: the button there runs your code on real digits with the
+        trained weights, and every activation it lights up will have been computed
+        by your function.
       </p>
 
       <ExerciseCard exercise={feedforwardExercise} />

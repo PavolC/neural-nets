@@ -244,10 +244,13 @@ export function Module3() {
         and 0 of X together with columns 3 and 0 of Y and you hold a batch of two
         examples. With that, the exercise: you write the update step and the loop
         that feeds it: shuffle the column order, walk it in mini-batches, repeat
-        (one full pass through the dataset is called an epoch). The course supplies
-        the gradient, measured by nudging every parameter to both sides and
-        rescoring, as described earlier. It is correct, and it is slow; the panel
-        after the exercise measures how slow.
+        (one full pass through the dataset is called an epoch). The gradient
+        arrives written for you, in its own section of your file just above the one
+        you are about to write, measured by nudging every parameter to both sides
+        and rescoring, as described earlier. A section line that says "written for
+        you" marks a stretch the course supplies so the file runs on its own; you
+        can read it, and nothing in the course asks you to change it. This one is
+        correct, and it is slow; the panel after the exercise measures how slow.
       </p>
 
       <ExerciseCard exercise={sgdExercise} />

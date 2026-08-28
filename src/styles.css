@@ -3244,12 +3244,15 @@ button:disabled {
    the sibling courses share: the panel is this course's, and the brand layer
    loads first so anything below can override it.
 
-   The shell holds the reading column away from the panel. Padding rather than
-   a grid track, for two reasons: a 1fr track takes a min-content floor from
-   the widest table in the course, so minmax(0, 1fr) would be mandatory, and a
-   grid item stretches by default, which silently defeats position: sticky on
-   the section bar inside it. */
-.shell {
+   #root, rather than .shell, holds the reading column away from the panel, so
+   the pre-mount placeholder in index.html is offset by the same rule as the
+   app that replaces it: a returning reader with the panel open does not watch
+   the column jump when React mounts. Padding rather than a grid track, for two
+   reasons: a 1fr track takes a min-content floor from the widest table in the
+   course, so minmax(0, 1fr) would be mandatory, and a grid item stretches by
+   default, which silently defeats position: sticky on the section bar inside
+   it. */
+#root {
   padding-right: var(--dock-w, 0px);
 }
 

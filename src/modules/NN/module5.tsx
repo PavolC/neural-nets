@@ -261,6 +261,12 @@ export function Module5() {
       </Figure>
 
       <SectionHeader id="m5-exercise" title="Write backprop" />
+      <p>
+        This goes into your file under Module 3's work, and one more written-for-you
+        section arrives with it: the adapter that calls backprop once per column of
+        a mini-batch and averages the slopes. Everything from here to Module 10 goes
+        through it.
+      </p>
       <ExerciseCard exercise={backpropExercise} />
 
       <SectionHeader id="m5-train" title="The real training run" />

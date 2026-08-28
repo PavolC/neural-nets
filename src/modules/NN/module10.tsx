@@ -291,9 +291,11 @@ export function Module10() {
 
       <SectionHeader id="m10-run" title="What the preparation was worth" />
       <p>
-        The panel below runs the whole pipeline: your <code>standardize</code>,{" "}
-        <code>one_hot</code> and <code>split</code> turn the file into a matrix,
-        and your <code>train</code> from Module 9 does the rest.
+        The panel below runs the whole pipeline out of one file: your{" "}
+        <code>standardize</code>, <code>one_hot</code> and <code>split</code> turn
+        the file into a matrix, and your <code>train</code> from Module 9 does the
+        rest, down to the sigmoid you wrote in Module 1. Nothing in the run is the
+        course's except the mini-batch adapter.
       </p>
       <Figure caption="The penguin file, prepared by your code and trained by your loop. The switches change the preparation, not the network: same shape, same step size, same epochs, same seeds.">
         <PenguinsPanel />

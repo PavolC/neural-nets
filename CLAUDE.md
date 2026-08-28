@@ -25,6 +25,14 @@ no accounts, no backend, no analytics.
 
 - **Never write solution logic into skeleton files.** Solutions live only in
   `solution.py`. Skeletons contain stubs, docstrings, and shape contracts only.
+  The invariant is now about the assembled file, not one skeleton: **an untouched
+  workbench must implement nothing.** Concatenating the nine untouched skeletons
+  in their pre-workbench state passed 19 of 52 tests, because each opened with a
+  line like `from course import sigmoid` and the harness execs the document
+  before the tests import from it, so the last binding won retroactively for
+  every suite. Running the suites cannot detect that; only the mutation check in
+  `tools/check_exercises.py` (assertion G) can, which is why it exists and why
+  its docstring says so.
 - **Attribution and license requirements must never be removed.** The app footer, README,
   and LICENSE carry the CC BY-NC 3.0 attribution to Michael A. Nielsen's *Neural Networks
   and Deep Learning* (Determination Press, 2015). The **course content** follows its
@@ -90,14 +98,33 @@ no accounts, no backend, no analytics.
   are short and always interleaved with components, so MDX would add a dependency
   without saving friction. Exercise prompts and hints live in each exercise's
   `index.ts`.
+- **The exercises are one growing file, not nine** (the workbench; decided after
+  the course shipped, on the primary learner's ask for something that felt
+  cohesive). `src/exercises/sections.json` is the section table both the app and
+  the tools read: eleven sections in course order, the exact marker line, what
+  each provides, what it requires, which given sections arrive with it, and which
+  names its own tests examine directly. `src/state/workbenchDoc.ts` owns the
+  format and holds the only marker regex; `tools/workbench.py` reads that regex
+  out of it rather than restating it. Markers are metadata for editing and
+  reporting, never for running: every run, download and panel takes the whole
+  string, so a mangled marker degrades features and cannot break execution or
+  lose code. Two sections are **given** (`given-cost`, `given-batch`), marked
+  "written for you", which is what lets the file import NumPy and nothing else.
 - **Exercise test contract**: tests import the learner's code via
-  `from submission import ...`; helpers the learner built in earlier modules are
-  provided via `from course import ...` (defined in `src/python/course_helpers.py`),
-  so skeletons never contain prior solutions. Test functions are named `test_*`, run
-  in definition order, and fail by raising `AssertionError` with a teaching message;
-  the first docstring line is the test's display title. Test fixtures are hardcoded
+  `from submission import ...`, which is now the whole document exec'd as one
+  module. A section the learner has not touched is **lent**: the course sets its
+  own copy of that section's names onto `submission` for the run, and the panel
+  says what it borrowed. Never a name the target section owns, and never one the
+  target's own tests examine (`checks` in the section table; Module 7's seam test
+  is the only case). Test functions are named `test_*`, run in definition order,
+  and fail by raising `AssertionError` with a teaching message; the first
+  docstring line is the test's display title. Test fixtures are hardcoded
   literals (never regenerated at test time from random streams), so results cannot
-  drift between NumPy versions.
+  drift between NumPy versions. An `AssertionError` carries no line number, so a
+  wrong upstream function cannot be located from the failure itself: on a failing
+  run the panel runs the upstream sections' own suites, earliest first, and stops
+  at the first that fails. That is sound because a section that breaks its
+  dependants always breaks its own suite too.
 - **Pretrained weights are gzipped JSON** (`pretrained_weights.json.gz`), not npz:
   the Module 2 diagram reads the weights in JS (weight-image patches, edge colors)
   and Python reads the same file for the payoff run, and JS has no npz parser.
@@ -123,18 +150,26 @@ no accounts, no backend, no analytics.
   error analysis), and carries the where-to-go-next list that used to end Module
   8. Neither it nor Module 10 follows a Nielsen chapter, so neither has a `<Recap>`
   or a "Go deeper" link; everything else about a module page applies to both.
-- **`course_helpers.py` carries Module 7's three functions too** (`init_network`,
-  `l2_step`, `cross_entropy_delta`), so Module 9's capstone can import the
-  learner's earlier work the way every exercise does. Module 9's panel then
-  patches the learner's own saved versions over them before running their loop,
-  so the run really is theirs.
-- **`course.backprop` carries a seam for BP1** (added in Module 7): its signature is
-  `backprop(weights, biases, x, y, output_delta=None)`, the learner's Module 5
-  algorithm with the output layer's blame lifted into an argument (default
-  `quadratic_output_delta`, which reproduces Module 5 exactly). This is what keeps
-  Module 7's three exercises one-line diffs instead of rewrites; `batch_gradient`
-  beside it is the per-example-average adapter Module 5's panel used inline. Module 7's
-  panels swap the delta rather than the algorithm, and say so in the prose.
+- **`course_helpers.py` is now only what gets lent.** Its seven reference copies
+  (`sigmoid`, `feedforward`, `sigmoid_prime`, `backprop`, `cross_entropy_delta`,
+  `init_network`, `l2_step`) exist so a reader who opens Module 9 first gets a run
+  rather than a `NameError`. Nothing imports from it any more: no skeleton, no
+  solution, and no panel. Two test suites still reach into it from inside a test
+  body, deliberately and with a comment saying why, because a correctness
+  guarantee whose oracle shares the code under test is not a guarantee: Module 5's
+  gradient check and Module 7's.
+- **Module 7 asks the learner to edit their own Module 5 backprop** (the BP1
+  seam). It is the first time the course asks anyone to change working code, and a
+  single file is the only design where that is a two-line edit rather than an
+  impossibility. The prompt ships the two lines; there is deliberately no button
+  that splices them, because a splice into a function the learner has written
+  themselves is the one edit that could destroy work. The adapter written for them
+  in Module 5 calls `backprop` with four arguments until a replacement BP1 is
+  actually handed over, so nothing needs the edit before Module 7, and
+  `test_backprop_takes_the_blame_argument` in the cross-entropy suite names the
+  section and the lines when it is missing. `src/exercises/backprop/seam.py` is the
+  course's copy of the post-edit state, used only by the checker to prove the edit
+  keeps every Module 5 test green.
 
 - **The visual identity is a shared series layer, not this course's stylesheet**
   (added after the course was finished, when a second course became likely). `src/brand/`
@@ -679,6 +714,29 @@ the footer. Rules that follow from it:
   sets its own transparent background: that is a bug this course has already shipped once.
   The primary treatment is reached as `button:not([class])`, which cannot match a variant,
   because every variant here carries a class.
+- **The workbench is the one thing allowed to move the column, and only because
+  the reader moved it.** `.shell` holds the reading column away from a fixed panel
+  with `padding-right: var(--dock-w)`. Padding, not a grid track: a `1fr` track
+  takes a min-content floor from the widest table in the course, so `minmax(0,1fr)`
+  would be mandatory, and a grid item stretches by default, which silently defeats
+  `position: sticky` on the section bar inside it. The dock opens at exactly the
+  width left over beside a full-width column, so a first open moves nothing;
+  dragging past that narrows the column, down to 752px, which is the widest thing
+  in the measure set. Closed by default on a first visit, so the front page a
+  stranger lands on is byte for byte the page it always was.
+  Two consequences are load-bearing. `--fig-scale` stops being a literal: the
+  shell publishes `--col-content` and `--fig-scale` on the root, computed as the
+  measured content box over 817 units, which is the same calibration the comment
+  always claimed and is now true at more than one width. And three rules that
+  asked the window how wide it is (the gutter nav, the sticky bar, the offset that
+  clears it) move onto one `data-toc` predicate that asks how much room is left
+  beside the column, keyed together so they cannot disagree; the tab strip's fold
+  to the picker gets the same treatment through `data-narrow`, overriding
+  `brand.css` from `styles.css` rather than editing the shared layer.
+  Below 1360px there is no dock, only a modal sheet. That is half of what the
+  panel is for, denied on small screens, and it is stated rather than dressed up:
+  no width under 1360 fits prose at the measure and code at a readable column
+  side by side.
 - **The editor is themed from brand tokens, in `CodeEditor.tsx`.** Its chrome comes from
   the surfaces and the accent; its token colours come from the accent family, so syntax
   highlighting is legible by construction (every hue in that family clears 6:1 on the page
@@ -705,10 +763,12 @@ tokens from the start.
 /src/start/          the front door: what the course is, the outline, stored progress
 /src/modules/NN/     one folder per module: content, interactives/
 /src/exercises/      per exercise: skeleton.py, tests.py, solution.py, index.ts (prompt, hints)
+/src/exercises/sections.json  the section table, read by the app AND by tools/
+/src/exercises/given/         the two sections written for the learner
 /src/python/         shared Python: harness, course helpers, gradient checker, data loader
 /src/runtime/        Pyodide Web Worker, message protocol, shared worker client
 /src/components/     shared UI: CodeEditor (CodeMirror), ExercisePage
-/src/state/          localStorage progress persistence (gn:v1: key prefix)
+/src/state/          the workbench document, its format, and progress persistence
 /src/m0/             Milestone 0 training demo UI
 /public/data/        mnist_subset.bin.gz, pretrained_weights.json.gz, penguins.json.gz
 /tools/              build-time scripts (MNIST preprocessing, weight pretraining)
@@ -721,10 +781,19 @@ tokens from the start.
 - `npm run build`: static production build (deployable to any static host).
 - `python3 tools/make_mnist_subset.py`: regenerate `public/data/mnist_subset.bin.gz`
   (pure stdlib, downloads MNIST from a public mirror, deterministic output).
-- `python3 tools/check_exercises.py`: run every exercise's tests against its
-  reference solution (all must pass) and against its skeleton (all must fail,
-  with the skeleton's own NotImplementedError). Same harness the app runs, so
-  it gates a change to any test, skeleton or solution. Needs NumPy.
+- `npm run check`: the four checkers, which is what CI runs before it builds.
+- `python3 tools/check_exercises.py`: the workbench, under twelve lettered
+  assertions (the file's docstring lists them). It assembles the document, checks
+  it compiles at every prefix a learner can reach, that no section rebinds a name
+  an earlier one owns, that the solved document passes all 53 tests and the
+  untouched one passes none, that lending cannot make an unwritten exercise pass,
+  and that markers round-trip. Assertion G is the mutation check and is the one
+  that looks redundant and is not: sabotage a provider, require its consumer's
+  suite to notice. `--quick` skips it. Needs NumPy.
+- `python3 tools/check_panels.py`: every payoff panel's Python, lifted out of its
+  `.tsx` and run against the assembled document with the worker's globals in
+  place. Nothing else checks that these run, and several modules quote their
+  numbers. `--fast` caps every loop at two epochs. Needs NumPy.
 - `python3 tools/make_penguins.py`: regenerate `public/data/penguins.json.gz`
   (Module 10's dataset; stdlib only, downloads from the palmerpenguins repo,
   deterministic output, written RAW because preparing it is the exercise).
