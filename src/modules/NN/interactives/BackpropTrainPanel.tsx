@@ -18,33 +18,25 @@ const EPOCHS = 15;
 const SNIPPET = `
 import json, time, types
 import numpy as np
-import course
-from course import feedforward, quadratic_cost
 
 _a = json.loads(_args_json)
 
-_bp = types.ModuleType("backprop_submission")
-exec(compile(_a["backprop_code"], "your_code.py", "exec"), _bp.__dict__)
+# The learner's file, once, up to and including their backprop and the
+# adapter that arrives with it. Everything below is a name out of it.
+_lib = types.ModuleType("your_code")
+exec(compile(_a["code"], "your_code.py", "exec"), _lib.__dict__)
+feedforward = _lib.feedforward
+quadratic_cost = _lib.quadratic_cost
 
-# A mini-batch's gradient is the average of per-example slopes: call the
-# learner's backprop once per column and average. This whole function is
-# the "adapter" the module prose describes.
+# The swap this module is about: their sgd_step asks for gradient(...) and
+# gets the nudge-and-measure one written for them in Module 3. Rebinding the
+# name in their own module after it has been read, rather than before, is
+# enough, because Python looks a global up when the call happens. Their sgd
+# runs unmodified and now walks on their backprop.
 def _bp_gradient(weights, biases, X, Y):
-    m = X.shape[1]
-    nw = [np.zeros_like(w) for w in weights]
-    nb = [np.zeros_like(b) for b in biases]
-    for k in range(m):
-        dnw, dnb = _bp.backprop(weights, biases, X[:, k:k+1], Y[:, k:k+1])
-        nw = [t + d for t, d in zip(nw, dnw)]
-        nb = [t + d for t, d in zip(nb, dnb)]
-    return [t / m for t in nw], [t / m for t in nb]
+    return _lib.batch_gradient(weights, biases, X, Y)
 
-# Swap the course's nudge-measured gradient for the learner's backprop,
-# THEN load their Module 3 sgd, so its "from course import gradient"
-# picks up the fast one. The sgd code itself runs unmodified.
-course.gradient = _bp_gradient
-_sgd = types.ModuleType("sgd_submission")
-exec(compile(_a["sgd_code"], "your_sgd.py", "exec"), _sgd.__dict__)
+_lib.gradient = _bp_gradient
 
 with open("/mnist_subset.bin", "rb") as _f:
     _buf = _f.read()
@@ -81,7 +73,7 @@ _rng = np.random.default_rng(2)
 _t0 = time.time()
 _acc = 0.0
 for _e in range(1, _epochs + 1):
-    weights, biases = _sgd.sgd(weights, biases, X_train, Y_train, 3.0, 1, 10, _rng)
+    weights, biases = _lib.sgd(weights, biases, X_train, Y_train, 3.0, 1, 10, _rng)
     _preds = np.argmax(feedforward(weights, biases, X_test), axis=0)
     _acc = float((_preds == y_test).mean())
     _js_report(json.dumps({"kind": "epoch", "epoch": _e, "epochs": _epochs,
@@ -177,9 +169,10 @@ export function BackpropTrainPanel() {
   useEffect(() => subscribeProgress(() => setUnlocked(bothDone())), []);
 
   const run = () => {
-    const backpropCode = loadCode(backpropExercise.id);
-    const sgdCode = loadCode(sgdExercise.id);
-    if (!backpropCode || !sgdCode) return;
+    // One projection: the file through backprop already contains their sgd,
+    // because sgd is Module 3 and backprop is Module 5.
+    const code = loadCode(backpropExercise.id);
+    if (!code) return;
     setRunning(true);
     setDuel(null);
     setPoints([]);
@@ -190,7 +183,7 @@ export function BackpropTrainPanel() {
       {
         type: "runPython",
         code: SNIPPET,
-        args: { backprop_code: backpropCode, sgd_code: sgdCode },
+        args: { code },
         dataUrl: assetUrl("data/mnist_subset.bin.gz"),
       },
       (msg) => {

@@ -14,10 +14,17 @@ const EPOCHS = 200;
 const SNIPPET = `
 import json, time, types
 import numpy as np
-from course import quadratic_cost, feedforward
 _a = json.loads(_args_json)
-_mod = types.ModuleType("sgd_submission")
-exec(compile(_a["code"], "your_code.py", "exec"), _mod.__dict__)
+
+# The learner's file, up to and including their sgd. One exec, and every name
+# below comes out of it: their sgd, their feedforward, their sigmoid, and the
+# nudge-and-measure gradient written for them in Module 3. Nothing is borrowed,
+# which is what makes the count this panel prints true rather than nearly true:
+# the slow gradient is the one their own sgd_step calls, by construction.
+_lib = types.ModuleType("your_code")
+exec(compile(_a["code"], "your_code.py", "exec"), _lib.__dict__)
+quadratic_cost = _lib.quadratic_cost
+feedforward = _lib.feedforward
 
 _data_rng = np.random.default_rng(0)
 _corners = [(0, 0, 0), (1, 1, 0), (0, 1, 1), (1, 0, 1)]
@@ -37,7 +44,7 @@ _bs = 10
 _sgd_rng = np.random.default_rng(2)
 _t0 = time.time()
 for _e in range(1, _epochs + 1):
-    weights, biases = _mod.sgd(weights, biases, X, Y, 5.0, 1, _bs, _sgd_rng)
+    weights, biases = _lib.sgd(weights, biases, X, Y, 5.0, 1, _bs, _sgd_rng)
     _js_report(json.dumps({
         "epoch": _e, "epochs": _epochs,
         "cost": float(quadratic_cost(weights, biases, X, Y)),

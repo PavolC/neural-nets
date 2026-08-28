@@ -23,20 +23,18 @@ const ETA: Record<string, number> = { sigmoid: 0.5, relu: 0.05 };
 const SNIPPET = `
 import json, time, types
 import numpy as np
-import course
-from course import backprop, batch_gradient, feedforward, sigmoid
 
 _a = json.loads(_args_json)
 _act = _a["activation"]
 _eta = _a["eta"]
 
-def _load(code, name):
-    mod = types.ModuleType(name)
-    exec(compile(code, name + ".py", "exec"), mod.__dict__)
-    return mod
-
-_ce = _load(_a["ce_code"], "your_cost")
-_init = _load(_a["init_code"], "your_init")
+# The learner's file, once, up to and including their better starting point.
+# With the sigmoid chosen, every gradient below is computed by their own
+# backprop, through the adapter written for them in Module 5.
+_lib = types.ModuleType("your_code")
+exec(compile(_a["code"], "your_code.py", "exec"), _lib.__dict__)
+feedforward = _lib.feedforward
+sigmoid = _lib.sigmoid
 
 with open("/mnist_subset.bin", "rb") as _f:
     X_train, y_train, X_test, y_test = load_mnist_subset(_f.read())
@@ -45,7 +43,8 @@ Y_train = one_hot(y_train)
 def _relu_backprop(weights, biases, x, y):
     """The same four equations with ReLU in the hidden layers, for one example.
 
-    Identical to course.backprop except for the squash and its slope: BP2
+    Identical to the backprop in their file except for the squash and its
+    slope, and written out here because theirs has sigmoid_prime in it: BP2
     multiplies by 1 where a hidden neuron's evidence is positive and by 0
     where it is not. The output layer stays a sigmoid, since the
     cross-entropy blame a - y is written for one."""
@@ -80,7 +79,7 @@ def _relu_feedforward(weights, biases, X):
 def _one_example(weights, biases, x, y):
     if _act == "relu":
         return _relu_backprop(weights, biases, x, y)
-    return backprop(weights, biases, x, y, _ce.cross_entropy_delta)
+    return _lib.backprop(weights, biases, x, y, _lib.cross_entropy_delta)
 
 def _grad(weights, biases, X, Y):
     if _act == "relu":
@@ -92,13 +91,12 @@ def _grad(weights, biases, X, Y):
             nw = [t + d for t, d in zip(nw, dw)]
             nb = [t + d for t, d in zip(nb, db)]
         return [t / m for t in nw], [t / m for t in nb]
-    return batch_gradient(weights, biases, X, Y, _ce.cross_entropy_delta)
+    return _lib.batch_gradient(weights, biases, X, Y, _lib.cross_entropy_delta)
 
 _predict = _relu_feedforward if _act == "relu" else feedforward
 
 # Their sgd, walking on whichever gradient the squash calls for.
-course.gradient = _grad
-_sgd = _load(_a["sgd_code"], "your_sgd")
+_lib.gradient = _grad
 
 def _layer_speeds(weights, biases, n=100):
     """Every layer's ||dC/db|| before the first step, from the same gradient."""
@@ -109,13 +107,13 @@ _out = {}
 for _key, _hidden in (("shallow", 1), ("deep", ${DEEP})):
     _sizes = [784] + [30] * _hidden + [10]
     _label = "1 hidden layer" if _hidden == 1 else str(_hidden) + " hidden layers"
-    weights, biases = _init.init_network(_sizes, np.random.default_rng(8))
+    weights, biases = _lib.init_network(_sizes, np.random.default_rng(8))
     _js_report(json.dumps({"kind": "start", "key": _key, "label": _label,
                            "sizes": _sizes, "speeds": _layer_speeds(weights, biases)}))
     _rng = np.random.default_rng(2)
     _t0 = time.time()
     for _e in range(1, ${EPOCHS} + 1):
-        weights, biases = _sgd.sgd(weights, biases, X_train, Y_train, _eta, 1, 10, _rng)
+        weights, biases = _lib.sgd(weights, biases, X_train, Y_train, _eta, 1, 10, _rng)
         _acc = float((np.argmax(_predict(weights, biases, X_test), axis=0) == y_test).mean())
         _js_report(json.dumps({"kind": "epoch", "key": _key, "label": _label,
                                "epoch": _e, "accuracy": _acc,
@@ -172,10 +170,10 @@ export function DepthTrainPanel() {
   useEffect(() => subscribeProgress(() => setUnlocked(needed())), []);
 
   const run = () => {
-    const ceCode = loadCode(crossEntropyExercise.id);
-    const initCode = loadCode(smartInitExercise.id);
-    const sgdCode = loadCode(sgdExercise.id);
-    if (!ceCode || !initCode || !sgdCode) return;
+    // One projection: the file through the starting-point section already
+    // holds their sgd, their backprop and their cross-entropy blame.
+    const code = loadCode(smartInitExercise.id);
+    if (!code) return;
     setRunning(true);
     setRanWith(activation);
     setStarts([]);
@@ -187,13 +185,7 @@ export function DepthTrainPanel() {
       {
         type: "runPython",
         code: SNIPPET,
-        args: {
-          ce_code: ceCode,
-          init_code: initCode,
-          sgd_code: sgdCode,
-          activation,
-          eta: ETA[activation],
-        },
+        args: { code, activation, eta: ETA[activation] },
         dataUrl: assetUrl("data/mnist_subset.bin.gz"),
       },
       (msg) => {

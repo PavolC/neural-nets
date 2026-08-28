@@ -18,17 +18,17 @@ const EPOCHS = 8;
 const SNIPPET = `
 import json, time, types
 import numpy as np
-import course
-from course import batch_gradient, feedforward, quadratic_cost, quadratic_output_delta
+from course import quadratic_output_delta
 
 _a = json.loads(_args_json)
 
-def _load(code, name):
-    mod = types.ModuleType(name)
-    exec(compile(code, name + ".py", "exec"), mod.__dict__)
-    return mod
-
-_ce = _load(_a["ce_code"], "your_cost")
+# The learner's file, once, up to and including their cross-entropy work.
+# It carries their sgd from Module 3 and the adapter from Module 5 too, so
+# every name below except the old BP1 is theirs.
+_lib = types.ModuleType("your_code")
+exec(compile(_a["code"], "your_code.py", "exec"), _lib.__dict__)
+feedforward = _lib.feedforward
+quadratic_cost = _lib.quadratic_cost
 
 with open("/mnist_subset.bin", "rb") as _f:
     X_train, y_train, X_test, y_test = load_mnist_subset(_f.read())
@@ -40,27 +40,28 @@ def _start():
     b = [r.standard_normal((30, 1)), r.standard_normal((10, 1))]
     return w, b
 
-# Their Module 3 sgd, loaded once per run: it binds course.gradient at import
-# time, so the swap has to happen before the exec. The loop inside it is
-# untouched; only what answers "which way is downhill" changes.
-def _load_sgd(output_delta):
-    course.gradient = lambda w, b, X, Y: batch_gradient(w, b, X, Y, output_delta)
-    return _load(_a["sgd_code"], "your_sgd")
+# Their sgd_step asks for gradient(...). Point that name at the adapter with
+# one BP1 or the other, and their loop is untouched: only what answers "which
+# way is downhill" changes. Rebinding after the exec is enough, because Python
+# looks a global up when the call happens, and it means the file is read once
+# rather than once per run.
+def _use(output_delta):
+    _lib.gradient = lambda w, b, X, Y: _lib.batch_gradient(w, b, X, Y, output_delta)
 
 _runs = [
     ("quad-matched", "the quadratic cost, η = 0.5", quadratic_output_delta, 0.5, quadratic_cost),
-    ("cross", "your cross-entropy cost, η = 0.5", _ce.cross_entropy_delta, 0.5, _ce.cross_entropy_cost),
+    ("cross", "your cross-entropy cost, η = 0.5", _lib.cross_entropy_delta, 0.5, _lib.cross_entropy_cost),
     ("quad-tuned", "the quadratic cost, η = 3.0", quadratic_output_delta, 3.0, quadratic_cost),
 ]
 
 _out = {}
 for _key, _label, _delta, _eta, _cost in _runs:
-    _sgd = _load_sgd(_delta)
+    _use(_delta)
     weights, biases = _start()
     _rng = np.random.default_rng(2)
     _t0 = time.time()
     for _e in range(1, ${EPOCHS} + 1):
-        weights, biases = _sgd.sgd(weights, biases, X_train, Y_train, _eta, 1, 10, _rng)
+        weights, biases = _lib.sgd(weights, biases, X_train, Y_train, _eta, 1, 10, _rng)
         _acc = float((np.argmax(feedforward(weights, biases, X_test), axis=0) == y_test).mean())
         _js_report(json.dumps({"key": _key, "label": _label, "epoch": _e,
                                "accuracy": _acc, "elapsed": time.time() - _t0}))
@@ -104,9 +105,10 @@ export function CostSwapPanel() {
   useEffect(() => subscribeProgress(() => setUnlocked(needed())), []);
 
   const run = () => {
-    const ceCode = loadCode(crossEntropyExercise.id);
-    const sgdCode = loadCode(sgdExercise.id);
-    if (!ceCode || !sgdCode) return;
+    // One projection: the file through the cross-entropy section already
+    // holds their Module 3 sgd and Module 5 backprop.
+    const code = loadCode(crossEntropyExercise.id);
+    if (!code) return;
     setRunning(true);
     setPoints([]);
     setSummary(null);
@@ -116,7 +118,7 @@ export function CostSwapPanel() {
       {
         type: "runPython",
         code: SNIPPET,
-        args: { ce_code: ceCode, sgd_code: sgdCode },
+        args: { code },
         dataUrl: assetUrl("data/mnist_subset.bin.gz"),
       },
       (msg) => {

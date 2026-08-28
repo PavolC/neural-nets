@@ -21,18 +21,16 @@ const LAMBDAS = [0.5, 1, 2, 5];
 const SNIPPET = `
 import json, time, types
 import numpy as np
-from course import batch_gradient, feedforward
 
 _a = json.loads(_args_json)
 
-def _load(code, name):
-    mod = types.ModuleType(name)
-    exec(compile(code, name + ".py", "exec"), mod.__dict__)
-    return mod
-
-_ce = _load(_a["ce_code"], "your_cost")
-_init = _load(_a["init_code"], "your_init")
-_l2 = _load(_a["l2_code"], "your_step")
+# The learner's file, once, up to and including their decaying step. The
+# epoch loop below stays written out here rather than calling their sgd,
+# deliberately: this panel varies lambda and the module quotes its numbers.
+_lib = types.ModuleType("your_code")
+exec(compile(_a["code"], "your_code.py", "exec"), _lib.__dict__)
+feedforward = _lib.feedforward
+batch_gradient = _lib.batch_gradient
 
 with open("/mnist_subset.bin", "rb") as _f:
     X_full, y_full, X_test, y_test = load_mnist_subset(_f.read())
@@ -43,7 +41,7 @@ _n = X_train.shape[1]
 
 def _start():
     if _a["start"] == "yours":
-        return _init.init_network([784, 30, 10], np.random.default_rng(8))
+        return _lib.init_network([784, 30, 10], np.random.default_rng(8))
     r = np.random.default_rng(8)
     return ([r.standard_normal((30, 784)), r.standard_normal((10, 30))],
             [r.standard_normal((30, 1)), r.standard_normal((10, 1))])
@@ -61,20 +59,20 @@ for _key, _lmbda in (("plain", 0.0), ("l2", float(_a["lmbda"]))):
         for _k in range(0, _n, 10):
             _batch = _order[_k:_k + 10]
             _nw, _nb = batch_gradient(weights, biases, X_train[:, _batch],
-                                      Y_train[:, _batch], _ce.cross_entropy_delta)
-            weights, biases = _l2.l2_step(weights, biases, _nw, _nb, 0.5, _lmbda, _n)
+                                      Y_train[:, _batch], _lib.cross_entropy_delta)
+            weights, biases = _lib.l2_step(weights, biases, _nw, _nb, 0.5, _lmbda, _n)
         _js_report(json.dumps({
             "key": _key, "lmbda": _lmbda, "epoch": _e,
             "train_accuracy": _accuracy(weights, biases, X_train, y_train),
             "test_accuracy": _accuracy(weights, biases, X_test, y_test),
-            "test_cost": float(_ce.cross_entropy_cost(weights, biases, X_test, Y_test)),
+            "test_cost": float(_lib.cross_entropy_cost(weights, biases, X_test, Y_test)),
             "elapsed": time.time() - _t0,
         }))
     _out[_key] = {
         "lmbda": _lmbda,
         "train_accuracy": _accuracy(weights, biases, X_train, y_train),
         "test_accuracy": _accuracy(weights, biases, X_test, y_test),
-        "test_cost": float(_ce.cross_entropy_cost(weights, biases, X_test, Y_test)),
+        "test_cost": float(_lib.cross_entropy_cost(weights, biases, X_test, Y_test)),
         "weight_size": float(sum(float((w ** 2).sum()) for w in weights)),
         "seconds": time.time() - _t0,
     }
@@ -126,10 +124,10 @@ export function RegularizePanel() {
   useEffect(() => subscribeProgress(() => setUnlocked(needed())), []);
 
   const run = () => {
-    const ceCode = loadCode(crossEntropyExercise.id);
-    const initCode = loadCode(smartInitExercise.id);
-    const l2Code = loadCode(l2Exercise.id);
-    if (!ceCode || !initCode || !l2Code) return;
+    // One projection: the file through the decaying step already holds their
+    // cross-entropy work and their better starting point.
+    const code = loadCode(l2Exercise.id);
+    if (!code) return;
     setRunning(true);
     setPoints([]);
     setSummary(null);
@@ -139,7 +137,7 @@ export function RegularizePanel() {
       {
         type: "runPython",
         code: SNIPPET,
-        args: { ce_code: ceCode, init_code: initCode, l2_code: l2Code, start, lmbda },
+        args: { code, start, lmbda },
         dataUrl: assetUrl("data/mnist_subset.bin.gz"),
       },
       (msg) => {

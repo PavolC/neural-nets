@@ -36,7 +36,9 @@ const PAYOFF_SNIPPET = `
 import json, types
 import numpy as np
 _a = json.loads(_args_json)
-_mod = types.ModuleType("payoff_submission")
+# The learner's file, up to and including their feedforward, so the sigmoid
+# inside it is the one they wrote in Module 1 rather than the course's copy.
+_mod = types.ModuleType("your_code")
 exec(compile(_a["code"], "your_code.py", "exec"), _mod.__dict__)
 _W = [np.array(w) for w in _a["weights"]]
 _B = [np.array(b).reshape(-1, 1) for b in _a["biases"]]
