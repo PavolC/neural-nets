@@ -306,28 +306,28 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       </p>
       <p>
         So the second link has to cover for the first, and the question is how
-        much cover to ask for. Two things are worth asking of the land's
-        slope. It should be zero where the answer is right, so a neuron with nothing
+        much cover to ask for. Two things are worth asking of the land's slope.
+        It should be zero where the answer is right, so a neuron with nothing
         to fix stays put. It should grow as the answer gets worse, so the worst
-        answers bring the largest corrections. The gap has both, it never
-        exceeds 1 so no step can be wild, and it is the simplest quantity that
+        answers bring the largest corrections. The gap has both. It also never
+        exceeds 1, so no step can be wild, and it is the simplest quantity that
         qualifies. Asking for exactly the gap is a design choice rather than a
         forced one: any rate that keeps growing with wrongness would break the
         shelf, and this is the plainest of them.
       </p>
       <p>
-        Module 3's rule already charges at that rate. Take the slope of half
-        the squared gap and the gap is what comes back, which is the double
-        duty the last section pointed out. What ruins it is the next step: at
-        an answer of 0.98 the first link takes that 0.98 and multiplies it by
-        0.0196, so the land rises at 0.0192.
+        Module 3's rule already charges at that rate, since the slope of half
+        the squared gap is the gap. The multiplication that follows is what
+        ruins it, and any fix has to survive that multiplication:
       </p>
+      <Eq
+        tex="\begin{gathered} \underbrace{0.98}_{\text{Module 3 charges}} \times \underbrace{0.0196}_{\text{the squash's slope}} = \underbrace{0.0192}_{\text{the land's slope}} \\[0.8em] \underbrace{50}_{\text{the new rule charges}} \times \underbrace{0.0196}_{\text{the squash's slope}} = \underbrace{0.98}_{\text{the gap, as asked}} \end{gathered}"
+        gloss="Both lines sit at an answer of 0.98 against a right answer of 0, and the middle factor is the same in both, because the neuron has not changed. The top line is what the land does now. The bottom line is what it has to do, and the only number free to move is the charge."
+      />
       <p>
-        So the new yardstick has to charge the gap divided by what the first
-        link passes on, leaving the multiplication to bring it back to the gap.
-        At an answer of 0.98 that is 0.98 divided by 0.0196, which is 50: fifty
-        times what Module 3 charges, exactly where the neuron is most confident
-        and most wrong.
+        So the new rule has to charge the gap divided by the squash's slope,{" "}
+        <M tex="(a - y) / (a(1-a))" />, which is 2 at an answer of 0.5, 50 at
+        0.98, and 1000 at 0.999.
       </p>
       <p>
         Module 3's rule cannot be stretched to charge that, and the obstacle
