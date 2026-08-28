@@ -60,7 +60,7 @@ export function ModuleToc() {
       article.querySelectorAll<HTMLHeadingElement>(".module-section-title"),
     );
     setSections(headers.map((h) => ({ id: h.id, title: h.textContent ?? "" })));
-    const onScroll = () => {
+    const measure = () => {
       let current: string | null = null;
       for (const h of headers) {
         if (h.offsetParent === null) continue; // module hidden by tab switch
@@ -68,12 +68,35 @@ export function ModuleToc() {
       }
       setActive(current);
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("hashchange", onScroll);
-    onScroll();
+    window.addEventListener("scroll", measure, { passive: true });
+    window.addEventListener("resize", measure);
+    window.addEventListener("hashchange", measure);
+    // A scroll is not the only thing that carries a heading past the line, and
+    // this course moves them constantly: panels mount as they come near the
+    // viewport, an interactive grows when its chart or its log appears, the
+    // opener folds, a late web font re-wraps the tab strip. Every one of those
+    // moves the headings below it with no scroll event to recompute on, and
+    // until the reader happens to scroll again the toc names the section they
+    // have already left. Reported from a 1500px window on Module 7: one section
+    // behind, with the next heading in view at the top of the screen.
+    //
+    // The article covers what changes size inside the module, the body the
+    // chrome above it, which moves the module without changing its own height.
+    // Both are cheap: a ResizeObserver delivers at most one callback per frame,
+    // and it delivers it after layout, so these read settled positions. The
+    // measurement itself is one rect read per section and a state update that
+    // is almost always a no-op, so nothing here is throttled: a frame callback
+    // would buy nothing and would freeze the toc in a renderer that never
+    // paints.
+    const resized = new ResizeObserver(measure);
+    resized.observe(article);
+    resized.observe(document.body);
+    measure();
     return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("hashchange", onScroll);
+      resized.disconnect();
+      window.removeEventListener("scroll", measure);
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("hashchange", measure);
     };
   }, []);
 
