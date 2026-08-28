@@ -305,15 +305,33 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         cost.
       </p>
       <p>
-        Put a number on what it has to do. At an answer of 0.98 the first link
-        passes on 0.0196. For the two rates multiplied to come out at the gap,
-        0.98, the second link's rate has to be 50, because 50 times 0.0196 is
-        0.98. Module 3's rule charges 0.98 there. So the new yardstick has to
-        charge about fifty times more for the same movement of the answer,
-        exactly where the neuron is most confident and most wrong.
+        So the second link has to cover for the first, and the question is how
+        much cover to ask for. Two things are worth asking of the land's
+        slope. It should be zero where the answer is right, so a neuron with nothing
+        to fix stays put. It should grow as the answer gets worse, so the worst
+        answers bring the largest corrections. The gap has both, it never
+        exceeds 1 so no step can be wild, and it is the simplest quantity that
+        qualifies. Asking for exactly the gap is a design choice rather than a
+        forced one: any rate that keeps growing with wrongness would break the
+        shelf, and this is the plainest of them.
       </p>
       <p>
-        Module 3's rule cannot charge that, and the obstacle is a ceiling. The
+        Module 3's rule already charges at that rate. Take the slope of half
+        the squared gap and the gap is what comes back, which is the double
+        duty the last section pointed out. What ruins it is the next step: at
+        an answer of 0.98 the first link takes that 0.98 and multiplies it by
+        0.0196, so the land rises at 0.0192.
+      </p>
+      <p>
+        So the new yardstick has to charge the gap divided by what the first
+        link passes on, leaving the multiplication to bring it back to the gap.
+        At an answer of 0.98 that is 0.98 divided by 0.0196, which is 50: fifty
+        times what Module 3 charges, exactly where the neuron is most confident
+        and most wrong.
+      </p>
+      <p>
+        Module 3's rule cannot be stretched to charge that, and the obstacle
+        is a ceiling. The
         most one output can ever cost under half the squared gap is 0.5,
         reached by answering 1 when the right answer is 0. At an answer of 0.98
         it has already charged 0.48, so the whole rule has 0.02 points left in
