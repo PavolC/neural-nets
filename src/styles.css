@@ -2230,7 +2230,12 @@ button:disabled {
 
 .module-jump-list .module-toc-item {
   min-height: 44px;
-  padding: 0.5rem 0;
+  /* The left value is not decoration: the active item marks itself with a 2px
+     inset rule, and the base .module-toc-item reserves 0.7rem for it. A
+     padding shorthand here that names only two values resets that to zero and
+     puts the rule flush against the label, which is what the gutter nav does
+     not do and so reads as a mistake in the picker alone. */
+  padding: 0.5rem 0 0.5rem 0.7rem;
   font-size: 0.85rem;
 }
 
