@@ -1,6 +1,12 @@
 import { useEffect, useRef } from "react";
 import { basicSetup, EditorView } from "codemirror";
-import { Decoration, keymap, type DecorationSet } from "@codemirror/view";
+import {
+  Decoration,
+  GutterMarker,
+  gutter,
+  keymap,
+  type DecorationSet,
+} from "@codemirror/view";
 import { indentWithTab } from "@codemirror/commands";
 import { HighlightStyle, indentUnit, syntaxHighlighting } from "@codemirror/language";
 import { python } from "@codemirror/lang-python";
@@ -81,6 +87,30 @@ const highlight = HighlightStyle.define([
   { tag: tags.invalid, color: "var(--loss)" },
 ]);
 
+/** A run marker beside every section line, which is the one notebook idiom
+ * that fits here: the control for "run this piece" belongs next to the piece,
+ * not in a toolbar the reader has to travel to. The document is still one
+ * file, so pressing it runs that section's tests against the whole file. */
+class RunMarker extends GutterMarker {
+  constructor(private readonly onRun: () => void) {
+    super();
+  }
+  toDOM() {
+    const button = document.createElement("button");
+    button.className = "cm-run-section";
+    button.type = "button";
+    button.textContent = "\u25b6";
+    button.title = "Run this section's tests";
+    button.setAttribute("aria-label", "Run this section's tests");
+    button.addEventListener("mousedown", (e) => e.preventDefault());
+    button.addEventListener("click", (e) => {
+      e.preventDefault();
+      this.onRun();
+    });
+    return button;
+  }
+}
+
 export interface CodeEditorHandle {
   getDoc(): string;
   /** Replace the whole document. Builds a fresh state rather than dispatching
@@ -132,6 +162,8 @@ export function CodeEditor({
   handleRef,
   onReady,
   onSelection,
+  onRun,
+  runMarkerLines,
   className,
 }: {
   initialDoc: string;
@@ -142,6 +174,10 @@ export function CodeEditor({
   onReady?: (ready: boolean) => void;
   /** Where the caret is, so the panel can follow it from section to section. */
   onSelection?: (pos: number) => void;
+  /** Mod-Enter runs the tests, Shift-Enter runs the code: the notebook keys. */
+  onRun?: (kind: "tests" | "scratch", sectionId?: string) => void;
+  /** 1-based lines carrying a section marker, each with the id to run. */
+  runMarkerLines?: () => { line: number; id: string }[];
   className?: string;
 }) {
   const hostRef = useRef<HTMLDivElement>(null);
@@ -151,6 +187,10 @@ export function CodeEditor({
   onReadyRef.current = onReady;
   const onSelectionRef = useRef(onSelection);
   onSelectionRef.current = onSelection;
+  const onRunRef = useRef(onRun);
+  onRunRef.current = onRun;
+  const markerLinesRef = useRef(runMarkerLines);
+  markerLinesRef.current = runMarkerLines;
 
   useEffect(() => {
     // Named, because setDoc rebuilds the whole state to drop the undo history
@@ -165,6 +205,20 @@ export function CodeEditor({
       python(),
       indentUnit.of("    "), // Python convention: 4 spaces
       sectionField,
+      ...(runMarkerLines
+        ? [
+            gutter({
+              class: "cm-run-gutter",
+              lineMarker: (view, block) => {
+                const line = view.state.doc.lineAt(block.from).number;
+                const hit = markerLinesRef.current?.().find((m) => m.line === line);
+                if (!hit) return null;
+                return new RunMarker(() => onRunRef.current?.("tests", hit.id));
+              },
+              initialSpacer: () => new RunMarker(() => {}),
+            }),
+          ]
+        : []),
       // The panel is narrower than a page-width editor ever was, so a long
       // line has to wrap rather than scroll sideways: a horizontal scrollbar
       // inside a docked column is the one thing that would make reading and
@@ -173,6 +227,30 @@ export function CodeEditor({
       // Tab indents (Shift-Tab dedents). CodeMirror leaves this off by
       // default for keyboard accessibility; Escape then Tab moves focus.
       keymap.of([indentWithTab]),
+      // The two run chords are the notebook ones, because that is what anybody
+      // who has used one will reach for. At the highest precedence: basicSetup
+      // comes first in this array and its default keymap binds Mod-Enter to
+      // "insert a blank line", which swallowed it silently.
+      Prec.highest(
+        keymap.of([
+          {
+            key: "Mod-Enter",
+            preventDefault: true,
+            run: () => {
+              onRunRef.current?.("tests");
+              return true;
+            },
+          },
+          {
+            key: "Shift-Enter",
+            preventDefault: true,
+            run: () => {
+              onRunRef.current?.("scratch");
+              return true;
+            },
+          },
+        ]),
+      ),
       EditorView.updateListener.of((update) => {
         if (update.docChanged) onChangeRef.current(update.state.doc.toString());
         if (update.selectionSet || update.docChanged) {

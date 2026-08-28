@@ -55,7 +55,8 @@ export function TestResults({
       </div>
     );
   }
-  const passedCount = result.tests.filter((t) => t.passed).length;
+  const passed = result.tests.filter((t) => t.passed);
+  const passedCount = passed.length;
   const failures = groupFailures(result.tests);
   const nothingWritten =
     failures.length > 0 &&
@@ -108,21 +109,28 @@ export function TestResults({
           </div>
         );
       })}
-      {result.tests
-        .filter((t) => t.passed)
-        .map((t) => (
-          <div key={t.name} className="test-result test-pass">
+      {passed.length > 0 && (
+        /* Folded. A passing check is a receipt, not a finding: six of them at
+           full size pushed the failures and the output most of a screen down,
+           and the reader who wants to know which six is one press away. The
+           summary line carries the count, which is the part that is read. */
+        <details className="test-passed">
+          <summary>
             <span className="test-mark" aria-hidden="true">
               ✓
-            </span>
-            <div>
-              <strong>
+            </span>{" "}
+            {passed.length} {passed.length === 1 ? "check" : "checks"} passed
+          </summary>
+          <ul>
+            {passed.map((t) => (
+              <li key={t.name}>
                 <span className="sr-only">Passed: </span>
                 {t.title}
-              </strong>
-            </div>
-          </div>
-        ))}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
     </div>
   );
 }

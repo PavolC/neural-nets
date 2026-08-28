@@ -714,6 +714,26 @@ the footer. Rules that follow from it:
   sets its own transparent background: that is a bug this course has already shipped once.
   The primary treatment is reached as `button:not([class])`, which cannot match a variant,
   because every variant here carries a class.
+- **The panel's controls are one sticky row, and a passing check is one line.**
+  The run buttons were the course's prose buttons, 51px each, over a reserved
+  status line and a sentence naming the section: 95px of chrome before any
+  output, in a panel whose lower half is about 300px. They are one compact row
+  now, with the section name and whatever the run is saying sharing a single
+  text slot, and it is `position: sticky` because the results under it can run
+  for hundreds of pixels and the button you want next should never be a scroll
+  away. Passing checks fold into "N checks passed": six of them at full size
+  pushed the failures and the output most of a screen down, and a receipt is
+  not a finding. Failures never fold.
+- **The workbench borrows three things from a notebook, and not the fourth.**
+  Mod-Enter runs the tests and Shift-Enter runs the scratch pad, because that is
+  what anybody who has used a notebook reaches for first; both need
+  `Prec.highest`, since `basicSetup` binds Mod-Enter to "insert a blank line"
+  and silently swallowed it. Every section line carries a run marker in the
+  gutter, so the control for "run this piece" sits next to the piece. The rail
+  chips carry each section's state, which is what a notebook's execution count
+  is for. What is deliberately not borrowed is independent cells: this is one
+  file that runs top to bottom and downloads as an `nn.py`, and per-cell state
+  would cost exactly the thing the whole design is for.
 - **The section bar and the panel head share one height, `--bar-h`.** Both sit
   at the top of the screen when the panel is docked, so their bottom rules have
   to land on one line. They were 53.4px and 57.1px, and four pixels apart reads
@@ -817,6 +837,13 @@ tokens from the start.
   `.tsx` and run against the assembled document with the worker's globals in
   place. Nothing else checks that these run, and several modules quote their
   numbers. `--fast` caps every loop at two epochs. Needs NumPy.
+- `node tools/check_run_path.mjs`: what the panel does with a verdict once it
+  has one, driven in a real browser against a stub Pyodide (the worker needs
+  exactly four methods from it). Covers the message protocol, the run state,
+  every shape of result, the borrowed-names line, the output stream and all
+  three ways to start a run. Not in `npm run check` and not in CI: it wants a
+  browser and a dev server, which is the bargain `make_og_image.sh` already
+  makes.
 - `python3 tools/make_penguins.py`: regenerate `public/data/penguins.json.gz`
   (Module 10's dataset; stdlib only, downloads from the palmerpenguins repo,
   deterministic output, written RAW because preparing it is the exercise).

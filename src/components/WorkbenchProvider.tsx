@@ -456,7 +456,7 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
         onScratchChange={saveScratch}
         onCaret={onCaret}
         onSelectSection={reveal}
-        onRunTests={() => runTests()}
+        onRunTests={(id) => runTests(id)}
         onRunScratch={runScratch}
         onStop={terminateWorker}
         onClose={close}

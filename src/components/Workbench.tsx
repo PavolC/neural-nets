@@ -23,7 +23,7 @@ import {
   undoLastSplice,
   type SectionState,
 } from "../state/workbench";
-import { SECTIONS, SECTION_BY_ID, type SectionDef } from "../state/workbenchDoc";
+import { SECTIONS, SECTION_BY_ID, lineMap, type SectionDef } from "../state/workbenchDoc";
 import type { CodeEditorHandle } from "./CodeEditor";
 import { TestResults } from "./TestResults";
 import type { DockState, RunKind, UpstreamBlame } from "./WorkbenchProvider";
@@ -60,7 +60,7 @@ interface Props {
   onScratchChange(text: string): void;
   onCaret(pos: number): void;
   onSelectSection(id: string): void;
-  onRunTests(): void;
+  onRunTests(sectionId?: string): void;
   onRunScratch(): void;
   onStop(): void;
   onClose(): void;
@@ -243,6 +243,22 @@ export function Workbench(props: Props) {
   const notes = doc.problems.filter((p) => p.kind === "out-of-order");
   const touchedGivens = useMemo(() => editedGivens(), [revision]);
 
+  /** The bar's one text slot. Everything the run has to say goes here, in
+   * priority order, so nothing reserves a second row that is empty most of the
+   * time. When there is nothing to say it names what Run tests is pointed at,
+   * which is the thing a reader needs to know before pressing it. */
+  const barText = error
+    ? `Something went wrong: ${error}`
+    : cancelled
+      ? "Stopped. Press Run tests to try again."
+      : blaming
+        ? "Checking the sections above this one..."
+        : busy
+          ? status || "Running..."
+          : def
+            ? def.label
+            : "Put the caret in a section, or pick one above.";
+
   const liveMessage = error
     ? `Run failed. ${error}`
     : cancelled
@@ -326,6 +342,16 @@ export function Workbench(props: Props) {
                 initialDoc={loadDocument()}
                 onChange={props.onDocumentChange}
                 onSelection={props.onCaret}
+                onRun={(kind, id) =>
+                  kind === "tests" ? props.onRunTests(id) : props.onRunScratch()
+                }
+                // Only the sections with tests of their own: a stretch written
+                // for the learner has nothing to run.
+                runMarkerLines={() =>
+                  lineMap(currentDoc())
+                    .filter((s) => s.kind === "exercise")
+                    .map((s) => ({ line: s.start, id: s.id }))
+                }
                 handleRef={editorRef}
                 onReady={props.onEditorReady}
               />
@@ -356,18 +382,26 @@ export function Workbench(props: Props) {
           }}
         />
         <div className="wb-lower">
-          <div className="wb-controls">
-            <button onClick={props.onRunTests} disabled={!canRun || !current}>
+          {/* One row, pinned to the top of the scrolling half: the controls,
+              what they are pointed at, and whatever the run is saying. It used
+              to be a row of full-size prose buttons plus a reserved status line
+              plus a sentence naming the section, 95px of chrome before any
+              output. Sticky because the results below it can run for hundreds
+              of pixels, and the button you want next should not be a scroll
+              away. */}
+          <div className="wb-bar">
+            <button className="wb-run" onClick={() => props.onRunTests()} disabled={!canRun || !current}>
               {busy === "tests" ? "Running..." : "Run tests"}
             </button>
             <button className="button-secondary" onClick={props.onRunScratch} disabled={!canRun}>
               {busy === "scratch" ? "Running..." : "Run my code"}
             </button>
             {running && (
-              <button className="button-secondary" onClick={props.onStop}>
+              <button className="button-secondary wb-stop" onClick={props.onStop}>
                 Stop
               </button>
             )}
+            <span className={error ? "wb-target wb-target-error" : "wb-target"}>{barText}</span>
             <details className="wb-more">
               <summary>More</summary>
               <div className="wb-more-menu">
@@ -377,30 +411,80 @@ export function Workbench(props: Props) {
                 <button className="button-secondary" onClick={undo} disabled={!canUndo()}>
                   Undo that
                 </button>
+                <p className="wb-more-tip">
+                  <b>Run tests</b> runs your whole file and then checks the section the caret is
+                  in. <b>Run my code</b> runs your whole file and then the scratch pad, so you can
+                  call your functions and print(...) values. Everything you print appears in the
+                  Output panel as it happens. Ctrl or Cmd with Enter runs the tests; Shift with
+                  Enter runs your code. Tab indents, and Escape then Tab moves keyboard focus out.
+                  Your file is saved in this browser only.
+                </p>
               </div>
             </details>
           </div>
           <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
             {liveMessage}
           </p>
-          <p className="wb-where status-fixed">
-            {def ? (
-              <>
-                Run tests checks <b>{def.label}</b>.
-              </>
-            ) : (
-              "Put the caret in a section, or pick one above, to choose what Run tests checks."
-            )}
-          </p>
-          {status && <p className="demo-status">{status}</p>}
-          {blaming && <p className="demo-status">Checking the sections above this one...</p>}
-          {cancelled && <p className="demo-status">Stopped. Press Run tests to try again.</p>}
-          {error && <p className="demo-status demo-status-error">Something went wrong: {error}</p>}
           {notes.map((p) => (
             <p key={p.line} className="demo-status">
               {p.message}
             </p>
           ))}
+
+          {blame && (
+            <div className="wb-blame">
+              <strong>Before this section.</strong>
+              <p>
+                Your {blame.section.label} section is failing {blame.failing} of {blame.total} of its
+                own tests, and the tests below call it. Fixing it there is likely to fix these.
+              </p>
+              {blame.firstMessage && <p className="wb-blame-message">{blame.firstMessage}</p>}
+              <button
+                className="button-secondary"
+                onClick={() => props.onSelectSection(blame.section.id)}
+              >
+                Go to {blame.section.label}
+              </button>
+            </div>
+          )}
+
+          {result && (
+            <TestResults
+              result={result}
+              flagship={flagship}
+              stale={stale}
+              onGoToSection={props.onSelectSection}
+            />
+          )}
+
+          {ranOnce && (
+            <div className="output-panel wb-output">
+              <h5>Output</h5>
+              <pre ref={outputRef}>
+                {trimmed && "(earlier output trimmed to the last 200 lines)\n"}
+                {output.length
+                  ? output.join("\n")
+                  : running
+                    ? "(waiting for output...)"
+                    : "(nothing printed; add print(...) anywhere to inspect values)"}
+              </pre>
+              {scratchError && (
+                <p className="demo-status demo-status-error">
+                  Your code stopped with {scratchError.message}
+                  {scratchError.line !== null && ` (line ${scratchError.line})`}
+                  {scratchError.label ? `, in the ${scratchError.label}` : ""}.
+                </p>
+              )}
+            </div>
+          )}
+
+          {lent !== null && !running && (
+            <p className="wb-lent">
+              {lent.length === 0
+                ? "Run entirely on your own code."
+                : `Run with the course's ${listNames(lent)}. Your own versions run here once those sections are written.`}
+            </p>
+          )}
 
           <details
             className="wb-scratch"
@@ -422,73 +506,6 @@ export function Workbench(props: Props) {
                 />
               </Suspense>
             )}
-          </details>
-
-          {blame && (
-            <div className="wb-blame">
-              <strong>Before this section.</strong>
-              <p>
-                Your {blame.section.label} section is failing {blame.failing} of {blame.total} of its
-                own tests, and the tests below call it. Fixing it there is likely to fix these.
-              </p>
-              {blame.firstMessage && <p className="wb-blame-message">{blame.firstMessage}</p>}
-              <button
-                className="button-secondary"
-                onClick={() => props.onSelectSection(blame.section.id)}
-              >
-                Go to {blame.section.label}
-              </button>
-            </div>
-          )}
-
-          {ranOnce && (
-            <div className="output-panel">
-              <h5>Output</h5>
-              <pre ref={outputRef}>
-                {trimmed && "(earlier output trimmed to the last 200 lines)\n"}
-                {output.length
-                  ? output.join("\n")
-                  : running
-                    ? "(waiting for output...)"
-                    : "(your code printed nothing; add print(...) anywhere to inspect values)"}
-              </pre>
-              {scratchError && (
-                <p className="demo-status demo-status-error">
-                  Your code stopped with {scratchError.message}
-                  {scratchError.line !== null && ` (line ${scratchError.line})`}
-                  {scratchError.label ? `, in the ${scratchError.label}` : ""}.
-                </p>
-              )}
-            </div>
-          )}
-
-          {lent !== null && !running && (
-            <p className="wb-lent">
-              {lent.length === 0
-                ? "Run entirely on your own code."
-                : `Run with the course's ${listNames(lent)}. Your own versions run here once those sections are written.`}
-            </p>
-          )}
-
-          {result && (
-            <TestResults
-              result={result}
-              flagship={flagship}
-              stale={stale}
-              onGoToSection={props.onSelectSection}
-            />
-          )}
-
-          <details className="wb-tip">
-            <summary>How the two Run buttons differ</summary>
-            <p>
-              <b>Run tests</b> runs your whole file and then checks the section named above.{" "}
-              <b>Run my code</b> runs your whole file and then the scratch pad, so you can call your
-              functions and print(...) values. Everything you print appears in the Output panel, as
-              it happens. Tab indents, and Escape then Tab moves keyboard focus out. Your file is
-              saved in this browser only. A symbol you have forgotten is in the notation reference
-              on the Start page.
-            </p>
           </details>
         </div>
       </div>

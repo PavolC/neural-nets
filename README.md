@@ -131,6 +131,7 @@ npm run check                         # everything below except the benches
 npm run check:doc                     # the document format: splices, projections
 python3 tools/check_exercises.py       # the workbench: 53 tests, twelve assertions
 python3 tools/check_panels.py --fast   # every payoff panel runs on the learner's file
+node tools/check_run_path.mjs          # the panel's run path, in a browser (needs Chromium)
 python3 tools/bench_depth.py           # Modules 7 and 8's Pyodide numbers (needs NumPy)
 python3 tools/bench_penguins.py        # Module 10's numbers (needs NumPy)
 npm run bench:speeds                   # the layer-speed panel's numbers

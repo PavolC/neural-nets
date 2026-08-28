@@ -3233,7 +3233,7 @@ button:disabled {
   .start-progress-link,
   .exercise-launcher-open,
   .wb-chip,
-  .wb-controls button,
+  .wb-bar button,
   .chip {
     min-height: 44px;
   }
@@ -3494,8 +3494,12 @@ button:disabled {
   flex-direction: column;
 }
 
+/* The splitter sets a floor for the editor, not a fixed share: it grows into
+   whatever the lower half is not using, which before a run is most of the
+   panel. A fixed share left a third of the panel blank at exactly the moment
+   the editor was the only thing in use. */
 .wb-editor-slot {
-  flex: 0 0 var(--wb-split, 60%);
+  flex: 1 0 var(--wb-split, 60%);
   min-height: 120px;
   display: flex;
 }
@@ -3524,22 +3528,76 @@ button:disabled {
 }
 
 .wb-lower {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
   overflow-y: auto;
-  padding: 0.7rem 0.9rem 2rem;
+  padding: 0 0.9rem 1.2rem;
 }
 
-.wb-controls {
+/* The action bar: one row for the controls, what they point at, and whatever
+   the run has to say. Sticky at the top of the scrolling half, because the
+   results under it can run for hundreds of pixels and the button you want next
+   should never be a scroll away. */
+.wb-bar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  margin-bottom: 0.4rem;
+  gap: 0.45rem;
+  padding: 0.45rem 0;
+  margin-bottom: 0.3rem;
+  background: var(--bg);
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Compact, unlike the prose buttons this course sets elsewhere: a 51px button
+   is right in a paragraph and wrong in a panel where it is one of five things
+   competing for the same 300px. The 44px touch floor still applies in the
+   sheet, through the narrow-screen block at the end of this file. */
+.wb-bar button {
+  font-size: 0.82rem;
+  padding: 0.28rem 0.7rem;
+}
+
+.wb-target {
+  flex: 1 1 0;
+  min-width: 0;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wb-target-error {
+  color: var(--loss);
 }
 
 .wb-more {
-  margin-left: auto;
+  flex: 0 0 auto;
+  position: relative;
+}
+
+.wb-more-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 3;
+  width: min(22rem, 80vw);
+  padding: 0.6rem;
+  background: var(--surface-card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+.wb-more-tip {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--muted);
 }
 
 .wb-more > summary {
@@ -3556,18 +3614,10 @@ button:disabled {
   display: none;
 }
 
-.wb-more-menu {
+.wb-more[open] .wb-more-menu {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
-  padding-top: 0.4rem;
-}
-
-.wb-where {
-  font-family: var(--font-ui);
-  font-size: 0.8rem;
-  color: var(--muted);
-  margin: 0 0 0.4rem;
 }
 
 .wb-lent {
@@ -3606,16 +3656,14 @@ button:disabled {
   font-size: 0.78rem;
 }
 
-.wb-scratch,
-.wb-tip {
+.wb-scratch {
   margin: 0.7rem 0;
   font-family: var(--font-ui);
   font-size: 0.8rem;
   color: var(--muted);
 }
 
-.wb-scratch > summary,
-.wb-tip > summary {
+.wb-scratch > summary {
   cursor: pointer;
 }
 
@@ -3650,7 +3698,7 @@ button:disabled {
    gives way, down to a floor of 40vh. A fixed share left a third of the screen
    blank at exactly the moment the editor was the only thing being used. */
 .wb[data-dock="sheet"] .wb-editor-slot {
-  flex: 1 1 45vh;
+  flex: 1 0 45vh;
   min-height: 40vh;
 }
 
@@ -3680,3 +3728,55 @@ button:disabled {
   color: var(--muted);
 }
 
+
+/* The folded receipts. A passing check is not a finding, so it reads as one
+   line with a count, and the list is one press away for anyone who wants it. */
+.test-passed {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0.5rem auto;
+}
+
+.test-passed > summary {
+  cursor: pointer;
+  color: var(--accent);
+}
+
+.test-passed .test-mark {
+  margin-right: 0.35rem;
+}
+
+.test-passed ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.6rem;
+}
+
+.test-passed li {
+  margin: 0.15rem 0;
+}
+
+/* The run marker beside each section line, and the gutter that holds it. */
+.wb-editor .cm-run-gutter {
+  padding: 0 0.15rem 0 0.25rem;
+}
+
+.wb-editor .cm-run-section {
+  display: block;
+  padding: 0 0.15rem;
+  border: none;
+  background: transparent;
+  color: color-mix(in srgb, var(--accent) 45%, transparent);
+  font-size: 0.7rem;
+  line-height: inherit;
+  cursor: pointer;
+}
+
+.wb-editor .cm-run-section:hover,
+.wb-editor .cm-run-section:focus-visible {
+  color: var(--accent);
+}
+
+/* CodeMirror's own spacer element, the one that reserves the column's width,
+   already carries visibility: hidden, so nothing is needed here for it. Noted
+   because the obvious rule to add is dead code. */
