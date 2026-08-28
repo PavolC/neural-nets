@@ -177,10 +177,15 @@ figures under `src/modules/`) follows its source: **CC BY-NC 3.0, so it may not 
 commercially.**
 
 The **application around it** is a separate matter. The exercise harness, the Pyodide
-worker, the brand layer, `tools/` and `course-kit/` are original work containing none of
-Nielsen's material, so the CC BY-NC grant does not reach them and they do not inherit its
-restriction. No license is granted for them yet; that is a decision outstanding rather
-than a refusal. See [LICENSE](LICENSE).
+worker, the brand layer, `tools/` and `course-kit/brand/` are original work containing
+none of Nielsen's material, so the CC BY-NC grant does not reach them. They are **MIT**
+([LICENSE-MIT](LICENSE-MIT)). The method kit's documents are **CC BY 4.0**. Take the
+harness, take the worker, take the brand layer, and build something else with them.
+
+Not granted by either: the name *Moving Parts* and the sigmoid glyph. The MIT licence
+covers the code that draws the mark, not the mark. Copy `src/brand/`, change the accent
+and the glyph in `brand.ts`, and publish under your own name; that is what the layer is
+for. Full terms in [LICENSE](LICENSE).
 
 Reference implementations are adapted from Nielsen's MIT-licensed code at
 [github.com/mnielsen/neural-networks-and-deep-learning](https://github.com/mnielsen/neural-networks-and-deep-learning).
