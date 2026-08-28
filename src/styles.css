@@ -62,7 +62,6 @@
      position is computed from these rather than hardcoded, so moving the
      column cannot silently leave the toc behind. */
   --col-width: 920px;
-  --col-shift: 100px; /* how far left of centre the column sits, above 1200px */
   --toc-width: 190px;
   --toc-gap: 28px;
 
@@ -98,17 +97,6 @@ body {
   max-width: var(--col-width);
   margin: 0 auto;
   padding: 2.5rem 1.25rem 4rem;
-}
-
-/* Wide enough for the gutter table of contents: the column sits a little left
-   of centre so the toc has real room beside it. Centred, the toc had nowhere to
-   go but the window edge, which is why it used to need 1360px before it could
-   appear at all. Below this the column re-centres and the sticky section bar
-   takes over. */
-@media (min-width: 1200px) {
-  .app {
-    margin-left: max(0px, calc((100% - var(--col-width)) / 2 - var(--col-shift)));
-  }
 }
 
 h2 {
@@ -437,38 +425,55 @@ button:disabled {
 
 /* ---------- the reading measure ---------- */
 
-/* Prose takes --measure; figures, tables, panels and the editor keep the whole
-   column. The selectors are all direct-child, which is what makes this safe in
-   a stylesheet with twenty-five interactives in it: a paragraph inside a panel
+/* Two widths, and only two. Everything read as text takes --measure: prose,
+   headings, captions, the cards, and the equations. Everything that is an
+   illustration keeps the whole column: figures, tables, interactive panels,
+   the editor, and the blocks that hold code. A third width in between is what
+   the equations used to have, and three widths on one page read as an accident
+   rather than as a rule.
+
+   The selectors are all direct-child, which is what makes this safe in a
+   stylesheet with twenty-five interactives in it: a paragraph inside a panel
    or a figure caption is not a child of the article and never sees this.
-   Equations come along, because they centre themselves and would otherwise
-   centre on the column while the text sat left of it. */
+   Headings are in the set too, the exercise's h4 included: left out, they
+   started at the column's left edge while the prose under them started
+   further in, which reads as a mistake.
+
+   margin-inline: auto is the load-bearing half. Left-aligned in a wider
+   column, every block wider than the prose (a figure, a table) hangs off to
+   its right and the page looks lopsided, which is exactly what it did.
+   Centred, the prose, the equations and the figures all share one axis: an
+   equation sits dead centre over the paragraph that introduces it, and a
+   figure grows symmetrically around it. */
+.module > h2,
 .module > p,
 .module > ul,
 .module > ol,
+.module > .eq,
+.module-section-title,
+.start-page > h3,
 .exercise > p,
+.exercise > .eq,
+.exercise-title,
 .after-this,
 .recap,
 .module-aside,
 .next-module {
   max-width: var(--measure);
+  margin-inline: auto;
 }
 
-/* An equation is centred and cannot be re-wrapped, so at the prose measure the
-   short ones started scrolling sideways inside their own affordance. They take
-   the wider measure and keep the prose column's left edge. */
-.module > .eq {
-  max-width: var(--measure-wide);
-}
-
-/* The cards hold prose, so they take the measure plus the padding that sits
-   outside it. Without the correction their text is narrower than the
-   paragraphs above and below them, which reads as a mistake rather than as a
-   box. */
+/* The cards hold prose, so their lines have to land on the axis at the measure
+   like every other line on the page. That means the box carries the measure
+   plus everything outside it: the 2.2rem of padding and the two 1px borders.
+   The borders were the part left out, and the recap's lines ran 4px short of
+   the paragraph above them because its accent rule is 3px rather than 1. That
+   asymmetry is given back in the padding below, so the card's inner edges are
+   even and the box can still centre itself. */
 .after-this,
 .recap,
 .module-aside {
-  max-width: calc(var(--measure) + 2.2rem);
+  max-width: calc(var(--measure) + 2.2rem + 2px);
 }
 
 /* ---------- module pages ---------- */
@@ -486,7 +491,7 @@ button:disabled {
    */
 .exercise-title {
   font-size: 1.05rem;
-  margin: 2.2rem 0 0.5rem;
+  margin: 2.2rem auto 0.5rem;
   display: flex;
   align-items: baseline;
   flex-wrap: wrap;
@@ -512,8 +517,10 @@ button:disabled {
   border: 1px solid var(--rule);
   border-left: 3px solid var(--accent);
   border-radius: var(--radius-lg);
-  padding: 0.2rem 1.1rem 0.8rem;
-  margin: 1.6rem 0;
+  /* The left padding is short by the 2px the accent rule is wider than the
+     hairline opposite it, so border-plus-padding is 21.9px on both sides. */
+  padding: 0.2rem 1.1rem 0.8rem calc(1.1rem - 2px);
+  margin: 1.6rem auto;
   background: var(--surface-card);
 }
 
@@ -551,7 +558,7 @@ button:disabled {
 }
 
 .eq {
-  margin: 1.2rem 0;
+  margin: 1.2rem auto;
 }
 
 /* The scroll sits on the equation alone, never on the block: when .eq itself
@@ -571,15 +578,28 @@ button:disabled {
   scrollbar-width: thin;
   scrollbar-color: var(--rule-strong) transparent;
   background-image:
-    linear-gradient(to right, var(--scroll-surface), rgba(255, 255, 255, 0)),
-    linear-gradient(to left, var(--scroll-surface), rgba(255, 255, 255, 0)),
-    linear-gradient(to right, rgba(26, 26, 26, 0.13), rgba(26, 26, 26, 0)),
-    linear-gradient(to left, rgba(26, 26, 26, 0.13), rgba(26, 26, 26, 0));
+    linear-gradient(to right, var(--scroll-surface) 0 15px, transparent 30px),
+    linear-gradient(to left, var(--scroll-surface) 0 15px, transparent 30px),
+    linear-gradient(to right, transparent 0, color-mix(in srgb, var(--ink) 13%, transparent) 4px, transparent 15px),
+    linear-gradient(to left, transparent 0, color-mix(in srgb, var(--ink) 13%, transparent) 4px, transparent 15px);
   background-position: 0 0, 100% 0, 0 0, 100% 0;
   background-repeat: no-repeat;
-  background-size: 30px 100%, 30px 100%, 12px 100%, 12px 100%;
-  /* The first two are painted with the content, so they slide away from an
-     edge once it is scrolled past and stop covering the shadow behind. */
+  background-size: 30px 100%, 30px 100%, 15px 100%, 15px 100%;
+  /* The first two are painted with the content, so they slide away from an edge
+     once it is scrolled past and stop covering the shadow behind. Two details
+     keep them from leaving a stray border on a container that has nothing to
+     scroll. They hold their surface colour flat across the shadow's whole
+     15px before they begin to fade, because fading from the first pixel left
+     about five percent of it showing. And the shadow starts transparent and
+     reaches full strength 4px in, rather than at the edge: the cover is
+     painted with the content while the shadow is painted with the box, so on a
+     2x screen, wherever the box lands on a half pixel, the two round to
+     different device columns and one column of shadow is left uncovered at the
+     very edge. Measured by rendering each equation twice, once with the shadow
+     layers made transparent, and differencing: at full strength that column
+     came out 29 levels darker than the page, and starting the shadow 4px in
+     puts it at 2, which is under the threshold where a single column of a
+     warm-white ground reads as a line. */
   background-attachment: local, local, scroll, scroll;
 }
 
@@ -615,10 +635,15 @@ button:disabled {
   margin: 1.5rem 0;
 }
 
+/* A caption is read in sentences, so it takes the text's measure and axis even
+   though the figure above it may be twice as wide. Left at the figure's width
+   it ran wider than every paragraph on the page, which put the one piece of
+   prose that explains a diagram outside the column the reader is reading in. */
 .module-figure figcaption {
+  max-width: var(--measure);
+  margin: 0.5rem auto 0;
   font-size: 0.85rem;
   color: var(--muted);
-  margin-top: 0.5rem;
 }
 
 /* The scroll lives on the wrapper, not the table: display:block on a <table>
@@ -1902,7 +1927,7 @@ button:disabled {
   border-radius: var(--radius-lg);
   background: var(--surface-note);
   padding: 0.1rem 1.1rem 0.9rem;
-  margin: 1.4rem 0;
+  margin: 1.4rem auto;
 }
 
 .module-aside-label {
@@ -1925,7 +1950,7 @@ button:disabled {
 /* Section headers inside modules, and the floating on-this-page nav. */
 .module-section-title {
   font-size: 1.15rem;
-  margin: 3.2rem 0 0.7rem;
+  margin: 3.2rem auto 0.7rem;
   scroll-margin-top: 24px;
 }
 
@@ -1954,7 +1979,7 @@ button:disabled {
    how they look. */
 .start-page > h3 {
   font-size: 1.15rem;
-  margin: 3.2rem 0 0.7rem;
+  margin: 3.2rem auto 0.7rem;
 }
 
 .start-page > h3::before {
@@ -1967,20 +1992,19 @@ button:disabled {
   background: var(--accent);
 }
 
-/* Tracks the text column rather than the window's right edge, which is what
-   let the breakpoint come down from 1360px. The min() is the guard rail: the
-   toc can never be pushed off the right of the viewport. */
+/* Tracks the text column rather than the window's right edge. The min() is the
+   guard rail: the toc can never be pushed off the right of the viewport. */
 .module-toc {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
   /* Sits one gutter to the right of the text column. Derived, not magic:
      the column's left edge is (100% - 920) / 2 - 100 (see .app above), its
-     right edge is 920 further on, and the toc starts a 28px gap after that,
-     so 920 - 100 + 28 = 848. The min() is the guard rail: 190 wide plus a
-     14px margin is 204, so it can never be pushed off the right edge. */
+     right edge is 920 further on, and the toc starts a 28px gap after that.
+     The min() is the guard rail: 190 wide plus a 14px margin is 204, so it can
+     never be pushed off the right edge. */
   left: min(
-    calc((100% - var(--col-width)) / 2 - var(--col-shift) + var(--col-width) + var(--toc-gap)),
+    calc((100% - var(--col-width)) / 2 + var(--col-width) + var(--toc-gap)),
     calc(100% - var(--toc-width) - 14px)
   );
   width: var(--toc-width);
@@ -1989,9 +2013,12 @@ button:disabled {
   font-family: var(--font-ui);
 }
 
-/* Below this there is no gutter beside the column, so the gutter toc gives way
-   to the sticky bar at the top of the module. */
-@media (max-width: 1199px) {
+/* Below this a centred column leaves no room beside it, so the gutter toc gives
+   way to the sticky bar at the top of the module. 1400 rather than 1200: the
+   toc needs 190px plus a 28px gap plus air at the window edge, and the column
+   no longer shifts left to lend it 100px. What the shift bought in coverage it
+   charged for on every page that has no toc at all. */
+@media (max-width: 1399px) {
   .module-toc {
     display: none;
   }
@@ -2012,7 +2039,7 @@ button:disabled {
   font-family: var(--font-ui);
 }
 
-@media (max-width: 1199px) {
+@media (max-width: 1399px) {
   .module-jump {
     display: block;
   }

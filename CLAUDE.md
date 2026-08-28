@@ -513,14 +513,70 @@ the footer. Rules that follow from it:
 - Data hues (`--acc`, `--loss`, `--data-*`) are not brand colours and do not follow the
   accent. They name quantities in charts, and a course that changes its accent must not
   silently repaint its charts.
-- **Prose takes `--measure`, everything else takes the column.** A line of prose runs to
-  34rem (about 69 characters at the 19px root); figures, tables, panels and the editor keep
-  the full 920px. The selectors that apply it are all direct-child of the reading column
+- **One axis, and everything is centred on it.** A line of prose runs to `--measure`
+  (34rem, about 69 characters at the 19px root) and is centred in the column, not
+  left-aligned in it. Left-aligned was the first attempt and it was wrong: every block
+  wider than the prose (an equation, a figure, a caption, a table) hung off to its right
+  and the page read as lopsided. Centred, the prose, the equations and the figures share
+  one centre line, so an equation sits dead centre over the paragraph that introduces it.
+  Headings, captions and the masthead are in the set too; left out, they started at the
+  column's left edge while the prose under them started 113px further in, which reads as a
+  mistake rather than as a wider header.
+- **The column does not shift.** It is centred at every width. It used to sit 100px left of
+  centre above 1200px to open a gutter for the on-this-page nav, and the cost was that
+  every page looked mis-centred whether it had that nav or not: the front page never does,
+  so a first visit landed on one that did. The nav now needs 1400px, where a centred column
+  leaves room beside it, and below that the sticky section bar takes over as it already did.
+- **The selectors that apply the measure are all direct-child of the reading column**
   (`.module > p`, `.exercise > p`), which is what makes it safe in a stylesheet with
   twenty-five interactives: a paragraph inside a panel is not a child of the article and
-  never sees it. Display equations take `--measure-wide` (42rem) because they centre
-  themselves and cannot re-wrap; two of the course's 51 equations still scroll inside their
-  own affordance, both of them wide `\underbrace` tallies.
+  never sees it. A rule further down the file that sets a `margin` shorthand resets the
+  horizontal `auto`, so those write `margin: X auto Y` themselves.
+- **Two things keep the column's full width, and only two:** the figures and panels
+  themselves, and the rules under the tab strip and above the footer. The tab strip starts
+  on the text's axis and runs on to the column's right edge, because the left edge is where
+  alignment is read and eleven tabs inset on both sides wrap to three rows instead of two.
+  It wraps to two rows down to 881px and pans as one row below that. The breakpoint is
+  880 rather than the 854 where the third row actually appears, and the 26px is headroom:
+  the labels are set in `system-ui`, a different face on every platform, and a sans a few
+  percent wider moves that boundary up into the band. Panning early costs one row;
+  getting it wrong the other way puts a three-row wall above the course. Shrinking the
+  labels instead does not reach (at 0.72rem with tight gaps a 390px phone still takes four
+  rows, 167px of navigation). Where it pans it has no scrollbar of its own: a thin thumb
+  lands a second grey bar right under the active tab's accent rule and reads as a
+  mis-drawn underline, so the edge fades carry the affordance alone, the way a native
+  phone tab strip does.
+- **The shared scroll affordance must leave nothing behind on a container that has
+  nothing to scroll.** `.scroll-x` is the two-signal treatment (a thin scrollbar and edge
+  shadows) built the usual way: covers painted with the content, shadows painted with the
+  box, so the covers sit exactly on the shadows at rest and slide off once an edge is
+  scrolled past. Two details are load-bearing and both were found by pixel-differencing a
+  render against the same render with the shadow layers made transparent. The cover holds
+  its surface colour flat across the shadow's whole width before it starts to fade, and
+  the shadow itself starts transparent and reaches full strength 4px in rather than at the
+  edge, because on a 2x screen a box whose edges land on a half CSS pixel rounds the two
+  layers to different device columns and leaves one column of shadow showing. That column
+  was 29 levels darker than the page and read as a grey border down the side of every
+  equation at 707px; it is 2 now. When touching this rule, re-run the difference test
+  rather than eyeballing a screenshot: a downscaled composite invents lines that are not
+  in the file, and this session chased two of them.
+- **Two widths on a page, and only two.** Everything read as text takes `--measure`:
+  prose, headings, captions, the cards, the exercise's h4, and the display equations.
+  Everything that is an illustration keeps the whole column: figures, tables, interactive
+  panels, the editor, and the blocks that hold code (the play snippets, the test-code
+  disclosure, the hints). Equations used to have a third width in between,
+  `--measure-wide` at 42rem, and three widths read as an accident rather than as a rule.
+  A card's box is `--measure` plus its padding AND its borders, the 3px accent rule
+  included, so the lines inside it land on the axis at the measure like every other line.
+- **An equation that does not fit at the measure is split, not widened.** 45 of the
+  course's 51 already fit; the seven that did not (`m2`'s 11,935 tally, `m3`'s cost and
+  gradient, `m4`'s deltas and its new-z2 difference, `m7`'s blame chain and its
+  `(w+h)^2` expansion) are now `aligned` or `gathered` over two or three lines, which is
+  what a typesetter does with a long `\underbrace` tally anyway. Nothing scrolls above a
+  665px viewport, where the column itself drops below the widest equation's 617px;
+  below that, display math cannot re-wrap and scrolling is the only option left. Measure
+  a candidate with `.eq-scroll { width: 1px }` and read `scrollWidth`: that is the
+  natural width, and the box to beat is 646px.
 - **A course links up to the series index, never across to a sibling.** `SERIES.homeUrl`
   is set once and never touched; the index is the only thing that knows what else exists.
   There is deliberately no list of courses in `brand.ts`: carrying one would mean editing
