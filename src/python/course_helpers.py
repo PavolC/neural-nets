@@ -118,8 +118,8 @@ def quadratic_output_delta(a, y, z):
 def backprop(weights, biases, x, y, output_delta=None):
     """Every parameter's slope for ONE example, via BP1 to BP4.
 
-    The learner's Module 5 algorithm, with one seam: output_delta(a, y, z)
-    supplies the output layer's blame (BP1). It defaults to
+    The learner's Module 5 algorithm with BP1 lifted into an argument:
+    output_delta(a, y, z) supplies the output layer's blame. It defaults to
     quadratic_output_delta, which reproduces Module 5's function exactly;
     Module 7 passes a different one. Everything after BP1 is untouched,
     which is the point.
