@@ -8,9 +8,9 @@
 // what each payoff panel is handed.
 
 import { SECTION_BODIES, startingBody } from "../exercises/skeletons";
+import preludeSource from "../python/workbench_prelude.py?raw";
 import { get, keysUnder, remove, set, BACKUP } from "./storage";
 import {
-  PRELUDE,
   SECTIONS,
   SECTION_BY_ID,
   SECTION_ORDER,
@@ -25,6 +25,11 @@ import {
   type ParsedDoc,
   type SectionDef,
 } from "./workbenchDoc";
+
+/** The file's header: its docstring and its one import. Lives here rather than
+ * in workbenchDoc.ts so that file has no bundler-specific imports and the
+ * tools can run its splices directly. */
+export const PRELUDE = preludeSource.replace(/\s+$/, "");
 
 const DOC_KEY = "code:workbench";
 const SCRATCH_KEY = "code:scratch";
@@ -167,7 +172,7 @@ export function ensureLibrary(force = false): MigrationReport {
   }
 
   if (adopted.length) set(BACKUP + "at", new Date().toISOString(), "");
-  const text = assemble(bodies);
+  const text = assemble(bodies, PRELUDE);
   set(DOC_KEY, text);
   if (get(SCRATCH_KEY) === null) set(SCRATCH_KEY, "");
   cached = null;

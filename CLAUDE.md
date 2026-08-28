@@ -781,7 +781,16 @@ tokens from the start.
 - `npm run build`: static production build (deployable to any static host).
 - `python3 tools/make_mnist_subset.py`: regenerate `public/data/mnist_subset.bin.gz`
   (pure stdlib, downloads MNIST from a public mirror, deterministic output).
-- `npm run check`: the four checkers, which is what CI runs before it builds.
+- `npm run check`: the five checkers, which is what CI runs before it builds.
+- `npm run check:doc`: the document format's own invariants, run against
+  `src/state/workbenchDoc.ts` itself in Node. `check_exercises.py` can only test
+  the documents this repo assembles; this tests the ones the editor produces.
+  The difference is where a bug was: replacing a section put its text back
+  trimmed, so the next marker landed at the end of the previous section's last
+  line, where the anchored regex cannot see it, and that section vanished into
+  its neighbour with no error anywhere. `workbenchDoc.ts` therefore imports
+  nothing a bundler has to resolve, which is why the prelude lives in
+  `workbench.ts` and `assemble()` takes it as an argument.
 - `python3 tools/check_exercises.py`: the workbench, under twelve lettered
   assertions (the file's docstring lists them). It assembles the document, checks
   it compiles at every prefix a learner can reach, that no section rebinds a name

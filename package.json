@@ -7,7 +7,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "check": "python3 tools/check_exercises.py && python3 tools/check_panels.py --fast && python3 tools/check_brand.py && python3 tools/brand_palette.py --check",
+    "check": "npm run check:doc && python3 tools/check_exercises.py && python3 tools/check_panels.py --fast && python3 tools/check_brand.py && python3 tools/brand_palette.py --check",
+    "check:doc": "tsc -p tools/tsconfig.doc.json && echo '{\"type\":\"commonjs\"}' > .bench/package.json && node .bench/tools/check_document.js",
     "bench:speeds": "tsc -p tools/tsconfig.bench.json && echo '{\"type\":\"commonjs\"}' > .bench/package.json && node .bench/tools/bench_layer_speeds.js",
     "preview": "vite preview",
     "bench:bumps": "tsc -p tools/tsconfig.bumps.json && echo '{\"type\":\"commonjs\"}' > .bench/package.json && node .bench/tools/bench_bumps.js"

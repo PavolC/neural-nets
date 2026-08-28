@@ -15,11 +15,9 @@
 // break execution or lose code.
 
 import sectionTable from "../exercises/sections.json";
-import preludeSource from "../python/workbench_prelude.py?raw";
 
 const MARKER_RE = /^#[ \t]*-{2,}[ \t]*\[section:([a-z0-9-]+)\][^\n]*$/gm;
 
-export const PRELUDE = preludeSource.replace(/\s+$/, "");
 export const JOIN = "\n\n\n";
 
 export type SectionKind = "exercise" | "given";
@@ -217,8 +215,8 @@ export function sectionText(def: SectionDef, body: string): string {
 }
 
 /** A document holding exactly these sections, in table order. */
-export function assemble(bodies: ReadonlyMap<string, string>): string {
-  const parts = [PRELUDE];
+export function assemble(bodies: ReadonlyMap<string, string>, prelude: string): string {
+  const parts = [prelude.replace(/\s+$/, "")];
   for (const def of SECTIONS) {
     const body = bodies.get(def.id);
     if (body !== undefined) parts.push(sectionText(def, body));
@@ -254,8 +252,18 @@ export function upsertSection(text: string, id: string, body: string): Splice {
   const existing = doc.byId.get(id);
   if (existing) {
     const before = text.slice(0, existing.from);
+    // A section runs to the start of the next marker, so its slice carries the
+    // blank lines between the two. The replacement has its trailing whitespace
+    // trimmed, so the separator has to be put back: without it the next
+    // section's marker lands at the end of this section's last line, where the
+    // parser cannot see it, and that section silently disappears into this one.
     const after = text.slice(existing.to);
-    return { text: before + piece + after, from: existing.from, to: existing.from + piece.length };
+    const tail = after.length ? JOIN : "\n";
+    return {
+      text: before + piece + tail + after,
+      from: existing.from,
+      to: existing.from + piece.length,
+    };
   }
   const at = insertionOffset(doc, id);
   const head = text.slice(0, at).replace(/\s+$/, "");

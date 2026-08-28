@@ -127,6 +127,8 @@ code path the browser does, each section printing the prose sentence it backs. T
 exercises have a checker that runs the app's own harness outside the browser:
 
 ```
+npm run check                         # everything below except the benches
+npm run check:doc                     # the document format: splices, projections
 python3 tools/check_exercises.py       # the workbench: 53 tests, twelve assertions
 python3 tools/check_panels.py --fast   # every payoff panel runs on the learner's file
 python3 tools/bench_depth.py           # Modules 7 and 8's Pyodide numbers (needs NumPy)

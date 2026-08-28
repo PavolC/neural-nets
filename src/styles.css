@@ -3610,8 +3610,18 @@ button:disabled {
   display: none;
 }
 
+/* The editor takes whatever the panel is not using. Before a run that is most
+   of the sheet, which is the state a phone is in while the code is being
+   written; once output and results arrive the lower half grows and the editor
+   gives way, down to a floor of 40vh. A fixed share left a third of the screen
+   blank at exactly the moment the editor was the only thing being used. */
 .wb[data-dock="sheet"] .wb-editor-slot {
-  flex: 0 0 45vh;
+  flex: 1 1 45vh;
+  min-height: 40vh;
+}
+
+.wb[data-dock="sheet"] .wb-lower {
+  flex: 0 1 auto;
 }
 
 /* The exercise's launcher: what is left in the module page where the editor

@@ -41,10 +41,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - run: npm ci
       - run: pip install numpy
+      - run: npm run check:doc
       - run: python3 tools/check_exercises.py
       - run: python3 tools/check_panels.py --fast
       - run: python3 tools/check_brand.py
