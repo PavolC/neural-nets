@@ -129,7 +129,13 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
     goTo: document.querySelector(".wb-goto")?.textContent?.trim() ?? null,
     resultsPx: Math.round(document.querySelector(".test-results")?.getBoundingClientRect().height ?? 0),
     output: document.querySelector(".output-panel pre")?.textContent?.trim().slice(0, 30) ?? null,
-    barSticky: getComputedStyle(document.querySelector(".wb-bar")).position,
+    // The bar is panel chrome, outside the one scroll region, so it is on
+    // screen however far down the file the reader is.
+    barAlwaysVisible: !document.querySelector(".wb-flow").contains(document.querySelector(".wb-bar")),
+    scrollRegions: [...document.querySelectorAll(".wb *")].filter((e) => {
+      const cs = getComputedStyle(e);
+      return (cs.overflowY === "auto" || cs.overflowY === "scroll") && e.scrollHeight > e.clientHeight + 2;
+    }).length,
   }));
   console.log(`\n${label}`);
   for (const [k, v] of Object.entries(s)) if (v !== null) console.log(`  ${k}: ${JSON.stringify(v)}`);
@@ -163,11 +169,25 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
   console.log("  output:", JSON.stringify((await p.locator(".output-panel pre").textContent())?.trim().slice(0, 20)));
   console.log("  no test results, as it should be:", (await p.locator(".test-results").count()) === 0);
 
+  console.log("\nclicking a rail chip scrolls the one flow to that section");
+  await p.evaluate(() => { document.querySelector(".wb-flow").scrollTop = 99999; });
+  await p.waitForTimeout(300);
+  const deep = await p.evaluate(() => Math.round(document.querySelector(".wb-flow").scrollTop));
+  await p.locator(".wb-chip", { hasText: "1. A sigmoid neuron" }).click();
+  await p.waitForTimeout(600);
+  const back = await p.evaluate(() => Math.round(document.querySelector(".wb-flow").scrollTop));
+  console.log(`  scrolled ${deep} -> ${back}, moved: ${back < deep}`);
+  if (!(back < deep)) failures++;
+
   console.log("\nthe gutter marker runs its own section, not the current one");
   const target = () => p.locator(".wb-target").textContent().then((s) => s.trim());
+  // Point the panel at Module 2 first, so clicking Module 1's marker has
+  // something to prove. The chip above already moved it to Module 1.
+  await p.locator(".wb-chip", { hasText: "2. Feedforward" }).click();
+  await p.waitForTimeout(400);
   const before = await target();
-  // Scroll to the top of the file: Module 1's marker sits above Module 2's.
-  await p.evaluate(() => { document.querySelector(".wb-editor .cm-scroller").scrollTop = 0; });
+  // The panel is one scroll now, so this is the thing that moves.
+  await p.evaluate(() => { document.querySelector(".wb-flow").scrollTop = 0; });
   await p.waitForTimeout(300);
   const marker = p.locator(".cm-run-gutter .cm-run-section:visible").first();
   console.log("  markers in view:", await p.locator(".cm-run-gutter .cm-run-section:visible").count());

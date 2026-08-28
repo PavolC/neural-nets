@@ -10,7 +10,6 @@ import { loadExercise } from "../exercises/loaders";
 import type { ScratchRunResult, TestRunResult } from "../runtime/messages";
 import nielsenNotice from "../python/nielsen_notice.txt?raw";
 import { resetExercise } from "../state/progress";
-import { loadUiNumber, saveUi } from "../state/ui";
 import {
   canUndo,
   currentDoc,
@@ -34,8 +33,6 @@ import type { DockState, RunKind, UpstreamBlame } from "./WorkbenchProvider";
 // in-view moment, so the first open is the gate instead.
 const CodeEditor = lazy(() => import("./CodeEditor").then((m) => ({ default: m.CodeEditor })));
 
-const SPLIT_KEY = "split";
-
 interface Props {
   dockState: DockState;
   current: string | null;
@@ -54,6 +51,8 @@ interface Props {
   blame: UpstreamBlame | null;
   blaming: boolean;
   editorReady: boolean;
+  /** The section the last finished run was for, so the output can say. */
+  ranFor: string | null;
   revealRequest: { id: string; at: number } | null;
   onEditorReady(ready: boolean): void;
   onDocumentChange(text: string): void;
@@ -93,15 +92,17 @@ export function Workbench(props: Props) {
     blame,
     blaming,
     editorReady,
+    ranFor,
     revealRequest,
   } = props;
 
   const editorRef = useRef<CodeEditorHandle | null>(null);
   const scratchRef = useRef<CodeEditorHandle | null>(null);
   const panelRef = useRef<HTMLElement>(null);
+  const flowRef = useRef<HTMLDivElement>(null);
+  const resultsRef = useRef<HTMLDivElement>(null);
   const outputRef = useRef<HTMLPreElement>(null);
   const [scratchOpen, setScratchOpen] = useState(false);
-  const [splitPercent, setSplitPercent] = useState(() => loadUiNumber(SPLIT_KEY, 60));
   const [spliceNote, setSpliceNote] = useState<string | null>(null);
   const [flagship, setFlagship] = useState<{ test: string; note: string } | undefined>();
   // The editor chunk is fetched on the first open and never unmounted after.
@@ -148,7 +149,7 @@ export function Workbench(props: Props) {
   // A CodeMirror laid out inside a hidden box has stale geometry.
   useEffect(() => {
     if (open) editorRef.current?.remeasure();
-  }, [open, splitPercent]);
+  }, [open]);
 
   // The sheet is modal, so focus goes into it and comes back out again.
   const returnFocus = useRef<HTMLElement | null>(null);
@@ -163,6 +164,16 @@ export function Workbench(props: Props) {
       returnFocus.current = null;
     }
   }, [open]);
+
+  // A finished run puts its answer at the bottom of a column that can be
+  // thousands of pixels long, so bring it into view. Only on a finish, never
+  // while typing: nothing else in the panel may move the reader.
+  const lastResult = useRef<TestRunResult | undefined>(undefined);
+  useEffect(() => {
+    if (!result || result === lastResult.current) return;
+    lastResult.current = result;
+    resultsRef.current?.scrollIntoView({ block: "nearest" });
+  }, [result]);
 
   // Follow the tail while a run streams, unless the reader has scrolled up.
   useEffect(() => {
@@ -216,28 +227,6 @@ export function Workbench(props: Props) {
       props.onChanged();
     }
   }, [props]);
-
-  // Dragging the divider between the editor and the output.
-  const dragSplit = useCallback((startEvent: React.PointerEvent) => {
-    const host = (startEvent.currentTarget as HTMLElement).parentElement;
-    if (!host) return;
-    startEvent.preventDefault();
-    const box = host.getBoundingClientRect();
-    const move = (e: PointerEvent) => {
-      const pct = ((e.clientY - box.top) / box.height) * 100;
-      setSplitPercent(Math.max(25, Math.min(85, pct)));
-    };
-    const up = () => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", up);
-      setSplitPercent((pct) => {
-        saveUi(SPLIT_KEY, String(Math.round(pct)));
-        return pct;
-      });
-    };
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", up);
-  }, []);
 
   const problems = doc.problems.filter((p) => p.kind !== "out-of-order");
   const notes = doc.problems.filter((p) => p.kind === "out-of-order");
@@ -333,110 +322,111 @@ export function Workbench(props: Props) {
         </div>
       )}
 
-      <div className="wb-body" style={{ "--wb-split": `${splitPercent}%` } as React.CSSProperties}>
-        <div className="wb-editor-slot">
-          {everOpened ? (
-            <Suspense fallback={<EditorPlaceholder />}>
-              <CodeEditor
-                className="code-editor wb-editor"
-                initialDoc={loadDocument()}
-                onChange={props.onDocumentChange}
-                onSelection={props.onCaret}
-                onRun={(kind, id) =>
-                  kind === "tests" ? props.onRunTests(id) : props.onRunScratch()
-                }
-                // Only the sections with tests of their own: a stretch written
-                // for the learner has nothing to run.
-                runMarkerLines={() =>
-                  lineMap(currentDoc())
-                    .filter((s) => s.kind === "exercise")
-                    .map((s) => ({ line: s.start, id: s.id }))
-                }
-                handleRef={editorRef}
-                onReady={props.onEditorReady}
-              />
-            </Suspense>
-          ) : (
-            <EditorPlaceholder />
-          )}
-        </div>
-        <div
-          className="wb-splitter"
-          role="separator"
-          aria-orientation="horizontal"
-          aria-label="Space given to the editor"
-          aria-valuenow={Math.round(splitPercent)}
-          aria-valuemin={25}
-          aria-valuemax={85}
-          tabIndex={0}
-          onPointerDown={dragSplit}
-          onKeyDown={(e) => {
-            const step = e.key === "ArrowUp" ? -4 : e.key === "ArrowDown" ? 4 : 0;
-            if (!step) return;
-            e.preventDefault();
-            setSplitPercent((pct) => {
-              const next = Math.max(25, Math.min(85, pct + step));
-              saveUi(SPLIT_KEY, String(Math.round(next)));
-              return next;
-            });
-          }}
-        />
-        <div className="wb-lower">
-          {/* One row, pinned to the top of the scrolling half: the controls,
-              what they are pointed at, and whatever the run is saying. It used
-              to be a row of full-size prose buttons plus a reserved status line
-              plus a sentence naming the section, 95px of chrome before any
-              output. Sticky because the results below it can run for hundreds
-              of pixels, and the button you want next should not be a scroll
-              away. */}
-          <div className="wb-bar">
-            <button className="wb-run" onClick={() => props.onRunTests()} disabled={!canRun || !current}>
-              {busy === "tests" ? "Running..." : "Run tests"}
+      {/* One scroll for the whole panel. It used to be two: the editor had
+          its own scroller and the results had theirs, so the panel showed two
+          keyholes and two scrollbars and neither half could use the other's
+          space. Now the chrome sits at the top and everything below it, code
+          and output and verdict, flows down one column the way a page does. */}
+      <div className="wb-bar">
+        <button className="wb-run" onClick={() => props.onRunTests()} disabled={!canRun || !current}>
+          {busy === "tests" ? "Running..." : "Run tests"}
+        </button>
+        <button className="button-secondary" onClick={props.onRunScratch} disabled={!canRun}>
+          {busy === "scratch" ? "Running..." : "Run my code"}
+        </button>
+        {running && (
+          <button className="button-secondary wb-stop" onClick={props.onStop}>
+            Stop
+          </button>
+        )}
+        <span className={error ? "wb-target wb-target-error" : "wb-target"}>{barText}</span>
+        <details className="wb-more">
+          <summary>More</summary>
+          <div className="wb-more-menu">
+            <button className="button-secondary" onClick={resetCurrent} disabled={!def}>
+              Reset this section
             </button>
-            <button className="button-secondary" onClick={props.onRunScratch} disabled={!canRun}>
-              {busy === "scratch" ? "Running..." : "Run my code"}
+            <button className="button-secondary" onClick={undo} disabled={!canUndo()}>
+              Undo that
             </button>
-            {running && (
-              <button className="button-secondary wb-stop" onClick={props.onStop}>
-                Stop
-              </button>
-            )}
-            <span className={error ? "wb-target wb-target-error" : "wb-target"}>{barText}</span>
-            <details className="wb-more">
-              <summary>More</summary>
-              <div className="wb-more-menu">
-                <button className="button-secondary" onClick={resetCurrent} disabled={!def}>
-                  Reset this section
-                </button>
-                <button className="button-secondary" onClick={undo} disabled={!canUndo()}>
-                  Undo that
-                </button>
-                <p className="wb-more-tip">
-                  <b>Run tests</b> runs your whole file and then checks the section the caret is
-                  in. <b>Run my code</b> runs your whole file and then the scratch pad, so you can
-                  call your functions and print(...) values. Everything you print appears in the
-                  Output panel as it happens. Ctrl or Cmd with Enter runs the tests; Shift with
-                  Enter runs your code. Tab indents, and Escape then Tab moves keyboard focus out.
-                  Your file is saved in this browser only.
-                </p>
-              </div>
-            </details>
+            <p className="wb-more-tip">
+              <b>Run tests</b> runs your whole file and then checks the section the caret is in.{" "}
+              <b>Run my code</b> runs your whole file and then the scratch pad, so you can call
+              your functions and print(...) values. Ctrl or Cmd with Enter runs the tests; Shift
+              with Enter runs your code. The triangle beside a section line runs that section.
+              Tab indents, and Escape then Tab moves keyboard focus out. Your file is saved in
+              this browser only.
+            </p>
           </div>
-          <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-            {liveMessage}
-          </p>
+        </details>
+      </div>
+      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {liveMessage}
+      </p>
+
+      <div className="wb-flow" ref={flowRef}>
+        {everOpened ? (
+          <Suspense fallback={<EditorPlaceholder />}>
+            <CodeEditor
+              className="code-editor wb-editor"
+              initialDoc={loadDocument()}
+              onChange={props.onDocumentChange}
+              onSelection={props.onCaret}
+              onRun={(kind, id) => (kind === "tests" ? props.onRunTests(id) : props.onRunScratch())}
+              // Only the sections with tests of their own: a stretch written
+              // for the learner has nothing to run.
+              runMarkerLines={() =>
+                lineMap(currentDoc())
+                  .filter((s) => s.kind === "exercise")
+                  .map((s) => ({ line: s.start, id: s.id }))
+              }
+              handleRef={editorRef}
+              onReady={props.onEditorReady}
+            />
+          </Suspense>
+        ) : (
+          <EditorPlaceholder />
+        )}
+
+        <div className="wb-results" ref={resultsRef}>
           {notes.map((p) => (
             <p key={p.line} className="demo-status">
               {p.message}
             </p>
           ))}
 
+          {/* What the code printed comes first, directly under the code, the
+              way a notebook puts a cell's output under the cell. The verdict
+              follows it. */}
+          {ranOnce && (
+            <div className="output-panel wb-output">
+              <h5>
+                Output{ranFor ? <span className="wb-ran-for"> from {ranFor}</span> : null}
+              </h5>
+              <pre ref={outputRef}>
+                {trimmed && "(earlier output trimmed to the last 200 lines)\n"}
+                {output.length
+                  ? output.join("\n")
+                  : running
+                    ? "(waiting for output...)"
+                    : "(nothing printed; add print(...) anywhere to inspect values)"}
+              </pre>
+              {scratchError && (
+                <p className="demo-status demo-status-error">
+                  Your code stopped with {scratchError.message}
+                  {scratchError.line !== null && ` (line ${scratchError.line})`}
+                  {scratchError.label ? `, in the ${scratchError.label}` : ""}.
+                </p>
+              )}
+            </div>
+          )}
+
           {blame && (
             <div className="wb-blame">
               <strong>Before this section.</strong>
               <p>
-                Your {blame.section.label} section is failing {blame.failing} of {blame.total} of its
-                own tests, and the tests below call it. Fixing it there is likely to fix these.
+                Your {blame.section.label} section is failing {blame.failing} of {blame.total} of
+                its own tests, and the tests below call it. Fixing it there is likely to fix these.
               </p>
               {blame.firstMessage && <p className="wb-blame-message">{blame.firstMessage}</p>}
               <button
@@ -455,27 +445,6 @@ export function Workbench(props: Props) {
               stale={stale}
               onGoToSection={props.onSelectSection}
             />
-          )}
-
-          {ranOnce && (
-            <div className="output-panel wb-output">
-              <h5>Output</h5>
-              <pre ref={outputRef}>
-                {trimmed && "(earlier output trimmed to the last 200 lines)\n"}
-                {output.length
-                  ? output.join("\n")
-                  : running
-                    ? "(waiting for output...)"
-                    : "(nothing printed; add print(...) anywhere to inspect values)"}
-              </pre>
-              {scratchError && (
-                <p className="demo-status demo-status-error">
-                  Your code stopped with {scratchError.message}
-                  {scratchError.line !== null && ` (line ${scratchError.line})`}
-                  {scratchError.label ? `, in the ${scratchError.label}` : ""}.
-                </p>
-              )}
-            </div>
           )}
 
           {lent !== null && !running && (

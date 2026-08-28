@@ -714,16 +714,31 @@ the footer. Rules that follow from it:
   sets its own transparent background: that is a bug this course has already shipped once.
   The primary treatment is reached as `button:not([class])`, which cannot match a variant,
   because every variant here carries a class.
-- **The panel's controls are one sticky row, and a passing check is one line.**
+- **The panel is one scroll, not two.** It used to be an editor with its own
+  scroller above a results pane with its own scroller: two keyholes, two
+  scrollbars, and neither half able to use the other's space. Now the chrome
+  (head, section rail, controls) is fixed at the top and everything below it
+  flows down a single column, code then output then verdict, the way a page
+  does. The editor has no height of its own (`height: auto`, and
+  `overflow: visible` on `.cm-scroller`), so it grows to its content and the
+  panel is what scrolls. CodeMirror still virtualizes against the scroll
+  ancestor: measured on the full 507-line file, 49 of those lines are in the
+  DOM at a time and the whole 14,000px scrolls in under a second.
+  Two consequences. The controls are panel chrome rather than something inside
+  the scroll, so they are on screen however deep in the file the reader is; and
+  a finished run scrolls its results into view, because the answer would
+  otherwise land at the bottom of a column thousands of pixels long. Nothing
+  else in the panel is allowed to move the reader.
+- **The panel's controls are one row, and a passing check is one line.**
   The run buttons were the course's prose buttons, 51px each, over a reserved
   status line and a sentence naming the section: 95px of chrome before any
-  output, in a panel whose lower half is about 300px. They are one compact row
-  now, with the section name and whatever the run is saying sharing a single
-  text slot, and it is `position: sticky` because the results under it can run
-  for hundreds of pixels and the button you want next should never be a scroll
-  away. Passing checks fold into "N checks passed": six of them at full size
-  pushed the failures and the output most of a screen down, and a receipt is
-  not a finding. Failures never fold.
+  output. They are one compact row now, with the section name and whatever the
+  run is saying sharing a single text slot, so nothing reserves a line that is
+  empty most of the time. Passing checks fold into "N checks passed": six of
+  them at full size pushed the failures and the output most of a screen down,
+  and a receipt is not a finding. Failures never fold. Output is one pool,
+  headed with the section the run was for, because one run execs the whole
+  file and pretending otherwise would be a lie about what just happened.
 - **The workbench borrows three things from a notebook, and not the fourth.**
   Mod-Enter runs the tests and Shift-Enter runs the scratch pad, because that is
   what anybody who has used a notebook reaches for first; both need

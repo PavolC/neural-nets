@@ -121,6 +121,9 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
   const [blame, setBlame] = useState<UpstreamBlame | null>(null);
   const [blaming, setBlaming] = useState(false);
   const [editorReady, setEditorReady] = useState(false);
+  /** Which section the last finished run was for. The output belongs to a run,
+   * and a run belongs to a section, so it says which. */
+  const [ranFor, setRanFor] = useState<string | null>(null);
   /** Where the panel should scroll to next. Consumed by the panel, then
    * cleared, so a second click on the same chip scrolls again. */
   const [revealRequest, setRevealRequest] = useState<{ id: string; at: number } | null>(null);
@@ -333,6 +336,7 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
             if (collectCommon(msg)) return;
             if (msg.type !== "testsDone") return;
             setResults((prev) => ({ ...prev, [target]: msg.result }));
+            setRanFor(SECTION_BY_ID.get(target)?.label ?? null);
             setStale((prev) => ({ ...prev, [target]: false }));
             setLent(msg.result.lent ?? []);
             setBusy(null);
@@ -370,6 +374,7 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
           if (collectCommon(msg)) return;
           if (msg.type !== "pythonDone") return;
           const result = msg.result as ScratchRunResult;
+          setRanFor("your code and the scratch pad");
           setScratchError(result.error);
           setLent(result.lent ?? []);
           setBusy(null);
@@ -450,6 +455,7 @@ export function WorkbenchProvider({ children }: { children: ReactNode }) {
         blame={blame}
         blaming={blaming}
         editorReady={editorReady}
+        ranFor={ranFor}
         revealRequest={revealRequest}
         onEditorReady={setEditorReady}
         onDocumentChange={setDocument}
