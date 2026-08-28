@@ -1,4 +1,4 @@
-import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader, fig } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { ExercisePage } from "../../components/ExercisePage";
 import { backpropExercise } from "../../exercises/backprop";
@@ -352,7 +352,9 @@ export function Module5() {
 // two-layer network, each entry labeled with both its positive and negative
 // index, so the exercise's negative-indexing reads have a picture.
 function ReceiptsDiagram() {
-  const BW = 118;
+  // 132, not 118: "layer 2's confidences" measures 116 units at 11px, so at
+  // 118 it sat with a letter almost touching each edge of its own box.
+  const BW = 132;
   const BH = 58;
   const GAP = 18;
   const X0 = 150;
@@ -390,7 +392,7 @@ function ReceiptsDiagram() {
   );
   return (
     <svg
-      viewBox="-116 0 812 220"
+      {...fig(41, 14, 550, 209)}
       className="chain-ripple"
       role="img"
       aria-label="The two lists a forward pass stores: activations with three entries indexed 0, 1, 2 or -3, -2, -1, and zs with two entries indexed 0, 1 or -2, -1"
@@ -420,7 +422,7 @@ function PipelineDiagram() {
   const topMid = TOP_Y + IMPL.h / 2;
   const botMid = BOT_Y + IMPL.h / 2;
   return (
-    <svg viewBox="0 0 812 242" className="chain-ripple" role="img"
+    <svg {...fig(15, -7, 781, 244)} className="chain-ripple" role="img"
          aria-label="Your sgd from Module 3 asks which way is downhill and receives one slope per knob. Two implementations can answer: nudge-and-measure, the course's gradient function, priced per knob; or your backprop, priced per pass, one forward pass and one backward sweep for every knob at once.">
       <defs>
         <marker id="pipe-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6"
@@ -495,7 +497,9 @@ function PipelineDiagram() {
 // imagine it (and the off-by-one the tests diagnose).
 function BackwardWalkDiagram() {
   const PANEL_W = 390;
-  const BW = 112;
+  // 122 for the same reason as the receipts diagram above; three of these plus
+  // two gaps still fit inside PANEL_W.
+  const BW = 122;
   const GAP = 8;
   const BH = 44;
   const ACTS_Y = 44;
@@ -548,7 +552,7 @@ function BackwardWalkDiagram() {
     </g>
   );
   return (
-    <svg viewBox="0 0 812 212" className="chain-ripple" role="img"
+    <svg {...fig(4, -1, 805, 218)} className="chain-ripple" role="img"
          aria-label="Two panels. Pass 1, BP1 at the output layer, reads activations[-1], activations[-2] and zs[-1], and writes the last layer's slopes. Pass 2, BP2 one layer back, reads activations[-3] and zs[-2], and writes the hidden layer's slopes: the same window of slots, moved one box left.">
       {panels.map((p, pi) => (
         <g key={pi}>
@@ -614,7 +618,7 @@ function GradientShapeDiagram() {
     </g>
   );
   return (
-    <svg viewBox="0 0 812 232" className="chain-ripple" role="img"
+    <svg {...fig(9, 0, 799, 234)} className="chain-ripple" role="img"
          aria-label="Two panels. On the left, weights[0] of shape (30, 784) and weights[1] of shape (10, 30), each with the slope array nabla_w[0] and nabla_w[1] of the same shape directly below it, holding 23,520 and 300 numbers. On the right, biases[0] of shape (30, 1) and biases[1] of shape (10, 1), with nabla_b[0] and nabla_b[1] below them, holding 30 and 10. The four slope arrays hold 23,860 numbers in total, one per knob.">
       <defs>
         <marker id="grad-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="5"

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Eq } from "../../../components/Math";
+import { fig } from "../../../components/ModuleBits";
 import { divergingColor } from "./utils";
 import {
   START,
@@ -124,14 +125,12 @@ export function BackpropStepper() {
     slopes: step >= REVEAL.slopes,
   };
 
-  // One wire: colored by weight, labeled with its value, clickable to select.
-  const edge = (
-    from: { x: number; y: number },
-    to: { x: number; y: number },
-    weight: number,
-    ref: ParamRef,
-    labelT: number,
-  ) => {
+  // One wire's geometry: the segment between the two circles, and where its
+  // label goes. The label is offset 15 units perpendicular rather than 11:
+  // the offset moves the text's baseline, and its digits stand about 9 units
+  // above that, so at 11 the cap height was still inside a wire up to 4.8
+  // units thick and the halo bit a notch out of it.
+  const edgeGeom = (from: { x: number; y: number }, to: { x: number; y: number }, labelT: number) => {
     const dx = to.x - from.x;
     const dy = to.y - from.y;
     const len = Math.hypot(dx, dy);
@@ -141,13 +140,26 @@ export function BackpropStepper() {
     const y1 = from.y + uy * R;
     const x2 = to.x - ux * R;
     const y2 = to.y - uy * R;
-    const lx = x1 + (x2 - x1) * labelT - uy * 11;
-    const ly = y1 + (y2 - y1) * labelT + ux * 11;
-    const selected = sameRef(sel, ref);
-    const key = `${ref.kind}-${ref.j}-${"k" in ref ? ref.k : ""}`;
+    return {
+      x1, y1, x2, y2,
+      lx: x1 + (x2 - x1) * labelT - uy * 15,
+      ly: y1 + (y2 - y1) * labelT + ux * 15,
+    };
+  };
+
+  const edgeKey = (ref: ParamRef) => `${ref.kind}-${ref.j}-${"k" in ref ? ref.k : ""}`;
+
+  // A wire: colored by weight, clickable to select.
+  const edgeLine = (
+    from: { x: number; y: number },
+    to: { x: number; y: number },
+    weight: number,
+    ref: ParamRef,
+  ) => {
+    const { x1, y1, x2, y2 } = edgeGeom(from, to, 0);
     return (
-      <g key={key}>
-        {selected && <line x1={x1} y1={y1} x2={x2} y2={y2} className="bp-edge-halo" />}
+      <g key={edgeKey(ref)}>
+        {sameRef(sel, ref) && <line x1={x1} y1={y1} x2={x2} y2={y2} className="bp-edge-halo" />}
         <line
           x1={x1} y1={y1} x2={x2} y2={y2}
           className="bp-edge"
@@ -159,10 +171,28 @@ export function BackpropStepper() {
           className="bp-edge-hit"
           onClick={() => setSel(ref)}
         />
-        <text x={lx} y={ly} className="bp-wlabel" textAnchor="middle">
-          {fmt(weight, 1)}
-        </text>
       </g>
+    );
+  };
+
+  // Every weight label, in a pass of its own after all six wires. Inside its
+  // own wire's group each label was painted before the wires drawn after it,
+  // so a later wire crossed the digits of an earlier label and the label's
+  // halo bit a notch out of that wire: with six wires and two crossings there
+  // is no label position that avoids every one of them, so the labels go on
+  // top and their halo does the work.
+  const edgeLabel = (
+    from: { x: number; y: number },
+    to: { x: number; y: number },
+    weight: number,
+    ref: ParamRef,
+    labelT: number,
+  ) => {
+    const { lx, ly } = edgeGeom(from, to, labelT);
+    return (
+      <text key={edgeKey(ref)} x={lx} y={ly} className="bp-wlabel" textAnchor="middle">
+        {fmt(weight, 1)}
+      </text>
     );
   };
 
@@ -245,7 +275,7 @@ export function BackpropStepper() {
 
       <div className="figure-scroll scroll-x" tabIndex={0}>
       <svg
-        viewBox="-70 0 812 362"
+        {...fig(34, -2, 598, 346)}
         className="interactive-svg bp-diagram"
         role="img"
         aria-label="A 2-3-1 network: two inputs feed three hidden neurons, which feed one output neuron. Wires and circles are clickable."
@@ -255,13 +285,15 @@ export function BackpropStepper() {
             is still spread out; in the middle the wires cross and labels
             collide. */}
         {HID_POS.map((h, j) =>
-          IN_POS.map((inp, k) =>
-            edge(inp, h, net.W2[j][k], { kind: "W2", j, k }, 0.22),
-          ),
+          IN_POS.map((inp, k) => edgeLine(inp, h, net.W2[j][k], { kind: "W2", j, k })),
         )}
-        {HID_POS.map((h, k) =>
-          edge(h, OUT_POS, net.W3[0][k], { kind: "W3", j: 0, k }, 0.4),
+        {HID_POS.map((h, k) => edgeLine(h, OUT_POS, net.W3[0][k], { kind: "W3", j: 0, k }))}
+
+        {/* then every label, above every wire */}
+        {HID_POS.map((h, j) =>
+          IN_POS.map((inp, k) => edgeLabel(inp, h, net.W2[j][k], { kind: "W2", j, k }, 0.22)),
         )}
+        {HID_POS.map((h, k) => edgeLabel(h, OUT_POS, net.W3[0][k], { kind: "W3", j: 0, k }, 0.4))}
 
         {/* inputs: plain numbers, not neurons */}
         {IN_POS.map((pos, i) => (

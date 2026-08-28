@@ -1,4 +1,4 @@
-import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader, fig } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { BackpropStepper } from "./interactives/BackpropStepper";
 import { DeltaQuiz } from "./interactives/DeltaQuiz";
@@ -142,7 +142,7 @@ export function Module4() {
         Subtract old from new:
       </p>
       <Eq
-        tex="\begin{aligned} &\underbrace{2.0\,(a_1 + 0.00235) + b_2}_{\text{new } z_2} - \underbrace{(2.0\,a_1 + b_2)}_{\text{old } z_2} \\[0.7em] &= 2.0 \times 0.00235 = 0.00470 \end{aligned}"
+        tex="\begin{aligned} &\underbrace{2.0\,(a_1 + 0.00235) + b_2}_{\text{new } z_2} - \underbrace{(2.0\,a_1 + b_2)}_{\text{old } z_2} \\[0.8em] &= 2.0 \times 0.00235 = 0.00470 \end{aligned}"
         gloss="The b2's cancel, the 2.0-times-a1 parts cancel, and what remains is the wiggle times the wire. A change riding into a multiplication comes out multiplied: that is the whole mechanism."
       />
       <p>
@@ -262,7 +262,7 @@ export function Module4() {
         <M tex="T" />, and both slopes fall out of it:
       </p>
       <Eq
-        tex="\begin{gathered} T = \underbrace{0.2350 \times 2.0 \times 0.2463 \times (-0.4391)}_{\text{everything from } z_1 \text{ to the cost}} = -0.0508 \\[0.9em] \text{slope for } w_1 = 1.0 \times T, \qquad \text{slope for } b_1 = 1 \times T \end{gathered}"
+        tex="\begin{gathered} T = \underbrace{0.2350 \times 2.0 \times 0.2463 \times (-0.4391)}_{\text{everything from } z_1 \text{ to the cost}} = -0.0508 \\[0.8em] \text{slope for } w_1 = 1.0 \times T, \qquad \text{slope for } b_1 = 1 \times T \end{gathered}"
         gloss="Both knobs live at neuron A, so from z1 onward their ripples are identical. Compute the shared part T once and both slopes are one extra multiplication each."
       />
       <p>
@@ -534,7 +534,7 @@ function CurrencyDiagram() {
   const Y0 = 40;
   const BH = 52;
   return (
-    <svg viewBox="-16 0 812 150" className="chain-ripple" role="img"
+    <svg {...fig(76, 7, 627, 146)} className="chain-ripple" role="img"
          aria-label="A 5 euro raise passes through two currency booths, times 2 into dollars and times 3 into pesos, arriving as 30 extra pesos; the through-rate is 6 pesos per euro">
       {boxes.map((b, i) => {
         const x = X0 + i * (BW + GAP);
@@ -616,7 +616,7 @@ function RoadDiagram() {
     ["b₂", 384, 2, 12, "× 1", ""],
   ];
   return (
-    <svg viewBox="-96 0 812 258" className="chain-ripple" role="img"
+    <svg {...fig(-25, -1, 683, 261)} className="chain-ripple" role="img"
          aria-label="The road from z1 through a1, z2, a2 to the cost, with knobs w1 and b1 entering at z1 and w2 and b2 entering at z2; delta-A prices the road from z1, delta-B from z2. Green bands group z1 and a1 inside neuron A and z2 and a2 inside neuron B.">
       <defs>
         <marker id="road-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6"
@@ -712,7 +712,7 @@ function NetworkAnatomyDiagram() {
     </text>
   ));
   return (
-    <svg viewBox="-41 0 812 330" className="chain-net" role="img"
+    <svg {...fig(50, 4, 673, 325)} className="chain-net" role="img"
          aria-label="The 2-3-1 network labeled: layer 1 is the input column a1 equals x; layer 2 has three neurons with columns z2, a2, delta2 and biases b2; layer 3 has one neuron with z3, a3, delta3 and bias b3; w2 and w3 are the wire ledgers; the target y and cost C sit outside the network">
       <text x={110} y={22} textAnchor="middle" className="ripple-band-label">layer 1</text>
       <text x={330} y={22} textAnchor="middle" className="ripple-band-label">layer 2</text>
@@ -778,7 +778,7 @@ function NetworkAnatomyDiagram() {
 // neuron's own steepness scales the sum. The upgrade BP2 generalizes.
 function ForkDiagram() {
   return (
-    <svg viewBox="-86 0 812 244" className="chain-net" role="img"
+    <svg {...fig(47, 17, 518, 229)} className="chain-net" role="img"
          aria-label="A hidden neuron feeds two output neurons with blames −0.10 and +0.08 through wires of weight 4.0 and −4.0; blame flows backward along each wire multiplied by its weight, the arrivals −0.40 and −0.32 add to −0.72, and times the neuron's own steepness 0.15 gives δ = −0.108">
       <defs>
         <marker id="fork-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6"
@@ -790,8 +790,11 @@ function ForkDiagram() {
       {/* wires, forward */}
       <line x1={154} y1={107} x2={425} y2={57} className="tiny-net-edge" />
       <line x1={154} y1={117} x2={425} y2={167} className="tiny-net-edge" />
-      <text x={290} y={79} textAnchor="middle" className="bp-wlabel">w = 4.0</text>
-      <text x={290} y={149} textAnchor="middle" className="bp-wlabel">w = −4.0</text>
+      {/* Above their own wires, not on them: at x = 290 the upper wire is at
+          y 82 and the lower at 142, and a baseline of 79 or 149 put the line
+          through the digits, which read "w = =4:0". */}
+      <text x={290} y={76} textAnchor="middle" className="bp-wlabel">w = 4.0</text>
+      <text x={290} y={134} textAnchor="middle" className="bp-wlabel">w = −4.0</text>
 
       {/* blame, backward */}
       <line x1={420} y1={38} x2={168} y2={86} className="fork-blame" markerEnd="url(#fork-head)" />
@@ -837,7 +840,7 @@ function ChainNetDiagram() {
     />
   );
   return (
-    <svg viewBox="-116 0 812 160" className="chain-net" role="img"
+    <svg {...fig(35, 29, 533, 122)} className="chain-net" role="img"
          aria-label="A chain: input x feeds neuron A through weight w1, neuron A feeds neuron B through weight w2, and neuron B's confidence is the answer, compared against the target y = 1">
       <defs>
         <marker id="chain-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7"
@@ -898,16 +901,25 @@ const RIPPLE_FACTORS = [
   { f: "× −0.439", why: "the gap", kind: "gap" },
 ];
 
+// The log's box geometry, shared with the recall strips below, so a strip is
+// the same drawing at the same size rather than a redraw of it. 116 rather
+// than 110 because the widest logged value, "0.09639 → 0.09589", measured 107
+// units and left a letter almost touching each edge; the arrow gap gives back
+// what the boxes take, so the diagram's width is unchanged.
+const RIPPLE_BW = 116;
+const RIPPLE_GAP = 20;
+const RIPPLE_BH = 62;
+
 // A recall strip: re-renders just the log segments a kind-beat discusses
 // (arrow i connects box i to box i+1), so the reader never scrolls back to
 // the full diagram.
 function RippleSlice({ arrows }: { arrows: number[] }) {
-  const BW = 110;
-  const GAP = 26;
+  const BW = RIPPLE_BW;
+  const GAP = RIPPLE_GAP;
   const SEP = 40; // space between segments
   const X0 = 14;
   const Y0 = 44;
-  const BH = 62;
+  const BH = RIPPLE_BH;
   const SEG = BW + GAP + BW;
   const W = X0 * 2 + arrows.length * SEG + (arrows.length - 1) * SEP;
   const markerId = `slice-arrow-${arrows.join("_")}`;
@@ -927,8 +939,7 @@ function RippleSlice({ arrows }: { arrows: number[] }) {
   );
   return (
     <div className="figure-scroll scroll-x" tabIndex={0}>
-    <svg viewBox={`0 0 ${W} 140`} className="ripple-slice"
-         style={{ width: `${W}px`, maxWidth: "100%" }} role="img"
+    <svg {...fig(5, -3, W - 11, 142)} className="ripple-slice" role="img"
          aria-label={`Recall from the log: ${arrows
            .map((i) => `${RIPPLE_BOXES[i].title} to ${RIPPLE_BOXES[i + 1].title}, factor ${RIPPLE_FACTORS[i].f}`)
            .join("; ")}`}>
@@ -970,14 +981,14 @@ function RippleSlice({ arrows }: { arrows: number[] }) {
 function ChainRippleDiagram() {
   const boxes = RIPPLE_BOXES;
   const factors = RIPPLE_FACTORS;
-  const BW = 110; // box width
-  const GAP = 26; // arrow length between boxes
+  const BW = RIPPLE_BW;
+  const GAP = RIPPLE_GAP;
   const X0 = 12;
   const Y0 = 44; // box top
-  const BH = 62;
+  const BH = RIPPLE_BH;
   const bandLeft = (i: number) => X0 + i * (BW + GAP); // band spans boxes i, i+1
   return (
-    <svg viewBox="0 0 812 212" className="chain-ripple" role="img"
+    <svg {...fig(0, 9, 817, 205)} className="chain-ripple" role="img"
          aria-label="A +0.01 nudge to w1 ripples through z1, a1, z2, a2 and the cost; each arrow multiplies the change by a local factor, and the product of all five factors is the slope, −0.0508. Green bands group z1 and a1 inside neuron A and z2 and a2 inside neuron B.">
       {/* which boxes live inside which neuron: the wiring diagram's circles,
           unrolled */}

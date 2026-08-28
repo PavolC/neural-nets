@@ -1,4 +1,5 @@
 import { scale } from "./utils";
+import { fig } from "../../../components/ModuleBits";
 
 // Static figure: the measured log of one run, the 784-30-10 digit reader
 // trained on 1,000 images for 80 epochs (cross-entropy cost, weights scaled
@@ -59,7 +60,7 @@ export function OverfitFigure() {
   return (
     <>
     <svg
-      viewBox={`0 0 ${W} ${H}`}
+      {...fig(5, -8, 618, 309)}
       className="curve-figure overfit-figure"
       role="img"
       aria-label="Eighty epochs of training on 1,000 images. Accuracy on the training images climbs from 82 percent to 100 percent and stays there; accuracy on the held-out images climbs to about 86 percent by epoch 10 and then stops. The cost on the training images falls to nearly zero; the cost on the held-out images bottoms out near 0.84 around epoch 9 and then rises to 1.09."

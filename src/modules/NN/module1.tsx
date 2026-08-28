@@ -1,4 +1,4 @@
-import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader, fig } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { ExercisePage } from "../../components/ExercisePage";
 import { sigmoidNeuronExercise } from "../../exercises/sigmoid-neuron";
@@ -332,11 +332,13 @@ np.exp(-2.0)    # e^(-2); given an array, it does every entry at once`}</pre>
 // the four possible situations, their z values, and the z = 0 line.
 function ConcertPlot() {
   const W = 400;
-  const H = 340;
+  // 348 rather than 340: the axis label needs a row of its own under the
+  // ticks, which at 340 it shared with the "1" tick directly above it.
+  const H = 348;
   const D0 = -0.35;
   const D1 = 1.35;
   const px = (v: number) => scale(v, D0, D1, 40, W - 14);
-  const py = (v: number) => scale(v, D0, D1, H - 34, 14);
+  const py = (v: number) => scale(v, D0, D1, H - 42, 14);
   // 6*x1 + 2*x2 - 5 = 0  ->  x1 = (5 - 2*x2) / 6
   const lineX1 = (x2: number) => (5 - 2 * x2) / 6;
   const dots = [
@@ -346,7 +348,7 @@ function ConcertPlot() {
     { x1: 1, x2: 1, z: "+3", go: true, labelAbove: true },
   ];
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="concert-plot" role="img"
+    <svg {...fig(-3, 0, W, H)} className="concert-plot" role="img"
          aria-label="The four concert situations plotted; a straight line separates the two stay dots from the two go dots">
       <polygon
         points={`${px(lineX1(D0))},${py(D0)} ${px(D1)},${py(D0)} ${px(D1)},${py(D1)} ${px(lineX1(D1))},${py(D1)}`}
@@ -356,7 +358,7 @@ function ConcertPlot() {
         <g key={v} className="axis-guides">
           <line x1={px(v)} y1={py(D0)} x2={px(v)} y2={py(D1)} />
           <line x1={px(D0)} y1={py(v)} x2={px(D1)} y2={py(v)} />
-          <text x={px(v) - 4} y={H - 16}>{v}</text>
+          <text x={px(v) - 4} y={py(D0) + 18}>{v}</text>
           <text x={22} y={py(v) + 4}>{v}</text>
         </g>
       ))}
@@ -402,7 +404,7 @@ function TinyNetDiagram() {
     ["x1", "h1"], ["x1", "h2"], ["x2", "h1"], ["x2", "h2"], ["h1", "out"], ["h2", "out"],
   ];
   return (
-    <svg viewBox="-50 0 490 232" className="tiny-net" role="img"
+    <svg {...fig(-32, 29, 437, 201)} className="tiny-net" role="img"
          aria-label="Diagram: inputs x1 and x2 feed hidden neurons h1 and h2, which feed one output neuron">
       <defs>
         <marker id="tn-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7"

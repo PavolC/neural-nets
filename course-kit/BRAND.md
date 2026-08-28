@@ -109,6 +109,36 @@ in a stylesheet with two dozen interactives in it, a paragraph inside a panel or
 row must not inherit a prose measure. And watch for rules further down the file that set a
 `margin` shorthand, which resets the horizontal `auto` that does the centring.
 
+**Figures: one number in the markup, every width derived from it.** A figure carries its
+viewBox width into CSS as a custom property (`--fig-units`, set by the same helper that
+writes the viewBox), and every width rule is `calc()` on that. Otherwise a stylesheet ends
+up with `min(490px, 100%)` written out beside a viewBox that says 490, in eight places, and
+tightening a viewBox leaves the two disagreeing.
+
+Keep each viewBox tight to what the figure draws, about eight units of margin a side. A
+padded viewBox is not free: the figure reserves that width in the column, starts shrinking
+as if it were that wide, and on a phone the reader pans across the empty margins. Centring
+the ink inside a padded box, which is the tempting fix, leaves all of that in place.
+
+Diagrams that belong to a set should render at one scale, so a diagram with fewer boxes in
+it is narrower rather than differently drawn. Calibrate that scale so the widest of them
+fills the column exactly, and have a check fail if a new one exceeds it.
+
+**Two CSS traps, both found by measuring rather than by looking.** A custom property that
+references another is substituted **where it is declared**: `--cover: var(--ground)` at
+`:root` freezes the root's value and inherits that down, so a card with a ground of its own
+still gets the page's. Read the token on the element that paints. And an invalid `var()`
+makes the whole declaration invalid at computed-value time, so a width built that way
+silently falls back to `auto`, which for an SVG with a viewBox means 100 percent. That
+scaled every plot figure to twice its drawn size, and the page looked *better*, not broken.
+Compare drawn sizes before and after a change like this; a screenshot will not tell you.
+
+**Labels on lines need clearance, not a halo.** A background-coloured stroke behind the
+glyphs (`paint-order: stroke`) covers the line beside each glyph and not in the gaps
+between them, so a line running through a label still reads through it. Move the label
+clear, remembering that an offset moves the *baseline* while the glyphs stand above it, and
+draw every label in a pass after every line or a later line paints over an earlier label.
+
 **5. The lockup.** A monogram tile, the series wordmark, and the course subject on the
 line below:
 

@@ -45,7 +45,7 @@ export function Module3() {
         against you, and average over the corners:
       </p>
       <Eq
-        tex="\begin{aligned} C &= \frac{\underbrace{(0 - 0.247)^2}_{(0,0)\text{, stay}} + \underbrace{(1 - 0.462)^2}_{(1,0)\text{, go}} + \underbrace{(1 - 0.462)^2}_{(0,1)\text{, go}} + \underbrace{(0 - 0.247)^2}_{(1,1)\text{, stay}}}{2 \times 4} \\[0.7em] &= \frac{0.700}{8} \approx 0.0875 \end{aligned}"
+        tex="\begin{aligned} C &= \frac{\underbrace{(0 - 0.247)^2}_{(0,0)\text{, stay}} + \underbrace{(1 - 0.462)^2}_{(1,0)\text{, go}} + \underbrace{(1 - 0.462)^2}_{(0,1)\text{, go}} + \underbrace{(0 - 0.247)^2}_{(1,1)\text{, stay}}}{2 \times 4} \\[0.8em] &= \frac{0.700}{8} \approx 0.0875 \end{aligned}"
         gloss="One term per corner of the truth table: the squared gaps are 0.061, 0.289, 0.289 and 0.061, which sum to 0.700. The 4 below the line is the number of examples (an average, so a bigger dataset does not automatically score worse). The extra 2 is a bookkeeping choice with a delayed payoff: in Module 4 it will make the cost's slope work out to exactly the gap between output and right answer, with no stray factor of 2."
       />
       <p>
@@ -115,7 +115,7 @@ export function Module3() {
         of the knobs, it comes out as:
       </p>
       <Eq
-        tex="\begin{gathered} \nabla C = (\underbrace{-0.024,\; -0.024,\; -0.041}_{\text{h1's knobs}},\; \underbrace{0.017,\; 0.017,\; 0.041}_{\text{h2's knobs}}, \\[0.9em] \underbrace{-0.035,\; -0.009,\; -0.044}_{\text{output's knobs}}) \end{gathered}"
+        tex="\begin{gathered} \nabla C = (\underbrace{-0.024,\; -0.024,\; -0.041}_{\text{h1's knobs}},\; \underbrace{0.017,\; 0.017,\; 0.041}_{\text{h2's knobs}}, \\[0.8em] \underbrace{-0.035,\; -0.009,\; -0.044}_{\text{output's knobs}}) \end{gathered}"
         gloss="Nine slopes, three per neuron in the interactive's order: each neuron's two weights then its bias, h1 first, the output neuron last. The final entry is the -0.044 you measured on the output bias. A different setting of the knobs would give a different list: the gradient is a local reading, taken where you stand."
       />
       <SectionHeader id="m3-descent" title="Walking downhill" />

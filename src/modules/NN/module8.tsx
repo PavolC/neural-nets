@@ -1,4 +1,4 @@
-import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
+import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader, fig } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
 import { DepthTrainPanel } from "./interactives/DepthTrainPanel";
 import { LayerSpeedBars } from "./interactives/LayerSpeedBars";
@@ -842,7 +842,7 @@ function SharedWeightsFigure() {
 
   return (
     <svg
-      viewBox="0 0 560 220"
+      {...fig(12, 11, 534, 208)}
       className="m8-conv"
       role="img"
       aria-label="A 5 by 5 window shown at three positions on a 28 by 28 image; all three point at one shared set of 26 numbers, which feeds a 24 by 24 grid of neurons, one per position."
@@ -954,7 +954,7 @@ function HiddenSpaceFigure() {
 
   return (
     <svg
-      viewBox="0 0 500 244"
+      {...fig(12, 1, 456, 238)}
       className="m8-spaces"
       role="img"
       aria-label="Left: the four concert situations plotted on the weather and friend axes, with the two go points on opposite corners so no straight line separates them from the two stay points. Right: the same four plotted on the two hidden neurons' reports, where both go points land at 0.95, 0.05 and a single dashed line separates them from the other two."
