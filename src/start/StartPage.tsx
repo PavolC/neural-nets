@@ -426,10 +426,14 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
                   {section.label}
                 </button>{" "}
                 <span className="start-progress-where">
-                  {section.kind === "given" ? "written for you" : STATE_WORDS[state]}
-                  <span className="sr-only">
-                    {section.kind === "given" ? "" : `, ${STATE_WORDS[state]}`}
-                  </span>
+                  {/* The label already says "written for you" for a given
+                      section, so what is worth adding there is whether it has
+                      arrived, not what it is. */}
+                  {section.kind === "given"
+                    ? state === "missing"
+                      ? "not in your file yet"
+                      : "in your file"
+                    : STATE_WORDS[state]}
                 </span>
                 <span className="start-progress-builds">
                   {exercise ? exercise.builds : section.provides.join(", ")}
