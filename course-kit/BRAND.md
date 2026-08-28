@@ -77,15 +77,27 @@ It marks the series wordmark, the aside and nav labels, the passed badge, and ev
 --label-size: 0.72rem;  --label-tracking: 0.09em;  --label-weight: 600;
 ```
 
-**4. The reading measure.** Prose runs to `--measure` (34rem, about 69 characters at a 19px
-root); figures, tables, panels and the editor keep the whole column. Display equations take
-`--measure-wide` (42rem) because they centre themselves and cannot re-wrap. The page then
-reads as a text column with wider illustrations beside it, which is the single change that
-does most for how designed it looks.
+**4. The reading measure, and one axis.** Prose runs to `--measure` (34rem, about 69
+characters at a 19px root); figures, tables and panels keep the whole column. Display
+equations take `--measure-wide` (42rem) because they centre themselves and cannot re-wrap.
+That is the single change that does most for how designed a long reading page looks.
 
-Apply it with direct-child selectors on the reading column, never on `p` globally: in a
-stylesheet with two dozen interactives in it, a paragraph inside a panel or a control row
-must not inherit a prose measure.
+**Centre the measured content in the column; do not left-align it.** This is the part that
+is easy to get wrong, and the first course got it wrong first. Left-aligned, every block
+wider than the prose hangs off to its right and the page reads as lopsided; centred, the
+prose, the equations and the figures share one centre line and an equation sits dead centre
+over the paragraph that introduces it. The masthead, the headings and the figure captions
+belong on that axis too: a title starting at the column edge while the prose under it starts
+113px further in reads as a misalignment, not as a wider header.
+
+Keep the column itself centred at every width. A column shifted off centre to open a gutter
+for a sidebar charges every page that has no sidebar, including the front page, which is the
+first thing anyone sees.
+
+Apply the measure with direct-child selectors on the reading column, never on `p` globally:
+in a stylesheet with two dozen interactives in it, a paragraph inside a panel or a control
+row must not inherit a prose measure. And watch for rules further down the file that set a
+`margin` shorthand, which resets the horizontal `auto` that does the centring.
 
 **5. The lockup.** A monogram tile, the series wordmark, and the course subject on the
 line below:

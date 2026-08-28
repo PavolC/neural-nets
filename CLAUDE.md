@@ -491,14 +491,32 @@ the footer. Rules that follow from it:
 - Data hues (`--acc`, `--loss`, `--data-*`) are not brand colours and do not follow the
   accent. They name quantities in charts, and a course that changes its accent must not
   silently repaint its charts.
-- **Prose takes `--measure`, everything else takes the column.** A line of prose runs to
-  34rem (about 69 characters at the 19px root); figures, tables, panels and the editor keep
-  the full 920px. The selectors that apply it are all direct-child of the reading column
+- **One axis, and everything is centred on it.** A line of prose runs to `--measure`
+  (34rem, about 69 characters at the 19px root) and is centred in the column, not
+  left-aligned in it. Left-aligned was the first attempt and it was wrong: every block
+  wider than the prose (an equation, a figure, a caption, a table) hung off to its right
+  and the page read as lopsided. Centred, the prose, the equations and the figures share
+  one centre line, so an equation sits dead centre over the paragraph that introduces it.
+  Headings, captions and the masthead are in the set too; left out, they started at the
+  column's left edge while the prose under them started 113px further in, which reads as a
+  mistake rather than as a wider header.
+- **The column does not shift.** It is centred at every width. It used to sit 100px left of
+  centre above 1200px to open a gutter for the on-this-page nav, and the cost was that
+  every page looked mis-centred whether it had that nav or not: the front page never does,
+  so a first visit landed on one that did. The nav now needs 1400px, where a centred column
+  leaves room beside it, and below that the sticky section bar takes over as it already did.
+- **The selectors that apply the measure are all direct-child of the reading column**
   (`.module > p`, `.exercise > p`), which is what makes it safe in a stylesheet with
   twenty-five interactives: a paragraph inside a panel is not a child of the article and
-  never sees it. Display equations take `--measure-wide` (42rem) because they centre
-  themselves and cannot re-wrap; two of the course's 51 equations still scroll inside their
-  own affordance, both of them wide `\underbrace` tallies.
+  never sees it. A rule further down the file that sets a `margin` shorthand resets the
+  horizontal `auto`, so those write `margin: X auto Y` themselves.
+- **Two things keep the column's full width, and only two:** the figures and panels
+  themselves, and the rules under the tab strip and above the footer. The tab strip starts
+  on the text's axis and runs on to the column's right edge, because the left edge is where
+  alignment is read and eleven tabs inset on both sides wrap to three rows instead of two.
+- Display equations take `--measure-wide` (42rem) because they centre themselves and cannot
+  re-wrap; four of the course's 51 still scroll inside their own affordance, all of them wide
+  `\underbrace` tallies.
 - **A course links up to the series index, never across to a sibling.** `SERIES.homeUrl`
   is set once and never touched; the index is the only thing that knows what else exists.
   There is deliberately no list of courses in `brand.ts`: carrying one would mean editing
