@@ -2,8 +2,6 @@
 # encoding and splitting are the same three moves in every framework's data
 # tooling, written out.
 
-import numpy as np
-
 
 def standardize(X, mean=None, spread=None):
     """Centre and scale each feature; reuse a given mean and spread if handed one."""

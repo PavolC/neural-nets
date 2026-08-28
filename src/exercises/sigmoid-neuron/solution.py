@@ -1,8 +1,6 @@
 # Reference solution, adapted from Michael Nielsen's network.py (MIT license,
 # github.com/mnielsen/neural-networks-and-deep-learning).
 
-import numpy as np
-
 
 def sigmoid(z):
     """Return 1 / (1 + e^(-z)), elementwise."""

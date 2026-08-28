@@ -135,6 +135,10 @@ def test_backprop_hidden_layer():
 
 def test_gradient_check():
     """the gradient check: your slopes against nudge-and-measure, all 54"""
+    # The oracle is deliberately the course's forward pass and the
+    # course's nudge-and-measure, not the copies in your file. This is
+    # the course's strongest promise about your code, and a guarantee
+    # whose yardstick shares the code under test is not a guarantee.
     from course import feedforward, numerical_gradient
     # A fixed 3-5-4-2 network: two hidden layers, so the backward loop has
     # to take more than one step, and no two layers the same size, so every

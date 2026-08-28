@@ -1,0 +1,179 @@
+[
+  {
+    "id": "sigmoid-neuron",
+    "kind": "exercise",
+    "module": "m1",
+    "label": "Module 1, A sigmoid neuron",
+    "marker": "# ---- [section:sigmoid-neuron] Module 1, A sigmoid neuron -----------------",
+    "provides": [
+      "sigmoid",
+      "fire"
+    ],
+    "requires": [],
+    "pulledInBy": [],
+    "checks": []
+  },
+  {
+    "id": "feedforward",
+    "kind": "exercise",
+    "module": "m2",
+    "label": "Module 2, Feedforward",
+    "marker": "# ---- [section:feedforward] Module 2, Feedforward -------------------------",
+    "provides": [
+      "feedforward"
+    ],
+    "requires": [
+      "sigmoid-neuron"
+    ],
+    "pulledInBy": [],
+    "checks": []
+  },
+  {
+    "id": "given-cost",
+    "kind": "given",
+    "module": "m3",
+    "label": "Module 3, written for you",
+    "marker": "# ---- [section:given-cost] Module 3, written for you ----------------------",
+    "provides": [
+      "quadratic_cost",
+      "numerical_gradient",
+      "gradient"
+    ],
+    "requires": [
+      "feedforward"
+    ],
+    "pulledInBy": [
+      "sgd"
+    ],
+    "checks": []
+  },
+  {
+    "id": "sgd",
+    "kind": "exercise",
+    "module": "m3",
+    "label": "Module 3, Stochastic gradient descent",
+    "marker": "# ---- [section:sgd] Module 3, Stochastic gradient descent -----------------",
+    "provides": [
+      "sgd_step",
+      "sgd"
+    ],
+    "requires": [
+      "given-cost"
+    ],
+    "pulledInBy": [],
+    "checks": []
+  },
+  {
+    "id": "backprop",
+    "kind": "exercise",
+    "module": "m5",
+    "label": "Module 5, Backpropagation",
+    "marker": "# ---- [section:backprop] Module 5, Backpropagation ------------------------",
+    "provides": [
+      "sigmoid_prime",
+      "backprop"
+    ],
+    "requires": [
+      "sigmoid-neuron"
+    ],
+    "pulledInBy": [],
+    "checks": []
+  },
+  {
+    "id": "given-batch",
+    "kind": "given",
+    "module": "m5",
+    "label": "Module 5, written for you",
+    "marker": "# ---- [section:given-batch] Module 5, written for you ---------------------",
+    "provides": [
+      "batch_gradient"
+    ],
+    "requires": [
+      "backprop"
+    ],
+    "pulledInBy": [
+      "backprop"
+    ],
+    "checks": []
+  },
+  {
+    "id": "cross-entropy",
+    "kind": "exercise",
+    "module": "m7",
+    "label": "Module 7, The cross-entropy cost",
+    "marker": "# ---- [section:cross-entropy] Module 7, The cross-entropy cost ------------",
+    "provides": [
+      "cross_entropy_cost",
+      "cross_entropy_delta"
+    ],
+    "requires": [
+      "feedforward",
+      "backprop"
+    ],
+    "pulledInBy": [],
+    "checks": [
+      "backprop"
+    ]
+  },
+  {
+    "id": "smart-init",
+    "kind": "exercise",
+    "module": "m7",
+    "label": "Module 7, A better starting point",
+    "marker": "# ---- [section:smart-init] Module 7, A better starting point --------------",
+    "provides": [
+      "init_network"
+    ],
+    "requires": [],
+    "pulledInBy": [],
+    "checks": []
+  },
+  {
+    "id": "l2",
+    "kind": "exercise",
+    "module": "m7",
+    "label": "Module 7, The decaying update step",
+    "marker": "# ---- [section:l2] Module 7, The decaying update step ---------------------",
+    "provides": [
+      "l2_step"
+    ],
+    "requires": [],
+    "pulledInBy": [],
+    "checks": []
+  },
+  {
+    "id": "train",
+    "kind": "exercise",
+    "module": "m9",
+    "label": "Module 9, The whole program",
+    "marker": "# ---- [section:train] Module 9, The whole program -------------------------",
+    "provides": [
+      "accuracy",
+      "train"
+    ],
+    "requires": [
+      "feedforward",
+      "given-batch",
+      "cross-entropy",
+      "smart-init",
+      "l2"
+    ],
+    "pulledInBy": [],
+    "checks": []
+  },
+  {
+    "id": "prepare",
+    "kind": "exercise",
+    "module": "m10",
+    "label": "Module 10, Getting your own data ready",
+    "marker": "# ---- [section:prepare] Module 10, Getting your own data ready ------------",
+    "provides": [
+      "standardize",
+      "one_hot",
+      "split"
+    ],
+    "requires": [],
+    "pulledInBy": [],
+    "checks": []
+  }
+]
