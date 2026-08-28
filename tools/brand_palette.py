@@ -28,8 +28,12 @@ ON_ACCENT = "#ffffff"
 SEED = "#0b6e4f"
 
 # Names in the order they are written into brand.css, and the hue offset each
-# one sits at from the seed. Forty degrees apart, so nine of them go most of
-# the way round and no two are close enough to be confused in a link.
+# one sits at from the seed. Thirty-six degrees apart, except that the stop at
+# 288 is skipped because it comes out an olive that reads as a mistake rather
+# than as a choice: nine hues over ten stops, reaching 324 degrees round the
+# circle, and no two close enough to be confused in a link. Regenerating an
+# even nine at 40 degrees, which this comment used to describe, gives a
+# different set.
 FAMILY = [
     ("green", 0),
     ("teal", 36),

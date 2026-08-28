@@ -53,9 +53,9 @@ export const SERIES = {
 };
 
 export const COURSE = {
-  /** The slug, not the display name. It is the key in SERIES.courses and the
-   *  stem of the progress file's name, so it stays put when the subject above
-   *  is reworded. */
+  /** The slug, not the display name. It is the stem of the progress file's
+   *  name and the series index's key for this course, so it stays put when the
+   *  subject above is reworded. */
   id: "nets",
   subject: "Neural Networks",
   /** Under the title, which now carries the topic itself, so this says what the

@@ -223,7 +223,9 @@ either wrong or empty.
 
 1. Copy `brand/` to `src/brand/`.
 2. Edit `brand.ts`: the series name, the note, the course's subject and tagline, and the
-   glyph path. Add the course to `SERIES.courses`.
+   glyph path. `SERIES.homeUrl` is copied from a sibling unchanged, because every course
+   points at the same index. There is deliberately no list of siblings to add the course
+   to; see "link up, never across" below for why not.
 3. Edit the one `--accent` line in `brand.css` to an unused hue.
 4. `@import "./brand/brand.css";` at the top of the course stylesheet, and delete whatever
    it already had for `h1`, the tagline, the nav strip and the footer, so the two do not
