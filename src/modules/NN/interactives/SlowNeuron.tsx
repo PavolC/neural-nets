@@ -40,7 +40,7 @@ const W = 620;
 const H = 250;
 const PAD = { top: 26, right: 20, bottom: 42, left: 52 };
 
-export function SlowNeuron() {
+export function SlowNeuron({ showCrossEntropy = false }: { showCrossEntropy?: boolean }) {
   const [w, setW] = useState(2.0);
   const [b, setB] = useState(2.0);
   const [eta, setEta] = useState(0.15);
@@ -88,7 +88,9 @@ export function SlowNeuron() {
   const start = sigmoid(w + b);
   const rows = [
     { label: "the quadratic cost", run: quad, cls: "slow-line-quad" },
-    { label: "the cross-entropy cost", run: cross, cls: "slow-line-cross" },
+    ...(showCrossEntropy
+      ? [{ label: "the cross-entropy cost", run: cross, cls: "slow-line-cross" }]
+      : []),
   ];
 
   return (
@@ -158,10 +160,12 @@ export function SlowNeuron() {
         className="metrics-chart"
         role="img"
         aria-label={
-          `The neuron's answer over ${STEPS} descent steps, one line per cost. ` +
-          `From ${start.toFixed(3)} the cross-entropy line falls to ` +
-          `${cross.answers[STEPS].toFixed(3)} and the quadratic line to ` +
-          `${quad.answers[STEPS].toFixed(3)}.`
+          `The neuron's answer over ${STEPS} descent steps. ` +
+          `From ${start.toFixed(3)} the quadratic line falls to ` +
+          `${quad.answers[STEPS].toFixed(3)}` +
+          (showCrossEntropy
+            ? ` and the cross-entropy line to ${cross.answers[STEPS].toFixed(3)}.`
+            : `.`)
         }
       >
         {[0, 0.25, 0.5, 0.75, 1].map((v) => (
@@ -184,19 +188,18 @@ export function SlowNeuron() {
           descent steps (every step nudges both knobs against their slope)
         </text>
         <path d={path(quad)} className="chart-line slow-line-quad" />
-        <path d={path(cross)} className="chart-line slow-line-cross" />
+        {showCrossEntropy && <path d={path(cross)} className="chart-line slow-line-cross" />}
       </svg>
       {/* The curves start at the top left, exactly where an in-chart legend
-          would sit, so the key goes underneath as HTML. */}
+          would sit, so the key goes underneath as HTML. Built from the same
+          rows as the table, so a hidden line cannot be left in the key. */}
       <ul className="m7-legend">
-        <li>
-          <span className="m7-swatch slow-line-quad" aria-hidden="true" />
-          under the quadratic cost
-        </li>
-        <li>
-          <span className="m7-swatch slow-line-cross" aria-hidden="true" />
-          under the cross-entropy cost
-        </li>
+        {rows.map((r) => (
+          <li key={r.label}>
+            <span className={`m7-swatch ${r.cls}`} aria-hidden="true" />
+            under {r.label}
+          </li>
+        ))}
       </ul>
 
       <div className="table-scroll scroll-x" tabIndex={0}>

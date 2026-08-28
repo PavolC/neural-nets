@@ -142,7 +142,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         two chips are exactly these two starts. The last column of its table
         counts the steps to 0.1 for whatever weight and bias you drag to.
       </p>
-      <Figure caption="One neuron learning to answer 0, with the input pinned at 1. The two lines are the same descent under two different costs; the second one is defined later in this module, so for now the quadratic line is the one to follow. Press Play to walk the run, and drag w and b to start it somewhere else: the further the starting answer is from 0, the longer the flat stretch at the beginning.">
+      <Figure caption="One neuron learning to answer 0, with the input pinned at 1, under the quadratic cost. Press Play to walk the run, and drag w and b to start it somewhere else: the further the starting answer is from 0, the longer the flat stretch at the beginning.">
         <SlowNeuron />
       </Figure>
       <p>
@@ -342,6 +342,13 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       </p>
       <Figure caption="The same axes as before, with cross-entropy's blame added. It is the diagonal: blame equals gap, so a worse answer always means a bigger correction. The quadratic curve is unchanged, and the two dots at an answer of 0.98 are 0.0192 and 0.98, a factor of 51 apart.">
         <BlameCurves showCrossEntropy />
+      </Figure>
+      <p>
+        Swap the blame and run the same neuron again. From the saturated start
+        it is below 0.1 in 50 steps instead of 469.
+      </p>
+      <Figure caption="The same neuron as at the top of the module, one line per cost. Both start by answering 0.982 and take the same step size; the cross-entropy line has no flat stretch at the beginning.">
+        <SlowNeuron showCrossEntropy />
       </Figure>
       <p>
         In the code, one line changes. BP1 was{" "}
