@@ -87,18 +87,14 @@
      be aligned against each other rather than nudged one at a time. */
   --monogram-size: 30px;
 
-  /* How wide a line of prose may run. At the 19px root this is about 69
+  /* How wide anything read as text may run: prose, headings, captions, the
+     cards, and the display equations. At the 19px root this is about 69
      characters of the serif, inside the 65-to-75 band a reader tracks without
-     losing the line. It is deliberately narrower than the column: figures,
-     tables and panels keep the full width, so the page reads as a text column
-     with wider illustrations beside it rather than as one wide block. */
+     losing the line. It is deliberately narrower than the column, which is
+     kept by the illustrations: figures, tables, panels and the editor. Those
+     two are the only widths on a page. An equation used to have a third, in
+     between, and three widths read as an accident rather than as a rule. */
   --measure: 34rem;
-
-  /* Display equations and other centred blocks get more room than a line of
-     prose. They share the prose column's left edge, so the page still reads as
-     one text column, but they are not forced to scroll at a width that a
-     sentence wants. */
-  --measure-wide: 42rem;
 
   /* Headings set their own line height. Inheriting the body's 1.62 leaves a
      two-line title looking like two separate lines rather than one title. */
@@ -347,27 +343,37 @@ a.brand-mark:hover .brand-wordmark {
   color: var(--ink);
 }
 
-/* Eleven tabs wrap to two rows at reading width and to six on a phone, where
+/* Eleven tabs wrap to two rows down to 881px, and to six on a phone, where
    they used to take the whole first screen before the course started. One row
-   that pans is the same information in a fraction of the height.
+   that pans is the same information in a fraction of the height, so the phone
+   pans and everything wider wraps.
 
-   880 rather than 720, which is where the third row appears: below that the
-   strip is inset by less than the measure's gutter, so it loses width faster
-   than the labels shrink. Two rows is the most the header spends on
-   navigation. */
+   880 rather than the 854 where the third row actually appears here, and the
+   26px is headroom rather than slack: the labels are set in system-ui, which
+   is a different face on every platform, and a sans a few percent wider moves
+   that boundary up into this band. Panning 26px earlier than it has to costs
+   one row of navigation; getting it wrong the other way puts a three-row wall
+   above the course. Shrinking the labels instead was tried and does not reach:
+   at 0.72rem with tight gaps a 390px phone still takes four rows, 167px of
+   navigation before the reading starts. Two rows is the most the header spends
+   on it. */
 @media (max-width: 880px) {
   .tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
-    /* Room for the thumb, so it does not sit on the tab labels. */
-    padding-bottom: 2px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--rule-strong) transparent;
-    /* The same two-signal affordance as .scroll-x, inlined rather than reused,
-       because that class would also paint its fade at reading width where the
-       row wraps and there is nothing to scroll. The first pair is painted with
-       the content so it slides away once an edge is scrolled past; the second
-       pair is the shadow it uncovers. */
+    /* No scrollbar of its own. A thin thumb here lands a second grey bar
+       directly under the accent rule of the active tab, at the same weight and
+       a few pixels lower, and it reads as a mis-drawn underline rather than as
+       a scrollbar. The fades below carry the affordance on their own, which is
+       also how a native tab strip on either phone platform does it: the active
+       tab is scrolled to the centre (App.tsx), so a cut-off neighbour at the
+       edge is the second signal. */
+    scrollbar-width: none;
+    /* The one-signal affordance the fades give, inlined rather than reusing
+       .scroll-x, because that class would also paint at reading width where
+       the row wraps and there is nothing to scroll. The first pair is painted
+       with the content so it slides away once an edge is scrolled past; the
+       second pair is the shadow it uncovers. */
     background-image:
       linear-gradient(to right, var(--bg), transparent),
       linear-gradient(to left, var(--bg), transparent),
@@ -380,12 +386,7 @@ a.brand-mark:hover .brand-wordmark {
   }
 
   .tabs::-webkit-scrollbar {
-    height: 6px;
-  }
-
-  .tabs::-webkit-scrollbar-thumb {
-    background: var(--rule-strong);
-    border-radius: var(--radius-pill);
+    display: none;
   }
 
   .tab {

@@ -141,7 +141,7 @@ export function Module2() {
         counted Module 1's nine:
       </p>
       <Eq
-        tex="\underbrace{15 \times 784}_{\text{hidden } W} + \underbrace{15}_{\text{hidden } b} + \underbrace{10 \times 15}_{\text{output } W} + \underbrace{10}_{\text{output } b} = 11{,}760 + 15 + 150 + 10 = 11{,}935"
+        tex="\begin{aligned} &\underbrace{15 \times 784}_{\text{hidden } W} + \underbrace{15}_{\text{hidden } b} + \underbrace{10 \times 15}_{\text{output } W} + \underbrace{10}_{\text{output } b} \\[0.7em] &= 11{,}760 + 15 + 150 + 10 = 11{,}935 \end{aligned}"
         gloss="The hidden layer's W has one row per neuron (15) and one column per input (784), plus one bias per neuron; the output layer reads the 15 hidden activations the same way. Nearly twelve thousand knobs, far too many to set by hand; Module 3 is about finding them automatically."
       />
 

@@ -198,8 +198,8 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         figure's step size is 0.15.
       </p>
       <Eq
-        tex="\underbrace{0.98201}_{\text{the gap}} \times \underbrace{0.01766}_{\text{the steepness}} = \underbrace{0.0173}_{\text{the blame}} \qquad 0.15 \times 0.0173 = \underbrace{0.0026}_{\text{per knob}} \qquad \underbrace{0.0052}_{\text{the drop in } z} \times 0.01766 = 0.00009"
-        gloss="Left to right: the blame, the step each knob takes against it, and how far the answer moves once the evidence has fallen by both steps together. The log's first step takes the answer from 0.9820 to 0.9819, a drop of 0.00009, and 500 steps at that rate would leave the answer above 0.93. The walk finishes in 469 because the blame grows as the answer falls back toward two thirds, not because that first rate holds."
+        tex="\begin{gathered} \underbrace{0.98201}_{\text{the gap}} \times \underbrace{0.01766}_{\text{the steepness}} = \underbrace{0.0173}_{\text{the blame}} \\[0.8em] 0.15 \times \underbrace{0.0173}_{\text{the blame}} = \underbrace{0.0026}_{\text{per knob}} \\[0.8em] \underbrace{0.0052}_{\text{the drop in } z} \times \underbrace{0.01766}_{\text{the steepness}} = 0.00009 \end{gathered}"
+        gloss="In order: the blame, the step each knob takes against it, and how far the answer moves once the evidence has fallen by both steps together. The log's first step takes the answer from 0.9820 to 0.9819, a drop of 0.00009, and 500 steps at that rate would leave the answer above 0.93. The walk finishes in 469 because the blame grows as the answer falls back toward two thirds, not because that first rate holds."
       />
       <p>
         Module 4's quiz already met this on its little 2-3-1 network: drag the
@@ -640,7 +640,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         does.
       </p>
       <Eq
-        tex="(w + h)^2 - w^2 = \underbrace{2wh}_{\text{proportional to } h} + \underbrace{h^2}_{\text{negligible for small } h} \qquad\Rightarrow\qquad \text{per unit of nudge, } 2w + h \approx 2w"
+        tex="\begin{gathered} (w + h)^2 - w^2 = \underbrace{2wh}_{\text{proportional to } h} + \underbrace{h^2}_{\text{negligible for small } h} \\[0.8em] \Rightarrow \quad \text{per unit of nudge, } 2w + h \approx 2w \end{gathered}"
         gloss="Multiply the square out, subtract the old value, and divide by the nudge: the rise per unit of nudge is 2w + h, which for a small nudge is 2w. Check it at w = 3 and h = 0.01, where the two squares are 9 and 9.0601: a rise of 0.0601 for a nudge of 0.01 is 6.01 per unit, against the 6 the rule predicts."
       />
       <p>

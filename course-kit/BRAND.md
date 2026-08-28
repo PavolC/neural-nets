@@ -77,10 +77,20 @@ It marks the series wordmark, the aside and nav labels, the passed badge, and ev
 --label-size: 0.72rem;  --label-tracking: 0.09em;  --label-weight: 600;
 ```
 
-**4. The reading measure, and one axis.** Prose runs to `--measure` (34rem, about 69
-characters at a 19px root); figures, tables and panels keep the whole column. Display
-equations take `--measure-wide` (42rem) because they centre themselves and cannot re-wrap.
-That is the single change that does most for how designed a long reading page looks.
+**4. The reading measure, and one axis.** Two widths on a page, and only two. Everything
+read as text runs to `--measure` (34rem, about 69 characters at a 19px root): prose,
+headings, captions, the cards, and the display equations. Everything that is an
+illustration keeps the whole column: figures, tables, panels, the editor, the blocks that
+hold code. That is the single change that does most for how designed a long reading page
+looks.
+
+Resist a third width in between. The first course gave equations their own 42rem, on the
+grounds that they centre themselves and cannot re-wrap, and the result was three widths
+on one page, which reads as an accident rather than as a rule; it also failed the four
+equations that were wider than 42rem anyway. Splitting a long equation over two or three
+lines is what a typesetter does with it regardless. A card's box carries the measure plus
+its padding AND its borders, so the lines inside it land on the same axis at the same
+width as the paragraphs above and below it.
 
 **Centre the measured content in the column; do not left-align it.** This is the part that
 is easy to get wrong, and the first course got it wrong first. Left-aligned, every block
