@@ -555,10 +555,40 @@ button:disabled {
   border-color: var(--accent-rule);
 }
 
+/* The opener's summary carries the card's heading treatment, plus the marker
+   that says it folds. The marker takes the accent, not --accent-rule: that
+   token is a 30 percent tint meant for rules, and a triangle drawn in it is
+   invisible, which is the whole affordance gone. */
+.after-this > summary {
+  cursor: pointer;
+  list-style-position: inside;
+}
+
+.after-this > summary::marker {
+  color: var(--accent);
+  font-size: 0.85em;
+}
+
+.after-this > summary::-webkit-details-marker {
+  color: var(--accent);
+}
+
+/* Folded, the card is one line, so it should be the height of one line: the
+   summary's own bottom margin and the card's bottom padding are both there to
+   separate it from a list that is not being shown. */
+.after-this:not([open]) > summary {
+  margin-bottom: 0.2rem;
+}
+
+.after-this:not([open]) {
+  padding-bottom: 0.3rem;
+}
+
 /* A card heading is chrome, not prose: it labels the box rather than
    continuing the argument, so it takes the chrome face and the accent. Not the
    uppercase label idiom, because "What you'll be able to do after this" is a
    sentence and letterspaced capitals would wrap it into three lines. */
+.after-this > summary,
 .after-this h3,
 .recap h3 {
   font-family: var(--font-ui);
@@ -2049,6 +2079,16 @@ button:disabled {
   scroll-margin-top: 24px;
 }
 
+/* Wherever the section bar is sticky it covers the top 53px of the viewport,
+   so a jump has to clear it: at 24px the heading landed behind the bar it was
+   chosen from, and the reader arrived mid-paragraph with no sign of the section
+   they had asked for. */
+@media (max-width: 1399px) {
+  .module-section-title {
+    scroll-margin-top: 68px;
+  }
+}
+
 /* A short accent rule above each section title. The page is a long single
    scroll of prose and figures, and before this the only thing marking a new
    section was a slightly larger line of the same serif. The mark is in the
@@ -2145,6 +2185,7 @@ button:disabled {
   align-items: center;
   gap: 0.5rem;
   width: 100%;
+  min-height: 44px;
   background: transparent;
   border: none;
   border-radius: 0;
@@ -2186,6 +2227,7 @@ button:disabled {
 }
 
 .module-jump-list .module-toc-item {
+  min-height: 44px;
   padding: 0.5rem 0;
   font-size: 0.85rem;
 }
@@ -3077,4 +3119,120 @@ button:disabled {
 .step-mark {
   stroke: var(--rule-strong);
   stroke-dasharray: 3 3;
+}
+
+/* ---------- phones ---------- */
+
+/* Everything below is about a 390x844 screen, where the course is read one
+   short line at a time and every pixel of chrome is a pixel of prose. The
+   header itself compresses in the brand layer (.masthead-compact) and the tab
+   strip is replaced there by the module picker; what is left is the page
+   around them. Measured on Module 2 at 390px: the first line of prose sat at
+   892px, off the bottom of the first screenful, and these rules with the
+   header change bring it to inside it. */
+@media (max-width: 560px) {
+  /* 16px rather than 20: it buys 9px of line, which is half a word, and more
+     usefully it buys the figures 16px before they start to pan. */
+  .app {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 1.6rem;
+  }
+
+  /* The full-bleed bars are pulled out by the app's own padding, so they track
+     it. */
+  .module-jump {
+    margin-left: -1rem;
+    margin-right: -1rem;
+  }
+
+  .module-jump-toggle,
+  .module-jump-list {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* The opener and the recap are 3 short items in a card, and at the page's
+     19px they run to three lines each and 357px, two fifths of the screen
+     before the lesson starts. A size down and a tighter leading is the whole
+     fix; folding them away would hide the one thing a module promises. */
+  .after-this li,
+  .recap li {
+    font-size: 0.88rem;
+    line-height: 1.45;
+    margin-bottom: 0.25rem;
+  }
+
+  .after-this > summary,
+  .after-this h3,
+  .recap h3 {
+    font-size: 0.78rem;
+    line-height: 1.3;
+    margin: 0.75rem 0 0.4rem;
+  }
+
+  /* A primary action at the end of a module, thumb-width rather than tucked
+     against the right edge: the flex row that right-aligns it on a wide screen
+     has nothing else in it, so on a phone the button takes the line. */
+  .next-module button,
+  .start-cta button {
+    width: 100%;
+  }
+
+  /* Run goes directly under the editor. The tip explaining the two buttons is
+     twelve lines on a phone, so between the editor and the controls it put
+     330px of reading in the middle of the course's tightest loop: edit, run,
+     read the output. After them it explains buttons the reader can already
+     see. The output panel and everything below keep their place. */
+  .workbench {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Negative orders on the three that move, so everything else keeps the
+     default 0 and follows in source order: the statuses, the output panel, and
+     anything added later. A catch-all :not() rule was tried and lost to its own
+     specificity, which put the editor last. */
+  .workbench > .code-editor,
+  .workbench > .code-editor-loading {
+    order: -3;
+  }
+
+  .workbench > .exercise-controls {
+    order: -2;
+  }
+
+  .workbench > .exercise-tip {
+    order: -1;
+    margin-top: 0.9rem;
+  }
+}
+
+/* Touch: the same band the module picker takes over in, because that is where
+   the reading happens with a thumb. 44px is the smaller of the two platform
+   minimums (iOS 44, Android 48) and the one the picker rows already use.
+   Sliders were the worst of it: an unstyled range input is 16px tall, and
+   twenty-two of them drive the interactives. Height on the input grows its box
+   and the browser keeps the track centred in it, so the affordance looks the
+   same and the target is twice the size. */
+@media (max-width: 880px) {
+  input[type="range"] {
+    min-height: 32px;
+  }
+
+  .button-secondary,
+  .start-outline-title,
+  .start-progress-link,
+  .chip {
+    min-height: 44px;
+  }
+
+  /* Padding rather than flex centring: a summary is display: list-item, and
+     display: flex on it removes the disclosure marker, which is the one thing
+     that says the block folds. That cost the module opener its triangle and
+     left a green heading nobody would think to tap. */
+  summary {
+    min-height: 44px;
+    padding-block: 0.5rem;
+  }
 }

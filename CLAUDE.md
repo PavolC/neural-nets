@@ -623,6 +623,49 @@ the footer. Rules that follow from it:
   below that, display math cannot re-wrap and scrolling is the only option left. Measure
   a candidate with `.eq-scroll { width: 1px }` and read `scrollWidth`: that is the
   natural width, and the box to beat is 646px.
+- **Below 880px the tab strip is replaced by a picker, not panned.** Eleven tabs
+  wrap to two rows down to 881px; below that the strip cannot show them without
+  panning, and dragging a row sideways is the worst way to offer a list of
+  eleven things (the active tab is centred, so a phone shows three of them and
+  the reader has to discover the rest). `.module-picker` is the same list folded
+  into one line, in the same idiom as the course's own section bar, and neither
+  navigation pans at any width. Wrapping instead was measured and does not
+  reach: a 390px phone takes six rows, 306px of navigation, and four rows even
+  at 0.72rem with tight gaps.
+- **The masthead compresses on inner pages at phone width.** `Masthead` takes a
+  `compact` flag (App passes it for every page but the start page) and below
+  560px that drops the tagline and sizes the title down to a running head. The
+  tagline is the course's pitch, which is what the front door is for; on page
+  seven it costs four lines. Measured on Module 2 at 390x844, the whole
+  first-screenful chrome was 329px and the first line of prose sat at 892px, off
+  the bottom of the screen: it is 459px now, and no module is past 600px.
+- **The module opener folds on a phone.** `AfterThis` is a `<details>`, open
+  everywhere except below 560px, where three items ran to between 250 and 390px
+  and Module 8's card alone was 46 percent of the first screenful. Folded, the
+  module still opens by naming what it will teach. The state is read once at
+  mount, not watched, so a reader who opens it does not have it shut again by a
+  rotation. A `<summary>` is `display: list-item`, and `display: flex` on it
+  (which is a tempting way to centre it in a 44px touch target) removes the
+  disclosure marker and leaves a heading nobody would think to tap: use padding.
+- **In-page jumps are instant, and that is correctness, not taste.** A browser's
+  smooth scroll animates toward the offset it computed when it started, and
+  these pages mount their panels as they come into view: measured on a 390px
+  screen, the document grew 971px in flight and the heading landed 189px above
+  the viewport, repeatably, while the same jump at 1440px was exact. Section
+  headings also need `scroll-margin-top` clearing the sticky section bar (68px
+  below 1400px, where the bar exists); at 24px the heading landed behind the bar
+  it was chosen from.
+- **Touch targets are 44px below 880px**, the band where the picker takes over.
+  The worst of it was the range inputs: an unstyled one is 16px tall and
+  twenty-two of them drive the interactives. `min-height` on the input grows its
+  box and the browser keeps the track centred, so the affordance looks the same
+  and the whole 32px box is live, which a drag 3px from its top edge confirms.
+- **The exercise's Run buttons sit directly under the editor on a phone.** The
+  tip explaining them is twelve lines there, so in source order it put 330px of
+  reading inside the course's tightest loop: edit, run, read the output. The
+  three that move take negative flex orders, so the statuses and the output
+  panel keep the default 0 and follow in source order; a catch-all `:not()` rule
+  was tried and lost to its own specificity, which put the editor last.
 - **A course links up to the series index, never across to a sibling.** `SERIES.homeUrl`
   is set once and never touched; the index is the only thing that knows what else exists.
   There is deliberately no list of courses in `brand.ts`: carrying one would mean editing

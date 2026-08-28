@@ -5,16 +5,29 @@ import type { CSSProperties, ReactNode } from "react";
 // opener with "What you'll be able to do after this", figures with
 // captions, and a closing recap with a "Go deeper" link to Nielsen.
 
+/**
+ * The module's opening promise. A disclosure rather than a plain card, open
+ * everywhere except on a phone, where three items run to between 250 and 390px
+ * and the lesson starts below the fold: on Module 8 at 390x844 the card alone
+ * was 46 percent of the first screenful. Folded, the module still opens by
+ * naming what it will teach, and the items are one tap away.
+ *
+ * The state is read once at mount rather than watched, because a reader who has
+ * opened the card should not have it closed again by a rotation.
+ */
 export function AfterThis({ items }: { items: string[] }) {
+  const [open] = useState(
+    () => !window.matchMedia("(max-width: 560px)").matches,
+  );
   return (
-    <div className="after-this">
-      <h3>What you'll be able to do after this</h3>
+    <details className="after-this" open={open}>
+      <summary>What you'll be able to do after this</summary>
       <ul>
         {items.map((item, i) => (
           <li key={i}>{item}</li>
         ))}
       </ul>
-    </div>
+    </details>
   );
 }
 
@@ -66,11 +79,22 @@ export function ModuleToc() {
 
   // Scrolling alone leaves a keyboard reader's focus behind in the nav, so the
   // arrow keys keep scrolling the list instead of the section they just chose.
+  //
+  // The jump is instant rather than smooth, and that is a correctness fix, not
+  // a preference. A browser's smooth scroll animates toward the offset it
+  // computed when it started, and these pages mount their panels as they come
+  // into view: measured on a 390px screen, the document grew 971px while the
+  // animation was in flight and the heading ended up 189px above the viewport,
+  // repeatably, so the reader arrived mid-paragraph with no sign of the section
+  // they asked for. The same jump at 1440px landed exactly, which is why this
+  // survived until a phone pass. An instant scroll lands on the mark and stays
+  // there, because everything that mounts afterwards is below it. Nothing is
+  // lost: every section in this course is thousands of pixels from the next, so
+  // the animation was a blur with nothing readable in it.
   const goTo = (id: string) => {
     const heading = document.getElementById(id);
     if (!heading) return;
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    heading.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    heading.scrollIntoView({ block: "start" });
     heading.tabIndex = -1;
     heading.focus({ preventScroll: true });
     setOpen(false);

@@ -287,6 +287,20 @@ a.brand-mark:hover .brand-wordmark {
   .brand-series-note {
     display: none;
   }
+
+  /* An inner page on a phone: the pitch goes, the title comes down to the size
+     of a running head. The monogram and wordmark stay, because they are 30px
+     and they are the link back up to the series. Measured on Module 2 at
+     390x844: the header was 329px of an 844px screen and the first line of
+     prose sat at 892px, off the bottom of the first screenful entirely. */
+  .masthead-compact .masthead-tagline {
+    display: none;
+  }
+
+  .masthead-compact .masthead-title {
+    font-size: 1.35rem;
+    margin-bottom: 0;
+  }
 }
 
 /* ---------- the module tab strip ---------- */
@@ -343,54 +357,116 @@ a.brand-mark:hover .brand-wordmark {
   color: var(--ink);
 }
 
-/* Eleven tabs wrap to two rows down to 881px, and to six on a phone, where
-   they used to take the whole first screen before the course started. One row
-   that pans is the same information in a fraction of the height, so the phone
-   pans and everything wider wraps.
+/* Eleven tabs wrap to two rows down to 881px. Below that the strip cannot show
+   them without panning, and dragging a row sideways to find Module 9 is the
+   worst way to offer a list of eleven things: on a phone the active tab is
+   scrolled to the centre, so the reader sees three of them and has to discover
+   that the rest are off to the side. The strip is replaced by the picker below,
+   which is the same list folded into one line, and neither ever pans.
 
-   880 rather than the 854 where the third row actually appears here, and the
-   26px is headroom rather than slack: the labels are set in system-ui, which
-   is a different face on every platform, and a sans a few percent wider moves
-   that boundary up into this band. Panning 26px earlier than it has to costs
-   one row of navigation; getting it wrong the other way puts a three-row wall
-   above the course. Shrinking the labels instead was tried and does not reach:
-   at 0.72rem with tight gaps a 390px phone still takes four rows, 167px of
-   navigation before the reading starts. Two rows is the most the header spends
-   on it. */
+   Wrapping instead was measured and does not reach: at the tab sizes here a
+   390px phone takes six rows, 306px of navigation before the course starts, and
+   even at 0.72rem with tight gaps it takes four rows and 167px. */
+/* ---------- the module picker: the tab strip, folded ---------- */
+
+/* The same idiom as the course's own section bar, so the two navigations read
+   as one family: a label saying what kind of thing this names, the name, and a
+   caret. Hidden above 880px, where the strip fits. */
+.module-picker {
+  display: none;
+  margin-top: 1rem;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-display);
+}
+
+.module-picker-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 44px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  color: var(--ink);
+  font-family: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  padding: 0.55rem 0;
+}
+
+.module-picker-where {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.module-picker-title {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.module-picker-caret {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 0.7rem;
+}
+
+.module-picker-list {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 0.4rem;
+  max-height: 60vh;
+  overflow-y: auto;
+  border-top: 1px solid var(--rule);
+}
+
+/* Full-width rows at a touch height, because this list is the one place on a
+   phone where every module has to be reachable in one tap. */
+.module-picker-item {
+  display: block;
+  width: 100%;
+  /* 44px, and no more: eleven rows at 44 come to 484px, which fits inside the
+     60vh cap on a 390x844 phone, so the whole course is visible in one tap
+     without a list that scrolls inside a page that also scrolls. */
+  min-height: 44px;
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  border-radius: 0;
+  color: var(--muted);
+  font-family: inherit;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  text-align: left;
+  padding: 0.45rem 0 0.45rem 0.7rem;
+}
+
+.module-picker-item:hover {
+  color: var(--ink);
+}
+
+.module-picker-current {
+  color: var(--ink);
+  font-weight: 600;
+  border-left-color: var(--accent);
+}
+
+/* Order matters: this comes after the base rules above, because both
+   declarations have one class of specificity and the later one wins. */
 @media (max-width: 880px) {
   .tabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    /* No scrollbar of its own. A thin thumb here lands a second grey bar
-       directly under the accent rule of the active tab, at the same weight and
-       a few pixels lower, and it reads as a mis-drawn underline rather than as
-       a scrollbar. The fades below carry the affordance on their own, which is
-       also how a native tab strip on either phone platform does it: the active
-       tab is scrolled to the centre (App.tsx), so a cut-off neighbour at the
-       edge is the second signal. */
-    scrollbar-width: none;
-    /* The one-signal affordance the fades give, inlined rather than reusing
-       .scroll-x, because that class would also paint at reading width where
-       the row wraps and there is nothing to scroll. The first pair is painted
-       with the content so it slides away once an edge is scrolled past; the
-       second pair is the shadow it uncovers. */
-    background-image:
-      linear-gradient(to right, var(--bg), transparent),
-      linear-gradient(to left, var(--bg), transparent),
-      linear-gradient(to right, color-mix(in srgb, var(--ink) 13%, transparent), transparent),
-      linear-gradient(to left, color-mix(in srgb, var(--ink) 13%, transparent), transparent);
-    background-position: 0 0, 100% 0, 0 0, 100% 0;
-    background-repeat: no-repeat;
-    background-size: 26px 100%, 26px 100%, 10px 100%, 10px 100%;
-    background-attachment: local, local, scroll, scroll;
-  }
-
-  .tabs::-webkit-scrollbar {
     display: none;
   }
 
-  .tab {
-    scroll-margin-inline: 1.25rem;
+  .module-picker {
+    display: block;
   }
 }
 

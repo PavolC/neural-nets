@@ -13,8 +13,14 @@ import { Monogram } from "./Monogram";
  * with only the heading changed. The heading is the subject alone, and needs no
  * hidden prefix: the wordmark immediately above it is text, so a screen reader
  * reaches the series name first and then the course.
+ *
+ * `compact` marks an inner page, and on a phone it drops the tagline and sizes
+ * the title down. The tagline is the course's pitch, which is what the front
+ * door is for; on page seven of a course the reader has bought it already, and
+ * on a 390px screen it costs four lines, a fifth of the first screenful. The
+ * flag changes nothing above 560px, where the masthead costs nothing.
  */
-export function Masthead({ nav }: { nav?: ReactNode }) {
+export function Masthead({ nav, compact }: { nav?: ReactNode; compact?: boolean }) {
   const wordmark = (
     <>
       <Monogram />
@@ -22,7 +28,7 @@ export function Masthead({ nav }: { nav?: ReactNode }) {
     </>
   );
   return (
-    <header className="masthead">
+    <header className={compact ? "masthead masthead-compact" : "masthead"}>
       <p className="brand-row">
         {SERIES.homeUrl ? (
           <a className="brand-mark" href={SERIES.homeUrl}>
