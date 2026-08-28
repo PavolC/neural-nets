@@ -19,11 +19,44 @@
       rel="icon"
       href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b6e4f'/%3E%3Cpath d='M5 24C12 24 15 19 16 16C17 13 20 8 27 8' fill='none' stroke='%23ffffff' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E"
     />
+    <!-- The social card. Every one of these URLs has to be absolute: a share
+         is unfurled by a crawler that has no page to resolve a relative path
+         against, so "./og-image.png" fetches nothing and the link renders as
+         bare text. That is why the deployed origin is spelled out here as a
+         literal even though vite.config.ts sets base to "./" so the build
+         itself is subpath-safe. It is the same trade the favicon makes above,
+         and tools/check_brand.py checks this one too.
+
+         Regenerate the image with tools/og_card.html (see tools/make_og_image.sh). -->
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Moving Parts" />
+    <meta property="og:url" content="https://pavolc.github.io/neural-nets/" />
     <meta property="og:title" content="Neural Networks · Moving Parts" />
     <meta
       property="og:description"
+      content="Build a neural network from first principles in your browser. Read a little, play with live visualizations, and write real Python that trains on handwritten digits. No installs, no accounts."
+    />
+    <meta
+      property="og:image"
+      content="https://pavolc.github.io/neural-nets/og-image.png"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Moving Parts: Neural Networks. Twenty-five live visualizations, nine coding exercises, trains on real MNIST."
+    />
+    <link rel="canonical" href="https://pavolc.github.io/neural-nets/" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Neural Networks · Moving Parts" />
+    <meta
+      name="twitter:description"
       content="Build a neural network from first principles in your browser. No installs, no accounts."
+    />
+    <meta
+      name="twitter:image"
+      content="https://pavolc.github.io/neural-nets/og-image.png"
     />
   </head>
   <body>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { width:1200px; height:630px; overflow:hidden; }
+  body { background:#fdfdfb; color:#1a1a1a; font-family:"DejaVu Serif",Georgia,serif; position:relative; }
+
+  .rule { position:absolute; top:0; left:0; right:0; height:8px; background:#0b6e4f; z-index:3; }
+  .art  { position:absolute; right:16px; top:140px; z-index:1; }
+
+  .brandrow { position:absolute; top:62px; left:80px; z-index:2;
+              display:flex; align-items:center; gap:14px; }
+  .tile { width:44px; height:44px; flex:none; }
+  .wordmark { font-family:"DejaVu Sans",sans-serif; font-size:21px; font-weight:700;
+              letter-spacing:.13em; text-transform:uppercase; color:#0b6e4f; }
+  .note { font-family:"DejaVu Sans",sans-serif; font-size:14px; letter-spacing:.1em;
+          text-transform:uppercase; color:#5a5a5a; padding-left:14px; border-left:1px solid #d8d8d2; }
+
+  h1 { position:absolute; top:148px; left:80px; z-index:2;
+       font-size:90px; line-height:1.0; letter-spacing:-.02em; font-weight:400; }
+
+  .tagline { position:absolute; top:268px; left:80px; z-index:2;
+             font-size:27px; line-height:1.5; color:#3a3a3a; width:700px; }
+  .tagline i { color:#0b6e4f; }
+
+  .chips { position:absolute; left:80px; top:452px; z-index:2; display:flex; gap:11px; }
+  .chip { font-family:"DejaVu Sans",sans-serif; font-size:16px; font-weight:600;
+          color:#0b6e4f; line-height:1; white-space:nowrap;
+          background:rgba(11,110,79,.075); border:1px solid rgba(11,110,79,.28);
+          border-radius:999px; padding:12px 20px; }
+</style></head>
+<body>
+  <div class="rule"></div>
+
+  <svg class="art" width="450" height="390" viewBox="0 0 450 390" fill="none">
+    <path d="M12 330 C124 330 172 248 222 190 C272 132 322 48 438 48"
+          stroke="rgba(11,110,79,.12)" stroke-width="38" stroke-linecap="round"/>
+    <path d="M12 330 C124 330 172 248 222 190 C272 132 322 48 438 48"
+          stroke="#0b6e4f" stroke-width="4.5" stroke-linecap="round" opacity=".42"/>
+    <g>
+      <line x1="112" y1="146" x2="228" y2="108" stroke="rgba(11,110,79,.42)" stroke-width="2.4"/>
+      <line x1="112" y1="146" x2="228" y2="204" stroke="rgba(11,110,79,.42)" stroke-width="2.4"/>
+      <line x1="112" y1="242" x2="228" y2="108" stroke="rgba(11,110,79,.42)" stroke-width="2.4"/>
+      <line x1="112" y1="242" x2="228" y2="204" stroke="rgba(11,110,79,.42)" stroke-width="2.4"/>
+      <line x1="228" y1="108" x2="344" y2="156" stroke="rgba(11,110,79,.42)" stroke-width="2.4"/>
+      <line x1="228" y1="204" x2="344" y2="156" stroke="rgba(11,110,79,.42)" stroke-width="2.4"/>
+      <circle cx="112" cy="146" r="15" fill="#fdfdfb" stroke="#a9aca7" stroke-width="2.4"/>
+      <circle cx="112" cy="242" r="15" fill="#fdfdfb" stroke="#a9aca7" stroke-width="2.4"/>
+      <circle cx="228" cy="108" r="18" fill="#fdfdfb" stroke="#0b6e4f" stroke-width="2.8"/>
+      <circle cx="228" cy="204" r="18" fill="#fdfdfb" stroke="#0b6e4f" stroke-width="2.8"/>
+      <circle cx="344" cy="156" r="18" fill="#0b6e4f"/>
+    </g>
+  </svg>
+
+  <div class="brandrow">
+    <svg class="tile" viewBox="0 0 32 32">
+      <rect width="32" height="32" rx="7" fill="#0b6e4f"/>
+      <path d="M5 24C12 24 15 19 16 16C17 13 20 8 27 8" fill="none"
+            stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    </svg>
+    <span class="wordmark">Moving Parts</span>
+    <span class="note">build-it-yourself courses</span>
+  </div>
+
+  <h1>Neural&nbsp;Networks</h1>
+
+  <p class="tagline">
+    Build one from first principles, in <i>real Python</i>,<br>
+    in your browser. No installs, no accounts.
+  </p>
+
+  <div class="chips">
+    <span class="chip">25 live visualizations</span>
+    <span class="chip">9 coding exercises</span>
+    <span class="chip">trains on real MNIST</span>
+  </div>
+</body>
+</html>

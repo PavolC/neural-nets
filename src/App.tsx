@@ -177,7 +177,10 @@ export default function App() {
           </a>
           , Determination Press, 2015, licensed{" "}
           <a href="https://creativecommons.org/licenses/by-nc/3.0/">CC BY-NC 3.0</a>.
-          This derivative work is non-commercial and inherits the same license.
+          This course's content follows its source and is non-commercial. Reference
+          implementations are adapted from Nielsen's MIT-licensed code; the software
+          around them is separate original work. Full terms in{" "}
+          <a href="./LICENSE.txt">LICENSE</a>.
         </p>
       </SeriesFooter>
     </div>

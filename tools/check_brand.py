@@ -19,6 +19,7 @@ Exit status is 0 when everything agrees. Stdlib only.
 
 import pathlib
 import re
+import struct
 import sys
 import urllib.parse
 
@@ -130,6 +131,80 @@ def main() -> int:
     elif theme.group(1).lower() != accent:
         fail(problems, f"theme-color is {theme.group(1)}, but --accent resolves to {accent}")
 
+    # The social card. A share is unfurled by a crawler with no page to
+    # resolve a relative path against, so every URL in this block has to be
+    # absolute, which makes the deployed origin a literal in index.html the
+    # same way the favicon and the theme colour are. Four places spell it and
+    # they go stale independently, so the check is that they agree with each
+    # other rather than with a copy of the URL kept here.
+    social = {
+        "og:url": re.search(r'property="og:url"\s+content="([^"]+)"', html),
+        "og:image": re.search(r'property="og:image"\s*\n?\s*content="([^"]+)"', html),
+        "twitter:image": re.search(r'name="twitter:image"\s*\n?\s*content="([^"]+)"', html),
+        "canonical": re.search(r'rel="canonical"\s+href="([^"]+)"', html),
+    }
+    missing = [k for k, v in social.items() if not v]
+    if missing:
+        fail(problems, f"index.html is missing {', '.join(missing)}")
+    else:
+        got = {k: v.group(1) for k, v in social.items()}
+        for key in ("og:url", "og:image", "twitter:image", "canonical"):
+            if not got[key].startswith("https://"):
+                fail(problems, f"{key} is {got[key]!r}, which a crawler cannot resolve: it must be absolute")
+        origins = {k: "/".join(v.split("/")[:4]) for k, v in got.items()}
+        if len(set(origins.values())) != 1:
+            spelled = ", ".join(f"{k} -> {v}" for k, v in sorted(origins.items()))
+            fail(problems, f"the social tags point at more than one origin: {spelled}")
+        if got["og:url"] != got["canonical"]:
+            fail(problems, f"og:url is {got['og:url']!r} but canonical is {got['canonical']!r}")
+        if got["og:image"] != got["twitter:image"]:
+            fail(problems, f"og:image is {got['og:image']!r} but twitter:image is {got['twitter:image']!r}")
+
+        # The image itself has to exist in public/ under the name the tag
+        # promises, and be the size the tags declare. A crawler that fetches a
+        # 404 renders the share as bare text, which is the bug this whole
+        # block exists to prevent, and it is invisible from the page.
+        card = ROOT / "public" / got["og:image"].rsplit("/", 1)[-1]
+        if not card.exists():
+            fail(problems, f"og:image names {card.name}, which is not in public/")
+        else:
+            data = card.read_bytes()
+            if data[:8] != b"\x89PNG\r\n\x1a\n" or data[12:16] != b"IHDR":
+                fail(problems, f"public/{card.name} is not a PNG")
+            else:
+                width, height = struct.unpack(">II", data[16:24])
+                declared = (
+                    re.search(r'property="og:image:width"\s+content="(\d+)"', html),
+                    re.search(r'property="og:image:height"\s+content="(\d+)"', html),
+                )
+                if not all(declared):
+                    fail(problems, "index.html declares og:image but not its width and height")
+                elif (width, height) != (int(declared[0].group(1)), int(declared[1].group(1))):
+                    fail(problems, f"public/{card.name} is {width}x{height}, but the tags declare "
+                                   f"{declared[0].group(1)}x{declared[1].group(1)}")
+                if (width, height) != (1200, 630):
+                    fail(problems, f"public/{card.name} is {width}x{height}; the summary_large_image "
+                                   f"slot wants 1200x630")
+
+        twitter_title = re.search(r'name="twitter:title"\s+content="([^"]+)"', html)
+        if title and twitter_title and twitter_title.group(1) != wanted:
+            fail(problems, f"index.html's twitter:title is {twitter_title.group(1)!r}, "
+                           f"but COURSE_TITLE is {wanted!r}")
+
+    # The card is drawn by tools/og_card.html rather than by a component, so it
+    # is one more copy of the accent that a rebrand would leave behind.
+    card_src = ROOT / "tools" / "og_card.html"
+    if not card_src.exists():
+        fail(problems, "tools/og_card.html is missing, so the social card cannot be regenerated")
+    else:
+        src = card_src.read_text()
+        if accent not in src.lower():
+            fail(problems, f"tools/og_card.html never uses {accent}, but --accent resolves to it")
+        card_d = re.search(r'd="(M5 24[^"]*)"', src)
+        if not card_d or card_d.group(1) != glyph_d.group(1):
+            got_d = card_d.group(1) if card_d else "(none)"
+            fail(problems, f"the social card's monogram path is\n    {got_d}\n  but brand.ts draws\n    {glyph_d.group(1)}")
+
     if not KIT.exists():
         fail(problems, f"{KIT.relative_to(ROOT)} does not exist, so the kit carries no brand")
     else:
@@ -157,7 +232,7 @@ def main() -> int:
         return 1
 
     print(f"Brand agrees: accent --hue-{hue_name} ({accent}), one glyph in "
-          f"{len(SHARED) + 2} places, the title in 3, kit in step.")
+          f"{len(SHARED) + 3} places, the title in 4, the social card, kit in step.")
     return 0
 
 
