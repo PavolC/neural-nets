@@ -585,15 +585,30 @@ export function Module7() {
         accident of how the weights were drawn.
       </p>
       <p>
-        Why does the draw land the evidence out there, before anything has
-        been learned? Count the terms. A hidden neuron's evidence is a sum of
+        Where did those weights come from? Module 5 never said: the course
+        built that starting network for you, every weight an independent
+        random number, made the
+        way the exercise below has you make them (<code>rng.standard_normal</code>,
+        the standard bell). Three choices hide in it. The weights are random
+        so the thirty neurons start different from one another: a layer that
+        starts as thirty copies of one neuron stays thirty copies, same
+        evidence on every image, same blame, same step. They are centred on
+        zero, positive and negative equally likely, because nothing is known
+        before training that favours pushing any evidence up rather than
+        down: 49.6 percent of this layer's 23,520 draws came out negative.
+        And they have a size of about 1, the typical draw sitting 0.8 from
+        zero and almost none past 3, for no examined reason: that width is
+        what the stock tool gives. The width is the choice on trial here.
+      </p>
+      <p>
+        So why does the evidence sit seven from zero when a typical draw is
+        0.8? Count the terms. A hidden neuron's evidence is a sum of
         784 of them, one per pixel, each a weight times a pixel value, plus the
         bias. Most pixels of a digit are black, and on average 103 of the 784
         are above half brightness (measured over the bundled images, and the
         number the exercise below builds its stand-in digits from). So about a
-        hundred weights contribute, and each is drawn from the standard bell:
-        a random number, centred on zero, typically about 1 away from it. Each
-        lit pixel therefore pushes the evidence up or down by its weight times
+        hundred weights contribute. Each
+        lit pixel pushes the evidence up or down by its weight times
         its brightness: about a hundred pushes, each of size about 1.
       </p>
       <p>

@@ -399,6 +399,11 @@ def bench_module7(b):
         print(f"  {label}: typical |z| {float(np.abs(z).mean()):.2f}, "
               f"median squash slope {float(np.median(steep)):.4f}, "
               f"share flatter than 0.01 {pct(float((steep < 0.01).mean()))}")
+        if label == "Module 5's start":
+            w = weights[0]
+            print(f"    the draw itself: {pct(float((w < 0).mean()))} negative, "
+                  f"typical size {float(np.abs(w).mean()):.1f}, "
+                  f"{pct(float((np.abs(w) > 3).mean()))} past 3")
         # The distance histogram the module's first table quotes.
         d = np.abs(z)
         shares = " / ".join(
