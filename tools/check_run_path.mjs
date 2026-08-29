@@ -130,7 +130,13 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
     backToCode: !!document.querySelector(".wb-back"),
     railGone: !document.querySelector(".wb-rail"),
     foldedOpen: document.querySelector(".test-passed")?.hasAttribute("open") ?? null,
+    // Only when something really was borrowed: "run entirely on your own
+    // code" is the ordinary case, and a line saying nothing happened is noise
+    // under every passing run.
     lent: document.querySelector(".wb-lent")?.textContent?.trim() ?? null,
+    // Whatever the run is saying, on its own line under the head. In the head
+    // it was the sixth thing across the row and rendered as "R...".
+    status: document.querySelector(".wb-status")?.textContent?.trim() ?? null,
     goTo: document.querySelector(".wb-goto")?.textContent?.trim() ?? null,
     resultsPx: Math.round(document.querySelector(".test-results")?.getBoundingClientRect().height ?? 0),
     output: document.querySelector(".output-panel pre")?.textContent?.trim().slice(0, 30) ?? null,
@@ -157,6 +163,11 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
   }));
   console.log(`\n${label}`);
   for (const [k, v] of Object.entries(s)) if (v !== null) console.log(`  ${k}: ${JSON.stringify(v)}`);
+  const borrowed = verdict.lent.length > 0;
+  if (borrowed !== (s.lent !== null)) {
+    failures++;
+    console.log(`  the borrowed line is wrong: lent ${JSON.stringify(verdict.lent)}, line ${JSON.stringify(s.lent)}`);
+  }
   if (errors.length) { failures++; console.log("  ERRORS:", errors.slice(0, 3)); }
   await b.close();
 }
@@ -219,6 +230,40 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
   console.log("  target after :", JSON.stringify(after));
   console.log("  the marker carried its own section:", after !== before);
   if (after === before) failures++;
+
+  // CodeMirror paints the selection in a layer BEHIND the content, so any
+  // background the theme puts on a line has to be an alpha tint. The two
+  // course tints, --accent-wash and --accent-panel, mix with the page ground
+  // and are opaque, and the section highlight covers every line of the
+  // section the reader is working in: the selection was invisible exactly
+  // where they type.
+  console.log("\nthe selection reads on every ground the editor paints");
+  await p.locator(".wb-editor .cm-content").click();
+  await p.keyboard.press("Control+Home");
+  for (let i = 0; i < 6; i++) await p.keyboard.press("Shift+ArrowDown");
+  await p.waitForTimeout(300);
+  const sel = await p.evaluate(() => {
+    const alpha = (c) => {
+      const m = c.match(/[\d.]+\s*\)\s*$/);
+      return /rgba|\/\s*[\d.]+\s*\)/.test(c) && m ? parseFloat(m[0]) : c === "rgba(0, 0, 0, 0)" ? 0 : 1;
+    };
+    const opaque = [];
+    for (const cls of ["cm-activeLine", "cm-section-here"]) {
+      const line = document.querySelector(".wb-editor .cm-line." + cls);
+      if (line && alpha(getComputedStyle(line).backgroundColor) >= 1) opaque.push(cls);
+    }
+    const boxes = [...document.querySelectorAll(".wb-editor .cm-selectionBackground")];
+    return { boxes: boxes.length, bg: boxes[0] ? getComputedStyle(boxes[0]).backgroundColor : null, opaque };
+  });
+  console.log("  selection boxes:", sel.boxes, "painted", JSON.stringify(sel.bg));
+  console.log("  line backgrounds that would hide it:", JSON.stringify(sel.opaque));
+  if (!sel.boxes || sel.opaque.length) failures++;
+  // CodeMirror's own light theme is #d7d4f0, which wins on specificity unless
+  // the theme spells out the whole child chain the base rule uses.
+  if (sel.bg && /215,\s*212,\s*240/.test(sel.bg)) {
+    failures++;
+    console.log("  the selection is CodeMirror's lavender, not the course accent");
+  }
   await b.close();
 }
 

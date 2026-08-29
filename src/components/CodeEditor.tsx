@@ -39,7 +39,13 @@ const chrome = EditorView.theme(
       fontFamily: "var(--font-mono)",
     },
     ".cm-lineNumbers .cm-gutterElement": { padding: "0 0.55rem 0 0.9rem" },
-    ".cm-activeLine": { backgroundColor: "var(--accent-wash)" },
+    // Every wash painted on a line is an alpha tint, never --accent-wash or
+    // --accent-panel. Those two mix with the page ground, so they are opaque,
+    // and CodeMirror draws the selection in a layer BEHIND the content: an
+    // opaque line background hides it completely. The section highlight below
+    // covers the whole section the reader is working in, so that was the
+    // selection invisible everywhere it matters.
+    ".cm-activeLine": { backgroundColor: "color-mix(in srgb, var(--accent) 6%, transparent)" },
     ".cm-activeLineGutter": {
       backgroundColor: "var(--accent-wash)",
       color: "var(--ink)",
@@ -47,18 +53,24 @@ const chrome = EditorView.theme(
     "&.cm-focused .cm-cursor": { borderLeftColor: "var(--accent)", borderLeftWidth: "2px" },
     // Both spellings: the focused editor uses ::selection, the unfocused one
     // paints its own layer, and leaving either out means a selection that
-    // vanishes the moment the reader clicks the Run button.
-    "&.cm-focused .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection": {
-      backgroundColor: "var(--accent-panel)",
-    },
+    // vanishes the moment the reader clicks the Run button. The focused rule
+    // spells out the whole child chain because CodeMirror's own is
+    // "&light.cm-focused > .cm-scroller > .cm-selectionLayer
+    // .cm-selectionBackground", and a shorter selector loses to it: the
+    // selection came out in CodeMirror's default lavender rather than the
+    // course's accent.
+    "&.cm-focused > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, & > .cm-scroller > .cm-selectionLayer .cm-selectionBackground, .cm-selectionBackground, .cm-content ::selection":
+      {
+        backgroundColor: "color-mix(in srgb, var(--accent) 22%, transparent)",
+      },
     ".cm-matchingBracket, .cm-nonmatchingBracket": {
-      backgroundColor: "var(--accent-panel)",
+      backgroundColor: "color-mix(in srgb, var(--accent) 14%, transparent)",
       outline: "none",
     },
     // The section the Run buttons are pointed at, marked the way a section
     // title is marked elsewhere in the course: a short accent rule.
     ".cm-line.cm-section-here": {
-      backgroundColor: "var(--accent-wash)",
+      backgroundColor: "color-mix(in srgb, var(--accent) 6%, transparent)",
       boxShadow: "inset 3px 0 0 var(--accent)",
     },
     ".cm-foldPlaceholder": {

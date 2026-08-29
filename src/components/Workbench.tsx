@@ -286,8 +286,8 @@ export function Workbench(props: Props) {
   const notes = doc.problems.filter((p) => p.kind === "out-of-order");
   const touchedGivens = useMemo(() => editedGivens(), [revision]);
 
-  /** The status slot. The picker beside it owns the section name now, so this
-   * says only what the run is saying, and is empty most of the time. */
+  /** The status line under the head. The picker owns the section name now, so
+   * this says only what the run is saying, and is empty most of the time. */
   const statusText = error
     ? `Something went wrong: ${error}`
     : cancelled
@@ -387,7 +387,6 @@ export function Workbench(props: Props) {
             })}
           </div>
         </details>
-        <span className={error ? "wb-target wb-target-error" : "wb-target"}>{statusText}</span>
         <details className="wb-more">
           <summary aria-label="More actions">More</summary>
           <div className="wb-more-menu">
@@ -413,6 +412,14 @@ export function Workbench(props: Props) {
           Close
         </button>
       </div>
+
+      {/* The run's own line, under the head rather than in it. Six things
+          across one row left it about 50px wide, so "Running the tests..."
+          rendered as "R...". It is empty except during a run, so at rest the
+          chrome is still one row. */}
+      {statusText && (
+        <p className={error ? "wb-status wb-status-error" : "wb-status"}>{statusText}</p>
+      )}
 
       {(problems.length > 0 || spliceNote || touchedGivens.length > 0) && (
         <div className="wb-repair">
@@ -530,11 +537,13 @@ export function Workbench(props: Props) {
             />
           )}
 
-          {lent !== null && !running && (
+          {/* Only when something was borrowed. "Run entirely on your own code"
+              is the ordinary case, and a line that says nothing happened is
+              noise under every passing run. */}
+          {lent !== null && lent.length > 0 && !running && (
             <p className="wb-lent">
-              {lent.length === 0
-                ? "Run entirely on your own code."
-                : `Run with the course's ${listNames(lent)}. Your own versions run here once those sections are written.`}
+              Run with the course&apos;s {listNames(lent)}. Your own versions run here once those
+              sections are written.
             </p>
           )}
 

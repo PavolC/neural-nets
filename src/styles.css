@@ -3345,6 +3345,9 @@ button:disabled {
   flex-direction: column;
   background: var(--bg);
   border-left: 1px solid var(--rule);
+  /* The head asks the panel how wide it is, not the window: the reader sets
+     this width by dragging, so a window query would answer the wrong question. */
+  container-type: inline-size;
   /* Anything inside painting the shared scroll affordance covers its own
      ground, and the panel's ground is the page's here. Declared rather than
      inherited: a custom property that references another is substituted where
@@ -3374,24 +3377,31 @@ button:disabled {
   z-index: 4;
 }
 
-/* On the sheet the picker takes a row of its own. Five things do not fit
-   across a phone: measured at 390px, the picker was squeezed to a 20px box
-   showing one letter of the section's name, which is the one thing in the row
-   a reader needs to read. */
-.wb[data-dock="sheet"] .wb-head {
-  flex-wrap: wrap;
-  min-height: 0;
-  padding-top: 0.4rem;
-  padding-bottom: 0.4rem;
-}
+/* Below 600px of panel the picker takes a row of its own, asked of the panel
+   and not of the window, because the reader sets the panel's width by dragging
+   it. Everything else in the head is fixed width: the file's name, Run tests,
+   Stop, More and Close come to 418px with the gaps and the padding, so under
+   600 there is nothing left to name a section in. Measured at 465px the picker
+   was a 39px box, and on a 390px phone a 20px one showing one letter, which is
+   the one thing in that row a reader needs to read. The threshold counts Stop,
+   which is only there during a run, so the head cannot change height under a
+   reader mid-run. */
+@container (max-width: 600px) {
+  .wb-head {
+    flex-wrap: wrap;
+    min-height: 0;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+  }
 
-.wb[data-dock="sheet"] .wb-sections {
-  order: 1;
-  flex: 1 0 100%;
-}
+  .wb-sections {
+    order: 1;
+    flex: 1 0 100%;
+  }
 
-.wb[data-dock="sheet"] .wb-sections > summary {
-  max-width: none;
+  .wb-sections > summary {
+    max-width: none;
+  }
 }
 
 .wb-head button {
@@ -3468,23 +3478,32 @@ button:disabled {
   padding: 0.4rem 0.9rem 2rem;
 }
 
-.wb-target {
-  flex: 1 1 0;
-  min-width: 0;
+/* What the run is saying, on a line of its own under the head. In the head it
+   was the sixth thing in the row and about 50px wide, so "Running the
+   tests..." rendered as "R...". Nothing renders here at rest, so the chrome is
+   still one row until a run starts. */
+.wb-status {
+  flex: 0 0 auto;
+  margin: 0;
+  /* Kept shallow on purpose. The strip is there only during a run, so the code
+     under it moves by exactly this much when one starts, in the course's
+     tightest loop. */
+  padding: 0.2rem 0.9rem;
+  border-bottom: 1px solid var(--rule);
   font-family: var(--font-ui);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   color: var(--muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.wb-target-error {
+.wb-status-error {
   color: var(--loss);
+  background: color-mix(in srgb, var(--loss) 7%, transparent);
 }
 
 .wb-more {
   flex: 0 0 auto;
+  /* The status used to be the spring that held these two at the right edge. */
+  margin-left: auto;
   position: relative;
   font-family: var(--font-ui);
 }
