@@ -745,9 +745,18 @@ the footer. Rules that follow from it:
   button is the notebook habit worth copying. Sending a snippet from a prompt
   opens the scratch pad and scrolls to it, because code sent somewhere the
   reader cannot see was not sent.
+  **What the run is saying gets a line of its own**, under the head rather than
+  in it. In the head it was the sixth thing across the row and about 50px wide,
+  so "Running tests..." rendered as "R...". The strip is 31px and is there only
+  during a run, so the chrome at rest is still one row, and the code moves by
+  that much when a run starts, which is the smallest price that leaves the
+  message readable.
   Passing checks fold into "N checks passed": six of them at full size pushed
   the failures and the output most of a screen down, and a receipt is not a
-  finding. Failures never fold. Output is one pool, headed with the section the
+  finding. Failures never fold. The borrowed-names line appears only when
+  something really was borrowed: "run entirely on your own code" is the
+  ordinary case, and a line saying nothing happened is noise under every
+  passing run. Output is one pool, headed with the section the
   run was for, because one run execs the whole file and pretending otherwise
   would be a lie about what just happened.
 - **The workbench borrows three things from a notebook, and not the fourth.**
@@ -778,9 +787,15 @@ the footer. Rules that follow from it:
   `.wb-section-name` the longest label (38 characters) pushes the state clean
   off the menu. And a given section says whether it is in the file and nothing
   else, because it has no tests and "not passing yet" would be a lie about it.
-  On the sheet the picker takes a row of its own: five things do not fit across
-  a phone, and at 390px it was squeezed to a 20px box showing one letter of the
-  section's name, which is the one thing in that row a reader needs to read.
+  Below 600px of panel the picker takes a row of its own, asked of the panel
+  with a container query and not of the window, because the reader sets that
+  width by dragging. Everything else in the head is fixed width and comes to
+  418px with the gaps and the padding, so under 600 there is nothing left to
+  name a section in: measured, the picker was a 39px box at the narrowest dock
+  and a 20px one on a 390px phone, showing one letter of the name, which is the
+  one thing in that row a reader needs to read. The threshold counts Stop,
+  which is only on screen during a run, so the head cannot change height under
+  a reader mid-run.
   The chrome that remains is `flex: 0 0 auto`, the head and the repair strip:
   left shrinkable, in a column whose editor wants every pixel, Firefox
   collapsed the old rail to the height of its own scrollbar with nothing
@@ -824,6 +839,16 @@ the footer. Rules that follow from it:
   the surfaces and the accent; its token colours come from the accent family, so syntax
   highlighting is legible by construction (every hue in that family clears 6:1 on the page
   ground) rather than by eye. Do not hand-pick a syntax colour: take one of the nine.
+  **A background painted on a line is an alpha tint, never `--accent-wash` or
+  `--accent-panel`.** Those two mix with the page ground, so they are opaque, and
+  CodeMirror draws the selection in a layer behind the content: an opaque line
+  background hides it completely. With the section highlight covering every line of
+  the section the reader is working in, the selection was invisible exactly where
+  they type. The selection rule also spells out the whole child chain CodeMirror's
+  own base theme uses (`&.cm-focused > .cm-scroller > .cm-selectionLayer
+  .cm-selectionBackground`), because a shorter selector loses to it on specificity
+  and the selection comes out in CodeMirror's default lavender.
+  `tools/check_run_path.mjs` checks both from the browser.
 - **KaTeX keeps its own face, and that is a choice.** Computer Modern is what mathematics
   is set in, and matching it to the prose serif would make the notation harder to read, not
   more consistent. It is the one type system on the page that is deliberately not the
@@ -889,8 +914,9 @@ tokens from the start.
 - `node tools/check_run_path.mjs`: what the panel does with a verdict once it
   has one, driven in a real browser against a stub Pyodide (the worker needs
   exactly four methods from it). Covers the message protocol, the run state,
-  every shape of result, the borrowed-names line, the output stream and all
-  three ways to start a run. Not in `npm run check` and not in CI: it wants a
+  every shape of result, the borrowed-names line, the output stream, all three
+  ways to start a run, and that a selection in the editor is visible on every
+  ground the theme paints. Not in `npm run check` and not in CI: it wants a
   browser and a dev server, which is the bargain `make_og_image.sh` already
   makes.
 - `python3 tools/make_penguins.py`: regenerate `public/data/penguins.json.gz`
