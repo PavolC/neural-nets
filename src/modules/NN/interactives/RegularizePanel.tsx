@@ -119,10 +119,18 @@ export function RegularizePanel() {
   const [points, setPoints] = useState<Report[]>([]);
   const [status, setStatus] = useState("");
   const [summary, setSummary] = useState<Summary | null>(null);
+  // What the drawn chart was actually trained with. The chips select the NEXT
+  // run, and nothing retrains on a click (a run is 160 epochs), so the panel
+  // has to say which settings the lines on screen came from and which are
+  // merely selected. Without this the drawn run's starting point was recorded
+  // nowhere on screen at all.
+  const [drawnWith, setDrawnWith] = useState<{ start: "yours" | "plain"; lmbda: number } | null>(null);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => subscribeProgress(() => setUnlocked(needed())), []);
+
+  const startName = (v: "yours" | "plain") => (v === "yours" ? "your start" : "Module 5's start");
 
   const run = () => {
     // One projection: the file through the decaying step already holds their
@@ -133,6 +141,7 @@ export function RegularizePanel() {
     setPoints([]);
     setSummary(null);
     setError(null);
+    setDrawnWith({ start, lmbda });
     setStatus("Starting...");
     sendRequest(
       {
@@ -216,7 +225,12 @@ export function RegularizePanel() {
           </button>
         )}
         <span className={`demo-status status-fixed ${error ? "demo-status-error" : ""}`}>
-          {error ?? status}
+          {error ??
+            (running || !drawnWith
+              ? status
+              : drawnWith.start === start && drawnWith.lmbda === lmbda
+                ? `drawn with ${startName(drawnWith.start)}, lambda ${drawnWith.lmbda}`
+                : `drawn with ${startName(drawnWith.start)}, lambda ${drawnWith.lmbda}; the chips pick the next run, so press Run both again`)}
         </span>
       </div>
       <div className="interactive-controls">
