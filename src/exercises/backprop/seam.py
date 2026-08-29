@@ -9,7 +9,7 @@
 
 
 def sigmoid_prime(z):
-    """Sigmoid's steepness at z: sigmoid(z) * (1 - sigmoid(z)), elementwise."""
+    """The squash's slope at z: sigmoid(z) * (1 - sigmoid(z)), elementwise."""
     s = sigmoid(z)
     return s * (1.0 - s)
 

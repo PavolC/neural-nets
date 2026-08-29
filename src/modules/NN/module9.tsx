@@ -136,7 +136,7 @@ export function Module9() {
 
       <SectionHeader id="m9-words" title="The same ideas, in everyone else's words" />
       <p>
-        This course chose plain words on purpose. Blame, steepness, evidence, the
+        This course chose plain words on purpose. Blame, the squash's slope, evidence, the
         wire ledger, the bill: each was picked so that a sentence could be read
         without a glossary. Almost nobody else uses those words, and that becomes a
         problem on the first page of the next thing you open. The table below gives
@@ -201,7 +201,7 @@ export function Module9() {
               <td>Module 3</td>
             </tr>
             <tr>
-              <td>steepness, <M tex="\sigma'(z)" /></td>
+              <td>the squash's slope, <M tex="\sigma'(z)" /></td>
               <td>the activation function's derivative</td>
               <td>Module 4</td>
             </tr>

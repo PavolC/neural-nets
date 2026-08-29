@@ -97,10 +97,10 @@ export interface LayerSpeed {
   hop: number | null;
   /** The hop's two factors, each measured as what that step does to the size
    * of the blame column, so the two multiply to the hop exactly: passing
-   * back through the wire ledger, then scaling by this layer's steepness. */
+   * back through the wire ledger, then scaling by this layer's squash slope. */
   weightFactor: number | null;
   steepFactor: number | null;
-  /** The average steepness itself, for reading against the sigmoid's 0.25
+  /** The average squash slope itself, for reading against the sigmoid's 0.25
    * ceiling. Not the factor: deleting entries shortens a column by less than
    * it lowers the average, which is why ReLU's two numbers differ. */
   meanSteepness: number | null;
@@ -194,7 +194,7 @@ export function measure(batch: Batch, opts: Options): Measurement {
   // as a size rather than as a cost). The gradient is the batch average of
   // that layer's blame columns, so the factors below are measured on the
   // averaged column too. Averaging commutes with the wire ledger and not with
-  // the steepness, so taking both ratios along the averaged column is what
+  // the squash slope, so taking both ratios along the averaged column is what
   // makes the two factors multiply to the hop exactly.
   const meanColumn = (d: Matrix) => {
     const out = new Float64Array(d.rows);
@@ -230,7 +230,7 @@ export function measure(batch: Batch, opts: Options): Measurement {
     for (let i = 0; i < z.a.length; i++) {
       const s = slope(z.a[i]);
       slopeSum += s;
-      next.a[i] = through.a[i] * s; // BP2's second step: scale by the steepness
+      next.a[i] = through.a[i] * s; // BP2's second step: scale by the squash slope
     }
     const speed = norm(meanColumn(next));
     layers.push({

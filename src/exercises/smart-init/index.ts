@@ -55,11 +55,11 @@ export const smartInitExercise: Exercise = {
         "    z = w[0] @ X + b[0]                        # every hidden neuron, every image\n" +
         "    steep = sigmoid(z) * (1 - sigmoid(z))\n" +
         '    print(name, "-> typical distance from zero:", round(float(np.abs(z).mean()), 2),\n' +
-        '          " median steepness:", round(float(np.median(steep)), 4),\n' +
+        '          " median squash slope:", round(float(np.median(steep)), 4),\n' +
         '          " share flatter than 0.01:", round(float((steep < 0.01).mean()), 3))',
     },
     "Module 5's start reports a typical distance of 8.27 and a median " +
-      "steepness of 0.0009, with 66 percent of the readings flatter than " +
+      "squash slope of 0.0009, with 66 percent of the readings flatter than " +
       "0.01. Yours reports 0.79 and 0.2206, with none at all below 0.01. " +
       "Same random numbers, same images; the only change is the division. " +
       "For the real bundled digits the two distances are 7.43 and 0.78: a " +

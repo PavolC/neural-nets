@@ -63,7 +63,7 @@ export const crossEntropyExercise: Exercise = {
         'print("hidden blames, cross-entropy:", new[0].ravel())',
     },
     "The output blame goes from -0.1012 to -0.4165, four times larger, and " +
-      "4.115 is exactly 1 divided by that neuron's steepness 0.2430: the " +
+      "4.115 is exactly 1 divided by that neuron's squash slope 0.2430: the " +
       "factor the new cost cancels. The hidden blames grow by the same " +
       "factor, because BP2 carries whatever arrives from the output layer " +
       "and multiplies by its own numbers, which did not change. And the " +

@@ -5,7 +5,7 @@
 # any shape.
 #
 # Contract:
-# - sigmoid_prime(z): sigmoid's steepness at z, sigmoid(z) * (1 - sigmoid(z)),
+# - sigmoid_prime(z): the squash's slope at z, sigmoid(z) * (1 - sigmoid(z)),
 #   elementwise: any shape in, the same shape out.
 # - backprop(weights, biases, x, y): the exact slopes of ONE example's
 #   quadratic cost, C = 0.5 * sum of squared gaps between the output and y.
@@ -28,7 +28,7 @@
 
 
 def sigmoid_prime(z):
-    """Sigmoid's steepness at z: sigmoid(z) * (1 - sigmoid(z)), elementwise.
+    """The squash's slope at z: sigmoid(z) * (1 - sigmoid(z)), elementwise.
 
     Replace the raise below with your implementation.
     """

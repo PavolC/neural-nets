@@ -187,8 +187,8 @@ export function Module8() {
         is the equation that carries blame one layer back:
       </p>
       <Eq
-        tex="\delta^l = \underbrace{\big( (w^{l+1})^T \delta^{l+1} \big)}_{\text{back through the wire ledger}} \odot \underbrace{\sigma'(z^l)}_{\text{scale by the steepness}}"
-        gloss="Module 4's BP2. The blame column of the layer above goes back through that layer's weight matrix transposed, which regroups the wires by sender, and then every entry is multiplied by that neuron's own steepness at its own evidence. The circled dot is the elementwise product, NumPy's plain star."
+        tex="\delta^l = \underbrace{\big( (w^{l+1})^T \delta^{l+1} \big)}_{\text{back through the wire ledger}} \odot \underbrace{\sigma'(z^l)}_{\text{scale by the squash's slope}}"
+        gloss="Module 4's BP2. The blame column of the layer above goes back through that layer's weight matrix transposed, which regroups the wires by sender, and then every entry is multiplied by that neuron's own squash slope at its own evidence. The circled dot is the elementwise product, NumPy's plain star."
       />
       <p>
         Two steps, in the order the code performs them, and each one changes the
@@ -203,7 +203,7 @@ export function Module8() {
               <th>hop</th>
               <th>from</th>
               <th>back through the ledger</th>
-              <th>times the steepness step</th>
+              <th>times the squash-slope step</th>
               <th>= the hop</th>
               <th>lands on</th>
             </tr>
@@ -246,11 +246,11 @@ export function Module8() {
       </div>
       <p>
         Read one row in the multiplying direction. Layer 5's speed is 0.2652;
-        the ledger sends it back at 1.159 times that, and the steepness step
+        the ledger sends it back at 1.159 times that, and the squash-slope step
         keeps 0.217 of what comes out:
       </p>
       <Eq
-        tex="\underbrace{0.2652}_{\text{layer 5's speed}} \times \underbrace{1.159}_{\text{the ledger}} \times \underbrace{0.217}_{\text{the steepness}} = \underbrace{0.0667}_{\text{layer 4's speed}}"
+        tex="\underbrace{0.2652}_{\text{layer 5's speed}} \times \underbrace{1.159}_{\text{the ledger}} \times \underbrace{0.217}_{\text{the squash's slope}} = \underbrace{0.0667}_{\text{layer 4's speed}}"
         gloss="Layer 4's measured speed is 0.06668, so the two factors account for it to four figures. Check the other three rows the same way, and every product lands on the speed in that row's own last column. This multiplying is the only arithmetic the backward sweep does to the size of a blame column."
       />
       <p>
@@ -274,18 +274,18 @@ export function Module8() {
         are ordinary members of that spread.
       </p>
       <p>
-        The steepness column is about 0.21, every time, and it can never be more
-        than 0.25. Module 4 gave the steepness of a sigmoid as{" "}
+        The squash-slope column is about 0.21, every time, and it can never be more
+        than 0.25. Module 4 gave the squash's slope as{" "}
         <M tex="a(1-a)" />, which is largest when the answer <M tex="a" /> is 0.5
         and equals 0.25 there, and shrinks toward zero at both ends. So the second
         factor is a fraction with a ceiling, and the divided start puts most
-        neurons near the top of it: Module 7 measured the median steepness at that
+        neurons near the top of it: Module 7 measured the median squash slope at that
         start as 0.22.
       </p>
       <p>Multiply the two kinds together and the hop is settled:</p>
       <Eq
-        tex="\text{one hop} \;=\; \underbrace{\approx 1}_{\text{the ledger}} \;\times\; \underbrace{\approx 0.21}_{\text{the steepness, at most } 0.25} \;\approx\; \tfrac{1}{5}"
-        gloss="A ledger that returns a column at about its own length, times a steepness that averages 0.21 here and cannot exceed 0.25 anywhere. The hop lands near one fifth, and nothing in the layer sizes or in the images moved it there."
+        tex="\text{one hop} \;=\; \underbrace{\approx 1}_{\text{the ledger}} \;\times\; \underbrace{\approx 0.21}_{\text{the squash's slope, at most } 0.25} \;\approx\; \tfrac{1}{5}"
+        gloss="A ledger that returns a column at about its own length, times a squash slope that averages 0.21 here and cannot exceed 0.25 anywhere. The hop lands near one fifth, and nothing in the layer sizes or in the images moved it there."
       />
       <p>
         A hop of one fifth, applied four times between the output and the first
@@ -355,7 +355,7 @@ export function Module8() {
               <td>0.9999</td>
             </tr>
             <tr>
-              <td>its steepness</td>
+              <td>its squash slope</td>
               <td>0.0452</td>
               <td>0.2350</td>
               <td>0.2500</td>
@@ -373,7 +373,7 @@ export function Module8() {
               <td>9</td>
             </tr>
             <tr>
-              <td>its steepness</td>
+              <td>its squash slope</td>
               <td>0</td>
               <td>0</td>
               <td>0</td>
@@ -386,8 +386,8 @@ export function Module8() {
       </div>
       <p>
         The last row is the whole change. A ReLU neuron with positive evidence has
-        steepness exactly 1, so BP2's second step multiplies its blame by 1 and
-        leaves it alone. A neuron with negative evidence has steepness 0 and its
+        a squash slope of exactly 1, so BP2's second step multiplies its blame by 1 and
+        leaves it alone. A neuron with negative evidence has a squash slope of 0 and its
         blame is deleted. There is no shrinking: a blame either passes through
         untouched or stops. (At exactly zero the slope has no single value; the
         usual convention picks 0, and it makes no measurable difference, because
@@ -405,7 +405,7 @@ export function Module8() {
       <p>
         Leave the weight multiplier on the panel below at 1, which is Module 7's
         divided draw exactly, and switch between the two squashes. A ReLU neuron's
-        steepness is 1 when it is live and 0 when it is not, so averaging it across
+        squash slope is 1 when it is live and 0 when it is not, so averaging it across
         a layer's neurons and images gives a share. The last column of the table
         under the chart reports exactly that average, so with ReLU chosen it reads
         as how often those neurons are live.
@@ -478,13 +478,13 @@ export function Module8() {
       <Aside>
         <p>
           Follow that silent layer one step further. A ReLU neuron whose evidence
-          is negative on every training image has steepness 0 on every image, so
+          is negative on every training image has a squash slope of 0 on every image, so
           every gradient it receives is 0, so nothing ever changes it, so it is
           negative on every image forever. The name for that is a dead unit, and a
           large step size creates them in bulk: one oversized update pushes a bias
           far enough negative that its neuron never fires again. This is the price
           of the flat half, and it is the one thing the sigmoid was better at,
-          since a sigmoid neuron's steepness gets small but never reaches zero.
+          since a sigmoid neuron's squash slope gets small but never reaches zero.
           Variants exist that leave a small slope on the negative side (leaky ReLU
           is the plainest, with 0.01 in place of 0) so that nothing is ever
           switched off completely.
@@ -502,7 +502,7 @@ export function Module8() {
         instead of <code>sigmoid(z)</code>, and its BP2 line multiplies by{" "}
         <code>(zs[-l] &gt; 0)</code> instead of{" "}
         <code>sigmoid_prime(zs[-l])</code>, since that comparison is already the
-        1-or-0 steepness row of the table above. The sgd around it is still
+        1-or-0 squash-slope row of the table above. The sgd around it is still
         yours.
       </p>
       <Figure caption="One hidden layer against four, trained identically, fifteen epochs each. The table above the chart is every layer's learning speed measured from your own gradient before either run starts. Each run takes a few seconds per epoch, and Stop ends it.">
@@ -536,14 +536,14 @@ export function Module8() {
               <td>7.220</td>
             </tr>
             <tr>
-              <td>times the steepness step</td>
+              <td>times the squash-slope step</td>
               <td>0.213</td>
               <td>0.206</td>
               <td>0.170</td>
               <td>0.126</td>
             </tr>
             <tr>
-              <td>average steepness across the hidden layers</td>
+              <td>average squash slope across the hidden layers</td>
               <td>0.20</td>
               <td>0.18</td>
               <td>0.14</td>
@@ -576,9 +576,9 @@ export function Module8() {
       </p>
       <p>
         The ledger factor rises roughly in step with the multiplier, which is
-        what a multiplier does. The steepness factor falls as it rises, because
+        what a multiplier does. The squash-slope factor falls as it rises, because
         bigger weights put a neuron's evidence further from zero and a sigmoid out
-        there is flatter. At a multiplier of 8 the average steepness across the
+        there is flatter. At a multiplier of 8 the average squash slope across the
         hidden layers is 0.08, against 0.20 at Module 7's draw, and Module 7 spent
         a section on why a start that flat cannot learn. So the two factors fight,
         the sigmoid wins, and the hop climbs toward 1 without reaching it however
@@ -586,7 +586,7 @@ export function Module8() {
         layers too much.
       </p>
       <p>
-        Select ReLU and turn the same dial. Its steepness step does not fall,
+        Select ReLU and turn the same dial. Its squash-slope step does not fall,
         because a live neuron's slope is 1 whatever the evidence is:
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
@@ -649,7 +649,7 @@ export function Module8() {
         starts at the right size, which is Module 7's division and its relatives
         (the ReLU version multiplies by a further{" "}
         <M tex="\sqrt{2}" /> to pay for the dead half). ReLU and its variants take
-        the ceiling off the steepness factor. Normalization layers rescale each
+        the ceiling off the squash-slope factor. Normalization layers rescale each
         layer's evidence during training, so the hop is corrected as it drifts
         rather than only set at the start. Residual connections add a path that
         skips a layer entirely, so blame has a route back that no hop multiplies
@@ -810,8 +810,8 @@ export function Module8() {
       <Recap
         items={[
           "A layer's learning speed is the size of its bias gradient, which is how far its biases move in one step per unit of step size. At Module 7's start a 784-30-30-30-30-10 network measures 0.00254 at the first hidden layer against 1.439 at the output: 567 times slower, before a single step, and its first epoch on 5,000 images ends by answering the commonest digit for every image.",
-          "That ratio is BP2 applied repeatedly. One hop multiplies the blame column by about 1 going back through the wire ledger, which is what dividing the weights by the square root of the input count buys, and by at most 0.25 for the sigmoid's steepness. The hop is about one fifth, so the gap is about five to the power of the depth: 5, 25, 125, 625, 3,125 against 4.8, 26.2, 117, 567, 3,002 measured.",
-          "ReLU answers max(0, z), so its steepness is 1 where the evidence is positive and 0 where it is not: a live neuron passes blame back untouched. The same network's hop rises to about 0.7, the gap falls from 567 to 4, four hidden layers average 90.9 percent over the last five epochs instead of 86.5, and the step size has to fall by a factor of ten to keep the flat half from killing neurons outright.",
+          "That ratio is BP2 applied repeatedly. One hop multiplies the blame column by about 1 going back through the wire ledger, which is what dividing the weights by the square root of the input count buys, and by at most 0.25 for the squash's slope. The hop is about one fifth, so the gap is about five to the power of the depth: 5, 25, 125, 625, 3,125 against 4.8, 26.2, 117, 567, 3,002 measured.",
+          "ReLU answers max(0, z), so its squash slope is 1 where the evidence is positive and 0 where it is not: a live neuron passes blame back untouched. The same network's hop rises to about 0.7, the gap falls from 567 to 4, four hidden layers average 90.9 percent over the last five epochs instead of 86.5, and the step size has to fall by a factor of ten to keep the flat half from killing neurons outright.",
           "The hop is a product with no reason to sit near 1. Multiplying every weight by 4 takes the sigmoid's hop to 0.62 and ReLU's to 2.99, where the first hidden layer moves ninety times as far as the output. Both failures are called unstable gradients, and careful initialization, ReLU, normalization layers and residual connections are all ways of holding that one number near 1.",
           "A convolutional layer uses one 5-by-5 window's 26 numbers at all 576 positions of the image, so twenty windows cost 520 numbers against 23,520 for one fully connected layer of 30. A hidden layer is a learned re-description of its input, which is what makes a word's column in an embedding table mean something, and what a language model is built out of at a scale of billions.",
         ]}

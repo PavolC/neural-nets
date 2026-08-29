@@ -216,7 +216,7 @@ export function InitStartPanel() {
             <thead>
               <tr>
                 <th>before a single step</th>
-                <th>median hidden steepness</th>
+                <th>median hidden squash slope</th>
                 <th>share of hidden neurons flatter than 0.01</th>
               </tr>
             </thead>

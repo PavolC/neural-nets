@@ -318,8 +318,8 @@ export function Module10() {
         The output layer is reading a constant, and the best a constant answer
         can do is name the commonest species. The network cannot climb out of it
         either, for the reason Module 7 gave for dividing the starting weights: a
-        flat neuron's steepness is near zero, and BP2 multiplies its blame by
-        that steepness, so the wires feeding it barely move.
+        flat neuron's squash slope is near zero, and BP2 multiplies its blame by
+        that slope, so the wires feeding it barely move.
       </p>
       <p>
         A perfect score should make you suspicious rather than pleased, so why

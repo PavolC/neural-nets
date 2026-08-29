@@ -260,9 +260,9 @@ export function LayerSpeedBars({ full = false }: { full?: boolean }) {
               <tr>
                 <th>hop into</th>
                 <th>back through the wire ledger</th>
-                <th>times the steepness step</th>
+                <th>times the squash-slope step</th>
                 <th>= the hop</th>
-                <th>average steepness there</th>
+                <th>average squash slope there</th>
               </tr>
             </thead>
             <tbody>

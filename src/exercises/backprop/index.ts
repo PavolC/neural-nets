@@ -8,7 +8,7 @@ export const backpropExercise: Exercise = {
   title: "Backpropagation",
   prompt: [
     "Two functions to add to your file. sigmoid_prime is a single formula: " +
-      "Module 4's steepness, sigmoid(z) times one minus sigmoid(z), " +
+      "Module 4's squash slope, sigmoid(z) times one minus sigmoid(z), " +
       "elementwise like sigmoid itself. backprop is the algorithm, and " +
       "every statement in it is one of the four equations above.",
     "The contract, precisely: backprop(weights, biases, x, y) handles ONE " +
