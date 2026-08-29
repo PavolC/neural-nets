@@ -730,10 +730,11 @@ the footer. Rules that follow from it:
   otherwise land at the bottom of a column thousands of pixels long. Nothing
   else in the panel is allowed to move the reader.
 - **One chrome row, one Run button, and a passing check on one line.** The
-  panel's chrome was three rows: a title with Download and Close, the section
-  rail, and a controls row. It is two now, 104px against 151: the file's name,
-  the one button the loop uses, what that button is pointed at, and a More
-  disclosure holding Download, Reset and Undo, above the rail.
+  panel's chrome was three rows: a title with Download and Close, a rail of
+  section chips, and a controls row. It is one now, 54px against 151: the
+  file's name, the one button the loop uses, a picker naming the section that
+  button is pointed at, the run's status, and a More disclosure holding
+  Download, Reset and Undo.
   **The second run button moved onto the scratch pad**, which is the thing it
   actually runs. "Run my code" sat beside "Run tests" as if the two were a
   choice to make every time, when one is the loop and the other is an aside;
@@ -754,9 +755,9 @@ the footer. Rules that follow from it:
   what anybody who has used a notebook reaches for first; both need
   `Prec.highest`, since `basicSetup` binds Mod-Enter to "insert a blank line"
   and silently swallowed it. Every section line carries a run marker in the
-  gutter, so the control for "run this piece" sits next to the piece. The rail
-  chips carry each section's state, which is what a notebook's execution count
-  is for. What is deliberately not borrowed is independent cells: this is one
+  gutter, so the control for "run this piece" sits next to the piece. The
+  picker carries each section's state, which is what a notebook's execution
+  count is for. What is deliberately not borrowed is independent cells: this is one
   file that runs top to bottom and downloads as an `nn.py`, and per-cell state
   would cost exactly the thing the whole design is for.
 - **The section bar and the panel head share one height, `--bar-h`.** Both sit
@@ -765,14 +766,37 @@ the footer. Rules that follow from it:
   as a misalignment rather than as two different things. The in-page jump
   offset is keyed to the same token, so the offset that clears the bar cannot
   drift from the bar.
-- **A row that pans draws no scrollbar of its own.** The tab strip's rule
-  applies to the workbench's section rail for the same reason: a thin thumb
-  lands a second grey bar directly under a row of chips and reads as a
-  mis-drawn underline, so the `.scroll-x` edge fades carry the affordance
-  alone. The rail is also `flex: 0 0 auto`, along with the head and the repair
-  strip. Left shrinkable, in a column whose editor wants every pixel, Firefox
-  collapsed it to the height of its own scrollbar with no chips visible at all;
-  Chromium did not, which is why the rule is written down rather than trusted.
+- **The section list is a picker, not a rail.** Eleven chips in a row that
+  pans showed four of them at the dock's own width, which is a keyhole onto the
+  course rather than a picture of it, and it cost 50px of every screen to do
+  that. The same eleven, with the same state marks, now open from the head: all
+  of them at once, and no permanent height. Three details are load-bearing. The
+  menu is anchored to the panel rather than to its own summary, because the
+  summary sits after the file's name and the Run button, so a menu hung off its
+  left edge ran 163px past the panel's right edge at the narrow dock. A flex
+  item cannot shrink below its content without `min-width: 0`, so without it on
+  `.wb-section-name` the longest label (38 characters) pushes the state clean
+  off the menu. And a given section says whether it is in the file and nothing
+  else, because it has no tests and "not passing yet" would be a lie about it.
+  On the sheet the picker takes a row of its own: five things do not fit across
+  a phone, and at 390px it was squeezed to a 20px box showing one letter of the
+  section's name, which is the one thing in that row a reader needs to read.
+  The chrome that remains is `flex: 0 0 auto`, the head and the repair strip:
+  left shrinkable, in a column whose editor wants every pixel, Firefox
+  collapsed the old rail to the height of its own scrollbar with nothing
+  visible in it, and Chromium did not, which is why the rule is written down
+  rather than trusted.
+- **The hints and the test code live in the panel, beside the code they
+  describe.** They sat in the module page under the prompt, which is where they
+  were written before there was a panel: reference material for while you are
+  coding, a scroll away from the code. The prompt stays in the reading column
+  at the measure, because it is course prose and is read, and several hundred
+  words at panel width beside prose at 646px is the "three widths read as an
+  accident" failure. Nothing is re-parented in the move: the prompt paragraphs
+  stay direct children of `.exercise`, so the stylesheet's measure rules keep
+  matching them and nine exercises do not silently widen. The output panel's
+  heading carries **Back to the code**, because one scroll means the code is
+  above whatever a run just produced, sometimes thousands of pixels above.
 - **The workbench is the one thing allowed to move the column, and only because
   the reader moved it.** `.shell` holds the reading column away from a fixed panel
   with `padding-right: var(--dock-w)`. Padding, not a grid track: a `1fr` track

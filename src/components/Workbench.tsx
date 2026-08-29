@@ -7,22 +7,24 @@
 
 import { Suspense, lazy, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { loadExercise } from "../exercises/loaders";
+import type { Exercise } from "../exercises/types";
 import type { ScratchRunResult, TestRunResult } from "../runtime/messages";
 import nielsenNotice from "../python/nielsen_notice.txt?raw";
-import { resetExercise } from "../state/progress";
+import { loadRevealStage, resetExercise, saveRevealStage } from "../state/progress";
 import {
   canUndo,
   currentDoc,
   downloadText,
   editedGivens,
   loadDocument,
+  putSection,
   loadScratch,
   sectionState,
   subscribeDocument,
   undoLastSplice,
   type SectionState,
 } from "../state/workbench";
-import { SECTIONS, SECTION_BY_ID, lineMap, type SectionDef } from "../state/workbenchDoc";
+import { SECTIONS, SECTION_BY_ID, lineMap } from "../state/workbenchDoc";
 import type { CodeEditorHandle } from "./CodeEditor";
 import { TestResults } from "./TestResults";
 import type { DockState, RunKind, UpstreamBlame } from "./WorkbenchProvider";
@@ -32,6 +34,8 @@ import type { DockState, RunKind, UpstreamBlame } from "./WorkbenchProvider";
 // It used to be deferred by an in-view gate on one exercise; a panel has no
 // in-view moment, so the first open is the gate instead.
 const CodeEditor = lazy(() => import("./CodeEditor").then((m) => ({ default: m.CodeEditor })));
+
+const REVEAL_LABELS = ["Show hint 1", "Show hint 2", "Show the solution"];
 
 interface Props {
   dockState: DockState;
@@ -69,10 +73,10 @@ interface Props {
 }
 
 const STATE_LABEL: Record<SectionState, string> = {
-  missing: "not in your file yet",
-  written: "written, not passing yet",
+  missing: "not started",
+  written: "not passing yet",
   passing: "passing",
-  stale: "passed, changed since",
+  stale: "changed since",
 };
 
 export function Workbench(props: Props) {
@@ -107,8 +111,10 @@ export function Workbench(props: Props) {
   const outputRef = useRef<HTMLPreElement>(null);
   const [scratchOpen, setScratchOpen] = useState(false);
   const scratchDetailsRef = useRef<HTMLDetailsElement>(null);
+  const sectionsRef = useRef<HTMLDetailsElement>(null);
   const [spliceNote, setSpliceNote] = useState<string | null>(null);
-  const [flagship, setFlagship] = useState<{ test: string; note: string } | undefined>();
+  const [exercise, setExercise] = useState<Exercise | null>(null);
+  const [reveal, setReveal] = useState(0);
   // The editor chunk is fetched on the first open and never unmounted after.
   const [everOpened, setEverOpened] = useState(dockState !== "closed");
 
@@ -200,17 +206,48 @@ export function Workbench(props: Props) {
     if (nearBottom) el.scrollTop = el.scrollHeight;
   }, [output]);
 
-  // The flagship banner belongs to one exercise, so it arrives with it.
+  // The current section's exercise: its flagship banner, its hints, and the
+  // test code. A section written for the learner has none of these, so this is
+  // null there and the disclosures below do not render.
   useEffect(() => {
-    if (!current) return;
+    if (!current) {
+      setExercise(null);
+      return;
+    }
+    setReveal(loadRevealStage(current));
+    const pending = loadExercise(current);
+    if (!pending) {
+      setExercise(null);
+      return;
+    }
     let live = true;
-    loadExercise(current)?.then((ex) => {
-      if (live) setFlagship(ex.flagship);
+    pending.then((ex) => {
+      if (live) setExercise(ex);
     });
     return () => {
       live = false;
     };
   }, [current]);
+
+  const revealNext = useCallback(() => {
+    if (!current) return;
+    const next = Math.min(reveal + 1, 3);
+    setReveal(next);
+    saveRevealStage(current, next);
+  }, [current, reveal]);
+
+  const putSolution = useCallback(() => {
+    if (!current || !exercise) return;
+    if (
+      !window.confirm(
+        "Replace this section of your file with the reference solution? One Undo brings back what is there now.",
+      )
+    )
+      return;
+    const outcome = putSection(current, exercise.solution);
+    if (!outcome.ok && outcome.reason) setSpliceNote(outcome.reason);
+    props.onChanged();
+  }, [current, exercise, props]);
 
   const running = busy !== null;
   const canRun = editorReady && !running;
@@ -249,11 +286,9 @@ export function Workbench(props: Props) {
   const notes = doc.problems.filter((p) => p.kind === "out-of-order");
   const touchedGivens = useMemo(() => editedGivens(), [revision]);
 
-  /** The bar's one text slot. Everything the run has to say goes here, in
-   * priority order, so nothing reserves a second row that is empty most of the
-   * time. When there is nothing to say it names what Run tests is pointed at,
-   * which is the thing a reader needs to know before pressing it. */
-  const barText = error
+  /** The status slot. The picker beside it owns the section name now, so this
+   * says only what the run is saying, and is empty most of the time. */
+  const statusText = error
     ? `Something went wrong: ${error}`
     : cancelled
       ? "Stopped. Press Run tests to try again."
@@ -261,9 +296,7 @@ export function Workbench(props: Props) {
         ? "Checking the sections above this one..."
         : busy
           ? status || "Running..."
-          : def
-            ? def.label
-            : "Put the caret in a section, or pick one above.";
+          : "";
 
   const liveMessage = error
     ? `Run failed. ${error}`
@@ -292,10 +325,11 @@ export function Workbench(props: Props) {
       aria-modal={dockState === "sheet" ? true : undefined}
       aria-busy={running}
     >
-      {/* One row of chrome, not two. The file's name, the one button the loop
-          uses, what that button is pointed at, and the things you reach for
-          once a session. The second run button moved to the scratch pad,
-          which is the thing it actually runs. */}
+      {/* One row of chrome. The section rail that used to sit under this was
+          eleven chips in a row that pans, so at the dock's own width it showed
+          four of them: a keyhole onto the course rather than a picture of it.
+          The same eleven, with the same state marks, are in the picker below,
+          which shows all of them at once and costs no permanent height. */}
       <div className="wb-head">
         <h2 className="wb-title" tabIndex={-1}>
           <span className="sr-only">Your library </span>
@@ -309,7 +343,51 @@ export function Workbench(props: Props) {
             Stop
           </button>
         )}
-        <span className={error ? "wb-target wb-target-error" : "wb-target"}>{barText}</span>
+        <details className="wb-sections" ref={sectionsRef}>
+          <summary aria-label={`Section: ${def ? def.label : "none chosen"}`}>
+            <span className="wb-sections-label">{def ? def.label : "Pick a section"}</span>
+          </summary>
+          <div className="wb-sections-menu" role="listbox">
+            {SECTIONS.map((section) => {
+              const state = sectionState(section.id);
+              // A given section has no tests, so "not passing yet" would be a
+              // lie about it: it says whether it is in the file, and nothing
+              // else.
+              const given = section.kind === "given";
+              return (
+                <button
+                  key={section.id}
+                  role="option"
+                  aria-selected={current === section.id}
+                  className={`wb-section-item wb-section-${state} ${current === section.id ? "wb-section-current" : ""}`}
+                  onClick={() => {
+                    if (sectionsRef.current) sectionsRef.current.open = false;
+                    props.onSelectSection(section.id);
+                  }}
+                >
+                  <span className="wb-section-mark" aria-hidden="true">
+                    {state === "passing" || (given && state !== "missing")
+                      ? "✓"
+                      : state === "stale"
+                        ? "!"
+                        : state === "missing"
+                          ? "+"
+                          : "·"}
+                  </span>
+                  <span className="wb-section-name">{section.label}</span>
+                  <span className="wb-section-state">
+                    {given
+                      ? state === "missing"
+                        ? "not in your file yet"
+                        : "in your file"
+                      : STATE_LABEL[state]}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </details>
+        <span className={error ? "wb-target wb-target-error" : "wb-target"}>{statusText}</span>
         <details className="wb-more">
           <summary aria-label="More actions">More</summary>
           <div className="wb-more-menu">
@@ -323,7 +401,7 @@ export function Workbench(props: Props) {
               Undo that
             </button>
             <p className="wb-more-tip">
-              <b>Run tests</b> runs your whole file and then checks the section the caret is in;
+              <b>Run tests</b> runs your whole file and then checks the section named beside it;
               Ctrl or Cmd with Enter does the same, and the triangle beside a section line runs
               that section. The scratch pad at the bottom has its own Run, for trying things and
               printing values; Shift with Enter runs it from anywhere. Tab indents, and Escape
@@ -334,18 +412,6 @@ export function Workbench(props: Props) {
         <button className="button-secondary wb-close" onClick={props.onClose}>
           Close
         </button>
-      </div>
-
-      <div className="wb-rail scroll-x" role="list" aria-label="Sections of your file">
-        {SECTIONS.map((section) => (
-          <RailChip
-            key={section.id}
-            section={section}
-            state={sectionState(section.id)}
-            currentId={current}
-            onSelect={props.onSelectSection}
-          />
-        ))}
       </div>
 
       {(problems.length > 0 || spliceNote || touchedGivens.length > 0) && (
@@ -413,6 +479,12 @@ export function Workbench(props: Props) {
             <div className="output-panel wb-output">
               <h5>
                 Output{ranFor ? <span className="wb-ran-for"> from {ranFor}</span> : null}
+                {/* One scroll means the code is above whatever a run just
+                    produced, sometimes thousands of pixels above. This is the
+                    way back, and the picker in the head is the way here. */}
+                <button className="wb-back" onClick={() => current && props.onSelectSection(current)}>
+                  Back to the code
+                </button>
               </h5>
               <pre ref={outputRef}>
                 {trimmed && "(earlier output trimmed to the last 200 lines)\n"}
@@ -452,7 +524,7 @@ export function Workbench(props: Props) {
           {result && (
             <TestResults
               result={result}
-              flagship={flagship}
+              flagship={exercise?.flagship}
               stale={stale}
               onGoToSection={props.onSelectSection}
             />
@@ -464,6 +536,44 @@ export function Workbench(props: Props) {
                 ? "Run entirely on your own code."
                 : `Run with the course's ${listNames(lent)}. Your own versions run here once those sections are written.`}
             </p>
+          )}
+
+          {exercise && (
+            <div className="wb-help">
+              <details className="wb-tests">
+                <summary>See exactly what the tests check (the test code)</summary>
+                <pre>{exercise.tests}</pre>
+              </details>
+
+              <div className="wb-hints">
+                {reveal > 0 && (
+                  <div className="hint">
+                    <h5>Hint 1</h5>
+                    <p>{exercise.hints[0]}</p>
+                  </div>
+                )}
+                {reveal > 1 && (
+                  <div className="hint">
+                    <h5>Hint 2</h5>
+                    <pre className="hint-pre">{exercise.hints[1]}</pre>
+                  </div>
+                )}
+                {reveal > 2 && (
+                  <div className="hint">
+                    <h5>Reference solution</h5>
+                    <pre className="hint-pre">{exercise.solution}</pre>
+                    <button className="button-secondary" onClick={putSolution}>
+                      Put this solution in my file
+                    </button>
+                  </div>
+                )}
+                {reveal < 3 && (
+                  <button className="button-secondary button-hint" onClick={revealNext}>
+                    {REVEAL_LABELS[reveal]}
+                  </button>
+                )}
+              </div>
+            </div>
           )}
 
           <details
@@ -507,35 +617,6 @@ function listNames(names: string[]): string {
   const code = names.map((n) => `${n}`);
   if (code.length === 1) return code[0];
   return `${code.slice(0, -1).join(", ")} and ${code[code.length - 1]}`;
-}
-
-function RailChip({
-  section,
-  state,
-  currentId,
-  onSelect,
-}: {
-  section: SectionDef;
-  state: SectionState;
-  currentId: string | null;
-  onSelect(id: string): void;
-}) {
-  const isCurrent = currentId === section.id;
-  return (
-    <button
-      role="listitem"
-      className={`wb-chip wb-chip-${state} ${isCurrent ? "wb-chip-current" : ""}`}
-      aria-current={isCurrent ? "true" : undefined}
-      onClick={() => onSelect(section.id)}
-      title={`${section.label}: ${STATE_LABEL[state]}`}
-    >
-      <span className="wb-chip-mark" aria-hidden="true">
-        {state === "passing" ? "✓" : state === "stale" ? "!" : state === "missing" ? "+" : "·"}
-      </span>
-      {section.label.replace(/^Module (\d+), /, "$1. ")}
-      <span className="sr-only">, {STATE_LABEL[state]}</span>
-    </button>
-  );
 }
 
 function EditorPlaceholder() {

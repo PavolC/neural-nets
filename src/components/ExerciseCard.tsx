@@ -1,6 +1,13 @@
 // What an exercise looks like in the module page now that the editor lives in
-// the panel: the prompt, a button that opens the section, the runnable
-// snippets, the test code, and the hints.
+// the panel: the prompt, the runnable snippets, and a button that opens the
+// section.
+//
+// The split is by what the thing is for. The prompt is course prose and is
+// read; it stays in the reading column at the measure, because several hundred
+// words at panel width beside prose at 646px is the "three widths read as an
+// accident" failure. The hints and the test code are reference material for
+// while you are coding, so they moved into the panel, beside the code they
+// describe.
 //
 // Nothing is re-parented. The prompt paragraphs stay direct children of
 // .exercise, so the stylesheet's measure rules keep matching them and nine
@@ -8,16 +15,13 @@
 
 import { useEffect, useState } from "react";
 import type { Exercise } from "../exercises/types";
-import { loadRevealStage, saveRevealStage, subscribeProgress } from "../state/progress";
-import { putSection, sectionState } from "../state/workbench";
+import { subscribeProgress } from "../state/progress";
+import { sectionState } from "../state/workbench";
 import { SECTION_BY_ID } from "../state/workbenchDoc";
 import { useWorkbench } from "./WorkbenchProvider";
 
-const REVEAL_LABELS = ["Show hint 1", "Show hint 2", "Show the solution"];
-
 export function ExerciseCard({ exercise }: { exercise: Exercise }) {
   const wb = useWorkbench();
-  const [reveal, setReveal] = useState(() => loadRevealStage(exercise.id));
   const [tick, setTick] = useState(0);
   useEffect(() => subscribeProgress(() => setTick((t) => t + 1)), []);
 
@@ -29,24 +33,6 @@ export function ExerciseCard({ exercise }: { exercise: Exercise }) {
   const def = SECTION_BY_ID.get(exercise.id);
   const result = wb.resultFor(exercise.id);
   const isOpen = wb.current === exercise.id && wb.dockState !== "closed";
-
-  const revealNext = () => {
-    const next = Math.min(reveal + 1, 3);
-    setReveal(next);
-    saveRevealStage(exercise.id, next);
-  };
-
-  const putSolution = () => {
-    if (
-      !window.confirm(
-        "Replace this section of your file with the reference solution? One Undo brings back what is there now.",
-      )
-    )
-      return;
-    const outcome = putSection(exercise.id, exercise.solution);
-    if (!outcome.ok && outcome.reason) window.alert(outcome.reason);
-    wb.reveal(exercise.id);
-  };
 
   const summary =
     state === "passing"
@@ -87,39 +73,6 @@ export function ExerciseCard({ exercise }: { exercise: Exercise }) {
         </span>
       </p>
 
-      <details className="demo-log tests-viewer">
-        <summary>See exactly what the tests check (the test code)</summary>
-        <pre>{exercise.tests}</pre>
-      </details>
-
-      <div className="hints">
-        {reveal > 0 && (
-          <div className="hint">
-            <h5>Hint 1</h5>
-            <p>{exercise.hints[0]}</p>
-          </div>
-        )}
-        {reveal > 1 && (
-          <div className="hint">
-            <h5>Hint 2</h5>
-            <pre className="hint-pre">{exercise.hints[1]}</pre>
-          </div>
-        )}
-        {reveal > 2 && (
-          <div className="hint">
-            <h5>Reference solution</h5>
-            <pre className="hint-pre">{exercise.solution}</pre>
-            <button className="button-secondary" onClick={putSolution}>
-              Put this solution in my file
-            </button>
-          </div>
-        )}
-        {reveal < 3 && (
-          <button className="button-secondary button-hint" onClick={revealNext}>
-            {REVEAL_LABELS[reveal]}
-          </button>
-        )}
-      </div>
     </section>
   );
 }

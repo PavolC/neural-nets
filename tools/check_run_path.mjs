@@ -124,6 +124,11 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
     setupError: document.querySelector(".test-fail strong")?.textContent?.trim() ?? null,
     failCards: document.querySelectorAll(".test-fail").length,
     folded: document.querySelector(".test-passed > summary")?.textContent?.trim() ?? null,
+    // The hints and the test code live beside the code now, not in the page.
+    hintsInPanel: document.querySelectorAll(".wb-hints button").length > 0,
+    testCodeInPanel: !!document.querySelector(".wb-tests"),
+    backToCode: !!document.querySelector(".wb-back"),
+    railGone: !document.querySelector(".wb-rail"),
     foldedOpen: document.querySelector(".test-passed")?.hasAttribute("open") ?? null,
     lent: document.querySelector(".wb-lent")?.textContent?.trim() ?? null,
     goTo: document.querySelector(".wb-goto")?.textContent?.trim() ?? null,
@@ -134,10 +139,21 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
     runAlwaysVisible: !document.querySelector(".wb-flow").contains(
       document.querySelector(".wb-run"),
     ),
+    // Visible ones only: a closed <details> still reports a scrollHeight in
+    // Chromium, which counted blocks nobody can see. The panel is meant to be
+    // the flow plus the deliberately capped output pane, and nothing else.
     scrollRegions: [...document.querySelectorAll(".wb *")].filter((e) => {
       const cs = getComputedStyle(e);
-      return (cs.overflowY === "auto" || cs.overflowY === "scroll") && e.scrollHeight > e.clientHeight + 2;
-    }).length,
+      return (
+        e.offsetParent !== null &&
+        (cs.overflowY === "auto" || cs.overflowY === "scroll") &&
+        e.scrollHeight > e.clientHeight + 2
+      );
+    }).map((e) => e.className.toString() || e.tagName),
+    editorHasItsOwnScroller: (() => {
+      const s = document.querySelector(".wb-editor .cm-scroller");
+      return !!s && s.scrollHeight > s.clientHeight + 2;
+    })(),
   }));
   console.log(`\n${label}`);
   for (const [k, v] of Object.entries(s)) if (v !== null) console.log(`  ${k}: ${JSON.stringify(v)}`);
@@ -171,21 +187,24 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
   console.log("  output:", JSON.stringify((await p.locator(".output-panel pre").textContent())?.trim().slice(0, 20)));
   console.log("  no test results, as it should be:", (await p.locator(".test-results").count()) === 0);
 
-  console.log("\nclicking a rail chip scrolls the one flow to that section");
+  console.log("\nthe section picker scrolls the one flow to that section");
   await p.evaluate(() => { document.querySelector(".wb-flow").scrollTop = 99999; });
   await p.waitForTimeout(300);
   const deep = await p.evaluate(() => Math.round(document.querySelector(".wb-flow").scrollTop));
-  await p.locator(".wb-chip", { hasText: "1. A sigmoid neuron" }).click();
+  await p.locator(".wb-sections > summary").click();
+  await p.locator(".wb-section-item", { hasText: "A sigmoid neuron" }).click();
   await p.waitForTimeout(600);
   const back = await p.evaluate(() => Math.round(document.querySelector(".wb-flow").scrollTop));
   console.log(`  scrolled ${deep} -> ${back}, moved: ${back < deep}`);
   if (!(back < deep)) failures++;
 
   console.log("\nthe gutter marker runs its own section, not the current one");
-  const target = () => p.locator(".wb-target").textContent().then((s) => s.trim());
+  // The picker owns the section name; .wb-target is the run status now.
+  const target = () => p.locator(".wb-sections-label").textContent().then((s) => s.trim());
   // Point the panel at Module 2 first, so clicking Module 1's marker has
   // something to prove. The chip above already moved it to Module 1.
-  await p.locator(".wb-chip", { hasText: "2. Feedforward" }).click();
+  await p.locator(".wb-sections > summary").click();
+  await p.locator(".wb-section-item", { hasText: "Feedforward" }).click();
   await p.waitForTimeout(400);
   const before = await target();
   // The panel is one scroll now, so this is the thing that moves.
