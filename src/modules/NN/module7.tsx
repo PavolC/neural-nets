@@ -784,14 +784,28 @@ export function Module7() {
         gloss="Multiply the square out, subtract the old value, and divide by the nudge: the rise per unit of nudge is 2w + h, which for a small nudge is 2w. Check it at w = 3 and h = 0.01, where the two squares are 9 and 9.0601: a rise of 0.0601 for a nudge of 0.01 is 6.01 per unit, against the 6 the rule predicts."
       />
       <p>
-        Two things follow. The new term contributes{" "}
-        <M tex="\lambda w / n" /> to that weight's slope, the 2 cancelling the
-        half. And Module 3's bookkeeping half in{" "}
-        <M tex="\tfrac12 (a - y)^2" /> is this same cancellation, the one
-        Module 4 cashed in when the output layer's slope came out as the plain
-        gap with no stray 2: halving a squared quantity makes its slope the
-        quantity itself. Put the new slope into the update rule and collect the
-        two terms in <M tex="w" />:
+        So the new term's slope, for one weight, is its coefficient times the
+        slope of the square:
+      </p>
+      <Eq
+        tex="\underbrace{\frac{\lambda}{2n}}_{\text{the term's coefficient}} \times \underbrace{2w}_{\text{the slope of } w^2} = \underbrace{\frac{\lambda w}{n}}_{\text{what it adds to the weight's slope}}"
+        gloss="The 2 from the square cancels the half in the coefficient, which is why the half was put there: whoever writes a squared term into a cost halves it, so the slope comes out clean."
+      />
+      <Aside>
+        <p>
+          The same trick has been under the course since Module 3. Its cost is{" "}
+          <M tex="\tfrac12 (a - y)^2" />, and the half was never explained: it
+          is there so that the 2 from squaring cancels on the way to the slope,
+          which is what Module 4 cashed in when the output layer's slope came
+          out as the plain gap with no stray 2. Halving a squared quantity
+          makes its slope the quantity itself.
+        </p>
+      </Aside>
+      <p>
+        A weight's whole slope is now the old one plus{" "}
+        <M tex="\lambda w / n" />. Put that into Module 3's update rule, and
+        the two pieces that both contain <M tex="w" /> collect into one
+        factor:
       </p>
       <Eq
         tex="w \;\leftarrow\; w - \eta \frac{\lambda}{n} w - \eta \frac{\partial C}{\partial w} \;=\; \Big( 1 - \frac{\eta \lambda}{n} \Big) w - \eta \frac{\partial C}{\partial w}"
