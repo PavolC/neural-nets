@@ -586,34 +586,45 @@ export function Module7() {
         bias. Most pixels of a digit are black, and on average 103 of the 784
         are above half brightness (measured over the bundled images, and the
         number the exercise below builds its stand-in digits from). So about a
-        hundred weights contribute, each drawn from a bell of spread 1, meaning
-        a typical draw sits about 1 away from the bell's middle.
+        hundred weights contribute, and each is drawn from the standard bell:
+        a random number, centred on zero, typically about 1 away from it.
       </p>
       <p>
-        A hundred random pushes of size about 1 do not cancel out to nothing,
-        and they do not add up to a hundred either. They pile up to about the
-        square root of the count: <M tex="\sqrt{100} = 10" />. That
-        square-root rule for adding up independent random quantities is the
-        one fact here taken on trust rather than derived, and it can at least
-        be checked. A spread runs a little larger than the plain average
-        distance quoted above (7.43 for these readings), because it squares the
-        far draws before averaging them. The exact version of the rule says the
-        spread of a weighted sum is the square root of the pixel values squared
-        and added up. For one bundled image those squares add to 87.4 on
-        average (fewer than the 103 lit pixels, because a digit's grey edge
-        pixels sit below 1), so the rule predicts{" "}
-        <M tex="\sqrt{87.4} = 9.35" /> against a measured spread of{" "}
-        <M tex="z" /> of 9.28.
+        A hundred random pushes of size about 1 could do three things. They
+        could cancel out to almost nothing, they could add up to about a
+        hundred, or they could land somewhere between. They land between, at a
+        predictable spot: about the square root of the count,{" "}
+        <M tex="\sqrt{100} = 10" />. That square-root rule for adding up
+        independent random quantities is the one fact here taken on trust
+        rather than derived, and the table above is its check: the readings
+        sit 7 or more from zero on a typical image, the rule's neighbourhood,
+        not the 1 of cancelling out or the 100 of plain adding.
       </p>
+      <Aside>
+        <p>
+          The check can be made exact. The rule's precise form uses a
+          particular kind of average, the spread: square every reading,
+          average the squares, take the square root. A spread runs a little
+          larger than the plain typical distance (9.28 against 7.43 for these
+          readings) because squaring counts the far draws more heavily. In
+          that form the prediction is sharp: the spread of a hidden neuron's
+          weighted sum is the square root of the image's pixel values squared
+          and added up, which averages 87.4 over the bundled images (fewer
+          than the 103 lit pixels, because a digit's grey edge pixels sit
+          below 1). The rule predicts <M tex="\sqrt{87.4} = 9.35" />; the
+          measured spread is 9.28.
+        </p>
+      </Aside>
       <p>
-        Nine is a long way out on a sigmoid. So the fix is to divide the pile
-        back down, and the rule gives the divisor: shrink each weight by the
-        square root of the number of inputs feeding its layer. For the hidden
-        layer that is <M tex="\sqrt{784} = 28" />.
+        Seven is already a long way out on a sigmoid, and half the readings
+        sit past it. So the fix is to divide the pile back down, and the rule
+        gives the divisor: shrink each weight by the square root of the number
+        of inputs feeding its layer. For the hidden layer that is{" "}
+        <M tex="\sqrt{784} = 28" />.
       </p>
       <Eq
-        tex="w = \frac{\text{a draw of spread } 1}{\sqrt{n_{\text{in}}}} \qquad\text{and}\qquad \frac{9.28}{28} = 0.33"
-        gloss="Every weight into a layer is drawn as before and then divided by the square root of that layer's input count, n-in: 28 for the 784 pixels, and the square root of 30 for the layer reading the 30 hidden neurons. The weighted sum's spread falls from 9.28 to 0.33, so the bias, still drawn at spread 1, becomes the larger term and the evidence lands within about 1 of zero."
+        tex="w = \frac{\text{a draw from the standard bell}}{\sqrt{n_{\text{in}}}} \qquad\text{and}\qquad \frac{9.28}{28} = 0.33"
+        gloss="Every weight into a layer is drawn as before and then divided by the square root of that layer's input count, n-in: 28 for the 784 pixels, and the square root of 30 for the layer reading the 30 hidden neurons. The pile's measured width (9.28, the aside's exact check) falls to 0.33, so the bias, still drawn from the standard bell, becomes the larger term and the evidence lands within about 1 of zero."
       />
       <p>
         Measured on the same 150,000 readings, the typical distance from zero
@@ -623,13 +634,14 @@ export function Module7() {
       </p>
       <Aside>
         <p>
-          The biases keep their spread of 1, and after the division they are
+          The biases keep their full-size draw from the standard bell, and after
+          the division they are
           the bigger of the two terms in <M tex="z" />. Shrinking them too
           would push the evidence closer to zero still, and it is not worth
           doing: a bias is one number per neuron rather than one per wire, so
           nothing piles up in it, and starting every neuron at exactly the
           middle of the sigmoid removes some of the variety the layer starts
-          with. Nielsen's Chapter 3 leaves the biases at spread 1 as well, and
+          with. Nielsen's Chapter 3 leaves the biases undivided as well, and
           reports that the choice makes little difference either way.
         </p>
       </Aside>
@@ -968,7 +980,7 @@ export function Module7() {
         items={[
           "A descent step reaches the score through two links: the knobs move the answer, and the answer moves the score. BP1 multiplies their two rates, the squash's slope and the gap, which is why blame is just how steeply the land rises under a neuron's knobs. Where an output neuron is confidently wrong the first link goes slack: the blame peaks at 0.148 two thirds of the way wrong and falls away past it, and at an answer of 0.999 it is 0.001.",
           "The first link is the neuron's own machinery and is not open to change; the second is the yardstick, and it is. The quadratic yardstick has a ceiling of 0.5 per output, so its rate can never grow enough to cover for a slack first link. The cross-entropy cost charges -ln of the confidence in the right answer, which rises without limit, at a rate of exactly the gap divided by the squash's slope. The two multiply out to the gap everywhere, so BP1 becomes delta = a - y with nothing struck out. BP2 keeps its own sigma-prime, which is a hidden neuron's own first link and out of the yardstick's reach.",
-          "Weights drawn at spread 1 pile up over about a hundred lit pixels to an evidence spread of 9.3, leaving 62 percent of hidden neurons flatter than 0.01 before training starts. Dividing each layer's weights by the square root of its input count puts the typical evidence within 1 of zero, with no neuron below 0.01, and is worth 4.3 points of accuracy against the same cost started undivided.",
+          "A hundred standard-bell weights pile up to about the square root of a hundred, so a hidden neuron's evidence starts 7 or more from zero on a typical image, leaving 62 percent of the readings flatter than 0.01 before training starts. Dividing each layer's weights by the square root of its input count puts the typical evidence within 1 of zero, with no neuron below 0.01, and is worth 4.3 points of accuracy against the same cost started undivided.",
           "Training on 1,000 images reaches 100 percent on those images while the held-out accuracy stops improving and the held-out cost turns around and rises: the network is buying confidence, not recognition. Weight decay multiplies every weight by a factor just under 1 each step, which reliably holds the weights and the held-out cost down, and buys accuracy only where something else left the weights too large.",
           "Every constant here was found by trying, and the grid shows the step size mattering more than the cost. Module 8 takes the four equations into deep networks and finds a limit that no choice of cost fixes.",
         ]}
