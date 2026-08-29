@@ -935,10 +935,22 @@ button:disabled {
   min-height: 2.9em;
 }
 
+/* A chip at rest is an outline pill: the base button rule fills every button
+   with the accent, so a chip that does not reset the fill is pixel-identical
+   to .chip-active, and all of a group's options read as selected at once.
+   That hid which lambda, start and view were chosen on every panel. Same
+   idiom as .button-secondary: transparent ground, accent ink, its own hover
+   at its own specificity, which never matches the active chip. */
 .chip {
   padding: 0.2rem 0.7rem;
   font-size: 0.85rem;
   border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--accent);
+}
+
+.chip:hover:not(:disabled):not(.chip-active) {
+  background: var(--accent-wash);
 }
 
 .chip-active {
