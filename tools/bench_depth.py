@@ -380,7 +380,7 @@ def bench_mistakes(b):
 def bench_module7(b):
     section(
         "7. Module 7's numbers that Module 8 opens by quoting",
-        "the digit reader stands at 92.1 percent; the median hidden-neuron steepness at "
+        "the digit reader stands at 92.1 percent; the hidden layer's median squash slope at "
         "the divided start is 0.22",
     )
     r = b.run(1)
@@ -397,7 +397,7 @@ def bench_module7(b):
         a = b.course.sigmoid(z)
         steep = a * (1.0 - a)
         print(f"  {label}: typical |z| {float(np.abs(z).mean()):.2f}, "
-              f"median steepness {float(np.median(steep)):.4f}, "
+              f"median squash slope {float(np.median(steep)):.4f}, "
               f"share flatter than 0.01 {pct(float((steep < 0.01).mean()))}")
 
 

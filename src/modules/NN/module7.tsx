@@ -572,8 +572,9 @@ export function Module7() {
         </table>
       </div>
       <p>
-        The typical distance is 7.43, and the squash's slope has a median of 0.0020,
-        against the 0.25 a neuron has at its steepest. Almost 62 percent of
+        Averaged over all 150,000 readings, the distance from zero is 7.43,
+        and the squash's slope has a median of 0.0020, against the 0.25 a
+        neuron has at its steepest. Almost 62 percent of
         the readings are flatter than 0.01. A hidden neuron in that state
         passes almost nothing backward and moves almost nowhere, and it is in
         that state before it has learned anything at all: the flatness is an
@@ -587,10 +588,12 @@ export function Module7() {
         are above half brightness (measured over the bundled images, and the
         number the exercise below builds its stand-in digits from). So about a
         hundred weights contribute, and each is drawn from the standard bell:
-        a random number, centred on zero, typically about 1 away from it.
+        a random number, centred on zero, typically about 1 away from it. Each
+        lit pixel therefore pushes the evidence up or down by its weight times
+        its brightness: about a hundred pushes, each of size about 1.
       </p>
       <p>
-        A hundred random pushes of size about 1 could do three things. They
+        Those hundred pushes could do three things. They
         could cancel out to almost nothing, they could add up to about a
         hundred, or they could land somewhere between. They land between, at a
         predictable spot: about the square root of the count,{" "}
