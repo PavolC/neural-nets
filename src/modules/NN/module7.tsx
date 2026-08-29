@@ -827,8 +827,8 @@ export function Module7() {
         factor:
       </p>
       <Eq
-        tex="w \;\leftarrow\; w - \eta \frac{\lambda}{n} w - \eta \frac{\partial C}{\partial w} \;=\; \Big( 1 - \frac{\eta \lambda}{n} \Big) w - \eta \frac{\partial C}{\partial w}"
-        gloss="The same update as Module 3's, with the weight multiplied by a number slightly below 1 before the usual step. That factor is the whole technique, and the name for it says what it does: weight decay. Biases keep the old rule exactly, since the new term does not mention them."
+        tex="\begin{aligned} w &\leftarrow w - \eta \, \frac{\partial C}{\partial w} && \text{(Module 3's update)} \\[0.5em] w &\leftarrow w - \eta \frac{\lambda}{n} w - \eta \, \frac{\partial C}{\partial w} && \text{(the new slope joins)} \\[0.5em] w &\leftarrow \Big( 1 - \frac{\eta \lambda}{n} \Big) w - \eta \, \frac{\partial C}{\partial w} && \text{(collected)} \end{aligned}"
+        gloss="Top: the rule as it has been since Module 3, one weight stepped against its slope. Middle: the cost gained a term, so the slope gained one. Bottom: the same line with the two pieces that contain w collected into one factor. Everything after the factor is the top line again, so the whole change is that the weight is first multiplied by a number slightly below 1. That factor is the technique, and its name says what it does: weight decay. Biases keep the top line exactly, since the new term does not mention them."
       />
       <p>
         Put numbers in it. The run below uses <M tex="\eta = 0.5" />,{" "}
