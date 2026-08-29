@@ -20,6 +20,11 @@
 # Each layer turns the running activation a into sigmoid(w @ a + b). Return
 # the final activation, shape (n_out, 1).
 #
+# Every module from 3 on calls this same function on a whole batch X of
+# shape (n, m), one example per column. There is nothing extra to write:
+# w @ a + b computes every column at once, as long as the loop never
+# reshapes a or picks out a single column. The tests check a batch too.
+#
 # sigmoid is the one you wrote in Module 1, higher up this same file. Call it
 # by name; there is nothing to import.
 

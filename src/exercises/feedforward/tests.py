@@ -72,6 +72,45 @@ def test_two_layer_values():
     )
 
 
+def test_batch_of_columns():
+    """a whole batch: many columns in, that many answers out"""
+    # From Module 3 on, every caller hands feedforward a whole batch at once:
+    # X of shape (n, m), one example per column. The layer rule
+    # sigmoid(w @ a + b) already computes every column together, so this
+    # passes unless something in the loop reshapes a, indexes one column, or
+    # converts to a plain float. The same 4-3-2 network as the previous
+    # test; the batch's first column is that test's x.
+    w1 = np.array([[0.3047, -1.04, 0.7505, 0.9406],
+                   [-1.951, -1.3022, 0.1278, -0.3162],
+                   [-0.0168, -0.853, 0.8794, 0.7778]])
+    b1 = np.array([[0.066], [1.1272], [0.4675]])
+    w2 = np.array([[-0.8593, 0.3688, -0.9589], [0.8785, -0.0499, -0.1849]])
+    b2 = np.array([[-0.6809], [1.2225]])
+    X = np.array([[-0.1545, 0.9, 0.0],
+                  [-0.4283, -1.2, 0.25],
+                  [-0.3521, 0.33, -0.9],
+                  [0.5323, -0.71, 1.5]])
+    out = feedforward([w1, w2], [b1, b2], X)
+    assert np.shape(out) == (2, 3), (
+        f"expected shape (2, 3) for a batch of 3 columns, got {np.shape(out)}. "
+        "Later modules call feedforward on whole batches: X is (n, m), one "
+        "example per column, and the answer keeps that layout. The layer rule "
+        "a = sigmoid(w @ a + b) already handles this, so check that nothing "
+        "in your loop reshapes a, picks out a single column, or wraps the "
+        "result in float(...)."
+    )
+    expected = np.array([[0.1639029911, 0.1428024502, 0.1616823002],
+                         [0.8367229900, 0.8470571816, 0.8361190351]])
+    assert np.allclose(out, expected, atol=1e-6), (
+        f"wrong values on a batch: expected\n{expected}\ngot\n{np.asarray(out)}\n"
+        "Each column of the answer must be exactly what your feedforward "
+        "returns for that column alone; the first column here is the previous "
+        "test's x, so it must reproduce that test's numbers. If only the "
+        "first column is right, the loop is reading column 0 instead of the "
+        "whole matrix."
+    )
+
+
 def test_layer_order():
     """Layers are applied in order: weights[0] first"""
     v1 = np.array([[2.0409, -2.5557], [0.4181, -0.5678]])

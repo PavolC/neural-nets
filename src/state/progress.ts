@@ -24,7 +24,7 @@ import {
   sectionDefines,
   sectionPresent,
 } from "./workbench";
-import { SECTION_BY_ID } from "./workbenchDoc";
+import { SECTION_BY_ID, withGivens, type SectionDef } from "./workbenchDoc";
 
 /** The prefix of the whole file up to and including this exercise's section.
  *
@@ -70,16 +70,56 @@ export function subscribeProgress(fn: () => void): () => void {
   return () => window.removeEventListener(PROGRESS_EVENT, fn);
 }
 
-/** Passed, and the code that passed is still in the file.
+/** One section, ready to be run outside the test harness: an exercise
+ * section has passed and still defines what it promised; a written-for-you
+ * section just has to be in the file, intact enough to define its names.
  *
- * The panels that train with the learner's own code need all three. The
- * checks can come apart: a progress file that carries the passed marks
- * without the code, storage cleared halfway, or a function deleted out of a
- * section that has already passed. Gating on the pass alone gave those panels
- * an unlocked button that quietly did nothing.
+ * The passed-present-defines triple can come apart: a progress file that
+ * carries the passed marks without the code, storage cleared halfway, or a
+ * function deleted out of a section that has already passed. Gating on the
+ * pass alone gave the panels an unlocked button that quietly did nothing.
+ */
+function sectionReady(id: string): boolean {
+  const def = SECTION_BY_ID.get(id);
+  if (!def) return false;
+  if (def.kind === "exercise" && !loadCompleted(id)) return false;
+  return sectionPresent(id) && sectionDefines(id);
+}
+
+/** Passed, the code that passed is still in the file, and so is everything
+ * it runs on.
+ *
+ * The test harness lends the course's copy of any section the learner has
+ * not written, so a pass can be earned out of order: open Module 3 first and
+ * sgd goes green with feedforward on loan. The payoff panels have no lending;
+ * they exec the projection as it stands, so that same learner's file would
+ * die on the missing name. codeReady therefore walks the requires closure
+ * plus the given sections that arrive with it, which is exactly the set the
+ * projection is asked for.
  */
 export function codeReady(exerciseId: string): boolean {
-  return loadCompleted(exerciseId) && sectionPresent(exerciseId) && sectionDefines(exerciseId);
+  return withGivens([exerciseId]).every(sectionReady);
+}
+
+/** The sections keeping a panel locked, in course order: everything the
+ * named exercises run on that is not ready yet. A locked note names these,
+ * so it never claims to wait on an exercise the learner has finished. */
+export function notReadyFor(exerciseIds: readonly string[]): SectionDef[] {
+  const notReady = new Set(withGivens(exerciseIds).filter((id) => !sectionReady(id)));
+  return [...notReady]
+    .map((id) => SECTION_BY_ID.get(id))
+    .filter((s): s is SectionDef => s !== undefined)
+    // A given section that is not in the file yet arrives on its own the
+    // moment the exercise that pulls it in is opened, so while that exercise
+    // is itself on this list, naming the given too is noise. A given that is
+    // missing while its exercise is ready really is the thing to name: the
+    // learner deleted it, and nothing else would say so.
+    .filter(
+      (s) =>
+        s.kind !== "given" ||
+        sectionPresent(s.id) ||
+        !s.pulledInBy.some((ex) => notReady.has(ex)),
+    );
 }
 
 /** Put one section back to its starting text, and clear its marks. */

@@ -94,7 +94,9 @@ def _lend(submission, names):
     A section the learner has not touched is not their work, so the course
     lends its own copy for the run. JavaScript decides the list (an untouched
     or absent section, never a name the tested section itself owns); this
-    just applies it, and never overwrites something the document defined.
+    just applies it. Overwriting an untouched section's stub is the point;
+    what must never be overwritten, a function the learner wrote, is kept off
+    the list by the caller, not checked here.
     """
     import course
     lent = []

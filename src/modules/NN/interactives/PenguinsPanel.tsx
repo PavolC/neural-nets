@@ -5,6 +5,7 @@ import { codeReady, loadCode, subscribeProgress } from "../../../state/progress"
 import { prepareExercise } from "../../../exercises/prepare";
 import { trainExercise } from "../../../exercises/train";
 import { EpochChart, type EpochSeries } from "./EpochChart";
+import { lockedBy, speakList } from "./lockedBy";
 
 // Module 10's payoff: the learner's own preparation and their own training
 // loop, on a file that arrives the way data actually does. Two switches,
@@ -192,14 +193,15 @@ export function PenguinsPanel() {
   };
 
   if (!unlocked) {
-    const missing = [
-      codeReady(prepareExercise.id) ? null : "this module's exercise",
-      codeReady(trainExercise.id) ? null : "Module 9's program",
-    ].filter(Boolean);
+    const missing = speakList(
+      lockedBy([prepareExercise.id, trainExercise.id], {
+        [prepareExercise.id]: "this module's exercise",
+      }),
+    );
     return (
       <p className="payoff-locked">
         This run prepares the file with your own code and trains it with your own
-        loop, so it needs {missing.join(" and ")} passed first.
+        loop, nothing borrowed, so it needs {missing}.
       </p>
     );
   }

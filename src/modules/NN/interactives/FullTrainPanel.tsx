@@ -6,6 +6,7 @@ import { crossEntropyExercise } from "../../../exercises/cross-entropy";
 import { smartInitExercise } from "../../../exercises/smart-init";
 import { l2Exercise } from "../../../exercises/l2";
 import { trainExercise } from "../../../exercises/train";
+import { lockedBy, speakList } from "./lockedBy";
 import { EpochChart, type EpochSeries } from "./EpochChart";
 
 // The capstone run: the learner's own loop, on the digit reader, with their
@@ -149,16 +150,16 @@ export function FullTrainPanel() {
   };
 
   if (!unlocked) {
-    const missing = [
-      codeReady(trainExercise.id) ? null : "this module's exercise",
-      codeReady(smartInitExercise.id) ? null : "Module 7's starting-point exercise",
-      codeReady(crossEntropyExercise.id) ? null : "Module 7's cross-entropy exercise",
-      codeReady(l2Exercise.id) ? null : "Module 7's decaying update",
-    ].filter(Boolean);
+    const missing = speakList(
+      lockedBy(
+        [trainExercise.id, smartInitExercise.id, crossEntropyExercise.id, l2Exercise.id],
+        { [trainExercise.id]: "this module's exercise" },
+      ),
+    );
     return (
       <p className="payoff-locked">
-        This run is your whole program, so it needs {missing.join(", ")} passed
-        first. Every function it calls is one you wrote.
+        This run is your whole program, so it needs {missing}. Every function it
+        calls is one you wrote, and nothing is borrowed.
       </p>
     );
   }

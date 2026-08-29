@@ -306,10 +306,21 @@ export function closure(id: string, into = new Set<string>()): Set<string> {
   return into;
 }
 
-/** Those sections plus the given ones they need, in table order. */
+/** Those sections, everything they call into, and the given sections that
+ * arrive alongside them, in table order: what the learner's file holds once
+ * these exercises have been opened. Mirrors with_givens in
+ * tools/workbench.py, which check_exercises.py runs; the two must agree on
+ * what "everything backprop runs on" means, because given-batch is pulled in
+ * by backprop without being in its requires. */
 export function withGivens(ids: readonly string[]): string[] {
   const want = new Set<string>();
-  for (const id of ids) closure(id, want);
+  const todo = [...ids];
+  while (todo.length) {
+    const id = todo.pop()!;
+    if (want.has(id)) continue;
+    want.add(id);
+    todo.push(...closure(id), ...givensFor(id));
+  }
   return SECTION_ORDER.filter((id) => want.has(id));
 }
 

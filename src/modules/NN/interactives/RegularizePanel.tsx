@@ -6,6 +6,7 @@ import { crossEntropyExercise } from "../../../exercises/cross-entropy";
 import { smartInitExercise } from "../../../exercises/smart-init";
 import { l2Exercise } from "../../../exercises/l2";
 import { EpochChart, type EpochSeries } from "./EpochChart";
+import { lockedBy, speakList } from "./lockedBy";
 
 // Module 7, third cycle: the 1,000-image slice, trained twice through the
 // learner's l2_step, once with lmbda = 0 (which is exactly their Module 3
@@ -172,14 +173,16 @@ export function RegularizePanel() {
   };
 
   if (!unlocked) {
-    const missing = [
-      codeReady(crossEntropyExercise.id) ? null : "the cross-entropy exercise",
-      codeReady(smartInitExercise.id) ? null : "the starting-point exercise",
-      codeReady(l2Exercise.id) ? null : "the decaying step above",
-    ].filter(Boolean);
+    const missing = speakList(
+      lockedBy([crossEntropyExercise.id, smartInitExercise.id, l2Exercise.id], {
+        [crossEntropyExercise.id]: "the cross-entropy exercise",
+        [smartInitExercise.id]: "the starting-point exercise",
+        [l2Exercise.id]: "the decaying step above",
+      }),
+    );
     return (
       <p className="payoff-locked">
-        Both runs go through your l2_step, so this needs {missing.join(", ")} passed first.
+        Both runs go through your l2_step, with nothing borrowed, so this needs {missing}.
       </p>
     );
   }

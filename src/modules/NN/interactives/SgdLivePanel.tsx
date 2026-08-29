@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
 import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
 import { sgdExercise } from "../../../exercises/sgd";
+import { lockedBy, speakList } from "./lockedBy";
 
 // Module 3 payoff: run the learner's own sgd on a toy 2D dataset, live.
 // It works, and it is visibly slow; the numbers reported here set up the
@@ -120,10 +121,13 @@ export function SgdLivePanel() {
   };
 
   if (!unlocked) {
+    const missing = speakList(
+      lockedBy([sgdExercise.id], { [sgdExercise.id]: "the SGD exercise above" }),
+    );
     return (
       <p className="payoff-locked">
-        Locked: pass the SGD exercise above, then train a real (tiny) network with your
-        own code here.
+        Locked: this panel trains a real (tiny) network with your own code, nothing
+        borrowed, so it needs {missing}. Come back once the tests are green.
       </p>
     );
   }

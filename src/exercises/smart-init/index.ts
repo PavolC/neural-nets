@@ -38,6 +38,8 @@ export const smartInitExercise: Exercise = {
       "run it:",
     {
       code:
+        "from course import sigmoid\n" +
+        "\n" +
         "pixels = np.random.default_rng(0)\n" +
         "X = np.zeros((784, 200))                       # 200 stand-in digits\n" +
         "for k in range(200):\n" +

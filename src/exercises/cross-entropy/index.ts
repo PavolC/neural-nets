@@ -44,7 +44,7 @@ export const crossEntropyExercise: Exercise = {
       "Module 5's own fixture network. Send this to the scratch pad and run it:",
     {
       code:
-        "from course import quadratic_output_delta\n" +
+        "from course import quadratic_cost, quadratic_output_delta\n" +
         "\n" +
         "weights = [np.array([[0.5, -0.3], [-0.8, 0.9], [0.1, 0.4]]),\n" +
         "           np.array([[0.7, -0.5, 0.2]])]\n" +

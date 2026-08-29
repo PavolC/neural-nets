@@ -99,6 +99,7 @@ def test_step_goes_downhill():
 
 def test_sgd_final_values():
     """the full loop follows the prescribed batch order"""
+    # The course's copy again, for the same reason as the downhill check.
     from course import quadratic_cost
     weights, biases, X, Y = _fixture_net()
     initial_cost = quadratic_cost(weights, biases, X, Y)

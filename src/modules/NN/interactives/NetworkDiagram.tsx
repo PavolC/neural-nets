@@ -9,6 +9,7 @@ import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
 import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
 import { feedforwardExercise } from "../../../exercises/feedforward";
 import { divergingColor, drawMnistDigit } from "./utils";
+import { lockedBy, speakList } from "./lockedBy";
 import { useInViewOnce } from "../../../components/useInViewOnce";
 
 // Module 2 interactive: a 784-15-10 network, rendered compactly. Hovering a
@@ -274,8 +275,12 @@ export function NetworkDiagram() {
       <div className="payoff">
         {!unlocked ? (
           <p className="payoff-locked">
-            This panel runs your own feedforward, so it needs the exercise below
-            passed first. Come back here once its tests are green.
+            This panel runs your own feedforward, with nothing borrowed, so it needs{" "}
+            {speakList(
+              lockedBy([feedforwardExercise.id], {
+                [feedforwardExercise.id]: "the exercise below",
+              }),
+            )}. Come back here once the tests are green.
           </p>
         ) : (
           <>

@@ -5,6 +5,7 @@ import { codeReady, loadCode, subscribeProgress } from "../../../state/progress"
 import { crossEntropyExercise } from "../../../exercises/cross-entropy";
 import { sgdExercise } from "../../../exercises/sgd";
 import { EpochChart, type EpochSeries } from "./EpochChart";
+import { lockedBy, speakList } from "./lockedBy";
 
 // Module 7, first cycle: the digit reader from Module 5, trained three ways
 // from the same starting parameters. Two costs at the same step size, and
@@ -151,14 +152,15 @@ export function CostSwapPanel() {
   };
 
   if (!unlocked) {
-    const missing = [
-      codeReady(crossEntropyExercise.id) ? null : "the cross-entropy exercise above",
-      codeReady(sgdExercise.id) ? null : "Module 3's sgd exercise",
-    ].filter(Boolean);
+    const missing = speakList(
+      lockedBy([crossEntropyExercise.id, sgdExercise.id], {
+        [crossEntropyExercise.id]: "the cross-entropy exercise above",
+      }),
+    );
     return (
       <p className="payoff-locked">
-        These runs use your cost inside your sgd, so they need {missing.join(" and ")}{" "}
-        passed first.
+        These runs use your cost inside your sgd, with nothing borrowed, so they
+        need {missing}.
       </p>
     );
   }

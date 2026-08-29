@@ -29,6 +29,7 @@ import {
   parseDocument,
   projection,
   upsertSection,
+  withGivens,
 } from "../src/state/workbenchDoc";
 
 const PRELUDE = '"""My library."""\n\nimport numpy as np';
@@ -187,6 +188,30 @@ console.log("\n--- projections ---");
     ok(closure(id).size > 0 && [...closure(id)].every((need) => found.includes(need)),
        `  and carries everything ${id} calls into`);
   }
+}
+
+console.log("\n--- withGivens: everything a section runs on ---");
+{
+  // codeReady gates the payoff panels on this set, so it has to carry the
+  // given sections that arrive alongside a requirement, not just the requires
+  // closure: given-batch is pulled in by backprop without being required by
+  // it, and a projection through backprop contains it.
+  for (const s of SECTIONS) {
+    if (s.kind !== "exercise") continue;
+    const got = withGivens([s.id]);
+    const wantsGivens = [...closure(s.id)].flatMap((id) => givensFor(id));
+    ok(
+      [...closure(s.id), ...wantsGivens].every((id) => got.includes(id)),
+      `withGivens(${s.id}) carries its closure and the givens that arrive with it`,
+      got.join(","),
+    );
+    ok(
+      got.join(",") === SECTION_ORDER.filter((id) => got.includes(id)).join(","),
+      `  and lists them in course order`,
+    );
+  }
+  ok(withGivens(["backprop"]).includes("given-batch"),
+     "withGivens(backprop) includes given-batch, the adapter its panel runs");
 }
 
 console.log("\n--- the body hash ---");

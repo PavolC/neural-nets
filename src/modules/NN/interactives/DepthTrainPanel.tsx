@@ -6,6 +6,7 @@ import { crossEntropyExercise } from "../../../exercises/cross-entropy";
 import { smartInitExercise } from "../../../exercises/smart-init";
 import { sgdExercise } from "../../../exercises/sgd";
 import { EpochChart, type EpochSeries } from "./EpochChart";
+import { lockedBy, speakList } from "./lockedBy";
 
 // Module 8's payoff run: the same digit reader at two depths, trained by the
 // learner's own sgd from their own starting point, so the collapse the bars
@@ -223,15 +224,13 @@ export function DepthTrainPanel() {
   };
 
   if (!unlocked) {
-    const missing = [
-      codeReady(crossEntropyExercise.id) ? null : "Module 7's cross-entropy exercise",
-      codeReady(smartInitExercise.id) ? null : "Module 7's starting-point exercise",
-      codeReady(sgdExercise.id) ? null : "Module 3's sgd exercise",
-    ].filter(Boolean);
+    const missing = speakList(
+      lockedBy([crossEntropyExercise.id, smartInitExercise.id, sgdExercise.id]),
+    );
     return (
       <p className="payoff-locked">
-        This run needs {missing.join(", ")} passed first: it builds both networks with
-        your init_network and trains them with your sgd.
+        This run needs {missing}: it builds both networks with your init_network
+        and trains them with your sgd, with nothing borrowed.
       </p>
     );
   }

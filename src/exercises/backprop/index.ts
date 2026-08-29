@@ -45,6 +45,7 @@ export const backpropExercise: Exercise = {
       "the two-neuron chain. Send this to the scratch pad and run it:",
     {
       code:
+        "from course import gradient\n" +
         "\n" +
         "weights = [np.array([[1.0]]), np.array([[2.0]])]   # w1, w2 from Module 4's chain\n" +
         "biases = [np.array([[-0.5]]), np.array([[-1.0]])]  # b1, b2\n" +

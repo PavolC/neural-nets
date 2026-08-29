@@ -4,6 +4,7 @@ import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
 import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
 import { backpropExercise } from "../../../exercises/backprop";
 import { sgdExercise } from "../../../exercises/sgd";
+import { lockedBy, speakList } from "./lockedBy";
 
 // Module 5 payoff: train the 784-30-10 digit reader on the bundled MNIST
 // subset, driven by the learner's own backprop plugged into the learner's
@@ -224,16 +225,16 @@ export function BackpropTrainPanel() {
   };
 
   if (!unlocked) {
-    const missing = [
-      codeReady(backpropExercise.id) ? null : "the backprop exercise above",
-      codeReady(sgdExercise.id) ? null : "Module 3's sgd exercise",
-    ].filter(Boolean);
+    const missing = speakList(
+      lockedBy([backpropExercise.id, sgdExercise.id], {
+        [backpropExercise.id]: "the backprop exercise above",
+      }),
+    );
     return (
       <p className="payoff-locked">
-        This run is your own backprop driving your own sgd, so it needs{" "}
-        {missing.join(" and ")} passed first. Come back here once the tests are green.
-        Only this panel waits on it: Modules 6 to 8 read on without it, and their
-        own training panels use the course's copy of backprop rather than yours.
+        This run is your own backprop driving your own sgd, with nothing borrowed,
+        so it needs {missing}. Come back here once the tests are green; nothing in
+        Modules 6 to 8 waits on this run, so reading on is fine.
       </p>
     );
   }

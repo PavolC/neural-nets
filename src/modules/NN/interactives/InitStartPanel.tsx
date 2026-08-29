@@ -6,6 +6,7 @@ import { crossEntropyExercise } from "../../../exercises/cross-entropy";
 import { smartInitExercise } from "../../../exercises/smart-init";
 import { sgdExercise } from "../../../exercises/sgd";
 import { EpochChart, type EpochSeries } from "./EpochChart";
+import { lockedBy, speakList } from "./lockedBy";
 
 // Module 7, second cycle: the same digit reader, the same cross-entropy cost,
 // the same sgd, the same random draws, started twice. Once at Module 5's
@@ -170,15 +171,16 @@ export function InitStartPanel() {
   };
 
   if (!unlocked) {
-    const missing = [
-      codeReady(crossEntropyExercise.id) ? null : "the cross-entropy exercise",
-      codeReady(smartInitExercise.id) ? null : "the starting-point exercise above",
-      codeReady(sgdExercise.id) ? null : "Module 3's sgd exercise",
-    ].filter(Boolean);
+    const missing = speakList(
+      lockedBy([crossEntropyExercise.id, smartInitExercise.id, sgdExercise.id], {
+        [crossEntropyExercise.id]: "the cross-entropy exercise",
+        [smartInitExercise.id]: "the starting-point exercise above",
+      }),
+    );
     return (
       <p className="payoff-locked">
-        This run needs {missing.join(", ")} passed first: it builds the network with your
-        init_network and trains it with your cost inside your sgd.
+        This run needs {missing}: it builds the network with your init_network and
+        trains it with your cost inside your sgd, with nothing borrowed.
       </p>
     );
   }

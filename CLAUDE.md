@@ -154,10 +154,24 @@ no accounts, no backend, no analytics.
   (`sigmoid`, `feedforward`, `sigmoid_prime`, `backprop`, `cross_entropy_delta`,
   `init_network`, `l2_step`) exist so a reader who opens Module 9 first gets a run
   rather than a `NameError`. Nothing imports from it any more: no skeleton, no
-  solution, and no panel. Two test suites still reach into it from inside a test
+  solution, and no panel. Three test suites still reach into it from inside a test
   body, deliberately and with a comment saying why, because a correctness
-  guarantee whose oracle shares the code under test is not a guarantee: Module 5's
-  gradient check and Module 7's.
+  guarantee whose oracle shares the code under test is not a guarantee: Module 3's
+  downhill checks, Module 5's gradient check and Module 7's. The prompts' play
+  snippets also import from it by name (`from course import gradient`) for any
+  name owned by a section their exercise does not require, because the scratch
+  pad lends only the current section's requires closure and a snippet has to run
+  for a reader who skipped a module.
+- **A payoff panel waits for everything its projection runs, not only its own
+  page's exercises.** A pass can be earned with borrowed names (open Module 3
+  first and sgd goes green with `feedforward` on loan), but the panels exec the
+  projection raw, with no lending, so a gate that asks only "did sgd pass?"
+  hands the panel a file with no `feedforward` in it and the run dies on a bare
+  `AttributeError`. `codeReady` therefore walks the requires closure plus the
+  given sections that arrive with it (`withGivens`, mirrored by `with_givens`
+  in `tools/workbench.py`), and a locked note names what is actually missing
+  through one shared phrase map (`interactives/lockedBy.ts`) instead of a
+  hand-kept list per panel that could claim to wait on a finished exercise.
 - **Module 7 asks the learner to edit their own Module 5 backprop** (the BP1
   seam). It is the first time the course asks anyone to change working code, and a
   single file is the only design where that is a two-line edit rather than an
@@ -902,7 +916,7 @@ tokens from the start.
 - `python3 tools/check_exercises.py`: the workbench, under twelve lettered
   assertions (the file's docstring lists them). It assembles the document, checks
   it compiles at every prefix a learner can reach, that no section rebinds a name
-  an earlier one owns, that the solved document passes all 53 tests and the
+  an earlier one owns, that the solved document passes all 54 tests and the
   untouched one passes none, that lending cannot make an unwritten exercise pass,
   and that markers round-trip. Assertion G is the mutation check and is the one
   that looks redundant and is not: sabotage a provider, require its consumer's
