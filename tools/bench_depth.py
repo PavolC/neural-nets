@@ -399,6 +399,12 @@ def bench_module7(b):
         print(f"  {label}: typical |z| {float(np.abs(z).mean()):.2f}, "
               f"median squash slope {float(np.median(steep)):.4f}, "
               f"share flatter than 0.01 {pct(float((steep < 0.01).mean()))}")
+        # The distance histogram the module's first table quotes.
+        d = np.abs(z)
+        shares = " / ".join(
+            f"{float(((d >= lo) & (d < hi)).mean()) * 100:.1f}%"
+            for lo, hi in ((0, 1), (1, 2), (2, 4), (4, 8), (8, np.inf)))
+        print(f"    distance bins 0-1 / 1-2 / 2-4 / 4-8 / 8+: {shares}")
 
 
 def bench_capstone(b):

@@ -542,8 +542,9 @@ export function Module7() {
 
       <SectionHeader id="m7-birth" title="Saturated at birth" />
       <p>
-        Measure the hidden layer of Module 5's network before it takes a single
-        step. Feed one image in and each of the thirty hidden neurons computes
+        Go back to Module 5's network as it stood before its first training
+        step: weights and biases freshly drawn at random, nothing learned yet.
+        Feed one image in and each of the thirty hidden neurons computes
         its own evidence, thirty numbers. Do it for all 5,000 training images
         and there are 150,000 of these readings, each one neuron's{" "}
         <M tex="z" /> on one image. The table sorts them by distance from
@@ -566,7 +567,7 @@ export function Module7() {
               <td>share of the readings</td>
               <td>8.8%</td>
               <td>8.6%</td>
-              <td>16.4%</td>
+              <td>16.3%</td>
               <td>27.8%</td>
               <td>38.5%</td>
             </tr>
