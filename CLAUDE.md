@@ -19,7 +19,8 @@ Goals, in priority order:
 
 Non-goals: not a production ML tool (small networks, subsampled data, clarity over
 performance); not a full port of Nielsen's book (chapters 5-6 covered conceptually only);
-no accounts, no backend, no analytics.
+no accounts, no backend; analytics off by default (opt-in counting via GoatCounter,
+editor contents never sent; see `src/analytics.ts`).
 
 ## Hard rules
 
