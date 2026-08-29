@@ -125,6 +125,14 @@ export function RegularizePanel() {
   // merely selected. Without this the drawn run's starting point was recorded
   // nowhere on screen at all.
   const [drawnWith, setDrawnWith] = useState<{ start: "yours" | "plain"; lmbda: number } | null>(null);
+  // Every setting trained this session, one row per (start, lambda), reruns
+  // replacing their own row. The chart draws the latest pair; the table is
+  // where runs meet, because the comparison the module asks for (decay
+  // against none, from each start) is across runs, and a table that only
+  // showed the last pair erased one side of it.
+  const [history, setHistory] = useState<
+    { start: "yours" | "plain"; lmbda: number; s: RunSummary }[]
+  >([]);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -163,7 +171,19 @@ export function RegularizePanel() {
           );
         }
         if (msg.type === "pythonDone") {
-          setSummary(msg.result as Summary);
+          const done = msg.result as Summary;
+          setSummary(done);
+          setHistory((prev) => {
+            const next = prev.filter(
+              (r) => !(r.start === start && (r.lmbda === 0 || r.lmbda === lmbda)),
+            );
+            next.push({ start, lmbda: 0, s: done.runs["plain"] });
+            next.push({ start, lmbda: done.runs["l2"].lmbda, s: done.runs["l2"] });
+            next.sort((a, b) =>
+              a.start !== b.start ? (a.start === "yours" ? -1 : 1) : a.lmbda - b.lmbda,
+            );
+            return next;
+          });
           setRunning(false);
           setStatus("");
         }
@@ -312,7 +332,7 @@ export function RegularizePanel() {
           ariaLabel="Cross-entropy cost on the held-out digits per epoch, for a run with no regularization and a run with the chosen lambda."
         />
       )}
-      {summary && (
+      {summary && history.length > 0 && (
         <div className="interactive-status">
           <div className="table-scroll scroll-x" tabIndex={0}>
             <table className="truth-table">
@@ -326,14 +346,19 @@ export function RegularizePanel() {
                 </tr>
               </thead>
               <tbody>
-                {[
-                  ["no regularization", summary.runs["plain"]],
-                  [`lambda ${summary.runs["l2"].lmbda}`, summary.runs["l2"]],
-                ].map(([label, r]) => {
-                  const s = r as RunSummary;
+                {history.map((row) => {
+                  const s = row.s;
+                  const onChart =
+                    drawnWith !== null &&
+                    row.start === drawnWith.start &&
+                    (row.lmbda === 0 || row.lmbda === drawnWith.lmbda);
+                  const label =
+                    `${startName(row.start)}, ` +
+                    (row.lmbda === 0 ? "no regularization" : `lambda ${row.lmbda}`) +
+                    (onChart ? " (on the chart)" : "");
                   return (
-                    <tr key={label as string}>
-                      <td>{label as string}</td>
+                    <tr key={`${row.start}-${row.lmbda}`}>
+                      <td>{label}</td>
                       <td>{(s.train_accuracy * 100).toFixed(1)}%</td>
                       <td>{(s.test_accuracy * 100).toFixed(1)}%</td>
                       <td>{s.test_cost.toFixed(2)}</td>

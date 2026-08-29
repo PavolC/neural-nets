@@ -851,7 +851,7 @@ export function Module7() {
         shuffle. The starting point is a control too, because the answer
         depends on it.
       </p>
-      <Figure caption="The same 1,000-image run, with and without weight decay. Switch between accuracy (solid for the images trained on, dashed for the held-out ones) and the cost on the held-out digits. The starting point matters more than lambda does, so try both settings of it.">
+      <Figure caption="The same 1,000-image run, with and without weight decay. Switch between accuracy (solid for the images trained on, dashed for the held-out ones) and the cost on the held-out digits. The chart shows the latest run; every setting you train adds its row to the table, so the comparison the section makes, decay against none from each start, sits in one place. The starting point matters more than lambda does, so try both settings of it.">
         <RegularizePanel />
       </Figure>
       <p>
