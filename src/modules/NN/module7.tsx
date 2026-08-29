@@ -543,9 +543,11 @@ export function Module7() {
       <SectionHeader id="m7-birth" title="Saturated at birth" />
       <p>
         Measure the hidden layer of Module 5's network before it takes a single
-        step. Thirty neurons, 5,000 training images, so 150,000 readings of
-        one neuron's evidence <M tex="z" /> on one image. Here is how they are
-        spread, and what the squash's slope is where they land.
+        step. Feed one image in and each of the thirty hidden neurons computes
+        its own evidence, thirty numbers. Do it for all 5,000 training images
+        and there are 150,000 of these readings, each one neuron's{" "}
+        <M tex="z" /> on one image. The table sorts them by distance from
+        zero.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
@@ -572,8 +574,9 @@ export function Module7() {
         </table>
       </div>
       <p>
-        Averaged over all 150,000 readings, the distance from zero is 7.43,
-        and the squash's slope has a median of 0.0020, against the 0.25 a
+        The typical distance, averaged over all 150,000 readings, is 7.43.
+        And the squash's slope, how much a neuron's answer moves when its
+        evidence moves, has a median of 0.0020 out there, against the 0.25 a
         neuron has at its steepest. Almost 62 percent of
         the readings are flatter than 0.01. A hidden neuron in that state
         passes almost nothing backward and moves almost nowhere, and it is in
