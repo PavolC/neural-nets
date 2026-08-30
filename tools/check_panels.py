@@ -49,7 +49,7 @@ CASES = [
     ("BackpropTrainPanel.tsx", "SNIPPET", "backprop", {}),
     ("CostSwapPanel.tsx", "SNIPPET", "cross-entropy", {}),
     ("InitStartPanel.tsx", "SNIPPET", "smart-init", {}),
-    ("RegularizePanel.tsx", "SNIPPET", "l2", {"start": "yours", "lmbda": 3.0}),
+    ("RegularizePanel.tsx", "SNIPPET", "l2", {"runs": [{"start": "yours", "lmbda": 0.0}, {"start": "plain", "lmbda": 3.0}]}),
     ("DepthTrainPanel.tsx", "SNIPPET", "smart-init", {"activation": "sigmoid", "eta": 0.5}),
     ("DepthTrainPanel.tsx", "SNIPPET", "smart-init", {"activation": "relu", "eta": 0.05}),
     ("FullTrainPanel.tsx", "SNIPPET", "train", {"eta": 0.5, "lmbda": 1.0}),

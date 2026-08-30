@@ -2565,6 +2565,10 @@ button:disabled {
   stroke-dasharray: 6 4;
 }
 
+.m7-line-dotted {
+  stroke-dasharray: 2 5;
+}
+
 .m7-swatch {
   display: inline-block;
   width: 18px;
@@ -2600,6 +2604,10 @@ button:disabled {
 
 .m7-swatch.m7-line-dashed {
   border-top-style: dashed;
+}
+
+.m7-swatch.m7-line-dotted {
+  border-top-style: dotted;
 }
 
 .m7-legend {

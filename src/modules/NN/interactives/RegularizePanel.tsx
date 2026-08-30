@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { assetUrl } from "../../../runtime/assets";
 import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
 import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
@@ -8,17 +8,38 @@ import { l2Exercise } from "../../../exercises/l2";
 import { EpochChart, type EpochSeries } from "./EpochChart";
 import { lockedBy, speakList } from "./lockedBy";
 
-// Module 7, third cycle: the 1,000-image slice, trained twice through the
-// learner's l2_step, once with lmbda = 0 (which is exactly their Module 3
-// update) and once with the lmbda they pick. The starting point is a control,
-// because the two starts give this comparison two different answers.
+// Module 7, third cycle: the 1,000-image slice, trained through the learner's
+// l2_step. One button runs the whole experiment: both starting points, each
+// at lambda 0 (which is exactly their Module 3 update), 1 and 5. The panel
+// used to offer the settings as chips and train one pair per press, and the
+// comparison the section makes (decay against none, from each start) lived in
+// the reader's memory; now every line and every row is on screen at once.
 
 const EPOCHS = 80;
-const LAMBDAS = [0.5, 1, 2, 5];
+
+// The fixed experiment, in chart and table order: your start's three runs,
+// then Module 5's. Hue carries the start, dash pattern carries the lambda.
+const RUNS: { start: "yours" | "plain"; lmbda: number }[] = [
+  { start: "yours", lmbda: 0 },
+  { start: "yours", lmbda: 1 },
+  { start: "yours", lmbda: 5 },
+  { start: "plain", lmbda: 0 },
+  { start: "plain", lmbda: 1 },
+  { start: "plain", lmbda: 5 },
+];
+
+const runKey = (r: { start: string; lmbda: number }) => `${r.start}|${r.lmbda}`;
+const startName = (v: "yours" | "plain") => (v === "yours" ? "your start" : "Module 5's start");
+const lambdaName = (l: number) => (l === 0 ? "no regularization" : `lambda ${l}`);
+const lineCls = (r: { start: string; lmbda: number }) =>
+  (r.start === "yours" ? "m7-line-a" : "m7-line-b") +
+  (r.lmbda === 1 ? " m7-line-dashed" : r.lmbda === 5 ? " m7-line-dotted" : "");
 
 // The loop is their sgd's loop written out, so its update line can be theirs
 // from this module's exercise. Shuffle order matches the sgd contract:
-// rng.permutation, then consecutive slices of batch_size.
+// rng.permutation, then consecutive slices of batch_size. Each run draws its
+// start and its shuffle from fresh fixed seeds, so the six runs are the same
+// runs however they are grouped, and the module's quoted numbers hold.
 const SNIPPET = `
 import json, time, types
 import numpy as np
@@ -40,8 +61,8 @@ X_train, y_train = X_full[:, :_slice], y_full[:_slice]
 Y_train, Y_test = one_hot(y_train), one_hot(y_test)
 _n = X_train.shape[1]
 
-def _start():
-    if _a["start"] == "yours":
+def _start(which):
+    if which == "yours":
         return _lib.init_network([784, 30, 10], np.random.default_rng(8))
     r = np.random.default_rng(8)
     return ([r.standard_normal((30, 784)), r.standard_normal((10, 30))],
@@ -51,13 +72,10 @@ def _accuracy(w, b, X, y):
     return float((np.argmax(feedforward(w, b, X), axis=0) == y).mean())
 
 _out = {}
-_runs = []
-if _a.get("run_plain", True):
-    _runs.append(("plain", 0.0))
-if _a.get("run_l2", True):
-    _runs.append(("l2", float(_a["lmbda"])))
-for _key, _lmbda in _runs:
-    weights, biases = _start()
+for _i, _cfg in enumerate(_a["runs"]):
+    _key = f"{_cfg['start']}|{_cfg['lmbda']}"
+    _lmbda = float(_cfg["lmbda"])
+    weights, biases = _start(_cfg["start"])
     _rng = np.random.default_rng(2)
     _t0 = time.time()
     for _e in range(1, ${EPOCHS} + 1):
@@ -68,13 +86,15 @@ for _key, _lmbda in _runs:
                                       Y_train[:, _batch], _lib.cross_entropy_delta)
             weights, biases = _lib.l2_step(weights, biases, _nw, _nb, 0.5, _lmbda, _n)
         _js_report(json.dumps({
-            "key": _key, "lmbda": _lmbda, "epoch": _e,
+            "key": _key, "start": _cfg["start"], "lmbda": _lmbda,
+            "run_index": _i, "epoch": _e,
             "train_accuracy": _accuracy(weights, biases, X_train, y_train),
             "test_accuracy": _accuracy(weights, biases, X_test, y_test),
             "test_cost": float(_lib.cross_entropy_cost(weights, biases, X_test, Y_test)),
             "elapsed": time.time() - _t0,
         }))
     _out[_key] = {
+        "start": _cfg["start"],
         "lmbda": _lmbda,
         "train_accuracy": _accuracy(weights, biases, X_train, y_train),
         "test_accuracy": _accuracy(weights, biases, X_test, y_test),
@@ -88,7 +108,9 @@ json.dumps({"runs": _out, "n_train": int(_n), "n_test": int(X_test.shape[1])})
 
 interface Report {
   key: string;
+  start: "yours" | "plain";
   lmbda: number;
+  run_index: number;
   epoch: number;
   train_accuracy: number;
   test_accuracy: number;
@@ -97,6 +119,7 @@ interface Report {
 }
 
 interface RunSummary {
+  start: "yours" | "plain";
   lmbda: number;
   train_accuracy: number;
   test_accuracy: number;
@@ -118,104 +141,46 @@ const needed = () =>
 
 export function RegularizePanel() {
   const [unlocked, setUnlocked] = useState(needed);
-  const [start, setStart] = useState<"yours" | "plain">("yours");
-  const [lmbda, setLmbda] = useState(1);
   const [view, setView] = useState<"accuracy" | "cost">("accuracy");
   const [points, setPoints] = useState<Report[]>([]);
   const [status, setStatus] = useState("");
   const [summary, setSummary] = useState<Summary | null>(null);
-  // What the drawn chart was actually trained with. The chips select the NEXT
-  // run, and nothing retrains on a click (a run is 160 epochs), so the panel
-  // has to say which settings the lines on screen came from and which are
-  // merely selected. Without this the drawn run's starting point was recorded
-  // nowhere on screen at all.
-  const [drawnWith, setDrawnWith] = useState<{ start: "yours" | "plain"; lmbda: number } | null>(null);
-  // Every setting trained this session, one row per (start, lambda), reruns
-  // replacing their own row. The chart draws the latest pair; the table is
-  // where runs meet, because the comparison the module asks for (decay
-  // against none, from each start) is across runs, and a table that only
-  // showed the last pair erased one side of it.
-  const [history, setHistory] = useState<
-    { start: "yours" | "plain"; lmbda: number; s: RunSummary }[]
-  >([]);
-  // The per-epoch lines of every run this session, keyed by start and
-  // lambda. Same seed and same settings give byte-identical training, so a
-  // run that is already here is never trained again: the snippet is asked
-  // for only the missing half, and a fully cached pair redraws with no run
-  // at all. The ref mirrors what setPoints receives, because the completion
-  // callback cannot read fresh state through its own closure.
-  const pointsCache = useRef(new Map<string, Report[]>());
-  const reportsRef = useRef<Report[]>([]);
-  const cacheKey = (st: "yours" | "plain", l: number) => `${st}|${l}`;
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => subscribeProgress(() => setUnlocked(needed())), []);
-
-  const startName = (v: "yours" | "plain") => (v === "yours" ? "your start" : "Module 5's start");
 
   const run = () => {
     // One projection: the file through the decaying step already holds their
     // cross-entropy work and their better starting point.
     const code = loadCode(l2Exercise.id);
     if (!code) return;
-    const cachedPlain = pointsCache.current.get(cacheKey(start, 0));
-    const cachedL2 = pointsCache.current.get(cacheKey(start, lmbda));
-    const seed = [...(cachedPlain ?? []), ...(cachedL2 ?? [])];
-    setError(null);
-    setDrawnWith({ start, lmbda });
-    if (cachedPlain && cachedL2) {
-      // Both halves already trained this session: redraw, train nothing.
-      setPoints(seed);
-      return;
-    }
     setRunning(true);
-    setPoints(seed);
-    reportsRef.current = [];
+    setPoints([]);
     setSummary(null);
-    setStatus(cachedPlain ? "baseline reused from the earlier run" : "Starting...");
+    setError(null);
+    setStatus("Starting...");
     sendRequest(
       {
         type: "runPython",
         code: SNIPPET,
-        args: { code, start, lmbda, run_plain: !cachedPlain, run_l2: !cachedL2 },
+        args: { code, runs: RUNS },
         dataUrl: assetUrl("data/mnist_subset.bin.gz"),
       },
       (msg) => {
         if (msg.type === "status") setStatus(msg.text);
         if (msg.type === "report") {
           const r = msg.payload as Report;
-          reportsRef.current.push(r);
           setPoints((prev) => [...prev, r]);
           setStatus(
-            `${r.lmbda === 0 ? "no regularization" : `lambda ${r.lmbda}`}: epoch ` +
-              `${r.epoch}/${EPOCHS}, ${(r.train_accuracy * 100).toFixed(1)}% of the ` +
-              `training images and ${(r.test_accuracy * 100).toFixed(1)}% of the held-out ` +
-              `ones, ${r.elapsed.toFixed(0)}s`,
+            `run ${r.run_index + 1} of ${RUNS.length} (${startName(r.start)}, ` +
+              `${lambdaName(r.lmbda)}): epoch ${r.epoch}/${EPOCHS}, ` +
+              `${(r.test_accuracy * 100).toFixed(1)}% of the held-out digits, ` +
+              `${r.elapsed.toFixed(0)}s`,
           );
         }
         if (msg.type === "pythonDone") {
-          const done = msg.result as Summary;
-          setSummary(done);
-          const trained: { lmbda: number; s: RunSummary }[] = [];
-          if (done.runs["plain"]) trained.push({ lmbda: 0, s: done.runs["plain"] });
-          if (done.runs["l2"]) trained.push({ lmbda: done.runs["l2"].lmbda, s: done.runs["l2"] });
-          for (const t of trained) {
-            pointsCache.current.set(
-              cacheKey(start, t.lmbda),
-              reportsRef.current.filter((r) => (t.lmbda === 0 ? r.key === "plain" : r.key === "l2")),
-            );
-          }
-          setHistory((prev) => {
-            const next = prev.filter(
-              (r) => !(r.start === start && trained.some((t) => t.lmbda === r.lmbda)),
-            );
-            for (const t of trained) next.push({ start, lmbda: t.lmbda, s: t.s });
-            next.sort((a, b) =>
-              a.start !== b.start ? (a.start === "yours" ? -1 : 1) : a.lmbda - b.lmbda,
-            );
-            return next;
-          });
+          setSummary(msg.result as Summary);
           setRunning(false);
           setStatus("");
         }
@@ -243,43 +208,28 @@ export function RegularizePanel() {
     );
     return (
       <p className="payoff-locked">
-        Both runs go through your l2_step, with nothing borrowed, so this needs {missing}.
+        All six runs go through your l2_step, with nothing borrowed, so this needs {missing}.
       </p>
     );
   }
 
   const pick = (key: string) => points.filter((p) => p.key === key);
-  // The lambda on the chart is the one the drawn run used, not the one now
-  // selected: picking a different chip before rerunning must not relabel a
-  // finished run.
-  const drawn = pick("l2")[0]?.lmbda ?? lmbda;
-  const accuracySeries: EpochSeries[] = [
-    { key: "plain-train", label: "no regularization, the training images", cls: "m7-line-a", values: pick("plain").map((p) => p.train_accuracy) },
-    { key: "plain-test", label: "no regularization, the held-out images", cls: "m7-line-a", dashed: true, values: pick("plain").map((p) => p.test_accuracy) },
-    { key: "l2-train", label: `lambda ${drawn}, the training images`, cls: "m7-line-b", values: pick("l2").map((p) => p.train_accuracy) },
-    { key: "l2-test", label: `lambda ${drawn}, the held-out images`, cls: "m7-line-b", dashed: true, values: pick("l2").map((p) => p.test_accuracy) },
-  ].filter((s) => s.values.length > 0);
-  const costSeries: EpochSeries[] = [
-    { key: "plain-cost", label: "no regularization", cls: "m7-line-a", values: pick("plain").map((p) => p.test_cost) },
-    { key: "l2-cost", label: `lambda ${drawn}`, cls: "m7-line-b", values: pick("l2").map((p) => p.test_cost) },
-  ].filter((s) => s.values.length > 0);
+  const series = (of: (p: Report) => number): EpochSeries[] =>
+    RUNS.map((r) => ({
+      key: runKey(r),
+      label: `${startName(r.start)}, ${lambdaName(r.lmbda)}`,
+      cls: lineCls(r),
+      values: pick(runKey(r)).map(of),
+    })).filter((s) => s.values.length > 0);
+  const accuracySeries = series((p) => p.test_accuracy);
+  const costSeries = series((p) => p.test_cost);
   const costMax = Math.max(2, ...costSeries.flatMap((s) => s.values));
-
-  const haveP = pointsCache.current.has(cacheKey(start, 0));
-  const haveL = pointsCache.current.has(cacheKey(start, lmbda));
-  const runLabel = !summary
-    ? "Train both ways"
-    : haveP && haveL
-      ? "Redraw this pair"
-      : haveP
-        ? `Train lambda ${lmbda}`
-        : "Run both again";
 
   return (
     <div className="interactive">
       <div className="interactive-controls">
         <button onClick={run} disabled={running}>
-          {running ? "Training..." : runLabel}
+          {running ? "Training..." : summary ? "Run all six again" : "Train all six runs"}
         </button>
         {running && (
           <button className="button-secondary" onClick={terminateWorker}>
@@ -287,52 +237,17 @@ export function RegularizePanel() {
           </button>
         )}
         <span className={`demo-status status-fixed ${error ? "demo-status-error" : ""}`}>
-          {error ??
-            (running || !drawnWith
-              ? status
-              : drawnWith.start === start && drawnWith.lmbda === lmbda
-                ? `drawn with ${startName(drawnWith.start)}, lambda ${drawnWith.lmbda}`
-                : `drawn with ${startName(drawnWith.start)}, lambda ${drawnWith.lmbda}; the chips pick the next run, so press ${runLabel}`)}
+          {error ?? status}
         </span>
       </div>
       <div className="interactive-controls">
-        <fieldset className="m7-choice">
-          <legend>starting point</legend>
-          <button
-            className={`chip ${start === "yours" ? "chip-active" : ""}`}
-            onClick={() => setStart("yours")}
-            disabled={running}
-          >
-            your start
-          </button>
-          <button
-            className={`chip ${start === "plain" ? "chip-active" : ""}`}
-            onClick={() => setStart("plain")}
-            disabled={running}
-          >
-            Module 5's start
-          </button>
-        </fieldset>
-        <fieldset className="m7-choice">
-          <legend>lambda for the second run</legend>
-          {LAMBDAS.map((v) => (
-            <button
-              key={v}
-              className={`chip ${lmbda === v ? "chip-active" : ""}`}
-              onClick={() => setLmbda(v)}
-              disabled={running}
-            >
-              {v}
-            </button>
-          ))}
-        </fieldset>
         <fieldset className="m7-choice">
           <legend>show</legend>
           <button
             className={`chip ${view === "accuracy" ? "chip-active" : ""}`}
             onClick={() => setView("accuracy")}
           >
-            accuracy
+            accuracy on held-out digits
           </button>
           <button
             className={`chip ${view === "cost" ? "chip-active" : ""}`}
@@ -354,9 +269,9 @@ export function RegularizePanel() {
             { at: 0.8, label: "80%" },
             { at: 1, label: "100%" },
           ]}
-          yLabel="accuracy"
+          yLabel="accuracy on the held-out digits"
           xLabel="epoch (one full pass through the 1,000 training images)"
-          ariaLabel="Accuracy per epoch on the training images and on the held-out images, for a run with no regularization and a run with the chosen lambda."
+          ariaLabel="Held-out accuracy per epoch for six runs: both starting points, each with no regularization, lambda 1 and lambda 5."
         />
       )}
       {view === "cost" && costSeries.length > 0 && (
@@ -371,10 +286,10 @@ export function RegularizePanel() {
           ]}
           yLabel="cross-entropy cost on the held-out digits"
           xLabel="epoch (one full pass through the 1,000 training images)"
-          ariaLabel="Cross-entropy cost on the held-out digits per epoch, for a run with no regularization and a run with the chosen lambda."
+          ariaLabel="Cross-entropy cost on the held-out digits per epoch for six runs: both starting points, each with no regularization, lambda 1 and lambda 5."
         />
       )}
-      {summary && history.length > 0 && (
+      {summary && (
         <div className="interactive-status">
           <div className="table-scroll scroll-x" tabIndex={0}>
             <table className="truth-table">
@@ -388,19 +303,12 @@ export function RegularizePanel() {
                 </tr>
               </thead>
               <tbody>
-                {history.map((row) => {
-                  const s = row.s;
-                  const onChart =
-                    drawnWith !== null &&
-                    row.start === drawnWith.start &&
-                    (row.lmbda === 0 || row.lmbda === drawnWith.lmbda);
-                  const label =
-                    `${startName(row.start)}, ` +
-                    (row.lmbda === 0 ? "no regularization" : `lambda ${row.lmbda}`) +
-                    (onChart ? " (on the chart)" : "");
+                {RUNS.map((r) => {
+                  const s = summary.runs[runKey(r)];
+                  if (!s) return null;
                   return (
-                    <tr key={`${row.start}-${row.lmbda}`}>
-                      <td>{label}</td>
+                    <tr key={runKey(r)}>
+                      <td>{`${startName(r.start)}, ${lambdaName(r.lmbda)}`}</td>
                       <td>{(s.train_accuracy * 100).toFixed(1)}%</td>
                       <td>{(s.test_accuracy * 100).toFixed(1)}%</td>
                       <td>{s.test_cost.toFixed(2)}</td>

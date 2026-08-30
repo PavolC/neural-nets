@@ -845,13 +845,14 @@ export function Module7() {
 
       <ExerciseCard exercise={l2Exercise} />
       <p>
-        Both runs in the panel go through your l2_step, one with{" "}
-        <M tex="\lambda = 0" />, which is your Module 3 update exactly, and one
-        with the lambda you pick. Same 1,000 images, same eighty epochs, same
-        shuffle. The starting point is a control too, because the answer
-        depends on it.
+        The panel below runs the whole experiment in one press: both starting
+        points, each at <M tex="\lambda = 0" /> (your Module 3 update
+        exactly), <M tex="\lambda = 1" /> and <M tex="\lambda = 5" />. Six
+        runs, every one through your l2_step, same 1,000 images, same eighty
+        epochs, same shuffle. The starting point is in the experiment because
+        the answer depends on it.
       </p>
-      <Figure caption="The same 1,000-image run, with and without weight decay. Switch between accuracy (solid for the images trained on, dashed for the held-out ones) and the cost on the held-out digits. The chart shows the latest run; every setting you train adds its row to the table, so the comparison the section makes, decay against none from each start, sits in one place. The starting point matters more than lambda does, so try both settings of it.">
+      <Figure caption="All six runs, drawn as they finish. Every line is the held-out digits: hue is the starting point, and the dash pattern is the lambda (solid none, dashed 1, dotted 5). The training-image accuracies are in the table, and the comparison the section makes, decay against none from each start, sits in one place. The starting point matters more than lambda does.">
         <RegularizePanel />
       </Figure>
       <p>
@@ -870,8 +871,8 @@ export function Module7() {
         and stopped becoming more confident while reading the same digits.
       </p>
       <p>
-        Switch the start to Module 5's undivided draw and the same comparison
-        answers differently. Those weights begin at a total of 23,538, since
+        The same comparison, read from Module 5's undivided draw, answers
+        differently. Those weights begin at a total of 23,538, since
         that is what not dividing by 28 means, and without decay they stay
         there: 25,528 after eighty epochs, with the held-out accuracy stalled
         at 77.8 percent. With <M tex="\lambda = 1" /> the decay pulls them down
@@ -886,9 +887,8 @@ export function Module7() {
         of this cycle is a narrow one: decay reliably holds the weights and the
         held-out cost down, and it buys accuracy where something else was
         leaving the weights too large. Lambda is one more number found by trying, and the
-        panel's other settings are there to be tried:{" "}
-        <M tex="\lambda = 5" /> holds the weights down hard enough that the
-        network reads fewer digits.
+        two <M tex="\lambda = 5" /> runs show the far end of it: weights held
+        down hard enough that the network reads fewer digits.
       </p>
 
       <SectionHeader id="m7-more" title="The rest of the toolbox" />
