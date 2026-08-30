@@ -422,6 +422,19 @@ this floor after direct feedback; every later module must be written to it too.
   noun, check what the earlier modules already call the thing, and check the
   reverse too: Module 6 had "band" meaning a step's switchover in one section
   and a strip of the concert plane in another.
+- **Derive at the size of the step, and suspect a missing picture when a
+  count will not land.** Two findings from one Module 8 exchange. The
+  fencepost 24 (a 5-wide window on a 28-wide image) did need deriving, but in
+  one clause ("one further and the 5-wide window would run past the image's
+  edge"); the column-by-column walkthrough written first was read back as
+  overexplained. And the twenty windows stayed opaque through two prose
+  patches because the learner's real question was architectural ("how many
+  layers are we talking about", are twenty windows twenty layers?), which no
+  sentence about the count could settle: it took drawing the whole network
+  (ConvNetFigure: image, window layer, pooling layer, the tail from Module 5,
+  a bracket marking the only new part). When a number that names a component
+  keeps not landing, the missing thing is usually the assembly it belongs to,
+  drawn.
 - **Mind vocabulary collisions.** "Line" means the decision boundary in this
   course; never reuse it for an equation or a row of code. Prefer short
   sentences over connective-heavy ones; wordiness reads as weirdness. A word

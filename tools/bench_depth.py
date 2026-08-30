@@ -310,9 +310,9 @@ def bench_relu(b):
 def bench_dead(b):
     section(
         "6. Dead units at too large a step (ReLU, 4 hidden layers)",
-        "at eta 0.5, 97% of layer 4's neurons answer 0 on every training image after "
-        "1 epoch and all of them by epoch 3, and the run sits between 9 and 13 percent; "
-        "at 0.05 the same layer is 17% silent after 1 epoch and 7% after 3",
+        "at eta 0.5, 28 of the 30 neurons in layer 4 answer 0 on every training image "
+        "after 1 epoch and all 30 by epoch 3, and the run sits between 9 and 13 percent; "
+        "at 0.05 the same layer has 3 silent neurons after one epoch and 1 after three",
     )
     _, _, predict = make_engine(b.lib, b.ce, "relu")
 
