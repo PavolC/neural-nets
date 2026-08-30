@@ -21,28 +21,18 @@ export function Module9() {
       <p>
         Count what you have written: a squash and one neuron (Module 1), a whole
         network's forward pass as one matrix multiplication per layer (Module 2),
-        and a descent step and the loop around it (Module 3). Then the four
-        equations that turn one forward pass into every knob's slope (Module 5), and
-        a cost, a starting draw and an update rule (Module 7). Every training run in
-        this course has been made of those functions.
+        a descent step and the loop around it (Module 3), the four equations that
+        turn one forward pass into every knob's slope (Module 5), and a cost, a
+        starting draw and an update rule (Module 7). Every training run in this
+        course has been made of those functions. The loop around them, loading the
+        images, walking the epochs, scoring each pass against the held-out
+        thousand, was always the course's.
       </p>
       <p>
-        And every one of those runs was started by a panel. The panel loaded the
-        images, drew the network, walked the epochs, cut the mini-batches, called
-        your gradient, applied your update, scored the result against the held-out
-        thousand and drew the chart. Your functions did the work inside that loop.
-        The loop was the course's.
-      </p>
-      <p>
-        Module 3 is the exception that shows the shape of the gap. You wrote a loop
-        there, <code>sgd</code>, and it is the right loop: shuffle, cut, step,
-        repeat. It has been running on your own gradient since Module 5, where the
-        panel pointed its <code>gradient</code> at the adapter around your backprop,
-        and Module 7's first two panels ran it as well. But every one of those
-        panels called it with epochs set to 1, once per epoch, so the walk through
-        the epochs stayed the panel's. And your <code>sgd</code> has never drawn the
-        network it trains, never scored one, and never taken a decayed step: Module
-        7's decay panel called your <code>l2_step</code> from a loop of its own.
+        Module 3's <code>sgd</code> came closest: the right loop, shuffle, cut,
+        step, repeat, running on your own gradient since Module 5. But the course
+        only ever called it one epoch at a time, and it has never drawn the network
+        it trains, never scored one, and never taken a decayed step.
       </p>
       <p>
         So write it. The exercise below is two functions, and the second one is the
@@ -50,42 +40,63 @@ export function Module9() {
         along with a score after each one.
       </p>
       <p>
-        The first is smaller and has been missing for longer.{" "}
-        <code>accuracy</code> takes a network and a batch of images and reports the
-        share it reads correctly. Module 2 said how: ten output neurons, each
-        answering its own yes-or-no question, and the network's verdict is whichever
-        one is most confident. In NumPy that is a single call,{" "}
-        <code>np.argmax(out, axis=0)</code>, which hands back the row number of the
-        largest value in each column (argmax is read "arg max", the argument at
-        which a maximum occurs, so what comes back is the row rather than the
-        confidence sitting in it). You have never written it, because every accuracy
-        figure in eight modules was computed for you.
+        The first, <code>accuracy</code>, answers one question: out of a batch of
+        images, what share did the network read right? You have never written it,
+        because every accuracy figure in eight modules was computed for you, but
+        every ingredient is from Module 2. <code>feedforward</code> on a batch
+        returns ten confidences per image, one column each, and row 0 holds the
+        "is it a 0?" neuron's answer for every image, row 7 the "is it a 7?"
+        neuron's. So the network's verdict on an image is a row number: the row
+        where its column peaks. Here is the whole computation on a batch of three:
+      </p>
+      <Figure caption="The whole of accuracy, run on three images. A starred entry is its column's largest, and its row number is the network's verdict for that image.">
+        <div className="table-scroll scroll-x" tabIndex={0}>
+          <pre className="torch-listing">{`out = feedforward(weights, biases, X)   three images in, so out is (10, 3)
+
+           image 1  image 2  image 3
+  row 0    0.03     0.91*    0.02
+  row 1    0.05     0.02     0.11
+  row 2    0.01     0.04     0.08
+  row 3    0.86*    0.01     0.07
+  row 4    0.02     0.03     0.30
+  row 5    0.04     0.02     0.09
+  row 6    0.01     0.01     0.05
+  row 7    0.11     0.02     0.44*
+  row 8    0.03     0.08     0.12
+  row 9    0.02     0.05     0.38
+
+guesses = np.argmax(out, axis=0)  ->  array([3, 0, 7])   the winning rows
+y                                     array([3, 0, 9])   the right answers
+guesses == y                      ->  array([True, True, False])
+(guesses == y).mean()             ->  0.6666...          two of three`}</pre>
+        </div>
+      </Figure>
+      <p>
+        Two of those lines are new notation. <code>np.argmax(out, axis=0)</code>,
+        read "arg max", the argument at which a maximum occurs, hands back each
+        column's winning row: the position of the largest value, not the value
+        sitting there. And the right answers arrive as <code>y</code>, one plain
+        integer per image rather than the one-hot columns training uses, so the
+        comparison is integer against integer, verdict against answer.{" "}
+        <code>guesses == y</code> checks every image at once; True counts as 1 and
+        False as 0 in arithmetic, so the mean of the comparison is the share read
+        correctly. Image 3 shows what the single number hides: 0.44 over 0.38 is a
+        coin flip of a verdict, and it counts against the score exactly as a
+        confident miss would.
       </p>
 
       <ExerciseCard exercise={trainExercise} />
 
       <SectionHeader id="m9-run" title="Your program, on the digits" />
       <p>
-        The panel below runs it on the real thing: 5,000 training images and the
-        held-out thousand, at the settings printed under its own button. Run it at
-        0.5 first, the middle of the three step sizes, and let all fifteen epochs
-        finish. The number worth reading is where the chart settles, not the best
-        single epoch. Your <code>train</code> imports nothing. Every
-        name it calls is defined higher up the same file: the draw from Module 7,
-        the blame from Module 7, the decayed step from Module 7, the mini-batch
-        adapter written for you in Module 5, the backprop under that from Module 5,
-        and the forward pass your <code>accuracy</code> reads the ten confidences
-        from, from Module 2. The panel runs your file and calls your{" "}
-        <code>train</code>; nothing is substituted underneath it.
+        Your <code>train</code> imports nothing. Every name it calls is defined
+        higher up the same file, and apart from the shuffle NumPy performs and the
+        mini-batch adapter written for you in Module 5, every line in the map below
+        is code you wrote. The panel runs your file and nothing is substituted
+        underneath it, which is what nine modules of writing code into one file
+        were for.
       </p>
-      <p>
-        That is worth one sentence of its own, because it is what nine modules of
-        writing code into one file were for. Every arrow in the map below, except
-        the shuffle NumPy performs and the adapter marked as written for you, ends
-        at something you wrote. The panel says so itself under its results: when it
-        has borrowed nothing it prints that it ran entirely on your own code.
-      </p>
-      <Figure caption="Your program's call map, indented by who calls whom. One name in it is not yours, the mini-batch adapter, and your file carries it under a section line that says it was written for you. Everything else is code you wrote, read from your own file in the order you wrote it.">
+      <Figure caption="Your program's call map, indented by who calls whom, each line labeled with who wrote it and where.">
         <div className="table-scroll scroll-x" tabIndex={0}>
           <pre className="torch-listing">{`train(sizes, X, Y, X_test, y_test, ...)   yours, this module
     init_network(sizes, rng)              yours, Module 7
@@ -99,6 +110,13 @@ export function Module9() {
             feedforward(w, b, X)          yours, Module 2`}</pre>
         </div>
       </Figure>
+      <p>
+        The panel below runs it on the real thing: 5,000 training images scored
+        against the held-out thousand, at the settings printed under its button.
+        Run it at 0.5 first, the middle of the three step sizes, and let all
+        fifteen epochs finish. The number worth reading is where the chart settles,
+        not the best single epoch.
+      </p>
       <Figure caption="Your whole program on the digit reader, with the step size in your hands. Each epoch takes a few seconds, and Stop ends the run.">
         <FullTrainPanel />
       </Figure>

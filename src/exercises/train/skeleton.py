@@ -18,8 +18,8 @@
 # - accuracy(weights, biases, X, y): the share of X's columns the network
 #   reads correctly, as a float between 0 and 1. X is (n_in, m). y holds
 #   integer class ids, shape (m,), NOT one-hot columns: y[k] is the right
-#   answer for column k. A network answers with the output neuron that is
-#   most confident.
+#   answer for column k. A network's answer for a column is the row number
+#   of its most confident output.
 #
 # - train(sizes, X, Y, X_test, y_test, epochs, eta, lmbda, batch_size, rng):
 #   builds a network of the given sizes and trains it. X is (n_in, n) and Y

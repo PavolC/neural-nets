@@ -13,12 +13,12 @@ export const trainExercise: Exercise = {
       "did the work inside that loop; the loop itself was the course's. This " +
       "exercise is the loop.",
     "The contract, in two functions. accuracy(weights, biases, X, y) returns " +
-      "the share of X's columns the network reads correctly, as a float. Note " +
-      "what y is here: integer class ids, shape (m,), one per column, not the " +
-      "one-hot columns of Y. A network's answer is the output neuron that is " +
-      "most confident, so this is np.argmax(..., axis=0) down each column, " +
-      "compared against y. You have never written this: the panels always " +
-      "scored for you.",
+      "the share of X's columns the network reads correctly, as a float " +
+      "between 0 and 1. It is the three-image walk above, in code: feedforward " +
+      "for the confidences, np.argmax(..., axis=0) for each column's winning " +
+      "row, and the mean of comparing those verdicts against y. Note what y is " +
+      "here: integer class ids, shape (m,), one per column, not the one-hot " +
+      "columns of Y, because a verdict is a row number.",
     "train(sizes, X, Y, X_test, y_test, epochs, eta, lmbda, batch_size, rng) " +
       "builds a network and trains it, returning (weights, biases, history) " +
       "with one held-out score per epoch. Everything it calls is your own work " +
