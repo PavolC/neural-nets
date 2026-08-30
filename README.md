@@ -17,7 +17,7 @@ compiled to WebAssembly), in a Web Worker so a training run never freezes the ta
 code and your progress never leave the browser, and the only download is the runtime
 itself, about 10 MB, on the first run.
 
-The sequence follows Michael Nielsen's *Neural Networks and Deep Learning*, with the
+The sequence follows Michael Nielsen's _Neural Networks and Deep Learning_, with the
 explanations rewritten around the interactive parts. It assumes Python and high-school
 algebra; vectors, matrices, dot products and slopes are built up from arithmetic where
 they are first needed.
@@ -37,18 +37,18 @@ site in `dist/` that any static host will serve.
 Ten modules, each a few readings interleaved with figures, most ending in an exercise
 whose output every later module uses.
 
-| # | Module | You write |
-|---|--------|-----------|
-| 1 | From neurons to networks | `sigmoid`, `fire` |
-| 2 | Feedforward | `feedforward` |
-| 3 | Learning as descent | `sgd_step`, `sgd` |
-| 4 | Backpropagation, the idea | (a step-through visualization and a quiz) |
-| 5 | Backpropagation, for real | `backprop` |
-| 6 | Universality (an interlude) | (a curve-sculpting playground) |
-| 7 | Making it actually work | `cross_entropy_cost`, `cross_entropy_delta`, `init_network`, `l2_step` |
-| 8 | Why deep is hard | (a depth and squash comparison) |
-| 9 | Assembling the program | `train`, `accuracy` |
-| 10 | Your own problem | `standardize`, `one_hot`, `split` |
+| #   | Module                      | You write                                                              |
+| --- | --------------------------- | ---------------------------------------------------------------------- |
+| 1   | From neurons to networks    | `sigmoid`, `fire`                                                      |
+| 2   | Feedforward                 | `feedforward`                                                          |
+| 3   | Learning as descent         | `sgd_step`, `sgd`                                                      |
+| 4   | Backpropagation, the idea   | (a step-through visualization and a quiz)                              |
+| 5   | Backpropagation, for real   | `backprop`                                                             |
+| 6   | Universality (an interlude) | (a curve-sculpting playground)                                         |
+| 7   | Making it actually work     | `cross_entropy_cost`, `cross_entropy_delta`, `init_network`, `l2_step` |
+| 8   | Why deep is hard            | (a depth and squash comparison)                                        |
+| 9   | Assembling the program      | `train`, `accuracy`                                                    |
+| 10  | Your own problem            | `standardize`, `one_hot`, `split`                                      |
 
 Module 5 is the summit: the learner's `backprop` is checked entry by entry against
 central-difference numerical gradients on a fixed 3-5-4-2 network, to one part in ten
@@ -127,11 +127,11 @@ code path the browser does, each section printing the prose sentence it backs. T
 exercises have a checker that runs the app's own harness outside the browser:
 
 ```
-npm run check                         # everything below except the benches
+npm run check                         # document, exercise, panel and brand checks
 npm run check:doc                     # the document format: splices, projections
-python3 tools/check_exercises.py       # the workbench: 53 tests, twelve assertions
+python3 tools/check_exercises.py       # the workbench: 54 tests, twelve assertions
 python3 tools/check_panels.py --fast   # every payoff panel runs on the learner's file
-node tools/check_run_path.mjs          # the panel's run path, in a browser (needs Chromium)
+node tools/check_run_path.mjs          # browser run and saved-state paths (needs Playwright + Chromium)
 python3 tools/bench_depth.py           # Modules 7 and 8's Pyodide numbers (needs NumPy)
 python3 tools/bench_penguins.py        # Module 10's numbers (needs NumPy)
 npm run bench:speeds                   # the layer-speed panel's numbers
@@ -180,7 +180,7 @@ honours `navigator.doNotTrack`. GoatCounter is free for non-commercial use, whic
 
 ## License and attribution
 
-Adapted from Michael A. Nielsen, *Neural Networks and Deep Learning*, Determination
+Adapted from Michael A. Nielsen, _Neural Networks and Deep Learning_, Determination
 Press, 2015, licensed [CC BY-NC 3.0](https://creativecommons.org/licenses/by-nc/3.0/).
 
 The **course content** (the module prose, the pedagogical sequence and the interactive
@@ -193,7 +193,7 @@ none of Nielsen's material, so the CC BY-NC grant does not reach them. They are 
 ([LICENSE-MIT](LICENSE-MIT)). The method kit's documents are **CC BY 4.0**. Take the
 harness, take the worker, take the brand layer, and build something else with them.
 
-Not granted by either: the name *Moving Parts* and the sigmoid glyph. The MIT licence
+Not granted by either: the name _Moving Parts_ and the sigmoid glyph. The MIT licence
 covers the code that draws the mark, not the mark. Copy `src/brand/`, change the accent
 and the glyph in `brand.ts`, and publish under your own name; that is what the layer is
 for. Full terms in [LICENSE](LICENSE).

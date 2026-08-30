@@ -11,6 +11,7 @@ network on an MNIST subset. No installs, no accounts, no backend; progress lives
 localStorage. Full design: `nn-course-design-doc.md`.
 
 Goals, in priority order:
+
 1. The primary learner achieves deep understanding by implementing feedforward, SGD, and
    backpropagation himself.
 2. The artifact is fully self-sufficient: a colleague can open a link and complete the
@@ -35,8 +36,8 @@ editor contents never sent; see `src/analytics.ts`).
   `tools/check_exercises.py` (assertion G) can, which is why it exists and why
   its docstring says so.
 - **Attribution and license requirements must never be removed.** The app footer, README,
-  and LICENSE carry the CC BY-NC 3.0 attribution to Michael A. Nielsen's *Neural Networks
-  and Deep Learning* (Determination Press, 2015). The **course content** follows its
+  and LICENSE carry the CC BY-NC 3.0 attribution to Michael A. Nielsen's _Neural Networks
+  and Deep Learning_ (Determination Press, 2015). The **course content** follows its
   source and is non-commercial.
   **State that scope precisely, and do not widen it.** All three places used to say the
   project inherits CC BY-NC, which is broader than the facts and broader than the licence
@@ -148,8 +149,7 @@ editor contents never sent; see `src/analytics.ts`).
   (`train` and `accuracy`, the course's only assessment of assembly), translates
   the course's invented vocabulary into the field's, names what the course did
   not teach (automatic differentiation, modern optimizers, data preparation,
-  error analysis), and carries the where-to-go-next list that used to end Module
-  8. Neither it nor Module 10 follows a Nielsen chapter, so neither has a `<Recap>`
+  error analysis), and carries the where-to-go-next list that used to end Module 8. Neither it nor Module 10 follows a Nielsen chapter, so neither has a `<Recap>`
   or a "Go deeper" link; everything else about a module page applies to both.
 - **`course_helpers.py` is now only what gets lent.** Its seven reference copies
   (`sigmoid`, `feedforward`, `sigmoid_prime`, `backprop`, `cross_entropy_delta`,
@@ -291,10 +291,10 @@ this floor after direct feedback; every later module must be written to it too.
   figure to twice its drawn size, and only a before-and-after measurement of
   drawn width caught it.
 - **A label on a wire needs clearance, not just a halo.** The halo (`paint-order:
-  stroke`) covers the line beside each glyph and not in the gaps between them,
+stroke`) covers the line beside each glyph and not in the gaps between them,
   so a line running through a label still reads through it: Module 4's fork
   diagram showed "w = =4:0". Put the label clear of the line (the offset moves
-  the text's *baseline*, and its digits stand about 9 units above that, so a
+  the text's _baseline_, and its digits stand about 9 units above that, so a
   label below a line needs roughly 15 units and one above it needs 6), and draw
   every label in a pass after every line, or a later wire paints over an
   earlier label. Where wires cross there is no position that clears them all,
@@ -741,7 +741,7 @@ the footer. Rules that follow from it:
   The worst of it was the range inputs: an unstyled one is 16px tall and
   twenty-two of them drive the interactives. `min-height` on the input grows its
   box and the browser keeps the track centred, so the affordance looks the same
-  and the whole 32px box is live, which a drag 3px from its top edge confirms.
+  and the whole 44px box is live.
 - **The exercise's Run buttons sit directly under the editor on a phone.** The
   tip explaining them is twelve lines there, so in source order it put 330px of
   reading inside the course's tightest loop: edit, run, read the output. The
@@ -893,7 +893,7 @@ the footer. Rules that follow from it:
   the section the reader is working in, the selection was invisible exactly where
   they type. The selection rule also spells out the whole child chain CodeMirror's
   own base theme uses (`&.cm-focused > .cm-scroller > .cm-selectionLayer
-  .cm-selectionBackground`), because a shorter selector loses to it on specificity
+.cm-selectionBackground`), because a shorter selector loses to it on specificity
   and the selection comes out in CodeMirror's default lavender.
   `tools/check_run_path.mjs` checks both from the browser.
 - **KaTeX keeps its own face, and that is a choice.** Computer Modern is what mathematics
