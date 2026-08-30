@@ -53,8 +53,8 @@ def _saturation(w, b):
     return float((_steep < 0.01).mean()), float(np.median(_steep))
 
 _out = {}
-for _key, _label, _make in (("plain", "Module 5's start", _plain_start),
-                            ("yours", "your start", _your_start)):
+for _key, _label, _make in (("plain", "the undivided start", _plain_start),
+                            ("yours", "the divided start", _your_start)):
     weights, biases = _make()
     _flat, _median = _saturation(weights, biases)
     _js_report(json.dumps({"kind": "start", "key": _key, "label": _label,
@@ -98,8 +98,8 @@ interface Summary {
 }
 
 const LINES: Record<string, { label: string; cls: string; dashed?: boolean }> = {
-  plain: { label: "Module 5's start (weights drawn at spread 1)", cls: "m7-line-a", dashed: true },
-  yours: { label: "your start (each weight divided by the square root of its layer's inputs)", cls: "m7-line-b" },
+  plain: { label: "the undivided start (Module 5's draw, used as it comes)", cls: "m7-line-a", dashed: true },
+  yours: { label: "the divided start (each weight divided by the square root of its layer's inputs)", cls: "m7-line-b" },
 };
 
 const needed = () =>
@@ -252,8 +252,8 @@ export function InitStartPanel() {
         <div className="interactive-status">
           <p>
             After {EPOCHS} epochs, out of {summary.n_test.toLocaleString()} held-out
-            digits: Module 5's start reads{" "}
-            <b>{(summary.runs["plain"].accuracy * 100).toFixed(1)}%</b>, your start reads{" "}
+            digits: the undivided start reads{" "}
+            <b>{(summary.runs["plain"].accuracy * 100).toFixed(1)}%</b>, the divided start reads{" "}
             <b>{(summary.runs["yours"].accuracy * 100).toFixed(1)}%</b>. Same wiring, same
             cost, same sgd, same random numbers, and{" "}
             {Math.abs(
@@ -263,9 +263,9 @@ export function InitStartPanel() {
           </p>
           <p>
             Saturation is not gone by the end, and it is not meant to be:{" "}
-            {(summary.runs["yours"].flat_share_end * 100).toFixed(1)}% of your run's hidden
+            {(summary.runs["yours"].flat_share_end * 100).toFixed(1)}% of the divided run's hidden
             neurons are flatter than 0.01 after training, against{" "}
-            {(summary.runs["plain"].flat_share_end * 100).toFixed(1)}% for the other run. A
+            {(summary.runs["plain"].flat_share_end * 100).toFixed(1)}% for the undivided one. A
             hidden neuron that has learned to answer one kind of stroke should be decisive
             about it. What the division fixed is saturation before anything has been
             learned, where the flatness is an accident of the draw.

@@ -392,14 +392,14 @@ def bench_module7(b):
     plain = ([rng.standard_normal((30, 784)), rng.standard_normal((10, 30))],
              [rng.standard_normal((30, 1)), rng.standard_normal((10, 1))])
     divided = b.init.init_network([784, HIDDEN_SIZE, 10], np.random.default_rng(INIT_SEED))
-    for label, (weights, biases) in (("Module 5's start", plain), ("the divided start", divided)):
+    for label, (weights, biases) in (("the undivided start", plain), ("the divided start", divided)):
         z = weights[0] @ b.X_train + biases[0]
         a = b.course.sigmoid(z)
         steep = a * (1.0 - a)
         print(f"  {label}: typical |z| {float(np.abs(z).mean()):.2f}, "
               f"median squash slope {float(np.median(steep)):.4f}, "
               f"share flatter than 0.01 {pct(float((steep < 0.01).mean()))}")
-        if label == "Module 5's start":
+        if label == "the undivided start":
             w = weights[0]
             print(f"    the draw itself: {pct(float((w < 0).mean()))} negative, "
                   f"typical size {float(np.abs(w).mean()):.1f}, "

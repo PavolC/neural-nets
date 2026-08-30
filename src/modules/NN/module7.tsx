@@ -673,14 +673,17 @@ export function Module7() {
         The comparison below is as controlled as this course gets. Same
         wiring, same cross-entropy blame, same sgd, same step size of 0.5,
         same shuffle, and the same random numbers from the same seed. One run
-        divides them; the other does not.
+        divides the drawn weights by the square root of the input count, the
+        divided start, which is what your init_network builds. The other
+        leaves the draw as it comes, the undivided start, which is exactly
+        the start Module 5 trained from.
       </p>
-      <Figure caption="Two starting points, fifteen epochs each. The table above the chart is the hidden layer measured before either run takes a step; the chart is test accuracy per epoch afterwards. The dashed line is Module 5's start, the solid line yours.">
+      <Figure caption="Two starting points, fifteen epochs each. The table above the chart is the hidden layer measured before either run takes a step; the chart is test accuracy per epoch afterwards. The dashed line is the undivided start, the solid line the divided one.">
         <InitStartPanel />
       </Figure>
       <p>
         The divided start reads 85.3 percent of the held-out digits after one
-        epoch, which is more than the other start reaches in its first four,
+        epoch, which is more than the undivided start reaches in its first four,
         and 92.1 percent after fifteen against 87.8. Module 5's own run, the quadratic
         cost at a step size of 3.0, reached 89.2 percent over the same fifteen
         epochs, so the network has gained about three points on where this
@@ -690,7 +693,7 @@ export function Module7() {
         One footnote on the two fixes together. Each cost can be given a step
         size that suits it, and at their best columns in the grid at the end of
         this module the two land close: 89.9 percent for the quadratic cost
-        against 89.3 for cross-entropy, both from Module 5's start. The
+        against 89.3 for cross-entropy, both from the undivided start. The
         cross-entropy cost reliably removes the slowdown, which is why it needs
         no cranked step size, and the division reliably removes a flat start.
         They are not competing.
@@ -856,7 +859,7 @@ export function Module7() {
         <RegularizePanel />
       </Figure>
       <p>
-        Two readings, and they disagree. From your divided start, weight decay
+        Two readings, and they disagree. From the divided start, weight decay
         at <M tex="\lambda = 1" /> leaves the held-out accuracy where it was,
         85.7 percent averaged over the last twenty epochs against 86.4 without
         it. (Both are averages over the last twenty epochs of the chart, not
@@ -871,7 +874,7 @@ export function Module7() {
         and stopped becoming more confident while reading the same digits.
       </p>
       <p>
-        The same comparison, read from Module 5's undivided draw, answers
+        The same comparison, read from the undivided start, answers
         differently. Those weights begin at a total of 23,538, since
         that is what not dividing by 28 means, and without decay they stay
         there: 25,528 after eighty epochs, with the held-out accuracy stalled
@@ -913,14 +916,14 @@ export function Module7() {
           </thead>
           <tbody>
             <tr>
-              <td>quadratic cost, Module 5's start</td>
+              <td>quadratic cost, the undivided start</td>
               <td>70.8%</td>
               <td>79.4%</td>
               <td>89.2%</td>
               <td>89.9%</td>
             </tr>
             <tr>
-              <td>cross-entropy cost, Module 5's start</td>
+              <td>cross-entropy cost, the undivided start</td>
               <td>87.8%</td>
               <td>89.3%</td>
               <td>87.6%</td>
