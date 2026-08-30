@@ -2,6 +2,8 @@
 # literals, verified against central-difference numerical gradients when
 # they were generated. Failure messages are teaching content (CLAUDE.md).
 
+import inspect
+
 import numpy as np
 from submission import cross_entropy_cost, cross_entropy_delta
 
@@ -174,3 +176,41 @@ def test_cost_and_delta_agree():
         "cost formula has a stray factor (a half, or a division by the "
         "number of output entries)."
     )
+
+
+def test_backprop_takes_the_blame_argument():
+    """your backprop accepts a swapped-in BP1"""
+    import submission
+    backprop = getattr(submission, "backprop", None)
+    assert backprop is not None, (
+        "your file has no backprop yet. This exercise changes the one you "
+        "wrote in Module 5, so write that first."
+    )
+    params = list(inspect.signature(backprop).parameters)
+    assert len(params) >= 5, (
+        f"your backprop takes {len(params)} arguments, {params}, so there is "
+        "nowhere to hand it a different BP1. Module 7's prompt shows the "
+        "two lines: add output_delta=None to the signature, and make the "
+        "BP1 line use it when it is not None. Leave it out and your "
+        "function does exactly what it did in Module 5. Until you make "
+        "that edit, everything that swaps the cost has no way in."
+    )
+    last = params[4]
+    assert last == "output_delta", (
+        f"your backprop's fifth argument is called {last!r}. The adapter "
+        "written for you passes it by position, so any name runs, but "
+        "output_delta is the name the rest of the course uses and the one "
+        "the prompts will keep saying."
+    )
+    weights, biases = _fixture_net()
+    x = np.array([[0.6], [-0.2]])
+    y = np.array([[1.0]])
+    plain = backprop(weights, biases, x, y)
+    defaulted = backprop(weights, biases, x, y, None)
+    for a, b in zip(plain[0] + plain[1], defaulted[0] + defaulted[1]):
+        assert np.allclose(a, b), (
+            "your backprop gives different slopes with the argument left "
+            "out than with it passed as None. Those two have to mean the "
+            "same thing: no replacement was supplied, so use the BP1 you "
+            "already had."
+        )

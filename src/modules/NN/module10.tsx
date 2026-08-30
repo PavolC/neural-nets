@@ -1,6 +1,6 @@
 import { AfterThis, Aside, Figure, ModuleToc, SectionHeader } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
-import { ExercisePage } from "../../components/ExercisePage";
+import { ExerciseCard } from "../../components/ExerciseCard";
 import { prepareExercise } from "../../exercises/prepare";
 import { PenguinsPanel } from "./interactives/PenguinsPanel";
 
@@ -287,13 +287,15 @@ export function Module10() {
         </p>
       </Aside>
 
-      <ExercisePage exercise={prepareExercise} />
+      <ExerciseCard exercise={prepareExercise} />
 
       <SectionHeader id="m10-run" title="What the preparation was worth" />
       <p>
-        The panel below runs the whole pipeline: your <code>standardize</code>,{" "}
-        <code>one_hot</code> and <code>split</code> turn the file into a matrix,
-        and your <code>train</code> from Module 9 does the rest.
+        The panel below runs the whole pipeline out of one file: your{" "}
+        <code>standardize</code>, <code>one_hot</code> and <code>split</code> turn
+        the file into a matrix, and your <code>train</code> from Module 9 does the
+        rest, down to the sigmoid you wrote in Module 1. Nothing in the run is the
+        course's except the mini-batch adapter.
       </p>
       <Figure caption="The penguin file, prepared by your code and trained by your loop. The switches change the preparation, not the network: same shape, same step size, same epochs, same seeds.">
         <PenguinsPanel />
@@ -316,8 +318,8 @@ export function Module10() {
         The output layer is reading a constant, and the best a constant answer
         can do is name the commonest species. The network cannot climb out of it
         either, for the reason Module 7 gave for dividing the starting weights: a
-        flat neuron's steepness is near zero, and BP2 multiplies its blame by
-        that steepness, so the wires feeding it barely move.
+        flat neuron's squash slope is near zero, and BP2 multiplies its blame by
+        that slope, so the wires feeding it barely move.
       </p>
       <p>
         A perfect score should make you suspicious rather than pleased, so why

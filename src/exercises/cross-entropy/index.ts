@@ -41,10 +41,10 @@ export const crossEntropyExercise: Exercise = {
       "the slopes YOUR delta produces through backprop. Passing it means " +
       "the delta you wrote really is the slope of the cost you wrote.",
     "Once the tests pass, put the old blame and the new one side by side on " +
-      "Module 5's own fixture network. Append this and press Run my code:",
+      "Module 5's own fixture network. Send this to the scratch pad and run it:",
     {
       code:
-        "from course import backprop, quadratic_output_delta, quadratic_cost\n" +
+        "from course import quadratic_cost, quadratic_output_delta\n" +
         "\n" +
         "weights = [np.array([[0.5, -0.3], [-0.8, 0.9], [0.1, 0.4]]),\n" +
         "           np.array([[0.7, -0.5, 0.2]])]\n" +
@@ -63,7 +63,7 @@ export const crossEntropyExercise: Exercise = {
         'print("hidden blames, cross-entropy:", new[0].ravel())',
     },
     "The output blame goes from -0.1012 to -0.4165, four times larger, and " +
-      "4.115 is exactly 1 divided by that neuron's steepness 0.2430: the " +
+      "4.115 is exactly 1 divided by that neuron's squash slope 0.2430: the " +
       "factor the new cost cancels. The hidden blames grow by the same " +
       "factor, because BP2 carries whatever arrives from the output layer " +
       "and multiplies by its own numbers, which did not change. And the " +

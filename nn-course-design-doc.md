@@ -29,10 +29,10 @@ Pedagogical sequence adapted from Michael A. Nielsen, *Neural Networks and Deep 
 ### Stack
 - **Frontend:** React + Vite, single-page app, static build. Deployable to GitHub Pages / Netlify / any static host, or run locally with one command.
 - **Python runtime:** Pyodide (WebAssembly CPython) with NumPy, loaded lazily on first exercise. Pin the Pyodide version in CLAUDE.md.
-- **Editor:** CodeMirror 6 with Python mode. One editor pane per exercise, pre-filled with skeleton code.
+- **Editor:** CodeMirror 6 with Python mode. One editor pane per exercise, pre-filled with skeleton code. *(Superseded: see section 10. One panel, one growing file, a section per exercise.)*
 - **Execution model:** Run Pyodide in a Web Worker so training loops never freeze the UI. Main thread sends code + test suite to worker; worker streams back stdout, test results, and training metrics (per-epoch loss/accuracy) for live charting.
 - **Visualizations:** SVG/Canvas in React. No heavy chart library needed; D3 acceptable for scales/paths if useful. Keep each interactive a self-contained component.
-- **State:** localStorage for module progress, saved editor code per exercise, and completion flags. "Reset module" and "Reset all" controls. Export/import progress as JSON (nice-to-have).
+- **State:** localStorage for module progress, saved editor code per exercise, and completion flags. *(Superseded: one document, plus a derived per-exercise projection so older builds and older exports still work.)* "Reset module" and "Reset all" controls. Export/import progress as JSON (nice-to-have).
 
 ### Data
 - Bundle a preprocessed MNIST subset as a static asset: 5,000 training images + 1,000 test images, stored as a compressed binary (e.g., uint8 pixels + labels, gzipped, roughly 4 MB). A build-time script (Python, in `tools/`) produces this file from the canonical MNIST source.
@@ -191,4 +191,23 @@ Milestones 0 through 5 are complete. Departures from the plan above, all deliber
 - **Three of section 4's names and numbers were never what shipped**, and are recorded here rather than edited above. Module 7's exercises are `l2_step` and `init_network`, not `l2_update` and `smart_init`: both were renamed for what they do to the learner's own network rather than to the update rule in the abstract, and `course_helpers.py` carries the shipped names. Module 8's depth slider runs 1 to 5 hidden layers rather than 2 to 6, because one hidden layer is the network the learner already owns from Module 5 and is the only honest baseline for the comparison. And the pretrained weights ship as `pretrained_weights.json.gz` rather than an npz, for the reason CLAUDE.md records: Module 2's diagram reads the same file in JS, which has no npz parser.
 - **The visual identity became a shared series layer, after the course was finished.** Section 3 said nothing about design beyond the stack, and the course shipped looking like an unstyled document with a green accent. `src/brand/` now holds a nine-hue accent family computed at one OKLCH lightness and chroma, four named type roles, and the masthead, tab strip, link and footer chrome, so a second course on another topic reads as a sibling rather than as an unrelated page. `course-kit/BRAND.md` is its spec.
 - **The working title did not survive.** The heading above still says "Grokking Nets", which is what this document was written under, and section 10 is where the change belongs rather than in the heading. Two collisions retired it: Manning publishes *Grokking Deep Learning*, which teaches building neural networks from scratch in Python and NumPy and is therefore a one-sentence description of this course, and Educative runs a "Grokking the ..." series of online courses, which is the same medium. The series is called **Moving Parts** and this course is **Neural Networks**, published under it. The series name is now an imprint rather than a prefix, because "Moving Parts Neural Networks" is not a name: the masthead puts the wordmark above the heading, the document title reads "Neural Networks · Moving Parts", and `tools/check_brand.py` asserts that the three places the HTML has to spell the title out still agree with `brand.ts`. The slug stays `nets`, which is what the repository, the progress file's name and the sibling-course key are keyed on, so rewording the subject does not move any of them.
+- **The nine editors became one file in one panel**, after the primary learner
+  finished most of the course and asked for it: "a side panel/workbench where every
+  exercise simply allows me to add on code so that by the end of it i have a single
+  piece that i understand and have built up ... instead of a random embedded window
+  on each module." Section 3 above says "one editor pane per exercise, pre-filled
+  with skeleton code" and "saved editor code per exercise"; neither is what ships
+  now. The editor is one panel docked beside the reading column above 1360px, and a
+  full-screen sheet below that; the code is one document with a section per
+  exercise, plus two marked "written for you", and it downloads as an `nn.py` that
+  runs anywhere NumPy is installed.
+  The exercise contract in section 4 changed with it. "Earlier chapters supplied as
+  an importable library" is gone: a section the learner has written is what the
+  later sections call, and only a section they have not written yet is filled in
+  from the course's copy, which the panel reports. That import was not neutral.
+  Concatenating the nine untouched skeletons in their old state passed 19 of 52
+  tests, because the import rebound a name an earlier section defined and the
+  harness executes the document before the tests import from it. `check_exercises.py`
+  now carries a mutation check for exactly that, because running the suites cannot
+  see it.
 - **The method was extracted into `course-kit/`.** Not a departure from the design so much as a second deliverable the design did not anticipate: this repo's `CLAUDE.md` grew from 629 words to 5,000 across five days, almost entirely out of one learner's reported confusions, and most of it is not about neural networks. The kit is that file with the topic removed, plus the process that generated it, the fifteen incidents behind its rules, this template's own conventions, the brand, and six slash commands.

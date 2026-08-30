@@ -1,5 +1,6 @@
 # Tests for the SGD exercise. All fixtures are hardcoded literals computed
-# with course.gradient (eps=1e-5), so results are deterministic.
+# with the nudge-and-measure gradient (eps=1e-5), the one written for you
+# in the section just above your code, so results are deterministic.
 # Failure messages are teaching content (see CLAUDE.md).
 
 import numpy as np
@@ -68,7 +69,8 @@ def test_step_values():
     assert np.allclose(new_w[1], expected_w1, atol=1e-6), (
         f"wrong updated weights: expected\n{expected_w1}\ngot\n{new_w[1]}\n"
         "The update is new_w = w - eta * slope, where the slopes come "
-        "from course.gradient(weights, biases, X, Y) on this batch. "
+        "from gradient(weights, biases, X, Y), which is written for you "
+        "in the section above yours. "
         "A plus instead of a minus walks uphill; a missing eta takes a "
         "full-size step."
     )
@@ -80,6 +82,9 @@ def test_step_values():
 
 def test_step_goes_downhill():
     """a step reduces the cost on its own batch"""
+    # The course's own copy, deliberately: a downhill check that measures
+    # with the same function the step descended on would agree with a
+    # broken one.
     from course import quadratic_cost
     weights, biases, X, Y = _fixture_net()
     before = quadratic_cost(weights, biases, X, Y)
@@ -94,6 +99,7 @@ def test_step_goes_downhill():
 
 def test_sgd_final_values():
     """the full loop follows the prescribed batch order"""
+    # The course's copy again, for the same reason as the downhill check.
     from course import quadratic_cost
     weights, biases, X, Y = _fixture_net()
     initial_cost = quadratic_cost(weights, biases, X, Y)

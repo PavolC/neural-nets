@@ -44,6 +44,9 @@ import types
 
 import numpy as np
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import workbench as wb  # noqa: E402
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 PY = ROOT / "src" / "python"
 EX = ROOT / "src" / "exercises"
@@ -67,41 +70,56 @@ def load_module(path, name):
     return mod
 
 
-def bootstrap():
-    """Register `course` and load the three exercise solutions the panel uses.
+def library(through="prepare"):
+    """The learner's file, assembled from the reference solutions.
 
-    Order matters: the sgd solution does `from course import gradient`, which
-    binds the function at import time, so `course.gradient` has to be pointed
-    at the gradient under test BEFORE sgd is loaded. The panel does exactly
-    this, and getting it wrong silently benches the numerical gradient.
+    The panels exec one document and read every name out of it, so this does
+    too: benching separately-loaded solution files would stop being a bench of
+    the code the reader runs the moment the two shapes drift apart.
     """
+    rank = wb.SECTIONS.index(wb.BY_ID[through])
+    ids = [s["id"] for s in wb.SECTIONS[: rank + 1]]
+    kinds = {"backprop": "seam"} if wb.needs_seam(ids) else {}
+    document = wb.assemble(ids, "solution", kinds)
+    mod = types.ModuleType("your_code")
+    mod.__file__ = "your_code.py"
+    exec(compile(document, "your_code.py", "exec"), mod.__dict__)
+    return mod
+
+
+def bootstrap():
+    """Register `course`, the data loader, and the learner's assembled file."""
     course = load_module(PY / "course_helpers.py", "course")
     sys.modules["course"] = course
     loader = load_module(PY / "data_loader.py", "data_loader")
-    ce = load_module(EX / "cross-entropy" / "solution.py", "your_cost")
-    init = load_module(EX / "smart-init" / "solution.py", "your_init")
-    return course, loader, ce, init
+    lib = library()
+    return course, loader, lib, lib
 
 
-def load_sgd(course, grad_fn):
-    """Load the learner's sgd on top of a chosen gradient (see bootstrap)."""
-    course.gradient = grad_fn
-    return load_module(EX / "sgd" / "solution.py", "your_sgd")
+def load_sgd(lib, grad_fn):
+    """Point the file's own gradient at the one under test, then hand it back.
+
+    Python looks a global up when the call happens, so rebinding after the
+    file has been read is enough, and it is what the panels do now. Getting
+    this wrong silently benches the nudge-and-measure gradient.
+    """
+    lib.gradient = grad_fn
+    return lib
 
 
 def relu(z):
     return np.maximum(0.0, z)
 
 
-def make_engine(course, ce, activation):
+def make_engine(lib, ce, activation):
     """The panel's two code paths, returned as (per_example, batch, predict).
 
-    With the sigmoid the gradient is course.backprop with the cross-entropy
-    blame, which is the learner's Module 5 algorithm. With ReLU it is the same
-    four equations with one line changed, because a learner's BP2 has
-    sigmoid_prime written into it.
+    With the sigmoid the gradient is the learner's own backprop, reached
+    through the adapter written for them in Module 5. With ReLU it is the same
+    four equations with one line changed, written out here and in the panel,
+    because a learner's BP2 has sigmoid_prime in it.
     """
-    sigmoid = course.sigmoid
+    sigmoid = lib.sigmoid
 
     def relu_backprop(weights, biases, x, y):
         L = len(weights)
@@ -146,9 +164,9 @@ def make_engine(course, ce, activation):
         return relu_backprop, relu_grad, relu_feedforward
 
     def sigmoid_grad(weights, biases, X, Y):
-        return course.batch_gradient(weights, biases, X, Y, ce.cross_entropy_delta)
+        return lib.batch_gradient(weights, biases, X, Y, ce.cross_entropy_delta)
 
-    return None, sigmoid_grad, course.feedforward
+    return None, sigmoid_grad, lib.feedforward
 
 
 def layer_speeds(grad, weights, biases, X, Y, n=SPEED_SAMPLES):
@@ -161,6 +179,7 @@ class Bench:
     def __init__(self, epochs):
         self.epochs = epochs
         self.course, loader, self.ce, self.init = bootstrap()
+        self.lib = self.ce
         with gzip.open(DATA, "rb") as f:
             raw = f.read()
         self.X_train, self.y_train, self.X_test, self.y_test = loader.load_mnist_subset(raw)
@@ -174,8 +193,8 @@ class Bench:
         """
         eta = ETA[activation] if eta is None else eta
         epochs = self.epochs if epochs is None else epochs
-        _, grad, predict = make_engine(self.course, self.ce, activation)
-        sgd = load_sgd(self.course, grad)
+        _, grad, predict = make_engine(self.lib, self.ce, activation)
+        sgd = load_sgd(self.lib, grad)
         sizes = [784] + [HIDDEN_SIZE] * hidden + [10]
         weights, biases = self.init.init_network(sizes, np.random.default_rng(init_seed))
         if weight_scale != 1.0:
@@ -295,7 +314,7 @@ def bench_dead(b):
         "1 epoch and all of them by epoch 3, and the run sits between 9 and 13 percent; "
         "at 0.05 the same layer is 17% silent after 1 epoch and 7% after 3",
     )
-    _, _, predict = make_engine(b.course, b.ce, "relu")
+    _, _, predict = make_engine(b.lib, b.ce, "relu")
 
     def silent_fractions(weights, biases):
         """Per hidden layer: the share of neurons that answer 0 on all 5,000 images.
@@ -330,19 +349,12 @@ def bench_mistakes(b):
     )
     # Module 5's panel exactly: the learner's backprop inside their sgd, the
     # quadratic cost, eta 3.0, the undivided draw, init seed 8, shuffle seed 2.
-    bp = load_module(EX / "backprop" / "solution.py", "your_backprop")
-
+    # The adapter written for the learner in Module 5, which is what the panel
+    # calls: one backprop per column, slopes averaged, summed in that order.
     def grad(w, bs, X, Y):
-        m = X.shape[1]
-        nw = [np.zeros_like(x) for x in w]
-        nb = [np.zeros_like(x) for x in bs]
-        for k in range(m):
-            dw, db = bp.backprop(w, bs, X[:, k:k + 1], Y[:, k:k + 1])
-            nw = [t + d for t, d in zip(nw, dw)]
-            nb = [t + d for t, d in zip(nb, db)]
-        return [t / m for t in nw], [t / m for t in nb]
+        return b.lib.batch_gradient(w, bs, X, Y)
 
-    sgd = load_sgd(b.course, grad)
+    sgd = load_sgd(b.lib, grad)
     r = np.random.default_rng(INIT_SEED)
     weights = [r.standard_normal((30, 784)), r.standard_normal((10, 30))]
     biases = [r.standard_normal((30, 1)), r.standard_normal((10, 1))]
@@ -368,7 +380,7 @@ def bench_mistakes(b):
 def bench_module7(b):
     section(
         "7. Module 7's numbers that Module 8 opens by quoting",
-        "the digit reader stands at 92.1 percent; the median hidden-neuron steepness at "
+        "the digit reader stands at 92.1 percent; the hidden layer's median squash slope at "
         "the divided start is 0.22",
     )
     r = b.run(1)
@@ -380,13 +392,24 @@ def bench_module7(b):
     plain = ([rng.standard_normal((30, 784)), rng.standard_normal((10, 30))],
              [rng.standard_normal((30, 1)), rng.standard_normal((10, 1))])
     divided = b.init.init_network([784, HIDDEN_SIZE, 10], np.random.default_rng(INIT_SEED))
-    for label, (weights, biases) in (("Module 5's start", plain), ("the divided start", divided)):
+    for label, (weights, biases) in (("the undivided start", plain), ("the divided start", divided)):
         z = weights[0] @ b.X_train + biases[0]
         a = b.course.sigmoid(z)
         steep = a * (1.0 - a)
         print(f"  {label}: typical |z| {float(np.abs(z).mean()):.2f}, "
-              f"median steepness {float(np.median(steep)):.4f}, "
+              f"median squash slope {float(np.median(steep)):.4f}, "
               f"share flatter than 0.01 {pct(float((steep < 0.01).mean()))}")
+        if label == "the undivided start":
+            w = weights[0]
+            print(f"    the draw itself: {pct(float((w < 0).mean()))} negative, "
+                  f"typical size {float(np.abs(w).mean()):.1f}, "
+                  f"{pct(float((np.abs(w) > 3).mean()))} past 3")
+        # The distance histogram the module's first table quotes.
+        d = np.abs(z)
+        shares = " / ".join(
+            f"{float(((d >= lo) & (d < hi)).mean()) * 100:.1f}%"
+            for lo, hi in ((0, 1), (1, 2), (2, 4), (4, 8), (8, np.inf)))
+        print(f"    distance bins 0-1 / 1-2 / 2-4 / 4-8 / 8+: {shares}")
 
 
 def bench_capstone(b):
@@ -398,7 +421,7 @@ def bench_capstone(b):
     # FullTrainPanel's exact configuration: ONE generator seeded at 8 draws the
     # network and then shuffles every epoch, lambda is 1, and the loop is the
     # capstone exercise's own.
-    prog = load_module(EX / "train" / "solution.py", "your_program")
+    prog = b.lib
     for eta in (0.1, 0.5, 3.0):
         _, _, history = prog.train(
             [784, HIDDEN_SIZE, 10], b.X_train, b.Y_train, b.X_test, b.y_test,

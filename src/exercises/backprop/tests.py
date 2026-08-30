@@ -19,11 +19,11 @@ def _fixture_net():
 
 
 def test_sigmoid_prime():
-    """sigmoid_prime: the steepness formula"""
+    """sigmoid_prime: the squash-slope formula"""
     v = float(sigmoid_prime(np.array(0.0)))
     assert abs(v - 0.25) < 1e-9, (
         f"sigmoid_prime(0) should be 0.25, got {v:.6f}. At z = 0 the "
-        "confidence is 0.5, and the steepness is confidence times doubt: "
+        "confidence is 0.5, and the squash slope is confidence times doubt: "
         "0.5 * 0.5 = 0.25. If you got 0.5, you returned sigmoid(z) itself; "
         "the formula is sigmoid(z) * (1 - sigmoid(z))."
     )
@@ -89,10 +89,10 @@ def test_backprop_output_layer():
     expected_b1 = np.array([[-0.1012158735]])
     assert np.allclose(nabla_b[1], expected_b1, atol=1e-8), (
         f"expected nabla_b[1] = {expected_b1}, got {nabla_b[1]}. BP1 has "
-        "exactly two factors: the gap (a - y) and the steepness "
+        "exactly two factors: the gap (a - y) and the squash slope "
         "sigmoid_prime(z), both at the output layer, multiplied "
         "elementwise. Common wrong answers here: -0.4165 means the "
-        "steepness factor is missing; +0.1012 means you wrote y - a "
+        "squash-slope factor is missing; +0.1012 means you wrote y - a "
         "(Module 4's flip: slopes use output minus right answer); "
         "-0.0957 means you fed sigmoid_prime the activation a instead of "
         "the evidence z."
@@ -116,9 +116,9 @@ def test_backprop_hidden_layer():
         f"expected nabla_b[0] =\n{expected_b0}\ngot\n{nabla_b[0]}\n"
         "BP2: the hidden delta is (weights[1].T @ delta) * "
         "sigmoid_prime(zs[0]): collect the blame through the transposed "
-        "wires, then scale by THIS layer's steepness. If you got "
+        "wires, then scale by THIS layer's squash slope. If you got "
         "(-0.0172, 0.0123, -0.0049), you reused the output layer's z in "
-        "sigmoid_prime; each layer's steepness is measured at its own "
+        "sigmoid_prime; each layer's squash slope is measured at its own "
         "stored z. Note the middle entry is positive: it arrives through "
         "the negative wire -0.5, which flips the blame's sign."
     )
@@ -135,6 +135,10 @@ def test_backprop_hidden_layer():
 
 def test_gradient_check():
     """the gradient check: your slopes against nudge-and-measure, all 54"""
+    # The oracle is deliberately the course's forward pass and the
+    # course's nudge-and-measure, not the copies in your file. This is
+    # the course's strongest promise about your code, and a guarantee
+    # whose yardstick shares the code under test is not a guarantee.
     from course import feedforward, numerical_gradient
     # A fixed 3-5-4-2 network: two hidden layers, so the backward loop has
     # to take more than one step, and no two layers the same size, so every

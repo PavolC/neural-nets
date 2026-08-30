@@ -6,7 +6,6 @@ import { MODULES } from "../modules/NN";
 import { M } from "../components/Math";
 import { EXERCISES } from "../exercises/registry";
 import {
-  codeReady,
   exportProgress,
   importProgress,
   loadCompleted,
@@ -14,12 +13,28 @@ import {
   resetExercise,
   subscribeProgress,
 } from "../state/progress";
+import {
+  downloadText,
+  hasBackup,
+  restoreBackup,
+  sectionState,
+  SECTIONS,
+} from "../state/workbench";
+import nielsenNotice from "../python/nielsen_notice.txt?raw";
 
 // The course's front door, and the only page that talks about the course
 // rather than about neural networks: what it is, how the machinery works,
 // what every module covers, the training run that shows where it ends up,
 // and what this browser has stored. Reachable at #start, which is where a
 // bare link lands.
+
+/** How each section of the file reads in the list below. */
+const STATE_WORDS = {
+  missing: "not in your file yet",
+  written: "written, not passing yet",
+  passing: "passing",
+  stale: "passed, changed since",
+} as const;
 
 /** What each module covers, for the outline below.
  *
@@ -88,6 +103,13 @@ const COVERS: Record<string, { title: string; covers: string }> = {
  * of words before a reader comes back wanting it. In the order they are met.
  */
 const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[] = [
+  {
+    id: "section-line",
+    symbol: <code>{"# ---- [section:...] ----"}</code>,
+    means:
+      "a section line in your file: the course reads the name in the brackets to find where each piece starts, and everything else on it is yours",
+    from: "Module 1",
+  },
   { id: "z", symbol: <M tex="z" />, means: "a neuron's evidence: its inputs times its weights, plus its bias", from: "Module 1" },
   { id: "a", symbol: <M tex="a" />, means: "a neuron's answer, the squash applied to its evidence", from: "Module 1" },
   { id: "sigma", symbol: <M tex="\sigma(z)" />, means: "the sigmoid, which squashes any number into 0 to 1", from: "Module 1" },
@@ -155,6 +177,33 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
 
   const passed = EXERCISES.filter((e) => loadCompleted(e.id));
 
+  const downloadLibrary = () => {
+    const blob = new Blob([downloadText(nielsenNotice)], { type: "text/x-python" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "nn.py";
+    a.click();
+    URL.revokeObjectURL(url);
+    say("Saved nn.py. It needs NumPy and nothing else.");
+  };
+
+  const restore = () => {
+    if (
+      !window.confirm(
+        "Put back the nine separate documents you had before the exercises became one file, and rebuild the file from them? Anything written since then is lost.",
+      )
+    )
+      return;
+    const ok = restoreBackup();
+    say(
+      ok
+        ? "Restored. Your file was rebuilt from the nine documents."
+        : "There is nothing to restore in this browser.",
+      !ok,
+    );
+  };
+
   const download = () => {
     const blob = new Blob([exportProgress()], { type: "application/json" });
     const url = URL.createObjectURL(blob);
@@ -170,8 +219,19 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
     file
       .text()
       .then((text) => {
-        const written = importProgress(text);
-        say(`Loaded ${written} saved ${written === 1 ? "item" : "items"} from ${file.name}.`);
+        const report = importProgress(text);
+        const n = report.written;
+        const head = `Loaded ${n} saved ${n === 1 ? "item" : "items"} from ${file.name}.`;
+        // Three shapes, and the difference matters enough to say out loud:
+        // an older file merged into a file that already existed is the one
+        // case where something of this browser's was replaced.
+        say(
+          report.shape === "merged"
+            ? `${head} ${report.merged.length} ${report.merged.length === 1 ? "section" : "sections"} of your file came from that export, and the version that was here is one Undo away in the workbench.`
+            : report.shape === "built"
+              ? `${head} Your file was rebuilt from them.`
+              : head,
+        );
       })
       .catch((err: Error) => say(`Nothing was loaded: ${err.message}.`, true));
   };
@@ -179,12 +239,12 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
   const forgetAll = () => {
     if (
       !window.confirm(
-        "Forget everything this browser has stored for the course: the code in every editor, every revealed hint, and every passed mark. The course text is unaffected. This cannot be undone.",
+        "Forget everything this browser has stored for the course: your whole nn.py, every revealed hint, every passed mark, and the copies kept from before the exercises became one file. The course text is unaffected. This cannot be undone.",
       )
     )
       return;
     resetAll();
-    say("Cleared. Every exercise is back to its skeleton.");
+    say("Cleared. Your file is empty and every section is back to its starting text.");
   };
 
   return (
@@ -193,10 +253,13 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
       <p>
         This is a course on neural networks that you finish by building one. Each
         module is a few short readings interleaved with figures you can drag, and
-        most of them end with Python you write in the page. Your code is checked by
-        tests, kept, and used by every module after it: by Module 5 it is training a
-        network that reads handwritten digits, and by Module 8 it is the thing being
-        measured when depth stops working.
+        most of them add a piece of Python to one file that you write across the
+        whole course. It opens in a panel beside the reading, so the explanation
+        stays on screen while you type. Each piece is checked by tests and then used
+        by every piece after it: by Module 5 the file is training a network that
+        reads handwritten digits, by Module 8 it is the thing being measured when
+        depth stops working, and at the end you can download it and run it anywhere
+        NumPy is installed.
       </p>
       <p>
         The sequence follows Michael Nielsen's <em>Neural Networks and Deep
@@ -276,9 +339,10 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
           download.
         </li>
         <li>
-          <b>Your work lives in this browser.</b> Editor contents, revealed hints
-          and passed marks are stored in this browser's local storage, per browser
-          and per device. The progress section below is how you move or clear them.
+          <b>Your work lives in this browser.</b> Your file, the hints you have
+          opened and the sections that have passed are stored in this browser's
+          local storage, per browser and per device. The progress section below is
+          how you move or clear them.
         </li>
         <li>
           <b>Nothing is locked.</b> Every module is open from the tabs at any time,
@@ -288,14 +352,19 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
         <li>
           <b>Each exercise shows its work.</b> The tests are readable in the page,
           hints come in three stages that you choose to open, and the reference
-          solution is one of them.
+          solution is one of them. When a run fails, the panel says whether the
+          cause is the section you are looking at or one further up your file, and
+          names it.
         </li>
         <li>
-          <b>Module 5 is the summit, and nothing after it depends on your version.</b>{" "}
-          A training panel needs the exercises in its own module, plus Module 3's
-          sgd, which drives all of them. Module 5's backprop is the exception:
-          every module after it runs on the course's own copy, so an exercise you
-          never finish costs you that module's panel and nothing later.
+          <b>Later modules run on your earlier code, really.</b> Everything is one
+          file, in the order you write it, so Module 9's program calls the backprop
+          you wrote in Module 5, which calls the sigmoid you wrote in Module 1. A
+          section you have not written yet is filled in from the course's copy for
+          the run, and the panel names what it borrowed; once you have written it,
+          yours is what runs. The bill for that is real and worth knowing: a wrong
+          sign in Module 1 can surface as a failure in Module 9, which is why the
+          panel goes looking upstream before it blames the section in front of you.
         </li>
       </ul>
 
@@ -331,57 +400,79 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
 
       <TrainingDemo />
 
-      <h3 id="start-progress">What this browser has stored</h3>
+      <h3 id="start-progress">Your file, and what this browser has stored</h3>
       <p>
-        {passed.length} of {EXERCISES.length} exercises are passing here.{" "}
+        Everything you write in this course goes into one Python file, a section
+        per exercise, in the order you meet them. {passed.length} of{" "}
+        {EXERCISES.length} sections are passing here.{" "}
         {passed.length === 0
           ? "Nothing is saved yet."
-          : "Resetting one puts back its skeleton and clears its hints and its passed mark."}
+          : "Resetting one puts back its starting text and clears its hints and its passed mark; the rest of the file is untouched."}
       </p>
       <ul className="start-progress">
-        {EXERCISES.map((e) => {
-          const done = loadCompleted(e.id);
+        {SECTIONS.map((section) => {
+          const state = sectionState(section.id);
+          const exercise = EXERCISES.find((e) => e.id === section.id);
           return (
-            <li key={e.id} className={done ? "start-done" : ""}>
+            <li key={section.id} className={state === "passing" ? "start-done" : ""}>
               <span className="start-progress-mark" aria-hidden="true">
-                {done ? "✓" : "·"}
+                {state === "passing" ? "✓" : state === "stale" ? "!" : state === "missing" ? "·" : "○"}
               </span>
               <span className="start-progress-name">
-                <button className="start-progress-link" onClick={() => onGoTo(e.module)}>
-                  {e.title}
+                <button
+                  className="start-progress-link"
+                  onClick={() => onGoTo(section.module)}
+                >
+                  {section.label}
                 </button>{" "}
                 <span className="start-progress-where">
-                  Module {e.module.slice(1)}
-                  <span className="sr-only">{done ? ", passed" : ", not passed yet"}</span>
+                  {/* The label already says "written for you" for a given
+                      section, so what is worth adding there is whether it has
+                      arrived, not what it is. */}
+                  {section.kind === "given"
+                    ? state === "missing"
+                      ? "not in your file yet"
+                      : "in your file"
+                    : STATE_WORDS[state]}
                 </span>
-                <span className="start-progress-builds">{e.builds}</span>
-                {done && !codeReady(e.id) && (
+                <span className="start-progress-builds">
+                  {exercise ? exercise.builds : section.provides.join(", ")}
+                </span>
+                {state === "stale" && (
                   <span className="start-progress-warn">
-                    Passed, but its code is not stored here, so panels that run it stay
-                    locked.
+                    Passed once, and the text has changed since. Run its tests again to
+                    know where it stands.
                   </span>
                 )}
               </span>
-              <button
-                className="button-secondary"
-                onClick={() => {
-                  if (
-                    window.confirm(
-                      `Reset "${e.title}"? Its editor goes back to the skeleton, and its hints and passed mark are cleared.`,
-                    )
-                  ) {
-                    resetExercise(e.id);
-                    say(`Reset ${e.title}.`);
-                  }
-                }}
-              >
-                Reset
-              </button>
+              {section.kind === "exercise" && (
+                <button
+                  className="button-secondary"
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        `Reset "${section.label}"? That section of your file goes back to its starting text, and its hints and passed mark are cleared. The rest of the file is untouched, and one Undo in the workbench brings it back.`,
+                      )
+                    ) {
+                      const outcome = resetExercise(section.id);
+                      say(
+                        outcome.ok ? `Reset ${section.label}.` : (outcome.reason ?? "Nothing was reset."),
+                        !outcome.ok,
+                      );
+                    }
+                  }}
+                >
+                  Reset
+                </button>
+              )}
             </li>
           );
         })}
       </ul>
       <div className="start-storage">
+        <button className="button-secondary" onClick={downloadLibrary}>
+          Download my nn.py
+        </button>
         <button className="button-secondary" onClick={download}>
           Save my progress to a file
         </button>
@@ -391,6 +482,11 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
         <button className="button-secondary" onClick={forgetAll}>
           Forget everything
         </button>
+        {hasBackup() && (
+          <button className="button-secondary" onClick={restore}>
+            Restore the nine files I had before
+          </button>
+        )}
         <input
           ref={fileRef}
           className="sr-only"
@@ -407,9 +503,10 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
         {note ?? ""}
       </p>
       <p className="start-storage-note">
-        A saved file holds the code in every editor, which hints you opened, and which
-        exercises passed. Loading one replaces the exercises it names and leaves the
-        rest alone.
+        A saved file holds your whole nn.py, which hints you opened, and which sections
+        passed. Loading one replaces the sections it names and leaves the rest alone.
+        Downloading nn.py is a different thing: that is the Python itself, ready to run
+        anywhere NumPy is installed, and it is not a file this page can load back.
       </p>
     </article>
   );

@@ -19,6 +19,9 @@ import types
 
 import numpy as np
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import workbench as wb  # noqa: E402
+
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 DATA = ROOT / "public" / "data" / "penguins.json.gz"
 
@@ -48,14 +51,24 @@ def load_module(path, name):
 
 
 def bootstrap():
+    """The panel's own code path: one file, exec'd once.
+
+    prep and prog are the same module, because standardize, one_hot and split
+    sit below train in the learner's file and train calls the pieces above it.
+    Loading them as two separate modules, which is what this did before the
+    workbench, benched a wiring the panel no longer has.
+    """
     course = load_module(ROOT / "src" / "python" / "course_helpers.py", "course")
     sys.modules["course"] = course
     loader = load_module(ROOT / "src" / "python" / "data_loader.py", "data_loader")
-    prep = load_module(ROOT / "src" / "exercises" / "prepare" / "solution.py", "your_prep")
-    prog = load_module(ROOT / "src" / "exercises" / "train" / "solution.py", "your_program")
+    document = wb.assemble([s["id"] for s in wb.SECTIONS], "solution",
+                           {"backprop": "seam"})
+    lib = types.ModuleType("your_code")
+    lib.__file__ = "your_code.py"
+    exec(compile(document, "your_code.py", "exec"), lib.__dict__)
     with gzip.open(DATA, "rb") as f:
         columns, rows = loader.load_penguins(f.read())
-    return course, prep, prog, columns, rows
+    return course, lib, lib, columns, rows
 
 
 def build(prep, columns, rows, features, scale):

@@ -305,9 +305,18 @@ its reason, plus the sentence that the small case is a sub-case and not a detour
   A "run my code" path executes the editor without tests. The test source is viewable in
   the page. Hidden test code breeds guessing.
 - **Every prompt carries a concrete experiment** tied back to an earlier chapter's
-  numbers, shipped as a copyable code block with Copy and Append-to-my-code buttons.
+  numbers, shipped as a copyable code block with Copy and Send-to-the-scratch-pad buttons.
   Never woven into a prose sentence: an experiment the reader must retype is an experiment
   they will not run.
+- **Decide early whether the exercises are one file or many, because retrofitting is a
+  course-wide change.** Many is simpler and isolates failure: a bug in chapter 1 can never
+  block chapter 9. One file is what a learner asks for once they have written five of
+  them, because it is the only shape where the thing they hold at the end is a thing.
+  If you choose one file, the invariant to protect from the first commit is that the
+  untouched file implements nothing: hand a chapter its predecessor's work through an
+  import and the import wins retroactively for every suite, so untouched skeletons start
+  passing. Running the suites cannot detect that. A mutation check can: sabotage a
+  provider, require its consumer's suite to notice. [casebook: 16]
 
 ### The two closing chapters
 
@@ -352,7 +361,9 @@ enforced mechanically, and retrofitting it is the most expensive pass in the pro
 FILL the commands; the list is fixed.
 
 - [ ] Typecheck and production build pass.
-- [ ] The exercise checker passes (solutions green, skeletons red for their own reason).
+- [ ] The exercise checker passes (solutions green, skeletons red for their own reason,
+      and if the exercises are one file: nothing passing when it is untouched).
+- [ ] Every panel that runs the learner's code has been run outside the browser.
 - [ ] Every bench whose numbers you touched has been re-run, and the prose matches it.
 - [ ] You looked at every string you added **in the real artifact**, not just in the diff.
 - [ ] Nothing scrolls sideways at FILL: the narrowest supported viewport (375px).
@@ -381,9 +392,10 @@ FILL: every content-critical library, pinned exactly.
 /src/brand/          the series brand layer (shared, see BRAND.md)
 /src/chapters/       one folder or file per chapter, plus interactives/
 /src/exercises/      per exercise: skeleton, tests, solution, prompt metadata
+/src/exercises/sections.json  the section table, if the exercises are one file
 /src/runtime/        the in-page language runtime (worker, protocol, client)
-/src/components/     shared UI: editor, exercise page, chapter building blocks
-/src/state/          progress persistence
+/src/components/     shared UI: editor, workbench, exercise card, chapter blocks
+/src/state/          the document format, and progress persistence
 /public/data/        committed datasets
 /tools/              build-time scripts, benches, and the exercise checker
 ```

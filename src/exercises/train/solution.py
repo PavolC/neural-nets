@@ -2,9 +2,6 @@
 # license, github.com/mnielsen/neural-networks-and-deep-learning), assembled
 # here out of the functions the learner wrote across Modules 2 to 7.
 
-import numpy as np
-from course import batch_gradient, cross_entropy_delta, feedforward, init_network, l2_step
-
 
 def accuracy(weights, biases, X, y):
     """Share of the columns of X that the network reads correctly."""
@@ -24,6 +21,8 @@ def train(sizes, X, Y, X_test, y_test, epochs, eta, lmbda, batch_size, rng):
             nabla_w, nabla_b = batch_gradient(
                 weights, biases, X[:, batch], Y[:, batch], cross_entropy_delta
             )
-            weights, biases = l2_step(weights, biases, nabla_w, nabla_b, eta, lmbda, n)
+            weights, biases = l2_step(
+                weights, biases, nabla_w, nabla_b, eta, lmbda, n
+            )
         history.append(accuracy(weights, biases, X_test, y_test))
     return weights, biases, history

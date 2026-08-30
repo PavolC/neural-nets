@@ -22,7 +22,7 @@ export const trainExercise: Exercise = {
     "train(sizes, X, Y, X_test, y_test, epochs, eta, lmbda, batch_size, rng) " +
       "builds a network and trains it, returning (weights, biases, history) " +
       "with one held-out score per epoch. Everything it calls is your own work " +
-      "from earlier modules, handed back through the course module: " +
+      "from earlier modules, sitting above this section in your file: " +
       "init_network draws the network, batch_gradient runs your backprop once " +
       "per column of a mini-batch and averages the slopes, cross_entropy_delta " +
       "is the blame it hands to BP1, and l2_step is the update.",
@@ -40,11 +40,9 @@ export const trainExercise: Exercise = {
       "thing actually learns, to the exact weights after four epochs.",
     "Once they pass, run the program on a problem of your own before pointing " +
       "it at the digits. This is the same three-band problem the tests use, " +
-      "trained for longer. Append it and press Run my code:",
+      "trained for longer. Send it to the scratch pad and run it:",
     {
       code:
-        "import numpy as np\n" +
-        "\n" +
         "x1 = np.linspace(-2.75, 2.75, 12)\n" +
         "X = np.vstack([x1, np.array([0.2, 0.8] * 6)])\n" +
         "label = lambda v: 0 if v < -1.0 else (1 if v < 1.0 else 2)\n" +

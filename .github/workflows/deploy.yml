@@ -32,7 +32,32 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # The checkers, in front of the build rather than beside it. Nothing ran them
+  # on the way to Pages before, so every assertion they make was enforced by
+  # whoever remembered to type the command. The one that matters most is the
+  # mutation check in check_exercises.py: no amount of running the test suites
+  # detects a section shadowing an earlier one, because everything stays green.
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: npm ci
+      - run: pip install numpy
+      - run: npm run check:doc
+      - run: python3 tools/check_exercises.py
+      - run: python3 tools/check_panels.py --fast
+      - run: python3 tools/check_brand.py
+      - run: python3 tools/brand_palette.py --check
+
   build:
+    needs: check
     runs-on: ubuntu-latest
     steps:
       # v5 of both actions for the Node 24 runtime: the v4 pair still works,

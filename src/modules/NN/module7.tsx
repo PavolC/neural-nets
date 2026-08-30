@@ -1,6 +1,6 @@
 import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
-import { ExercisePage } from "../../components/ExercisePage";
+import { ExerciseCard } from "../../components/ExerciseCard";
 import { crossEntropyExercise } from "../../exercises/cross-entropy";
 import { smartInitExercise } from "../../exercises/smart-init";
 import { l2Exercise } from "../../exercises/l2";
@@ -67,18 +67,33 @@ export function Module7() {
       </div>
       <p>
         Each fix is one line, and each one comes with a measurement of what it
-        bought. To keep them one-liners, the course now hands your Module 5
-        algorithm back to you with one step lifted out of it: the output
-        layer's blame, BP1, is now something you pass in.
+        bought. To keep them one-liners, one step comes out of the algorithm you
+        wrote in Module 5: the output layer's blame, BP1, becomes something you
+        pass in.
       </p>
       <div className="play-snippet">
-        <pre>{`from course import backprop
-nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
+        <pre>{`nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       </div>
       <p>
         Same four equations, same forward pass keeping receipts, same backward
-        sweep. Leave that last argument out and you get exactly what you wrote
-        in Module 5. The first exercise below writes a different one.
+        sweep. What changes is two lines of your own backprop, and this is the
+        first time the course asks you to go back and change working code. Add
+        the fifth argument to its signature, and let it supply BP1 when it is
+        given:
+      </p>
+      <div className="play-snippet">
+        <pre>{`def backprop(weights, biases, x, y, output_delta=None):
+    ...
+    if output_delta is None:
+        delta = (activations[-1] - y) * sigmoid_prime(zs[-1])
+    else:
+        delta = output_delta(activations[-1], y, zs[-1])`}</pre>
+      </div>
+      <p>
+        Leave the argument out at a call and your function does exactly what it
+        did in Module 5, so every test it passed then it passes now. The first
+        exercise below checks that edit before anything else, because everything
+        in this module and the three after it swaps a BP1 through that opening.
       </p>
 
       <SectionHeader id="m7-slowdown" title="Badly wrong, barely learning" />
@@ -184,7 +199,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       </div>
       <p>
         The same step raises the land by 0.069 in the first place and by 0.008
-        in the second, nine times less. That second spot is nearly the panel's
+        in the second, nine times less. That second spot is nearly the figure's
         saturated start, so the flat opening of the run above is this: the walk
         begins on a shelf.
       </p>
@@ -275,9 +290,8 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       <p>
         The same two rates predict the log in the last section. The
         neuron starts at 0.98201, so the gap is 0.98201 and the squash's slope
-        is the gap times 0.01799, or 0.01766 (not the 0.0196 in the table's
-        rounded 0.980 row: the fourth decimal of the answer moves it by a
-        tenth). Both knobs then take the same step, because the
+        is the gap times 0.01799, or 0.01766 (the table's 0.980 row is
+        rounded; at 0.98201 the slope is a tenth smaller). Both knobs then take the same step, because the
         input pinned at 1 makes the evidence just <M tex="w + b" />, and the
         run's step size is 0.15.
       </p>
@@ -326,8 +340,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       />
       <p>
         So the new rule has to charge the gap divided by the squash's slope,{" "}
-        <M tex="(a - y) / (a(1-a))" />, which is 2 at an answer of 0.5, 50 at
-        0.98, and 1000 at 0.999.
+        <M tex="(a - y) / (a(1-a))" />.
       </p>
       <p>
         Module 3's rule cannot be stretched to charge that, and the obstacle
@@ -458,16 +471,15 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         <SlowNeuron showCrossEntropy />
       </Figure>
       <p>
-        BP2 keeping its <M tex="\sigma'" /> is worth a sentence, because it
-        looks like an oversight. It is not. The <M tex="\sigma'" /> in BP1 was
-        the output neuron's own first link, and the new yardstick was built to
-        cover for that one. Every hidden neuron has a first link of its own,
-        and no choice of yardstick reaches inside it: the score is a function
-        of what comes out of the network, so only the last link into it can be
-        cancelled this way. A flat hidden neuron still swallows the blame
-        passing through it. Thirty flat hidden neurons are
-        the second complaint, and they can be measured before training takes a
-        single step.
+        BP2 keeping its <M tex="\sigma'" /> looks like an oversight. It is
+        not. The <M tex="\sigma'" /> in BP1 was the output neuron's own first
+        link, the one the new yardstick was built to cover. Every hidden
+        neuron has a first link of its own, and no yardstick reaches inside
+        the network: the score is a function of what comes out, so only the
+        last link into it can be cancelled this way. A flat hidden neuron
+        still swallows the blame passing through it. Thirty flat hidden
+        neurons are the second complaint, and they can be measured before
+        training takes a single step.
       </p>
       <Aside>
         <p>
@@ -496,7 +508,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         reminder that eta and the cost are not independent choices.
       </p>
 
-      <ExercisePage exercise={crossEntropyExercise} />
+      <ExerciseCard exercise={crossEntropyExercise} />
       <p>
         The panel below trains the digit reader three times from the same
         starting parameters, the same ones Module 5 used: 5,000 images, 8
@@ -527,10 +539,13 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
 
       <SectionHeader id="m7-birth" title="Saturated at birth" />
       <p>
-        Measure the hidden layer of Module 5's network before it takes a single
-        step. Thirty neurons, 5,000 training images, so 150,000 readings of
-        one neuron's evidence <M tex="z" /> on one image. Here is how they are
-        spread, and what the squash's slope is where they land.
+        Go back to Module 5's network as it stood before its first training
+        step: weights and biases freshly drawn at random, nothing learned yet.
+        Feed one image in and each of the thirty hidden neurons computes
+        its own evidence, thirty numbers. Do it for all 5,000 training images
+        and there are 150,000 of these readings, each one neuron's{" "}
+        <M tex="z" /> on one image. The table sorts them by distance from
+        zero.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
@@ -549,7 +564,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
               <td>share of the readings</td>
               <td>8.8%</td>
               <td>8.6%</td>
-              <td>16.4%</td>
+              <td>16.3%</td>
               <td>27.8%</td>
               <td>38.5%</td>
             </tr>
@@ -557,48 +572,81 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         </table>
       </div>
       <p>
-        The typical distance is 7.43, and the squash's slope has a median of 0.0020,
-        against the 0.25 a neuron has at its steepest. Almost 62 percent of
+        The typical distance, averaged over all 150,000 readings, is 7.43.
+        And the squash's slope, how much a neuron's answer moves when its
+        evidence moves, has a median of 0.0020 out there, against the 0.25 a
+        neuron has at its steepest. Almost 62 percent of
         the readings are flatter than 0.01. A hidden neuron in that state
         passes almost nothing backward and moves almost nowhere, and it is in
         that state before it has learned anything at all: the flatness is an
         accident of how the weights were drawn.
       </p>
       <p>
-        Why does the draw land the evidence out there, before anything has
-        been learned? Count the terms. A hidden neuron's evidence is a sum of
+        Where did those weights come from? Module 5 never said: the course
+        built that starting network for you, every weight an independent
+        random number, made the
+        way the exercise below has you make them (<code>rng.standard_normal</code>,
+        the standard bell).
+      </p>
+      <p>
+        Three choices hide in the draw. The weights are random
+        so the thirty neurons start different from one another: a layer that
+        starts as thirty copies of one neuron stays thirty copies, same
+        evidence on every image, same blame, same step. They are centred on
+        zero, positive and negative equally likely, because nothing is known
+        before training that favours pushing any evidence up rather than
+        down: 49.6 percent of this layer's 23,520 draws came out negative.
+        And they have a size of about 1, the typical draw sitting 0.8 from
+        zero and almost none past 3, for no examined reason: that width is
+        what the stock tool gives. The width is the choice on trial here.
+      </p>
+      <p>
+        So why does the evidence sit seven from zero when a typical draw is
+        0.8? Count the terms. A hidden neuron's evidence is a sum of
         784 of them, one per pixel, each a weight times a pixel value, plus the
         bias. Most pixels of a digit are black, and on average 103 of the 784
         are above half brightness (measured over the bundled images, and the
         number the exercise below builds its stand-in digits from). So about a
-        hundred weights contribute, each drawn from a bell of spread 1, meaning
-        a typical draw sits about 1 away from the bell's middle.
+        hundred weights contribute. Each
+        lit pixel pushes the evidence up or down by its weight times
+        its brightness: about a hundred pushes, each of size about 1.
       </p>
       <p>
-        A hundred random pushes of size about 1 do not cancel out to nothing,
-        and they do not add up to a hundred either. They pile up to about the
-        square root of the count: <M tex="\sqrt{100} = 10" />. That
-        square-root rule for adding up independent random quantities is the
-        one fact here taken on trust rather than derived, and it can at least
-        be checked. A spread runs a little larger than the plain average
-        distance quoted above (7.43 for these readings), because it squares the
-        far draws before averaging them. The exact version of the rule says the
-        spread of a weighted sum is the square root of the pixel values squared
-        and added up. For one bundled image those squares add to 87.4 on
-        average (fewer than the 103 lit pixels, because a digit's grey edge
-        pixels sit below 1), so the rule predicts{" "}
-        <M tex="\sqrt{87.4} = 9.35" /> against a measured spread of{" "}
-        <M tex="z" /> of 9.28.
+        Those hundred pushes could do three things. They
+        could cancel out to almost nothing, they could add up to about a
+        hundred, or they could land somewhere between. They land between, at a
+        predictable spot: about the square root of the count,{" "}
+        <M tex="\sqrt{100} = 10" />. That square-root rule for adding up
+        independent random quantities is the one fact here taken on trust
+        rather than derived, and the table above is its check: the readings
+        sit 7 or more from zero on a typical image, the rule's neighbourhood,
+        not the 1 of cancelling out or the 100 of plain adding.
       </p>
+      <Aside>
+        <p>
+          The check can be made exact. The rule's precise form uses a
+          particular kind of average, the spread: square every reading,
+          average the squares, take the square root. A spread runs a little
+          larger than the plain typical distance (9.28 against 7.43 for these
+          readings) because squaring counts the far draws more heavily. In
+          that form the prediction is sharp: the spread of a hidden neuron's
+          weighted sum is the square root of the image's pixel values squared
+          and added up, which averages 87.4 over the bundled images (fewer
+          than the 103 lit pixels, because a digit's grey edge pixels sit
+          below 1). The rule predicts <M tex="\sqrt{87.4} = 9.35" />; the
+          measured spread is 9.28.
+        </p>
+      </Aside>
       <p>
-        Nine is a long way out on a sigmoid. So the fix is to divide the pile
-        back down, and the rule gives the divisor: shrink each weight by the
-        square root of the number of inputs feeding its layer. For the hidden
-        layer that is <M tex="\sqrt{784} = 28" />.
+        Seven is already a long way out on a sigmoid, and half the readings
+        sit past it. So the fix is to divide the pile back down, and the rule
+        gives the divisor: shrink each weight by the square root of the number
+        of inputs feeding its layer. For the hidden layer that is{" "}
+        <M tex="\sqrt{784} = 28" />.
       </p>
       <Eq
-        tex="w = \frac{\text{a draw of spread } 1}{\sqrt{n_{\text{in}}}} \qquad\text{and}\qquad \frac{9.28}{28} = 0.33"
-        gloss="Every weight into a layer is drawn as before and then divided by the square root of that layer's input count, n-in: 28 for the 784 pixels, and the square root of 30 for the layer reading the 30 hidden neurons. The weighted sum's spread falls from 9.28 to 0.33, so the bias, still drawn at spread 1, becomes the larger term and the evidence lands within about 1 of zero."
+        tex="w = \frac{\text{a draw from the standard bell}}{\sqrt{n_{\text{in}}}} \qquad\text{and}\qquad \frac{9.28}{28} = 0.33"
+        gloss="Every weight into a layer is drawn as before and then divided by the square root of that layer's input count, n-in: 28 for the 784 pixels, and the square root of 30 for the layer reading the 30 hidden neurons. The pile's measured width (9.28, the aside's exact check) falls to 0.33, so the bias, still drawn from the standard bell, becomes the larger term and the evidence lands within about 1 of zero."
       />
       <p>
         Measured on the same 150,000 readings, the typical distance from zero
@@ -608,30 +656,34 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
       </p>
       <Aside>
         <p>
-          The biases keep their spread of 1, and after the division they are
+          The biases keep their full-size draw from the standard bell, and after
+          the division they are
           the bigger of the two terms in <M tex="z" />. Shrinking them too
           would push the evidence closer to zero still, and it is not worth
           doing: a bias is one number per neuron rather than one per wire, so
           nothing piles up in it, and starting every neuron at exactly the
           middle of the sigmoid removes some of the variety the layer starts
-          with. Nielsen's Chapter 3 leaves the biases at spread 1 as well, and
+          with. Nielsen's Chapter 3 leaves the biases undivided as well, and
           reports that the choice makes little difference either way.
         </p>
       </Aside>
 
-      <ExercisePage exercise={smartInitExercise} />
+      <ExerciseCard exercise={smartInitExercise} />
       <p>
         The comparison below is as controlled as this course gets. Same
         wiring, same cross-entropy blame, same sgd, same step size of 0.5,
         same shuffle, and the same random numbers from the same seed. One run
-        divides them; the other does not.
+        divides the drawn weights by the square root of the input count, the
+        divided start, which is what your init_network builds. The other
+        leaves the draw as it comes, the undivided start, which is exactly
+        the start Module 5 trained from.
       </p>
-      <Figure caption="Two starting points, fifteen epochs each. The table above the chart is the hidden layer measured before either run takes a step; the chart is test accuracy per epoch afterwards. The dashed line is Module 5's start, the solid line yours.">
+      <Figure caption="Two starting points, fifteen epochs each. The table above the chart is the hidden layer measured before either run takes a step; the chart is test accuracy per epoch afterwards. The dashed line is the undivided start, the solid line the divided one.">
         <InitStartPanel />
       </Figure>
       <p>
         The divided start reads 85.3 percent of the held-out digits after one
-        epoch, which is more than the other start reaches in its first four,
+        epoch, which is more than the undivided start reaches in its first four,
         and 92.1 percent after fifteen against 87.8. Module 5's own run, the quadratic
         cost at a step size of 3.0, reached 89.2 percent over the same fifteen
         epochs, so the network has gained about three points on where this
@@ -641,7 +693,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         One footnote on the two fixes together. Each cost can be given a step
         size that suits it, and at their best columns in the grid at the end of
         this module the two land close: 89.9 percent for the quadratic cost
-        against 89.3 for cross-entropy, both from Module 5's start. The
+        against 89.3 for cross-entropy, both from the undivided start. The
         cross-entropy cost reliably removes the slowdown, which is why it needs
         no cranked step size, and the division reliably removes a flat start.
         They are not competing.
@@ -754,18 +806,32 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         gloss="Multiply the square out, subtract the old value, and divide by the nudge: the rise per unit of nudge is 2w + h, which for a small nudge is 2w. Check it at w = 3 and h = 0.01, where the two squares are 9 and 9.0601: a rise of 0.0601 for a nudge of 0.01 is 6.01 per unit, against the 6 the rule predicts."
       />
       <p>
-        Two things follow. The new term contributes{" "}
-        <M tex="\lambda w / n" /> to that weight's slope, the 2 cancelling the
-        half. And Module 3's bookkeeping half in{" "}
-        <M tex="\tfrac12 (a - y)^2" /> is this same cancellation, the one
-        Module 4 cashed in when the output layer's slope came out as the plain
-        gap with no stray 2: halving a squared quantity makes its slope the
-        quantity itself. Put the new slope into the update rule and collect the
-        two terms in <M tex="w" />:
+        So the new term's slope, for one weight, is its coefficient times the
+        slope of the square:
       </p>
       <Eq
-        tex="w \;\leftarrow\; w - \eta \frac{\lambda}{n} w - \eta \frac{\partial C}{\partial w} \;=\; \Big( 1 - \frac{\eta \lambda}{n} \Big) w - \eta \frac{\partial C}{\partial w}"
-        gloss="The same update as Module 3's, with the weight multiplied by a number slightly below 1 before the usual step. That factor is the whole technique, and the name for it says what it does: weight decay. Biases keep the old rule exactly, since the new term does not mention them."
+        tex="\underbrace{\frac{\lambda}{2n}}_{\text{the term's coefficient}} \times \underbrace{2w}_{\text{the slope of } w^2} = \underbrace{\frac{\lambda w}{n}}_{\text{what it adds to the weight's slope}}"
+        gloss="The 2 from the square cancels the half in the coefficient, which is why the half was put there: whoever writes a squared term into a cost halves it, so the slope comes out clean."
+      />
+      <Aside>
+        <p>
+          The same trick has been under the course since Module 3. Its cost is{" "}
+          <M tex="\tfrac12 (a - y)^2" />, and the half was never explained: it
+          is there so that the 2 from squaring cancels on the way to the slope,
+          which is what Module 4 cashed in when the output layer's slope came
+          out as the plain gap with no stray 2. Halving a squared quantity
+          makes its slope the quantity itself.
+        </p>
+      </Aside>
+      <p>
+        A weight's whole slope is now the old one plus{" "}
+        <M tex="\lambda w / n" />. Put that into Module 3's update rule, and
+        the two pieces that both contain <M tex="w" /> collect into one
+        factor:
+      </p>
+      <Eq
+        tex="\begin{aligned} w &\leftarrow w - \eta \, \frac{\partial C}{\partial w} && \text{(Module 3's update)} \\[0.5em] w &\leftarrow w - \eta \frac{\lambda}{n} w - \eta \, \frac{\partial C}{\partial w} && \text{(the new slope joins)} \\[0.5em] w &\leftarrow \Big( 1 - \frac{\eta \lambda}{n} \Big) w - \eta \, \frac{\partial C}{\partial w} && \text{(collected)} \end{aligned}"
+        gloss="Top: the rule as it has been since Module 3, one weight stepped against its slope. Middle: the cost gained a term, so the slope gained one. Bottom: the same line with the two pieces that contain w collected into one factor. Everything after the factor is the top line again, so the whole change is that the weight is first multiplied by a number slightly below 1. That factor is the technique, and its name says what it does: weight decay. Biases keep the top line exactly, since the new term does not mention them."
       />
       <p>
         Put numbers in it. The run below uses <M tex="\eta = 0.5" />,{" "}
@@ -780,19 +846,20 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         the thousand is not pulled back hard enough.
       </p>
 
-      <ExercisePage exercise={l2Exercise} />
+      <ExerciseCard exercise={l2Exercise} />
       <p>
-        Both runs in the panel go through your l2_step, one with{" "}
-        <M tex="\lambda = 0" />, which is your Module 3 update exactly, and one
-        with the lambda you pick. Same 1,000 images, same eighty epochs, same
-        shuffle. The starting point is a control too, because the answer
-        depends on it.
+        The panel below runs the whole experiment in one press: both starting
+        points, each at <M tex="\lambda = 0" /> (your Module 3 update
+        exactly), <M tex="\lambda = 1" /> and <M tex="\lambda = 5" />. Six
+        runs, every one through your l2_step, same 1,000 images, same eighty
+        epochs, same shuffle. The starting point is in the experiment because
+        the answer depends on it.
       </p>
-      <Figure caption="The same 1,000-image run, with and without weight decay. Switch between accuracy (solid for the images trained on, dashed for the held-out ones) and the cost on the held-out digits. The starting point matters more than lambda does, so try both settings of it.">
+      <Figure caption="All six runs, drawn as they finish. Every line is the held-out digits: hue is the starting point, and the dash pattern is the lambda (solid none, dashed 1, dotted 5). The training-image accuracies are in the table, and the comparison the section makes, decay against none from each start, sits in one place. The starting point matters more than lambda does.">
         <RegularizePanel />
       </Figure>
       <p>
-        Two readings, and they disagree. From your divided start, weight decay
+        Two readings, and they disagree. From the divided start, weight decay
         at <M tex="\lambda = 1" /> leaves the held-out accuracy where it was,
         85.7 percent averaged over the last twenty epochs against 86.4 without
         it. (Both are averages over the last twenty epochs of the chart, not
@@ -807,8 +874,8 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         and stopped becoming more confident while reading the same digits.
       </p>
       <p>
-        Switch the start to Module 5's undivided draw and the same comparison
-        answers differently. Those weights begin at a total of 23,538, since
+        The same comparison, read from the undivided start, answers
+        differently. Those weights begin at a total of 23,538, since
         that is what not dividing by 28 means, and without decay they stay
         there: 25,528 after eighty epochs, with the held-out accuracy stalled
         at 77.8 percent. With <M tex="\lambda = 1" /> the decay pulls them down
@@ -823,9 +890,8 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         of this cycle is a narrow one: decay reliably holds the weights and the
         held-out cost down, and it buys accuracy where something else was
         leaving the weights too large. Lambda is one more number found by trying, and the
-        panel's other settings are there to be tried:{" "}
-        <M tex="\lambda = 5" /> holds the weights down hard enough that the
-        network reads fewer digits.
+        two <M tex="\lambda = 5" /> runs show the far end of it: weights held
+        down hard enough that the network reads fewer digits.
       </p>
 
       <SectionHeader id="m7-more" title="The rest of the toolbox" />
@@ -850,14 +916,14 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
           </thead>
           <tbody>
             <tr>
-              <td>quadratic cost, Module 5's start</td>
+              <td>quadratic cost, the undivided start</td>
               <td>70.8%</td>
               <td>79.4%</td>
               <td>89.2%</td>
               <td>89.9%</td>
             </tr>
             <tr>
-              <td>cross-entropy cost, Module 5's start</td>
+              <td>cross-entropy cost, the undivided start</td>
               <td>87.8%</td>
               <td>89.3%</td>
               <td>87.6%</td>
@@ -902,32 +968,27 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         training images.
       </p>
       <p>
-        That last rule needs one more turn of the screw, and this section is
-        where it bites. The overfitting cycle showed what happens to a number
-        that descent is allowed to optimize: the training cost fell to 0.0093
-        and stopped meaning anything about unseen digits. A search does the same
-        thing by hand. Sixteen runs were scored on those thousand held-out
-        digits and the best was kept, so the winning 92.3 percent is the best of
-        sixteen tries against that particular thousand, not what the network
-        would score on a fresh one. Some of that number is the fix and some of
-        it is the choosing.
+        That last rule needs one more turn of the screw. The overfitting cycle
+        showed what happens to a number descent is allowed to optimize; a
+        search does the same thing by hand. These sixteen runs were scored on
+        the thousand held-out digits and the best was kept, so the winning
+        92.3 percent is the best of sixteen tries against that particular
+        thousand, not what the network would score on a fresh one. The last
+        section measured the room that leaves: a point of wobble between
+        shuffles with nothing changed at all, and picking the best of sixteen
+        pockets some of that wobble as if it were improvement. Some of the
+        number is the fix, some is the choosing, and a repeated tenth of a
+        point is not worth chasing.
       </p>
       <p>
-        The standard repair is a third split. Hold out two sets rather than one:
-        a validation set you may look at as often as you like, because choosing
-        against it is what it is for, and a test set you look at once, at the
-        end, to report. Everything in the search above then happens on
-        validation data, and the test number is spent last and only once.
-      </p>
-      <p>
-        This course has one held-out thousand and uses it for both jobs, so its
-        quoted numbers are a little generous, and the last section measured
-        how generous. Three shuffles of one unchanged setting landed between
-        85.4 and 86.4 percent there: a point of wobble with nothing
-        changed at all. Picking the best of sixteen runs pockets some of that
-        wobble as if it were an improvement, which is why a repeated tenth of a
-        point is not worth chasing and why the number to trust is one scored on
-        digits nothing was chosen against.
+        The standard repair is a third split. Hold out two sets rather than
+        one: a validation set you may look at as often as you like, because
+        choosing against it is what it is for, and a test set you look at
+        once, at the end, to report. The search above then happens on
+        validation data, and the test number is spent last and only once. This
+        course has one held-out thousand doing both jobs, so its quoted
+        numbers are a little generous, and the number to trust anywhere is one
+        scored on digits nothing was chosen against.
       </p>
       <p>
         Four more techniques exist for the overfitting problem, named here and
@@ -953,7 +1014,7 @@ nabla_w, nabla_b = backprop(weights, biases, x, y, output_delta)`}</pre>
         items={[
           "A descent step reaches the score through two links: the knobs move the answer, and the answer moves the score. BP1 multiplies their two rates, the squash's slope and the gap, which is why blame is just how steeply the land rises under a neuron's knobs. Where an output neuron is confidently wrong the first link goes slack: the blame peaks at 0.148 two thirds of the way wrong and falls away past it, and at an answer of 0.999 it is 0.001.",
           "The first link is the neuron's own machinery and is not open to change; the second is the yardstick, and it is. The quadratic yardstick has a ceiling of 0.5 per output, so its rate can never grow enough to cover for a slack first link. The cross-entropy cost charges -ln of the confidence in the right answer, which rises without limit, at a rate of exactly the gap divided by the squash's slope. The two multiply out to the gap everywhere, so BP1 becomes delta = a - y with nothing struck out. BP2 keeps its own sigma-prime, which is a hidden neuron's own first link and out of the yardstick's reach.",
-          "Weights drawn at spread 1 pile up over about a hundred lit pixels to an evidence spread of 9.3, leaving 62 percent of hidden neurons flatter than 0.01 before training starts. Dividing each layer's weights by the square root of its input count puts the typical evidence within 1 of zero, with no neuron below 0.01, and is worth 4.3 points of accuracy against the same cost started undivided.",
+          "A hundred standard-bell weights pile up to about the square root of a hundred, so a hidden neuron's evidence starts 7 or more from zero on a typical image, leaving 62 percent of the readings flatter than 0.01 before training starts. Dividing each layer's weights by the square root of its input count puts the typical evidence within 1 of zero, with no neuron below 0.01, and is worth 4.3 points of accuracy against the same cost started undivided.",
           "Training on 1,000 images reaches 100 percent on those images while the held-out accuracy stops improving and the held-out cost turns around and rises: the network is buying confidence, not recognition. Weight decay multiplies every weight by a factor just under 1 each step, which reliably holds the weights and the held-out cost down, and buys accuracy only where something else left the weights too large.",
           "Every constant here was found by trying, and the grid shows the step size mattering more than the cost. Module 8 takes the four equations into deep networks and finds a limit that no choice of cost fixes.",
         ]}

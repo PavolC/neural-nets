@@ -1,9 +1,6 @@
 # Reference solution, adapted from Michael Nielsen's network.py (MIT license,
 # github.com/mnielsen/neural-networks-and-deep-learning).
 
-import numpy as np
-from course import quadratic_cost, gradient
-
 
 def sgd_step(weights, biases, X, Y, eta):
     """One gradient descent step on the batch (X, Y)."""
@@ -20,5 +17,7 @@ def sgd(weights, biases, X, Y, eta, epochs, batch_size, rng):
         idx = rng.permutation(n)
         for k in range(0, n, batch_size):
             batch = idx[k : k + batch_size]
-            weights, biases = sgd_step(weights, biases, X[:, batch], Y[:, batch], eta)
+            weights, biases = sgd_step(
+                weights, biases, X[:, batch], Y[:, batch], eta
+            )
     return weights, biases

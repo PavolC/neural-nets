@@ -34,8 +34,8 @@ export const smartInitExercise: Exercise = {
     "Once the tests pass, measure the thing this exercise is for: how far " +
       "from zero the hidden layer's evidence lands under each start. The " +
       "inputs here are stand-in digits, 103 pixels lit and the rest dark, " +
-      "103 being the bundled images' average. Append this and press Run my " +
-      "code:",
+      "103 being the bundled images' average. Send this to the scratch pad and " +
+      "run it:",
     {
       code:
         "from course import sigmoid\n" +
@@ -45,21 +45,21 @@ export const smartInitExercise: Exercise = {
         "for k in range(200):\n" +
         "    X[pixels.choice(784, size=103, replace=False), k] = 1.0\n" +
         "\n" +
-        "plain = np.random.default_rng(8)               # Module 5's start\n" +
+        "plain = np.random.default_rng(8)               # the undivided start, Module 5's\n" +
         "plain_w = [plain.standard_normal((30, 784)), plain.standard_normal((10, 30))]\n" +
         "plain_b = [plain.standard_normal((30, 1)), plain.standard_normal((10, 1))]\n" +
         "\n" +
         "yours_w, yours_b = init_network([784, 30, 10], np.random.default_rng(8))\n" +
         "\n" +
-        "for name, w, b in ((\"Module 5's start\", plain_w, plain_b), (\"your start\", yours_w, yours_b)):\n" +
+        "for name, w, b in ((\"the undivided start\", plain_w, plain_b), (\"the divided start\", yours_w, yours_b)):\n" +
         "    z = w[0] @ X + b[0]                        # every hidden neuron, every image\n" +
         "    steep = sigmoid(z) * (1 - sigmoid(z))\n" +
         '    print(name, "-> typical distance from zero:", round(float(np.abs(z).mean()), 2),\n' +
-        '          " median steepness:", round(float(np.median(steep)), 4),\n' +
+        '          " median squash slope:", round(float(np.median(steep)), 4),\n' +
         '          " share flatter than 0.01:", round(float((steep < 0.01).mean()), 3))',
     },
-    "Module 5's start reports a typical distance of 8.27 and a median " +
-      "steepness of 0.0009, with 66 percent of the readings flatter than " +
+    "The undivided start reports a typical distance of 8.27 and a median " +
+      "squash slope of 0.0009, with 66 percent of the readings flatter than " +
       "0.01. Yours reports 0.79 and 0.2206, with none at all below 0.01. " +
       "Same random numbers, same images; the only change is the division. " +
       "For the real bundled digits the two distances are 7.43 and 0.78: a " +

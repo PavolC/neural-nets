@@ -26,6 +26,14 @@ editor contents never sent; see `src/analytics.ts`).
 
 - **Never write solution logic into skeleton files.** Solutions live only in
   `solution.py`. Skeletons contain stubs, docstrings, and shape contracts only.
+  The invariant is now about the assembled file, not one skeleton: **an untouched
+  workbench must implement nothing.** Concatenating the nine untouched skeletons
+  in their pre-workbench state passed 19 of 52 tests, because each opened with a
+  line like `from course import sigmoid` and the harness execs the document
+  before the tests import from it, so the last binding won retroactively for
+  every suite. Running the suites cannot detect that; only the mutation check in
+  `tools/check_exercises.py` (assertion G) can, which is why it exists and why
+  its docstring says so.
 - **Attribution and license requirements must never be removed.** The app footer, README,
   and LICENSE carry the CC BY-NC 3.0 attribution to Michael A. Nielsen's *Neural Networks
   and Deep Learning* (Determination Press, 2015). The **course content** follows its
@@ -91,14 +99,33 @@ editor contents never sent; see `src/analytics.ts`).
   are short and always interleaved with components, so MDX would add a dependency
   without saving friction. Exercise prompts and hints live in each exercise's
   `index.ts`.
+- **The exercises are one growing file, not nine** (the workbench; decided after
+  the course shipped, on the primary learner's ask for something that felt
+  cohesive). `src/exercises/sections.json` is the section table both the app and
+  the tools read: eleven sections in course order, the exact marker line, what
+  each provides, what it requires, which given sections arrive with it, and which
+  names its own tests examine directly. `src/state/workbenchDoc.ts` owns the
+  format and holds the only marker regex; `tools/workbench.py` reads that regex
+  out of it rather than restating it. Markers are metadata for editing and
+  reporting, never for running: every run, download and panel takes the whole
+  string, so a mangled marker degrades features and cannot break execution or
+  lose code. Two sections are **given** (`given-cost`, `given-batch`), marked
+  "written for you", which is what lets the file import NumPy and nothing else.
 - **Exercise test contract**: tests import the learner's code via
-  `from submission import ...`; helpers the learner built in earlier modules are
-  provided via `from course import ...` (defined in `src/python/course_helpers.py`),
-  so skeletons never contain prior solutions. Test functions are named `test_*`, run
-  in definition order, and fail by raising `AssertionError` with a teaching message;
-  the first docstring line is the test's display title. Test fixtures are hardcoded
+  `from submission import ...`, which is now the whole document exec'd as one
+  module. A section the learner has not touched is **lent**: the course sets its
+  own copy of that section's names onto `submission` for the run, and the panel
+  says what it borrowed. Never a name the target section owns, and never one the
+  target's own tests examine (`checks` in the section table; Module 7's seam test
+  is the only case). Test functions are named `test_*`, run in definition order,
+  and fail by raising `AssertionError` with a teaching message; the first
+  docstring line is the test's display title. Test fixtures are hardcoded
   literals (never regenerated at test time from random streams), so results cannot
-  drift between NumPy versions.
+  drift between NumPy versions. An `AssertionError` carries no line number, so a
+  wrong upstream function cannot be located from the failure itself: on a failing
+  run the panel runs the upstream sections' own suites, earliest first, and stops
+  at the first that fails. That is sound because a section that breaks its
+  dependants always breaks its own suite too.
 - **Pretrained weights are gzipped JSON** (`pretrained_weights.json.gz`), not npz:
   the Module 2 diagram reads the weights in JS (weight-image patches, edge colors)
   and Python reads the same file for the payoff run, and JS has no npz parser.
@@ -124,18 +151,40 @@ editor contents never sent; see `src/analytics.ts`).
   error analysis), and carries the where-to-go-next list that used to end Module
   8. Neither it nor Module 10 follows a Nielsen chapter, so neither has a `<Recap>`
   or a "Go deeper" link; everything else about a module page applies to both.
-- **`course_helpers.py` carries Module 7's three functions too** (`init_network`,
-  `l2_step`, `cross_entropy_delta`), so Module 9's capstone can import the
-  learner's earlier work the way every exercise does. Module 9's panel then
-  patches the learner's own saved versions over them before running their loop,
-  so the run really is theirs.
-- **`course.backprop` carries a seam for BP1** (added in Module 7): its signature is
-  `backprop(weights, biases, x, y, output_delta=None)`, the learner's Module 5
-  algorithm with the output layer's blame lifted into an argument (default
-  `quadratic_output_delta`, which reproduces Module 5 exactly). This is what keeps
-  Module 7's three exercises one-line diffs instead of rewrites; `batch_gradient`
-  beside it is the per-example-average adapter Module 5's panel used inline. Module 7's
-  panels swap the delta rather than the algorithm, and say so in the prose.
+- **`course_helpers.py` is now only what gets lent.** Its seven reference copies
+  (`sigmoid`, `feedforward`, `sigmoid_prime`, `backprop`, `cross_entropy_delta`,
+  `init_network`, `l2_step`) exist so a reader who opens Module 9 first gets a run
+  rather than a `NameError`. Nothing imports from it any more: no skeleton, no
+  solution, and no panel. Three test suites still reach into it from inside a test
+  body, deliberately and with a comment saying why, because a correctness
+  guarantee whose oracle shares the code under test is not a guarantee: Module 3's
+  downhill checks, Module 5's gradient check and Module 7's. The prompts' play
+  snippets also import from it by name (`from course import gradient`) for any
+  name owned by a section their exercise does not require, because the scratch
+  pad lends only the current section's requires closure and a snippet has to run
+  for a reader who skipped a module.
+- **A payoff panel waits for everything its projection runs, not only its own
+  page's exercises.** A pass can be earned with borrowed names (open Module 3
+  first and sgd goes green with `feedforward` on loan), but the panels exec the
+  projection raw, with no lending, so a gate that asks only "did sgd pass?"
+  hands the panel a file with no `feedforward` in it and the run dies on a bare
+  `AttributeError`. `codeReady` therefore walks the requires closure plus the
+  given sections that arrive with it (`withGivens`, mirrored by `with_givens`
+  in `tools/workbench.py`), and a locked note names what is actually missing
+  through one shared phrase map (`interactives/lockedBy.ts`) instead of a
+  hand-kept list per panel that could claim to wait on a finished exercise.
+- **Module 7 asks the learner to edit their own Module 5 backprop** (the BP1
+  seam). It is the first time the course asks anyone to change working code, and a
+  single file is the only design where that is a two-line edit rather than an
+  impossibility. The prompt ships the two lines; there is deliberately no button
+  that splices them, because a splice into a function the learner has written
+  themselves is the one edit that could destroy work. The adapter written for them
+  in Module 5 calls `backprop` with four arguments until a replacement BP1 is
+  actually handed over, so nothing needs the edit before Module 7, and
+  `test_backprop_takes_the_blame_argument` in the cross-entropy suite names the
+  section and the lines when it is missing. `src/exercises/backprop/seam.py` is the
+  course's copy of the post-edit state, used only by the checker to prove the edit
+  keeps every Module 5 test green.
 
 - **The visual identity is a shared series layer, not this course's stylesheet**
   (added after the course was finished, when a second course became likely). `src/brand/`
@@ -680,10 +729,141 @@ the footer. Rules that follow from it:
   sets its own transparent background: that is a bug this course has already shipped once.
   The primary treatment is reached as `button:not([class])`, which cannot match a variant,
   because every variant here carries a class.
+- **The panel is one scroll, not two.** It used to be an editor with its own
+  scroller above a results pane with its own scroller: two keyholes, two
+  scrollbars, and neither half able to use the other's space. Now the chrome
+  (head, section rail, controls) is fixed at the top and everything below it
+  flows down a single column, code then output then verdict, the way a page
+  does. The editor has no height of its own (`height: auto`, and
+  `overflow: visible` on `.cm-scroller`), so it grows to its content and the
+  panel is what scrolls. CodeMirror still virtualizes against the scroll
+  ancestor: measured on the full 507-line file, 49 of those lines are in the
+  DOM at a time and the whole 14,000px scrolls in under a second.
+  Two consequences. The controls are panel chrome rather than something inside
+  the scroll, so they are on screen however deep in the file the reader is; and
+  a finished run scrolls its results into view, because the answer would
+  otherwise land at the bottom of a column thousands of pixels long. Nothing
+  else in the panel is allowed to move the reader.
+- **One chrome row, one Run button, and a passing check on one line.** The
+  panel's chrome was three rows: a title with Download and Close, a rail of
+  section chips, and a controls row. It is one now, 54px against 151: the
+  file's name, the one button the loop uses, a picker naming the section that
+  button is pointed at, the run's status, and a More disclosure holding
+  Download, Reset and Undo.
+  **The second run button moved onto the scratch pad**, which is the thing it
+  actually runs. "Run my code" sat beside "Run tests" as if the two were a
+  choice to make every time, when one is the loop and the other is an aside;
+  the name also implied the other button did not run your code. They are not
+  merged, and should not be: the tests are the expensive path (Module 5's
+  gradient check nudges 54 parameters twice), so making every print-a-value
+  experiment pay for them would be a real regression. A cell owning its own run
+  button is the notebook habit worth copying. Sending a snippet from a prompt
+  opens the scratch pad and scrolls to it, because code sent somewhere the
+  reader cannot see was not sent.
+  **What the run is saying gets a line of its own**, under the head rather than
+  in it. In the head it was the sixth thing across the row and about 50px wide,
+  so "Running tests..." rendered as "R...". The strip is 31px and is there only
+  during a run, so the chrome at rest is still one row, and the code moves by
+  that much when a run starts, which is the smallest price that leaves the
+  message readable.
+  Passing checks fold into "N checks passed": six of them at full size pushed
+  the failures and the output most of a screen down, and a receipt is not a
+  finding. Failures never fold. The borrowed-names line appears only when
+  something really was borrowed: "run entirely on your own code" is the
+  ordinary case, and a line saying nothing happened is noise under every
+  passing run. Output is one pool, headed with the section the
+  run was for, because one run execs the whole file and pretending otherwise
+  would be a lie about what just happened.
+- **The workbench borrows three things from a notebook, and not the fourth.**
+  Mod-Enter runs the tests and Shift-Enter runs the scratch pad, because that is
+  what anybody who has used a notebook reaches for first; both need
+  `Prec.highest`, since `basicSetup` binds Mod-Enter to "insert a blank line"
+  and silently swallowed it. Every section line carries a run marker in the
+  gutter, so the control for "run this piece" sits next to the piece. The
+  picker carries each section's state, which is what a notebook's execution
+  count is for. What is deliberately not borrowed is independent cells: this is one
+  file that runs top to bottom and downloads as an `nn.py`, and per-cell state
+  would cost exactly the thing the whole design is for.
+- **The section bar and the panel head share one height, `--bar-h`.** Both sit
+  at the top of the screen when the panel is docked, so their bottom rules have
+  to land on one line. They were 53.4px and 57.1px, and four pixels apart reads
+  as a misalignment rather than as two different things. The in-page jump
+  offset is keyed to the same token, so the offset that clears the bar cannot
+  drift from the bar.
+- **The section list is a picker, not a rail.** Eleven chips in a row that
+  pans showed four of them at the dock's own width, which is a keyhole onto the
+  course rather than a picture of it, and it cost 50px of every screen to do
+  that. The same eleven, with the same state marks, now open from the head: all
+  of them at once, and no permanent height. Three details are load-bearing. The
+  menu is anchored to the panel rather than to its own summary, because the
+  summary sits after the file's name and the Run button, so a menu hung off its
+  left edge ran 163px past the panel's right edge at the narrow dock. A flex
+  item cannot shrink below its content without `min-width: 0`, so without it on
+  `.wb-section-name` the longest label (38 characters) pushes the state clean
+  off the menu. And a given section says whether it is in the file and nothing
+  else, because it has no tests and "not passing yet" would be a lie about it.
+  Below 600px of panel the picker takes a row of its own, asked of the panel
+  with a container query and not of the window, because the reader sets that
+  width by dragging. Everything else in the head is fixed width and comes to
+  418px with the gaps and the padding, so under 600 there is nothing left to
+  name a section in: measured, the picker was a 39px box at the narrowest dock
+  and a 20px one on a 390px phone, showing one letter of the name, which is the
+  one thing in that row a reader needs to read. The threshold counts Stop,
+  which is only on screen during a run, so the head cannot change height under
+  a reader mid-run.
+  The chrome that remains is `flex: 0 0 auto`, the head and the repair strip:
+  left shrinkable, in a column whose editor wants every pixel, Firefox
+  collapsed the old rail to the height of its own scrollbar with nothing
+  visible in it, and Chromium did not, which is why the rule is written down
+  rather than trusted.
+- **The hints and the test code live in the panel, beside the code they
+  describe.** They sat in the module page under the prompt, which is where they
+  were written before there was a panel: reference material for while you are
+  coding, a scroll away from the code. The prompt stays in the reading column
+  at the measure, because it is course prose and is read, and several hundred
+  words at panel width beside prose at 646px is the "three widths read as an
+  accident" failure. Nothing is re-parented in the move: the prompt paragraphs
+  stay direct children of `.exercise`, so the stylesheet's measure rules keep
+  matching them and nine exercises do not silently widen. The output panel's
+  heading carries **Back to the code**, because one scroll means the code is
+  above whatever a run just produced, sometimes thousands of pixels above.
+- **The workbench is the one thing allowed to move the column, and only because
+  the reader moved it.** `.shell` holds the reading column away from a fixed panel
+  with `padding-right: var(--dock-w)`. Padding, not a grid track: a `1fr` track
+  takes a min-content floor from the widest table in the course, so `minmax(0,1fr)`
+  would be mandatory, and a grid item stretches by default, which silently defeats
+  `position: sticky` on the section bar inside it. The dock opens at exactly the
+  width left over beside a full-width column, so a first open moves nothing;
+  dragging past that narrows the column, down to 752px, which is the widest thing
+  in the measure set. Closed by default on a first visit, so the front page a
+  stranger lands on is byte for byte the page it always was.
+  Two consequences are load-bearing. `--fig-scale` stops being a literal: the
+  shell publishes `--col-content` and `--fig-scale` on the root, computed as the
+  measured content box over 817 units, which is the same calibration the comment
+  always claimed and is now true at more than one width. And three rules that
+  asked the window how wide it is (the gutter nav, the sticky bar, the offset that
+  clears it) move onto one `data-toc` predicate that asks how much room is left
+  beside the column, keyed together so they cannot disagree; the tab strip's fold
+  to the picker gets the same treatment through `data-narrow`, overriding
+  `brand.css` from `styles.css` rather than editing the shared layer.
+  Below 1360px there is no dock, only a modal sheet. That is half of what the
+  panel is for, denied on small screens, and it is stated rather than dressed up:
+  no width under 1360 fits prose at the measure and code at a readable column
+  side by side.
 - **The editor is themed from brand tokens, in `CodeEditor.tsx`.** Its chrome comes from
   the surfaces and the accent; its token colours come from the accent family, so syntax
   highlighting is legible by construction (every hue in that family clears 6:1 on the page
   ground) rather than by eye. Do not hand-pick a syntax colour: take one of the nine.
+  **A background painted on a line is an alpha tint, never `--accent-wash` or
+  `--accent-panel`.** Those two mix with the page ground, so they are opaque, and
+  CodeMirror draws the selection in a layer behind the content: an opaque line
+  background hides it completely. With the section highlight covering every line of
+  the section the reader is working in, the selection was invisible exactly where
+  they type. The selection rule also spells out the whole child chain CodeMirror's
+  own base theme uses (`&.cm-focused > .cm-scroller > .cm-selectionLayer
+  .cm-selectionBackground`), because a shorter selector loses to it on specificity
+  and the selection comes out in CodeMirror's default lavender.
+  `tools/check_run_path.mjs` checks both from the browser.
 - **KaTeX keeps its own face, and that is a choice.** Computer Modern is what mathematics
   is set in, and matching it to the prose serif would make the notation harder to read, not
   more consistent. It is the one type system on the page that is deliberately not the
@@ -706,10 +886,12 @@ tokens from the start.
 /src/start/          the front door: what the course is, the outline, stored progress
 /src/modules/NN/     one folder per module: content, interactives/
 /src/exercises/      per exercise: skeleton.py, tests.py, solution.py, index.ts (prompt, hints)
+/src/exercises/sections.json  the section table, read by the app AND by tools/
+/src/exercises/given/         the two sections written for the learner
 /src/python/         shared Python: harness, course helpers, gradient checker, data loader
 /src/runtime/        Pyodide Web Worker, message protocol, shared worker client
 /src/components/     shared UI: CodeEditor (CodeMirror), ExercisePage
-/src/state/          localStorage progress persistence (gn:v1: key prefix)
+/src/state/          the workbench document, its format, and progress persistence
 /src/m0/             Milestone 0 training demo UI
 /public/data/        mnist_subset.bin.gz, pretrained_weights.json.gz, penguins.json.gz
 /tools/              build-time scripts (MNIST preprocessing, weight pretraining)
@@ -722,10 +904,36 @@ tokens from the start.
 - `npm run build`: static production build (deployable to any static host).
 - `python3 tools/make_mnist_subset.py`: regenerate `public/data/mnist_subset.bin.gz`
   (pure stdlib, downloads MNIST from a public mirror, deterministic output).
-- `python3 tools/check_exercises.py`: run every exercise's tests against its
-  reference solution (all must pass) and against its skeleton (all must fail,
-  with the skeleton's own NotImplementedError). Same harness the app runs, so
-  it gates a change to any test, skeleton or solution. Needs NumPy.
+- `npm run check`: the five checkers, which is what CI runs before it builds.
+- `npm run check:doc`: the document format's own invariants, run against
+  `src/state/workbenchDoc.ts` itself in Node. `check_exercises.py` can only test
+  the documents this repo assembles; this tests the ones the editor produces.
+  The difference is where a bug was: replacing a section put its text back
+  trimmed, so the next marker landed at the end of the previous section's last
+  line, where the anchored regex cannot see it, and that section vanished into
+  its neighbour with no error anywhere. `workbenchDoc.ts` therefore imports
+  nothing a bundler has to resolve, which is why the prelude lives in
+  `workbench.ts` and `assemble()` takes it as an argument.
+- `python3 tools/check_exercises.py`: the workbench, under twelve lettered
+  assertions (the file's docstring lists them). It assembles the document, checks
+  it compiles at every prefix a learner can reach, that no section rebinds a name
+  an earlier one owns, that the solved document passes all 54 tests and the
+  untouched one passes none, that lending cannot make an unwritten exercise pass,
+  and that markers round-trip. Assertion G is the mutation check and is the one
+  that looks redundant and is not: sabotage a provider, require its consumer's
+  suite to notice. `--quick` skips it. Needs NumPy.
+- `python3 tools/check_panels.py`: every payoff panel's Python, lifted out of its
+  `.tsx` and run against the assembled document with the worker's globals in
+  place. Nothing else checks that these run, and several modules quote their
+  numbers. `--fast` caps every loop at two epochs. Needs NumPy.
+- `node tools/check_run_path.mjs`: what the panel does with a verdict once it
+  has one, driven in a real browser against a stub Pyodide (the worker needs
+  exactly four methods from it). Covers the message protocol, the run state,
+  every shape of result, the borrowed-names line, the output stream, all three
+  ways to start a run, and that a selection in the editor is visible on every
+  ground the theme paints. Not in `npm run check` and not in CI: it wants a
+  browser and a dev server, which is the bargain `make_og_image.sh` already
+  makes.
 - `python3 tools/make_penguins.py`: regenerate `public/data/penguins.json.gz`
   (Module 10's dataset; stdlib only, downloads from the palmerpenguins repo,
   deterministic output, written RAW because preparing it is the exercise).
