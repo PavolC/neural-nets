@@ -199,7 +199,7 @@ export function Module7() {
       </div>
       <p>
         The same step raises the land by 0.069 in the first place and by 0.008
-        in the second, nine times less. That second spot is nearly the panel's
+        in the second, nine times less. That second spot is nearly the figure's
         saturated start, so the flat opening of the run above is this: the walk
         begins on a shelf.
       </p>
@@ -290,9 +290,8 @@ export function Module7() {
       <p>
         The same two rates predict the log in the last section. The
         neuron starts at 0.98201, so the gap is 0.98201 and the squash's slope
-        is the gap times 0.01799, or 0.01766 (not the 0.0196 in the table's
-        rounded 0.980 row: the fourth decimal of the answer moves it by a
-        tenth). Both knobs then take the same step, because the
+        is the gap times 0.01799, or 0.01766 (the table's 0.980 row is
+        rounded; at 0.98201 the slope is a tenth smaller). Both knobs then take the same step, because the
         input pinned at 1 makes the evidence just <M tex="w + b" />, and the
         run's step size is 0.15.
       </p>
@@ -341,8 +340,7 @@ export function Module7() {
       />
       <p>
         So the new rule has to charge the gap divided by the squash's slope,{" "}
-        <M tex="(a - y) / (a(1-a))" />, which is 2 at an answer of 0.5, 50 at
-        0.98, and 1000 at 0.999.
+        <M tex="(a - y) / (a(1-a))" />.
       </p>
       <p>
         Module 3's rule cannot be stretched to charge that, and the obstacle
@@ -473,16 +471,15 @@ export function Module7() {
         <SlowNeuron showCrossEntropy />
       </Figure>
       <p>
-        BP2 keeping its <M tex="\sigma'" /> is worth a sentence, because it
-        looks like an oversight. It is not. The <M tex="\sigma'" /> in BP1 was
-        the output neuron's own first link, and the new yardstick was built to
-        cover for that one. Every hidden neuron has a first link of its own,
-        and no choice of yardstick reaches inside it: the score is a function
-        of what comes out of the network, so only the last link into it can be
-        cancelled this way. A flat hidden neuron still swallows the blame
-        passing through it. Thirty flat hidden neurons are
-        the second complaint, and they can be measured before training takes a
-        single step.
+        BP2 keeping its <M tex="\sigma'" /> looks like an oversight. It is
+        not. The <M tex="\sigma'" /> in BP1 was the output neuron's own first
+        link, the one the new yardstick was built to cover. Every hidden
+        neuron has a first link of its own, and no yardstick reaches inside
+        the network: the score is a function of what comes out, so only the
+        last link into it can be cancelled this way. A flat hidden neuron
+        still swallows the blame passing through it. Thirty flat hidden
+        neurons are the second complaint, and they can be measured before
+        training takes a single step.
       </p>
       <Aside>
         <p>
@@ -589,7 +586,10 @@ export function Module7() {
         built that starting network for you, every weight an independent
         random number, made the
         way the exercise below has you make them (<code>rng.standard_normal</code>,
-        the standard bell). Three choices hide in it. The weights are random
+        the standard bell).
+      </p>
+      <p>
+        Three choices hide in the draw. The weights are random
         so the thirty neurons start different from one another: a layer that
         starts as thirty copies of one neuron stays thirty copies, same
         evidence on every image, same blame, same step. They are centred on
@@ -673,14 +673,17 @@ export function Module7() {
         The comparison below is as controlled as this course gets. Same
         wiring, same cross-entropy blame, same sgd, same step size of 0.5,
         same shuffle, and the same random numbers from the same seed. One run
-        divides them; the other does not.
+        divides the drawn weights by the square root of the input count, the
+        divided start, which is what your init_network builds. The other
+        leaves the draw as it comes, the undivided start, which is exactly
+        the start Module 5 trained from.
       </p>
-      <Figure caption="Two starting points, fifteen epochs each. The table above the chart is the hidden layer measured before either run takes a step; the chart is test accuracy per epoch afterwards. The dashed line is Module 5's start, the solid line yours.">
+      <Figure caption="Two starting points, fifteen epochs each. The table above the chart is the hidden layer measured before either run takes a step; the chart is test accuracy per epoch afterwards. The dashed line is the undivided start, the solid line the divided one.">
         <InitStartPanel />
       </Figure>
       <p>
         The divided start reads 85.3 percent of the held-out digits after one
-        epoch, which is more than the other start reaches in its first four,
+        epoch, which is more than the undivided start reaches in its first four,
         and 92.1 percent after fifteen against 87.8. Module 5's own run, the quadratic
         cost at a step size of 3.0, reached 89.2 percent over the same fifteen
         epochs, so the network has gained about three points on where this
@@ -690,7 +693,7 @@ export function Module7() {
         One footnote on the two fixes together. Each cost can be given a step
         size that suits it, and at their best columns in the grid at the end of
         this module the two land close: 89.9 percent for the quadratic cost
-        against 89.3 for cross-entropy, both from Module 5's start. The
+        against 89.3 for cross-entropy, both from the undivided start. The
         cross-entropy cost reliably removes the slowdown, which is why it needs
         no cranked step size, and the division reliably removes a flat start.
         They are not competing.
@@ -856,7 +859,7 @@ export function Module7() {
         <RegularizePanel />
       </Figure>
       <p>
-        Two readings, and they disagree. From your divided start, weight decay
+        Two readings, and they disagree. From the divided start, weight decay
         at <M tex="\lambda = 1" /> leaves the held-out accuracy where it was,
         85.7 percent averaged over the last twenty epochs against 86.4 without
         it. (Both are averages over the last twenty epochs of the chart, not
@@ -871,7 +874,7 @@ export function Module7() {
         and stopped becoming more confident while reading the same digits.
       </p>
       <p>
-        The same comparison, read from Module 5's undivided draw, answers
+        The same comparison, read from the undivided start, answers
         differently. Those weights begin at a total of 23,538, since
         that is what not dividing by 28 means, and without decay they stay
         there: 25,528 after eighty epochs, with the held-out accuracy stalled
@@ -913,14 +916,14 @@ export function Module7() {
           </thead>
           <tbody>
             <tr>
-              <td>quadratic cost, Module 5's start</td>
+              <td>quadratic cost, the undivided start</td>
               <td>70.8%</td>
               <td>79.4%</td>
               <td>89.2%</td>
               <td>89.9%</td>
             </tr>
             <tr>
-              <td>cross-entropy cost, Module 5's start</td>
+              <td>cross-entropy cost, the undivided start</td>
               <td>87.8%</td>
               <td>89.3%</td>
               <td>87.6%</td>
@@ -965,32 +968,27 @@ export function Module7() {
         training images.
       </p>
       <p>
-        That last rule needs one more turn of the screw, and this section is
-        where it bites. The overfitting cycle showed what happens to a number
-        that descent is allowed to optimize: the training cost fell to 0.0093
-        and stopped meaning anything about unseen digits. A search does the same
-        thing by hand. Sixteen runs were scored on those thousand held-out
-        digits and the best was kept, so the winning 92.3 percent is the best of
-        sixteen tries against that particular thousand, not what the network
-        would score on a fresh one. Some of that number is the fix and some of
-        it is the choosing.
+        That last rule needs one more turn of the screw. The overfitting cycle
+        showed what happens to a number descent is allowed to optimize; a
+        search does the same thing by hand. These sixteen runs were scored on
+        the thousand held-out digits and the best was kept, so the winning
+        92.3 percent is the best of sixteen tries against that particular
+        thousand, not what the network would score on a fresh one. The last
+        section measured the room that leaves: a point of wobble between
+        shuffles with nothing changed at all, and picking the best of sixteen
+        pockets some of that wobble as if it were improvement. Some of the
+        number is the fix, some is the choosing, and a repeated tenth of a
+        point is not worth chasing.
       </p>
       <p>
-        The standard repair is a third split. Hold out two sets rather than one:
-        a validation set you may look at as often as you like, because choosing
-        against it is what it is for, and a test set you look at once, at the
-        end, to report. Everything in the search above then happens on
-        validation data, and the test number is spent last and only once.
-      </p>
-      <p>
-        This course has one held-out thousand and uses it for both jobs, so its
-        quoted numbers are a little generous, and the last section measured
-        how generous. Three shuffles of one unchanged setting landed between
-        85.4 and 86.4 percent there: a point of wobble with nothing
-        changed at all. Picking the best of sixteen runs pockets some of that
-        wobble as if it were an improvement, which is why a repeated tenth of a
-        point is not worth chasing and why the number to trust is one scored on
-        digits nothing was chosen against.
+        The standard repair is a third split. Hold out two sets rather than
+        one: a validation set you may look at as often as you like, because
+        choosing against it is what it is for, and a test set you look at
+        once, at the end, to report. The search above then happens on
+        validation data, and the test number is spent last and only once. This
+        course has one held-out thousand doing both jobs, so its quoted
+        numbers are a little generous, and the number to trust anywhere is one
+        scored on digits nothing was chosen against.
       </p>
       <p>
         Four more techniques exist for the overfitting problem, named here and

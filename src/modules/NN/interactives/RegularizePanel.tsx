@@ -17,8 +17,8 @@ import { lockedBy, speakList } from "./lockedBy";
 
 const EPOCHS = 80;
 
-// The fixed experiment, in chart and table order: your start's three runs,
-// then Module 5's. Hue carries the start, dash pattern carries the lambda.
+// The fixed experiment, in chart and table order: the divided start's
+// three runs, then the undivided start's. Hue carries the start, dash pattern carries the lambda.
 const RUNS: { start: "yours" | "plain"; lmbda: number }[] = [
   { start: "yours", lmbda: 0 },
   { start: "yours", lmbda: 1 },
@@ -29,7 +29,8 @@ const RUNS: { start: "yours" | "plain"; lmbda: number }[] = [
 ];
 
 const runKey = (r: { start: string; lmbda: number }) => `${r.start}|${r.lmbda}`;
-const startName = (v: "yours" | "plain") => (v === "yours" ? "your start" : "Module 5's start");
+const startName = (v: "yours" | "plain") =>
+  v === "yours" ? "the divided start" : "the undivided start";
 const lambdaName = (l: number) => (l === 0 ? "no regularization" : `lambda ${l}`);
 const lineCls = (r: { start: string; lmbda: number }) =>
   (r.start === "yours" ? "m7-line-a" : "m7-line-b") +
