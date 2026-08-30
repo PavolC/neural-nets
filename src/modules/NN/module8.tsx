@@ -491,21 +491,22 @@ export function Module8() {
         </p>
       </Aside>
       <p>
-        The panel below trains both depths with your own code: your init_network
-        builds them, your sgd walks them, and with the sigmoid chosen it is your
-        backprop computing every gradient, reached through the adapter written for
-        you in Module 5. ReLU cannot be, because your BP2 has{" "}
-        <code>sigmoid_prime</code> written into it. With ReLU chosen the gradient
-        comes from a copy of your backprop with two lines swapped, written into the
-        panel. Its forward
+        The panel below runs the whole experiment in one press: one hidden
+        layer and four, under each squash, all of it your own code. Your
+        init_network builds every network, your sgd walks them, and for the
+        sigmoid runs it is your backprop computing every gradient, reached
+        through the adapter written for you in Module 5. ReLU's cannot be,
+        because your BP2 has <code>sigmoid_prime</code> written into it. For
+        the ReLU runs the gradient comes from a copy of your backprop with two
+        lines swapped, written into the panel. Its forward
         pass squashes each hidden layer with <code>np.maximum(0.0, z)</code>{" "}
         instead of <code>sigmoid(z)</code>, and its BP2 line multiplies by{" "}
         <code>(zs[-l] &gt; 0)</code> instead of{" "}
         <code>sigmoid_prime(zs[-l])</code>, since that comparison is already the
-        1-or-0 squash-slope row of the table above. The sgd around it is still
-        yours.
+        1-or-0 squash-slope row of the table above. The sgd around every run is
+        still yours.
       </p>
-      <Figure caption="One hidden layer against four, trained identically, fifteen epochs each. The table above the chart is every layer's learning speed measured from your own gradient before either run starts. The chart shows the latest run; each squash you train adds its two rows to the table below, so the comparison the section makes, four layers against one under each squash, sits in one place. Each run takes a few seconds per epoch, and Stop ends it.">
+      <Figure caption="One hidden layer against four, under each squash: all four runs, drawn as they finish. Hue is the squash, dashed lines are the one-hidden-layer networks. The table above the chart is each deep network's per-layer learning speed, measured before its run starts. Each run takes a few seconds per epoch, and Stop ends it.">
         <DepthTrainPanel />
       </Figure>
 
