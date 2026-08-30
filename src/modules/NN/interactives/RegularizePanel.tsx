@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { assetUrl } from "../../../runtime/assets";
 import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
 import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
@@ -51,7 +51,12 @@ def _accuracy(w, b, X, y):
     return float((np.argmax(feedforward(w, b, X), axis=0) == y).mean())
 
 _out = {}
-for _key, _lmbda in (("plain", 0.0), ("l2", float(_a["lmbda"]))):
+_runs = []
+if _a.get("run_plain", True):
+    _runs.append(("plain", 0.0))
+if _a.get("run_l2", True):
+    _runs.append(("l2", float(_a["lmbda"])))
+for _key, _lmbda in _runs:
     weights, biases = _start()
     _rng = np.random.default_rng(2)
     _t0 = time.time()
@@ -133,6 +138,15 @@ export function RegularizePanel() {
   const [history, setHistory] = useState<
     { start: "yours" | "plain"; lmbda: number; s: RunSummary }[]
   >([]);
+  // The per-epoch lines of every run this session, keyed by start and
+  // lambda. Same seed and same settings give byte-identical training, so a
+  // run that is already here is never trained again: the snippet is asked
+  // for only the missing half, and a fully cached pair redraws with no run
+  // at all. The ref mirrors what setPoints receives, because the completion
+  // callback cannot read fresh state through its own closure.
+  const pointsCache = useRef(new Map<string, Report[]>());
+  const reportsRef = useRef<Report[]>([]);
+  const cacheKey = (st: "yours" | "plain", l: number) => `${st}|${l}`;
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -145,23 +159,33 @@ export function RegularizePanel() {
     // cross-entropy work and their better starting point.
     const code = loadCode(l2Exercise.id);
     if (!code) return;
-    setRunning(true);
-    setPoints([]);
-    setSummary(null);
+    const cachedPlain = pointsCache.current.get(cacheKey(start, 0));
+    const cachedL2 = pointsCache.current.get(cacheKey(start, lmbda));
+    const seed = [...(cachedPlain ?? []), ...(cachedL2 ?? [])];
     setError(null);
     setDrawnWith({ start, lmbda });
-    setStatus("Starting...");
+    if (cachedPlain && cachedL2) {
+      // Both halves already trained this session: redraw, train nothing.
+      setPoints(seed);
+      return;
+    }
+    setRunning(true);
+    setPoints(seed);
+    reportsRef.current = [];
+    setSummary(null);
+    setStatus(cachedPlain ? "baseline reused from the earlier run" : "Starting...");
     sendRequest(
       {
         type: "runPython",
         code: SNIPPET,
-        args: { code, start, lmbda },
+        args: { code, start, lmbda, run_plain: !cachedPlain, run_l2: !cachedL2 },
         dataUrl: assetUrl("data/mnist_subset.bin.gz"),
       },
       (msg) => {
         if (msg.type === "status") setStatus(msg.text);
         if (msg.type === "report") {
           const r = msg.payload as Report;
+          reportsRef.current.push(r);
           setPoints((prev) => [...prev, r]);
           setStatus(
             `${r.lmbda === 0 ? "no regularization" : `lambda ${r.lmbda}`}: epoch ` +
@@ -173,12 +197,20 @@ export function RegularizePanel() {
         if (msg.type === "pythonDone") {
           const done = msg.result as Summary;
           setSummary(done);
+          const trained: { lmbda: number; s: RunSummary }[] = [];
+          if (done.runs["plain"]) trained.push({ lmbda: 0, s: done.runs["plain"] });
+          if (done.runs["l2"]) trained.push({ lmbda: done.runs["l2"].lmbda, s: done.runs["l2"] });
+          for (const t of trained) {
+            pointsCache.current.set(
+              cacheKey(start, t.lmbda),
+              reportsRef.current.filter((r) => (t.lmbda === 0 ? r.key === "plain" : r.key === "l2")),
+            );
+          }
           setHistory((prev) => {
             const next = prev.filter(
-              (r) => !(r.start === start && (r.lmbda === 0 || r.lmbda === lmbda)),
+              (r) => !(r.start === start && trained.some((t) => t.lmbda === r.lmbda)),
             );
-            next.push({ start, lmbda: 0, s: done.runs["plain"] });
-            next.push({ start, lmbda: done.runs["l2"].lmbda, s: done.runs["l2"] });
+            for (const t of trained) next.push({ start, lmbda: t.lmbda, s: t.s });
             next.sort((a, b) =>
               a.start !== b.start ? (a.start === "yours" ? -1 : 1) : a.lmbda - b.lmbda,
             );
@@ -233,11 +265,21 @@ export function RegularizePanel() {
   ].filter((s) => s.values.length > 0);
   const costMax = Math.max(2, ...costSeries.flatMap((s) => s.values));
 
+  const haveP = pointsCache.current.has(cacheKey(start, 0));
+  const haveL = pointsCache.current.has(cacheKey(start, lmbda));
+  const runLabel = !summary
+    ? "Train both ways"
+    : haveP && haveL
+      ? "Redraw this pair"
+      : haveP
+        ? `Train lambda ${lmbda}`
+        : "Run both again";
+
   return (
     <div className="interactive">
       <div className="interactive-controls">
         <button onClick={run} disabled={running}>
-          {running ? "Training..." : summary ? "Run both again" : "Train both ways"}
+          {running ? "Training..." : runLabel}
         </button>
         {running && (
           <button className="button-secondary" onClick={terminateWorker}>
@@ -250,7 +292,7 @@ export function RegularizePanel() {
               ? status
               : drawnWith.start === start && drawnWith.lmbda === lmbda
                 ? `drawn with ${startName(drawnWith.start)}, lambda ${drawnWith.lmbda}`
-                : `drawn with ${startName(drawnWith.start)}, lambda ${drawnWith.lmbda}; the chips pick the next run, so press Run both again`)}
+                : `drawn with ${startName(drawnWith.start)}, lambda ${drawnWith.lmbda}; the chips pick the next run, so press ${runLabel}`)}
         </span>
       </div>
       <div className="interactive-controls">
