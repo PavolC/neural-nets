@@ -6,8 +6,11 @@ A course in the **Moving Parts** series.
 
 A self-contained, browser-based course that teaches neural networks by having you build
 one. You read short explanations, manipulate live visualizations, and write real Python
-(NumPy) in an in-browser editor. Your code is checked by automated tests, including a
-numerical gradient check, and then trains a network that reads handwritten digits.
+(NumPy) in a workbench that docks beside the reading, so the explanation stays on screen
+while you type. Every exercise adds a section to one growing file, checked by automated
+tests including a numerical gradient check, and by the end that file is a small neural
+network library you wrote, trains a network that reads handwritten digits, and downloads
+as an `nn.py` that runs anywhere NumPy is installed.
 
 Nothing to install and no account: Python runs in the page through Pyodide (CPython
 compiled to WebAssembly), in a Web Worker so a training run never freezes the tab. Your
@@ -63,13 +66,16 @@ apart, where leaving out one preprocessing step drops the network to the majorit
 baseline and a 73.5% score turns out to contain a species it never once predicts.
 
 Nothing is locked. Every module is reachable at any time; what an exercise gates is the
-panel that trains with your own code. Nothing after Module 5 depends on your version of
-`backprop` either, so a learner who never finishes it still gets every module after it in
-full.
+panel that trains with your own code. Later modules genuinely run on earlier ones: Module
+9's program calls the backprop from Module 5, which calls the sigmoid from Module 1. A
+section that has not been written yet is filled in from the course's own copy for the run,
+and the panel names what it borrowed, so a learner who opens Module 9 first still gets a
+run rather than a `NameError`.
 
-Progress (editor contents, revealed hints, passed marks) lives in this browser's local
-storage. The start page can save it to a file and load it back, which is how you move it
-between browsers.
+Progress (your file, revealed hints, passed marks) lives in this browser's local storage.
+The start page can save it to a file and load it back, which is how you move it between
+browsers. A learner who started before the exercises became one file has theirs merged in
+on first load, with the originals kept and restorable.
 
 ## Publishing it
 
@@ -121,7 +127,11 @@ code path the browser does, each section printing the prose sentence it backs. T
 exercises have a checker that runs the app's own harness outside the browser:
 
 ```
-python3 tools/check_exercises.py       # 52 tests: solutions pass, skeletons fail
+npm run check                         # everything below except the benches
+npm run check:doc                     # the document format: splices, projections
+python3 tools/check_exercises.py       # the workbench: 53 tests, twelve assertions
+python3 tools/check_panels.py --fast   # every payoff panel runs on the learner's file
+node tools/check_run_path.mjs          # the panel's run path, in a browser (needs Chromium)
 python3 tools/bench_depth.py           # Modules 7 and 8's Pyodide numbers (needs NumPy)
 python3 tools/bench_penguins.py        # Module 10's numbers (needs NumPy)
 npm run bench:speeds                   # the layer-speed panel's numbers
@@ -143,7 +153,7 @@ once the cross-entropy cost is paired with weights scaled by 1/sqrt(inputs).
 The course has been opened in Firefox and Safari and it runs; that is a smoke test rather
 than a sweep, so an interactive somewhere may still misbehave. The web APIs it depends on
 that are not ancient are `DecompressionStream` (Safari 16.4+, Firefox 113+) for the gzipped
-data files and `IntersectionObserver` for deferring the editor; `requestIdleCallback` and
+data files and `ResizeObserver` for the on-this-page nav; `requestIdleCallback` and
 `navigator.clipboard` are both used behind a fallback. So both should work at those
 versions and up, but that is inference, not a test.
 
@@ -164,7 +174,7 @@ VITE_GOATCOUNTER=https://yourcode.goatcounter.com/count npm run build
 
 With the variable unset the module compiles away and the bundle contains no reference to
 it, which is verifiable: `grep -r gc.zgo.at dist/` finds nothing. With it set, a page view
-is counted. It never sends the editor's contents, the stored progress, or anything a
+is counted. It never sends your file, the stored progress, or anything a
 learner typed; it sets no cookie, stores no personal data, skips the dev server, and
 honours `navigator.doNotTrack`. GoatCounter is free for non-commercial use, which this is.
 

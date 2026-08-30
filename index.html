@@ -60,9 +60,29 @@
     />
   </head>
   <body>
+    <!-- The workbench's width, before any of the bundle has parsed. A reader
+         who left the panel open would otherwise watch the column jump left
+         when React mounts, which is the one thing the panel is not allowed to
+         do. Reads the same key state/ui.ts writes, and does nothing at all if
+         the panel is shut, which is the default. -->
+    <script>
+      try {
+        if (localStorage.getItem("gn:ui:dock") === "1" && window.innerWidth >= 1360) {
+          var stored = Number(localStorage.getItem("gn:ui:dock-w"));
+          var max = Math.max(380, window.innerWidth - 752);
+          var width = stored ? Math.max(380, Math.min(stored, max))
+                             : Math.min(Math.max(380, window.innerWidth - 935), max);
+          document.documentElement.style.setProperty("--dock-w", width + "px");
+        }
+      } catch (e) {
+        /* storage disabled: the panel opens at its default and nothing jumps */
+      }
+    </script>
     <div id="root">
       <!-- Replaced as soon as React mounts. Without it the whole bundle
-           downloads against a blank white page. -->
+           downloads against a blank white page. It is centred inside #root,
+           which the stylesheet holds away from the panel, so it lands where
+           the real column will. -->
       <div
         style="
           max-width: 920px;

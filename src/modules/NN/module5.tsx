@@ -1,6 +1,6 @@
 import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader, fig } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
-import { ExercisePage } from "../../components/ExercisePage";
+import { ExerciseCard } from "../../components/ExerciseCard";
 import { backpropExercise } from "../../exercises/backprop";
 import { BackpropTrainPanel } from "./interactives/BackpropTrainPanel";
 
@@ -115,7 +115,7 @@ export function Module5() {
       </p>
       <Eq
         tex="\begin{aligned} \delta^L &= (a^L - y) \odot \sigma'(z^L) && \text{(BP1)} \\ \delta^l &= \big( (w^{l+1})^T \, \delta^{l+1} \big) \odot \sigma'(z^l) && \text{(BP2)} \\ \frac{\partial C}{\partial b^l} &= \delta^l && \text{(BP3)} \\ \frac{\partial C}{\partial w^l} &= \delta^l \, (a^{l-1})^T && \text{(BP4)} \end{aligned}"
-        gloss="Module 4's equations, with one upgrade: the layer letter l stands for each layer in turn (2 then 3 on this page; the tests also try a deeper network), which is exactly the loop you are about to write, and L names the last layer. Blame starts at the output as gap times steepness, flows backward through the transposed wires, and every slope reads off a blame; if any of the four feels foreign, the Module 4 stepper is the place to rebuild it."
+        gloss="Module 4's equations, with one upgrade: the layer letter l stands for each layer in turn (2 then 3 on this page; the tests also try a deeper network), which is exactly the loop you are about to write, and L names the last layer. Blame starts at the output as the gap times the squash's slope, flows backward through the transposed wires, and every slope reads off a blame; if any of the four feels foreign, the Module 4 stepper is the place to rebuild it."
       />
       <p>
         One index trap in BP2, worth settling before writing it. A weight
@@ -256,12 +256,18 @@ export function Module5() {
         that layer. Two passes finish the digit reader; a deeper network
         repeats the second panel with everything shifted left again.
       </p>
-      <Figure caption="The backward walk over the same receipts, pass by pass. Shaded slots are the ones that pass reads. The window slides one box left each pass, which is the whole motion of the loop: get it wrong by one and the tests say so, because the sigmoid steepness would come from the wrong layer's z.">
+      <Figure caption="The backward walk over the same receipts, pass by pass. Shaded slots are the ones that pass reads. The window slides one box left each pass, which is the whole motion of the loop: get it wrong by one and the tests say so, because the squash's slope would come from the wrong layer's z.">
         <BackwardWalkDiagram />
       </Figure>
 
       <SectionHeader id="m5-exercise" title="Write backprop" />
-      <ExercisePage exercise={backpropExercise} />
+      <p>
+        This goes into your file under Module 3's work, and one more written-for-you
+        section arrives with it: the adapter that calls backprop once per column of
+        a mini-batch and averages the slopes. Everything from here to Module 10 goes
+        through it.
+      </p>
+      <ExerciseCard exercise={backpropExercise} />
 
       <SectionHeader id="m5-train" title="The real training run" />
       <p>

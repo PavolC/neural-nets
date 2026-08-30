@@ -1,10 +1,25 @@
 import { Suspense, useEffect, useRef, useState } from "react";
 import { Masthead } from "./brand/Masthead";
 import { SeriesFooter } from "./brand/SeriesFooter";
+import { DockHandle, DockShell } from "./components/DockShell";
+import { WorkbenchProvider, useWorkbench } from "./components/WorkbenchProvider";
 import { StartPage } from "./start/StartPage";
 import { MODULES } from "./modules/NN";
+import { ensureLibrary } from "./state/progress";
 
 const START_TAB = "start";
+
+// The learner's file is built out of whatever this browser already holds
+// before anything renders, so no component ever sees a half-migrated state.
+ensureLibrary();
+
+export default function App() {
+  return (
+    <WorkbenchProvider>
+      <AppShell />
+    </WorkbenchProvider>
+  );
+}
 
 // The active tab lives in the URL hash (#start, #m1) so a reload or a shared
 // link lands on the same page. Every module is always reachable; a bare link
@@ -15,7 +30,8 @@ function tabFromHash(): string {
   return MODULES.some((m) => m.id === id) ? id : START_TAB;
 }
 
-export default function App() {
+function AppShell() {
+  const workbench = useWorkbench();
   const [tab, setTab] = useState<string>(tabFromHash);
   // Which modules have been opened. Modules load on demand, but once one is
   // rendered it stays rendered, so its editor and visualization state survives
@@ -122,7 +138,8 @@ export default function App() {
   }, [tab]);
 
   return (
-    <div className="app">
+    <>
+      <DockShell dockState={workbench.dockState}>
       <Masthead
         compact={tab !== START_TAB}
         nav={
@@ -232,6 +249,8 @@ export default function App() {
           <a href="./LICENSE.txt">LICENSE</a>.
         </p>
       </SeriesFooter>
-    </div>
+      </DockShell>
+      <DockHandle onOpen={() => workbench.open()} />
+    </>
   );
 }

@@ -31,10 +31,15 @@ export const feedforwardExercise: Exercise = {
       "layers is fine; the loop the module banned was over the neurons " +
       "inside a layer, and @ already does those.",
     "Keep every activation a column, shape (n, 1); the tests check that " +
-      "first. sigmoid is provided: from course import sigmoid.",
+      "first. They also hand your function a whole batch, X of shape (n, m) " +
+      "with one example per column, because that is how every module from 3 " +
+      "on calls it. There is nothing extra to write: w @ a + b computes " +
+      "every column at once, as long as the loop never reshapes a or picks " +
+      "out a single column. sigmoid is the one you wrote in Module 1, higher " +
+      "up the same file: call it by name, there is nothing to import.",
     "A satisfying way to play before (or after) the tests: rebuild Module 1's " +
       "XOR solution with your own function, and ask it about the corners. " +
-      "Append this below your code, then press Run my code:",
+      "Send this to the scratch pad and run it:",
     {
       code:
         "weights = [np.array([[6., 6.], [6., 6.]]),   # h1 and h2, stacked\n" +

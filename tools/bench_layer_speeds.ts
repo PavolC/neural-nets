@@ -101,7 +101,7 @@ function benchDepthLadder(batch: Batch) {
 function benchHops(batch: Batch) {
 	section(
 		"3. BP2's two factors per hop, 4 hidden layers, sigmoid",
-		"ledger 0.878 / 1.159 / 0.906 / 0.962, steepness 0.210 / 0.217 / 0.205 / 0.213, hops 0.184 / 0.251 / 0.186 / 0.205",
+		"ledger 0.878 / 1.159 / 0.906 / 0.962, squash slope 0.210 / 0.217 / 0.205 / 0.213, hops 0.184 / 0.251 / 0.186 / 0.205",
 	);
 	const m = speeds(batch, 4, "sigmoid", 1);
 	const back = [...m.layers].reverse();
@@ -110,7 +110,7 @@ function benchHops(batch: Batch) {
 		const from = back[i - 1];
 		console.log(
 			`  layer ${from.layer} to ${l.layer}: from ${sig(from.speed)}` +
-				`, ledger ${sig(l.weightFactor ?? 0, 3)}, steepness ${sig(l.steepFactor ?? 0, 3)}` +
+				`, ledger ${sig(l.weightFactor ?? 0, 3)}, squash slope ${sig(l.steepFactor ?? 0, 3)}` +
 				`, hop ${sig(l.hop ?? 0, 3)}, lands on ${sig(l.speed)}`,
 		);
 	}
@@ -169,8 +169,8 @@ function benchRelu(batch: Batch) {
 function benchScale(batch: Batch) {
 	section(
 		"6. The hop is a product, and the weight multiplier walks it (4 hidden layers)",
-		"sigmoid x1/2/4/8: ledger 0.962/1.914/3.630/7.220, steepness 0.213/0.206/0.170/0.126, " +
-			"mean steepness 0.20/0.18/0.14/0.08, hop into layer 2 0.205/0.394/0.618/0.908, slowdown 567/60.4/15.0/4.2; " +
+		"sigmoid x1/2/4/8: ledger 0.962/1.914/3.630/7.220, squash slope 0.213/0.206/0.170/0.126, " +
+			"mean squash slope 0.20/0.18/0.14/0.08, hop into layer 2 0.205/0.394/0.618/0.908, slowdown 567/60.4/15.0/4.2; " +
 			"relu x1/2/4: hop into layer 2 0.634/1.456/2.990, layer 2 speed 0.35/9.74/136.32, output speed 1.40/1.73/1.52",
 	);
 	for (const activation of ["sigmoid", "relu"] as Activation[]) {
@@ -179,15 +179,15 @@ function benchScale(batch: Batch) {
 			const m = speeds(batch, 4, activation, scale);
 			const first = m.layers[0]; // layer 2, the hop into it
 			const out = m.layers[m.layers.length - 1];
-			// The module quotes the steepness averaged over ALL the hidden layers,
+			// The module quotes the squash slope averaged over ALL the hidden layers,
 			// not layer 2's alone: it is being read against the sigmoid's 0.25
 			// ceiling, which is a fact about the squash rather than about one layer.
 			const hiddenSteep = m.layers.filter((l) => !l.isOutput).map((l) => l.meanSteepness ?? 0);
 			const meanHiddenSteep = hiddenSteep.reduce((a, b) => a + b, 0) / hiddenSteep.length;
 			console.log(
 				`  ${activation} x${scale}: ledger ${sig(first.weightFactor ?? 0, 3)}` +
-					`, steepness ${sig(first.steepFactor ?? 0, 3)}` +
-					`, mean steepness over the hidden layers ${meanHiddenSteep.toFixed(2)}` +
+					`, squash slope ${sig(first.steepFactor ?? 0, 3)}` +
+					`, mean squash slope over the hidden layers ${meanHiddenSteep.toFixed(2)}` +
 					` (layer 2 alone ${(first.meanSteepness ?? 0).toFixed(2)})` +
 					`, hop ${sig(first.hop ?? 0, 3)}` +
 					`, layer 2 speed ${sig(first.speed, 3)}, output speed ${sig(out.speed, 3)}` +

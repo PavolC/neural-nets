@@ -97,7 +97,7 @@ def numerical_gradient(cost_fn, weights, biases, eps=1e-5):
 
 
 def sigmoid_prime(z):
-    """Sigmoid's steepness at z: sigmoid(z) * (1 - sigmoid(z)), elementwise.
+    """The squash's slope at z: sigmoid(z) * (1 - sigmoid(z)), elementwise.
 
     Built by the learner in Module 5.
     """
@@ -106,7 +106,7 @@ def sigmoid_prime(z):
 
 
 def quadratic_output_delta(a, y, z):
-    """BP1 under the quadratic cost: the gap times the output's steepness.
+    """BP1 under the quadratic cost: the gap times the output's squash slope.
 
     The output layer's blame, exactly as the learner wrote it in Module 5's
     backprop. Provided as a function so it can be swapped (see backprop's

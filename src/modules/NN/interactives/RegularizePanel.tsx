@@ -6,6 +6,7 @@ import { crossEntropyExercise } from "../../../exercises/cross-entropy";
 import { smartInitExercise } from "../../../exercises/smart-init";
 import { l2Exercise } from "../../../exercises/l2";
 import { EpochChart, type EpochSeries } from "./EpochChart";
+import { lockedBy, speakList } from "./lockedBy";
 
 // Module 7, third cycle: the 1,000-image slice, trained twice through the
 // learner's l2_step, once with lmbda = 0 (which is exactly their Module 3
@@ -21,18 +22,16 @@ const LAMBDAS = [0.5, 1, 2, 5];
 const SNIPPET = `
 import json, time, types
 import numpy as np
-from course import batch_gradient, feedforward
 
 _a = json.loads(_args_json)
 
-def _load(code, name):
-    mod = types.ModuleType(name)
-    exec(compile(code, name + ".py", "exec"), mod.__dict__)
-    return mod
-
-_ce = _load(_a["ce_code"], "your_cost")
-_init = _load(_a["init_code"], "your_init")
-_l2 = _load(_a["l2_code"], "your_step")
+# The learner's file, once, up to and including their decaying step. The
+# epoch loop below stays written out here rather than calling their sgd,
+# deliberately: this panel varies lambda and the module quotes its numbers.
+_lib = types.ModuleType("your_code")
+exec(compile(_a["code"], "your_code.py", "exec"), _lib.__dict__)
+feedforward = _lib.feedforward
+batch_gradient = _lib.batch_gradient
 
 with open("/mnist_subset.bin", "rb") as _f:
     X_full, y_full, X_test, y_test = load_mnist_subset(_f.read())
@@ -43,7 +42,7 @@ _n = X_train.shape[1]
 
 def _start():
     if _a["start"] == "yours":
-        return _init.init_network([784, 30, 10], np.random.default_rng(8))
+        return _lib.init_network([784, 30, 10], np.random.default_rng(8))
     r = np.random.default_rng(8)
     return ([r.standard_normal((30, 784)), r.standard_normal((10, 30))],
             [r.standard_normal((30, 1)), r.standard_normal((10, 1))])
@@ -61,20 +60,20 @@ for _key, _lmbda in (("plain", 0.0), ("l2", float(_a["lmbda"]))):
         for _k in range(0, _n, 10):
             _batch = _order[_k:_k + 10]
             _nw, _nb = batch_gradient(weights, biases, X_train[:, _batch],
-                                      Y_train[:, _batch], _ce.cross_entropy_delta)
-            weights, biases = _l2.l2_step(weights, biases, _nw, _nb, 0.5, _lmbda, _n)
+                                      Y_train[:, _batch], _lib.cross_entropy_delta)
+            weights, biases = _lib.l2_step(weights, biases, _nw, _nb, 0.5, _lmbda, _n)
         _js_report(json.dumps({
             "key": _key, "lmbda": _lmbda, "epoch": _e,
             "train_accuracy": _accuracy(weights, biases, X_train, y_train),
             "test_accuracy": _accuracy(weights, biases, X_test, y_test),
-            "test_cost": float(_ce.cross_entropy_cost(weights, biases, X_test, Y_test)),
+            "test_cost": float(_lib.cross_entropy_cost(weights, biases, X_test, Y_test)),
             "elapsed": time.time() - _t0,
         }))
     _out[_key] = {
         "lmbda": _lmbda,
         "train_accuracy": _accuracy(weights, biases, X_train, y_train),
         "test_accuracy": _accuracy(weights, biases, X_test, y_test),
-        "test_cost": float(_ce.cross_entropy_cost(weights, biases, X_test, Y_test)),
+        "test_cost": float(_lib.cross_entropy_cost(weights, biases, X_test, Y_test)),
         "weight_size": float(sum(float((w ** 2).sum()) for w in weights)),
         "seconds": time.time() - _t0,
     }
@@ -120,26 +119,43 @@ export function RegularizePanel() {
   const [points, setPoints] = useState<Report[]>([]);
   const [status, setStatus] = useState("");
   const [summary, setSummary] = useState<Summary | null>(null);
+  // What the drawn chart was actually trained with. The chips select the NEXT
+  // run, and nothing retrains on a click (a run is 160 epochs), so the panel
+  // has to say which settings the lines on screen came from and which are
+  // merely selected. Without this the drawn run's starting point was recorded
+  // nowhere on screen at all.
+  const [drawnWith, setDrawnWith] = useState<{ start: "yours" | "plain"; lmbda: number } | null>(null);
+  // Every setting trained this session, one row per (start, lambda), reruns
+  // replacing their own row. The chart draws the latest pair; the table is
+  // where runs meet, because the comparison the module asks for (decay
+  // against none, from each start) is across runs, and a table that only
+  // showed the last pair erased one side of it.
+  const [history, setHistory] = useState<
+    { start: "yours" | "plain"; lmbda: number; s: RunSummary }[]
+  >([]);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => subscribeProgress(() => setUnlocked(needed())), []);
 
+  const startName = (v: "yours" | "plain") => (v === "yours" ? "your start" : "Module 5's start");
+
   const run = () => {
-    const ceCode = loadCode(crossEntropyExercise.id);
-    const initCode = loadCode(smartInitExercise.id);
-    const l2Code = loadCode(l2Exercise.id);
-    if (!ceCode || !initCode || !l2Code) return;
+    // One projection: the file through the decaying step already holds their
+    // cross-entropy work and their better starting point.
+    const code = loadCode(l2Exercise.id);
+    if (!code) return;
     setRunning(true);
     setPoints([]);
     setSummary(null);
     setError(null);
+    setDrawnWith({ start, lmbda });
     setStatus("Starting...");
     sendRequest(
       {
         type: "runPython",
         code: SNIPPET,
-        args: { ce_code: ceCode, init_code: initCode, l2_code: l2Code, start, lmbda },
+        args: { code, start, lmbda },
         dataUrl: assetUrl("data/mnist_subset.bin.gz"),
       },
       (msg) => {
@@ -155,7 +171,19 @@ export function RegularizePanel() {
           );
         }
         if (msg.type === "pythonDone") {
-          setSummary(msg.result as Summary);
+          const done = msg.result as Summary;
+          setSummary(done);
+          setHistory((prev) => {
+            const next = prev.filter(
+              (r) => !(r.start === start && (r.lmbda === 0 || r.lmbda === lmbda)),
+            );
+            next.push({ start, lmbda: 0, s: done.runs["plain"] });
+            next.push({ start, lmbda: done.runs["l2"].lmbda, s: done.runs["l2"] });
+            next.sort((a, b) =>
+              a.start !== b.start ? (a.start === "yours" ? -1 : 1) : a.lmbda - b.lmbda,
+            );
+            return next;
+          });
           setRunning(false);
           setStatus("");
         }
@@ -174,14 +202,16 @@ export function RegularizePanel() {
   };
 
   if (!unlocked) {
-    const missing = [
-      codeReady(crossEntropyExercise.id) ? null : "the cross-entropy exercise",
-      codeReady(smartInitExercise.id) ? null : "the starting-point exercise",
-      codeReady(l2Exercise.id) ? null : "the decaying step above",
-    ].filter(Boolean);
+    const missing = speakList(
+      lockedBy([crossEntropyExercise.id, smartInitExercise.id, l2Exercise.id], {
+        [crossEntropyExercise.id]: "the cross-entropy exercise",
+        [smartInitExercise.id]: "the starting-point exercise",
+        [l2Exercise.id]: "the decaying step above",
+      }),
+    );
     return (
       <p className="payoff-locked">
-        Both runs go through your l2_step, so this needs {missing.join(", ")} passed first.
+        Both runs go through your l2_step, with nothing borrowed, so this needs {missing}.
       </p>
     );
   }
@@ -215,7 +245,12 @@ export function RegularizePanel() {
           </button>
         )}
         <span className={`demo-status status-fixed ${error ? "demo-status-error" : ""}`}>
-          {error ?? status}
+          {error ??
+            (running || !drawnWith
+              ? status
+              : drawnWith.start === start && drawnWith.lmbda === lmbda
+                ? `drawn with ${startName(drawnWith.start)}, lambda ${drawnWith.lmbda}`
+                : `drawn with ${startName(drawnWith.start)}, lambda ${drawnWith.lmbda}; the chips pick the next run, so press Run both again`)}
         </span>
       </div>
       <div className="interactive-controls">
@@ -297,7 +332,7 @@ export function RegularizePanel() {
           ariaLabel="Cross-entropy cost on the held-out digits per epoch, for a run with no regularization and a run with the chosen lambda."
         />
       )}
-      {summary && (
+      {summary && history.length > 0 && (
         <div className="interactive-status">
           <div className="table-scroll scroll-x" tabIndex={0}>
             <table className="truth-table">
@@ -311,14 +346,19 @@ export function RegularizePanel() {
                 </tr>
               </thead>
               <tbody>
-                {[
-                  ["no regularization", summary.runs["plain"]],
-                  [`lambda ${summary.runs["l2"].lmbda}`, summary.runs["l2"]],
-                ].map(([label, r]) => {
-                  const s = r as RunSummary;
+                {history.map((row) => {
+                  const s = row.s;
+                  const onChart =
+                    drawnWith !== null &&
+                    row.start === drawnWith.start &&
+                    (row.lmbda === 0 || row.lmbda === drawnWith.lmbda);
+                  const label =
+                    `${startName(row.start)}, ` +
+                    (row.lmbda === 0 ? "no regularization" : `lambda ${row.lmbda}`) +
+                    (onChart ? " (on the chart)" : "");
                   return (
-                    <tr key={label as string}>
-                      <td>{label as string}</td>
+                    <tr key={`${row.start}-${row.lmbda}`}>
+                      <td>{label}</td>
                       <td>{(s.train_accuracy * 100).toFixed(1)}%</td>
                       <td>{(s.test_accuracy * 100).toFixed(1)}%</td>
                       <td>{s.test_cost.toFixed(2)}</td>

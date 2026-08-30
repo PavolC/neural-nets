@@ -6,6 +6,7 @@ import { crossEntropyExercise } from "../../../exercises/cross-entropy";
 import { smartInitExercise } from "../../../exercises/smart-init";
 import { l2Exercise } from "../../../exercises/l2";
 import { trainExercise } from "../../../exercises/train";
+import { lockedBy, speakList } from "./lockedBy";
 import { EpochChart, type EpochSeries } from "./EpochChart";
 
 // The capstone run: the learner's own loop, on the digit reader, with their
@@ -28,17 +29,12 @@ import course
 
 _a = json.loads(_args_json)
 
-def _load(code, name):
-    mod = types.ModuleType(name)
-    exec(compile(code, name + ".py", "exec"), mod.__dict__)
-    return mod
-
-# Their Module 7 work, put back into course before their loop imports from it.
-course.init_network = _load(_a["init_code"], "your_init").init_network
-course.l2_step = _load(_a["l2_code"], "your_l2").l2_step
-course.cross_entropy_delta = _load(_a["ce_code"], "your_cost").cross_entropy_delta
-
-_prog = _load(_a["train_code"], "your_program")
+# Their whole file, once. Nothing is patched over anything: init_network,
+# l2_step, cross_entropy_delta, batch_gradient, backprop and feedforward are
+# all defined above train in the same file, so their loop calls their code by
+# reading down the page.
+_prog = types.ModuleType("your_code")
+exec(compile(_a["code"], "your_code.py", "exec"), _prog.__dict__)
 
 with open("/mnist_subset.bin", "rb") as _f:
     X_train, y_train, X_test, y_test = load_mnist_subset(_f.read())
@@ -64,8 +60,9 @@ _weights, _biases, _history = _prog.train(
     [784, 30, 10], X_train, Y_train, X_test, y_test,
     ${EPOCHS}, _a["eta"], _a["lmbda"], 10, np.random.default_rng(8))
 
-# Scored again here, through the course's own copy, so the number the panel
-# prints does not depend on the function that produced the history.
+# Scored again here, through the course's own forward pass, so the number the
+# panel prints does not depend on the accuracy function that produced the
+# history: a check that shares its yardstick with the thing checked is not one.
 _final = float((np.argmax(course.feedforward(_weights, _biases, X_test), axis=0) == y_test).mean())
 _weight_size = float(sum((w ** 2).sum() for w in _weights))
 
@@ -107,11 +104,10 @@ export function FullTrainPanel() {
   useEffect(() => subscribeProgress(() => setUnlocked(needed())), []);
 
   const run = () => {
-    const trainCode = loadCode(trainExercise.id);
-    const initCode = loadCode(smartInitExercise.id);
-    const ceCode = loadCode(crossEntropyExercise.id);
-    const l2Code = loadCode(l2Exercise.id);
-    if (!trainCode || !initCode || !ceCode || !l2Code) return;
+    // One projection: the file through their program holds every piece it
+    // calls, in the order they wrote them.
+    const code = loadCode(trainExercise.id);
+    if (!code) return;
     setRunning(true);
     setRanWith(eta);
     setPoints([]);
@@ -122,14 +118,7 @@ export function FullTrainPanel() {
       {
         type: "runPython",
         code: SNIPPET,
-        args: {
-          train_code: trainCode,
-          init_code: initCode,
-          ce_code: ceCode,
-          l2_code: l2Code,
-          eta,
-          lmbda: 1.0,
-        },
+        args: { code, eta, lmbda: 1.0 },
         dataUrl: assetUrl("data/mnist_subset.bin.gz"),
       },
       (msg) => {
@@ -161,16 +150,16 @@ export function FullTrainPanel() {
   };
 
   if (!unlocked) {
-    const missing = [
-      codeReady(trainExercise.id) ? null : "this module's exercise",
-      codeReady(smartInitExercise.id) ? null : "Module 7's starting-point exercise",
-      codeReady(crossEntropyExercise.id) ? null : "Module 7's cross-entropy exercise",
-      codeReady(l2Exercise.id) ? null : "Module 7's decaying update",
-    ].filter(Boolean);
+    const missing = speakList(
+      lockedBy(
+        [trainExercise.id, smartInitExercise.id, crossEntropyExercise.id, l2Exercise.id],
+        { [trainExercise.id]: "this module's exercise" },
+      ),
+    );
     return (
       <p className="payoff-locked">
-        This run is your whole program, so it needs {missing.join(", ")} passed
-        first. Every function it calls is one you wrote.
+        This run is your whole program, so it needs {missing}. Every function it
+        calls is one you wrote, and nothing is borrowed.
       </p>
     );
   }

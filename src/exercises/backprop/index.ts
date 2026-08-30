@@ -7,8 +7,8 @@ export const backpropExercise: Exercise = {
   id: "backprop",
   title: "Backpropagation",
   prompt: [
-    "Two functions wait in the editor. sigmoid_prime is a single formula: " +
-      "Module 4's steepness, sigmoid(z) times one minus sigmoid(z), " +
+    "Two functions to add to your file. sigmoid_prime is a single formula: " +
+      "Module 4's squash slope, sigmoid(z) times one minus sigmoid(z), " +
       "elementwise like sigmoid itself. backprop is the algorithm, and " +
       "every statement in it is one of the four equations above.",
     "The contract, precisely: backprop(weights, biases, x, y) handles ONE " +
@@ -42,7 +42,7 @@ export const backpropExercise: Exercise = {
       "million. Passing it means your backpropagation is correct. Last, " +
       "your slopes drive a descent that retrains Module 1's XOR network.",
     "Once the tests pass, point your code at Module 4's by-hand numbers, " +
-      "the two-neuron chain. Append this and press Run my code:",
+      "the two-neuron chain. Send this to the scratch pad and run it:",
     {
       code:
         "from course import gradient\n" +

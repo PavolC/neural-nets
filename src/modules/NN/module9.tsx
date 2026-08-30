@@ -1,6 +1,6 @@
 import { AfterThis, Aside, Figure, ModuleToc, SectionHeader } from "../../components/ModuleBits";
 import { M } from "../../components/Math";
-import { ExercisePage } from "../../components/ExercisePage";
+import { ExerciseCard } from "../../components/ExerciseCard";
 import { trainExercise } from "../../exercises/train";
 import { FullTrainPanel } from "./interactives/FullTrainPanel";
 
@@ -37,7 +37,7 @@ export function Module9() {
         Module 3 is the exception that shows the shape of the gap. You wrote a loop
         there, <code>sgd</code>, and it is the right loop: shuffle, cut, step,
         repeat. It has been running on your own gradient since Module 5, where the
-        panel swapped its nudge-measured slopes for an adapter around your backprop,
+        panel pointed its <code>gradient</code> at the adapter around your backprop,
         and Module 7's first two panels ran it as well. But every one of those
         panels called it with epochs set to 1, once per epoch, so the walk through
         the epochs stayed the panel's. And your <code>sgd</code> has never drawn the
@@ -62,7 +62,7 @@ export function Module9() {
         figure in eight modules was computed for you.
       </p>
 
-      <ExercisePage exercise={trainExercise} />
+      <ExerciseCard exercise={trainExercise} />
 
       <SectionHeader id="m9-run" title="Your program, on the digits" />
       <p>
@@ -70,38 +70,33 @@ export function Module9() {
         held-out thousand, at the settings printed under its own button. Run it at
         0.5 first, the middle of the three step sizes, and let all fifteen epochs
         finish. The number worth reading is where the chart settles, not the best
-        single epoch. Your <code>train</code> imports <code>init_network</code>,{" "}
-        <code>l2_step</code> and <code>cross_entropy_delta</code> from{" "}
-        <code>course</code>, which carries its own copy of each, so that this
-        module's tests check one fixed set of numbers rather than whatever your
-        Module 7 code produces. Before this panel starts it overwrites those three
-        names with the versions you saved in Module 7, so the run is your loop
-        calling your own functions.
+        single epoch. Your <code>train</code> imports nothing. Every
+        name it calls is defined higher up the same file: the draw from Module 7,
+        the blame from Module 7, the decayed step from Module 7, the mini-batch
+        adapter written for you in Module 5, the backprop under that from Module 5,
+        and the forward pass your <code>accuracy</code> reads the ten confidences
+        from, from Module 2. The panel runs your file and calls your{" "}
+        <code>train</code>; nothing is substituted underneath it.
       </p>
       <p>
-        Your <code>train</code> imports five names from <code>course</code>, and the
-        two the panel does not overwrite stay the course's.{" "}
-        <code>batch_gradient</code> is the adapter Module 5's panel used on your
-        behalf, running a backprop once per column of a mini-batch and averaging the
-        slopes. The <code>backprop</code> it calls underneath is the one Module 7
-        handed back: your Module 5 algorithm with BP1 lifted into an argument, so
-        the cross-entropy blame can be passed in. And the <code>feedforward</code>{" "}
-        that your <code>accuracy</code> calls for the ten confidences is the
-        course's copy of your Module 2 loop. The starting draw, the blame, the
-        update, the walk through the epochs and the score are all yours.
+        That is worth one sentence of its own, because it is what nine modules of
+        writing code into one file were for. Every arrow in the map below, except
+        the shuffle NumPy performs and the adapter marked as written for you, ends
+        at something you wrote. The panel says so itself under its results: when it
+        has borrowed nothing it prints that it ran entirely on your own code.
       </p>
-      <Figure caption="Your program's call map, indented by who calls whom. Three names in it run the course's code rather than yours: the mini-batch adapter, the backprop underneath it, and the forward pass the score calls. Every other name runs the code saved in your editor.">
+      <Figure caption="Your program's call map, indented by who calls whom. One name in it is not yours, the mini-batch adapter, and your file carries it under a section line that says it was written for you. Everything else is code you wrote, read from your own file in the order you wrote it.">
         <div className="table-scroll scroll-x" tabIndex={0}>
           <pre className="torch-listing">{`train(sizes, X, Y, X_test, y_test, ...)   yours, this module
     init_network(sizes, rng)              yours, Module 7
     each epoch: rng.permutation(n)        NumPy's shuffle
         each mini-batch:
-            batch_gradient(...)           the course's adapter
-                backprop(...)             your Module 5 algorithm, course's copy
+            batch_gradient(...)           written for you, Module 5
+                backprop(...)             yours, Module 5
                     cross_entropy_delta   yours, Module 7
             l2_step(...)                  yours, Module 7
         accuracy(w, b, X_test, y_test)    yours, this module
-            feedforward(w, b, X)          your Module 2 loop, course's copy`}</pre>
+            feedforward(w, b, X)          yours, Module 2`}</pre>
         </div>
       </Figure>
       <Figure caption="Your whole program on the digit reader, with the step size in your hands. Each epoch takes a few seconds, and Stop ends the run.">
@@ -141,7 +136,7 @@ export function Module9() {
 
       <SectionHeader id="m9-words" title="The same ideas, in everyone else's words" />
       <p>
-        This course chose plain words on purpose. Blame, steepness, evidence, the
+        This course chose plain words on purpose. Blame, the squash's slope, evidence, the
         wire ledger, the bill: each was picked so that a sentence could be read
         without a glossary. Almost nobody else uses those words, and that becomes a
         problem on the first page of the next thing you open. The table below gives
@@ -206,7 +201,7 @@ export function Module9() {
               <td>Module 3</td>
             </tr>
             <tr>
-              <td>steepness, <M tex="\sigma'(z)" /></td>
+              <td>the squash's slope, <M tex="\sigma'(z)" /></td>
               <td>the activation function's derivative</td>
               <td>Module 4</td>
             </tr>

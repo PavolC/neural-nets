@@ -1,7 +1,5 @@
-# Reference solution, adapted from Michael Nielsen's network2.py (MIT license,
-# github.com/mnielsen/neural-networks-and-deep-learning).
-
-import numpy as np
+# Reference solution, adapted from Michael Nielsen's network2.py (MIT
+# license, github.com/mnielsen/neural-networks-and-deep-learning).
 
 
 def l2_step(weights, biases, nabla_w, nabla_b, eta, lmbda, n):

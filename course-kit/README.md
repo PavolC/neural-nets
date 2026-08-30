@@ -90,22 +90,33 @@ Worth cribbing from `../src/`:
   convention, the result shape), and it cannot run this repo's own tests until the caller
   registers the shared-helpers module first. It is the one place the Python assumption
   lives, which is what a non-Python course reimplements.
-- `components/ExercisePage.tsx` (467 lines, the largest file in `components/`): no
-  reference to MNIST, neurons, digits or the source text anywhere in it. Its couplings are
-  a handful of small named seams: two Python-side names in the run-my-code snippet, the
-  exception name a skeleton raises, three spots of Python-flavored copy, a pointer at the
-  notation reference, and the flagship-test banner. Its accumulated UX fixes are the
-  expensive part, and none of them are topic-bound.
+- `components/Workbench.tsx` and `components/WorkbenchProvider.tsx` (the panel and its
+  state), `components/ExerciseCard.tsx` (what stays in the chapter page) and
+  `components/DockShell.tsx` (the column-and-panel geometry): no reference to MNIST,
+  neurons, digits or the source text anywhere in them. Their couplings are a handful of
+  small named seams: two runtime-side names in the run-my-code path, the exception name a
+  skeleton raises, three spots of Python-flavored copy, a pointer at the notation
+  reference, and the flagship-test banner. The accumulated UX fixes are the expensive
+  part, and none of them are topic-bound. `DockShell` in particular carries the one
+  measurement worth stealing outright: publish the reading column's content width as a
+  custom property and derive every figure scale from it, so a resizable panel cannot
+  break a diagram system calibrated for one column width.
 - `components/CodeEditor.tsx`: three lines couple it to Python. Swap one language package.
 - `components/ModuleBits.tsx`: the chapter building blocks, including a table of contents
   that discovers its own sections from the DOM and needs no configuration.
-- `state/progress.ts` (172 lines) and `exercises/types.ts` (19 lines): the two files with
-  no chapter ids, no exercise ids and no topic knowledge at all, which makes them the
-  cleanest lift in the repo. Progress export and import come along free.
+- `state/workbenchDoc.ts`, `state/workbench.ts`, `state/storage.ts`, `state/progress.ts`
+  and `exercises/types.ts`: no chapter ids, no exercise ids and no topic knowledge at all,
+  which makes them the cleanest lift in the repo. The document format (one marker regex,
+  one join rule, one parse that never throws), the lending rule, the prefix projections and
+  progress export and import all come along free.
+- The section table (`exercises/sections.json`): one file the app and the tools both read,
+  which is what stops the format from being written down twice. Copy the shape, not the
+  rows.
 - The per-exercise folder convention: one directory per exercise holding the skeleton, the
   tests, the reference solution and the prompt metadata.
-- `tools/check_exercises.py` (115 lines): the invariant is the reusable part. Solutions
-  pass; untouched skeletons fail for their own reason.
+- `tools/check_exercises.py` and `tools/check_panels.py`: the invariants are the reusable
+  part. Solutions pass, untouched skeletons fail for their own reason, no section rebinds
+  an earlier section's name, and a sabotaged provider is noticed by its consumer.
 - `App.tsx` and the `ModuleDef` registry: a complete tabbed course shell with lazy chapters
   and preloading, in under 200 lines.
 - `tools/check_brand.py` and `tools/brand_palette.py`: copy both with `brand/`.

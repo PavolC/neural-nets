@@ -1,9 +1,7 @@
 # Reference solution. The cross-entropy cost is from Michael Nielsen's
-# network2.py (MIT license, github.com/mnielsen/neural-networks-and-deep-learning);
-# he plugs the 0 * log(0) hole with np.nan_to_num instead of clipping.
-
-import numpy as np
-from course import feedforward
+# network2.py (MIT license,
+# github.com/mnielsen/neural-networks-and-deep-learning); he plugs the
+# 0 * log(0) hole with np.nan_to_num instead of clipping.
 
 
 def cross_entropy_cost(weights, biases, X, Y):

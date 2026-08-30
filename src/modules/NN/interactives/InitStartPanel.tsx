@@ -6,6 +6,7 @@ import { crossEntropyExercise } from "../../../exercises/cross-entropy";
 import { smartInitExercise } from "../../../exercises/smart-init";
 import { sgdExercise } from "../../../exercises/sgd";
 import { EpochChart, type EpochSeries } from "./EpochChart";
+import { lockedBy, speakList } from "./lockedBy";
 
 // Module 7, second cycle: the same digit reader, the same cross-entropy cost,
 // the same sgd, the same random draws, started twice. Once at Module 5's
@@ -17,18 +18,15 @@ const EPOCHS = 15;
 const SNIPPET = `
 import json, time, types
 import numpy as np
-import course
-from course import batch_gradient, feedforward
 
 _a = json.loads(_args_json)
 
-def _load(code, name):
-    mod = types.ModuleType(name)
-    exec(compile(code, name + ".py", "exec"), mod.__dict__)
-    return mod
-
-_ce = _load(_a["ce_code"], "your_cost")
-_init = _load(_a["init_code"], "your_init")
+# The learner's file, once, up to and including their better starting point.
+# Their sgd, their backprop, their cross-entropy blame and their init_network
+# all come out of this one exec.
+_lib = types.ModuleType("your_code")
+exec(compile(_a["code"], "your_code.py", "exec"), _lib.__dict__)
+feedforward = _lib.feedforward
 
 with open("/mnist_subset.bin", "rb") as _f:
     X_train, y_train, X_test, y_test = load_mnist_subset(_f.read())
@@ -41,12 +39,12 @@ def _plain_start():
     return w, b
 
 def _your_start():
-    return _init.init_network([784, 30, 10], np.random.default_rng(8))
+    return _lib.init_network([784, 30, 10], np.random.default_rng(8))
 
-# Their sgd, with their cross-entropy blame behind it. Loaded once: the
-# gradient is the same for both runs, only the starting parameters differ.
-course.gradient = lambda w, b, X, Y: batch_gradient(w, b, X, Y, _ce.cross_entropy_delta)
-_sgd = _load(_a["sgd_code"], "your_sgd")
+# Their sgd, with their cross-entropy blame behind it. The gradient is the
+# same for both runs; only the starting parameters differ.
+_lib.gradient = lambda w, b, X, Y: _lib.batch_gradient(
+    w, b, X, Y, _lib.cross_entropy_delta)
 
 def _saturation(w, b):
     """Share of hidden neurons flatter than 0.01, over the training images."""
@@ -64,14 +62,14 @@ for _key, _label, _make in (("plain", "Module 5's start", _plain_start),
     _rng = np.random.default_rng(2)
     _t0 = time.time()
     for _e in range(1, ${EPOCHS} + 1):
-        weights, biases = _sgd.sgd(weights, biases, X_train, Y_train, 0.5, 1, 10, _rng)
+        weights, biases = _lib.sgd(weights, biases, X_train, Y_train, 0.5, 1, 10, _rng)
         _acc = float((np.argmax(feedforward(weights, biases, X_test), axis=0) == y_test).mean())
         _js_report(json.dumps({"kind": "epoch", "key": _key, "label": _label,
                                "epoch": _e, "accuracy": _acc,
                                "elapsed": time.time() - _t0}))
     _flat_end, _median_end = _saturation(weights, biases)
     _out[_key] = {"accuracy": _acc, "seconds": time.time() - _t0,
-                  "cost": float(_ce.cross_entropy_cost(weights, biases, X_train, Y_train)),
+                  "cost": float(_lib.cross_entropy_cost(weights, biases, X_train, Y_train)),
                   "flat_share_end": _flat_end}
 
 json.dumps({"runs": _out, "n_test": int(X_test.shape[1])})
@@ -121,10 +119,10 @@ export function InitStartPanel() {
   useEffect(() => subscribeProgress(() => setUnlocked(needed())), []);
 
   const run = () => {
-    const ceCode = loadCode(crossEntropyExercise.id);
-    const initCode = loadCode(smartInitExercise.id);
-    const sgdCode = loadCode(sgdExercise.id);
-    if (!ceCode || !initCode || !sgdCode) return;
+    // One projection: the file through the starting-point section already
+    // holds their sgd, their backprop and their cross-entropy blame.
+    const code = loadCode(smartInitExercise.id);
+    if (!code) return;
     setRunning(true);
     setStarts([]);
     setPoints([]);
@@ -135,7 +133,7 @@ export function InitStartPanel() {
       {
         type: "runPython",
         code: SNIPPET,
-        args: { ce_code: ceCode, init_code: initCode, sgd_code: sgdCode },
+        args: { code },
         dataUrl: assetUrl("data/mnist_subset.bin.gz"),
       },
       (msg) => {
@@ -173,15 +171,16 @@ export function InitStartPanel() {
   };
 
   if (!unlocked) {
-    const missing = [
-      codeReady(crossEntropyExercise.id) ? null : "the cross-entropy exercise",
-      codeReady(smartInitExercise.id) ? null : "the starting-point exercise above",
-      codeReady(sgdExercise.id) ? null : "Module 3's sgd exercise",
-    ].filter(Boolean);
+    const missing = speakList(
+      lockedBy([crossEntropyExercise.id, smartInitExercise.id, sgdExercise.id], {
+        [crossEntropyExercise.id]: "the cross-entropy exercise",
+        [smartInitExercise.id]: "the starting-point exercise above",
+      }),
+    );
     return (
       <p className="payoff-locked">
-        This run needs {missing.join(", ")} passed first: it builds the network with your
-        init_network and trains it with your cost inside your sgd.
+        This run needs {missing}: it builds the network with your init_network and
+        trains it with your cost inside your sgd, with nothing borrowed.
       </p>
     );
   }
@@ -217,7 +216,7 @@ export function InitStartPanel() {
             <thead>
               <tr>
                 <th>before a single step</th>
-                <th>median hidden steepness</th>
+                <th>median hidden squash slope</th>
                 <th>share of hidden neurons flatter than 0.01</th>
               </tr>
             </thead>

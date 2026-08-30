@@ -1,6 +1,6 @@
 import { AfterThis, Aside, Figure, ModuleToc, Recap, SectionHeader, fig } from "../../components/ModuleBits";
 import { Eq, M } from "../../components/Math";
-import { ExercisePage } from "../../components/ExercisePage";
+import { ExerciseCard } from "../../components/ExerciseCard";
 import { sigmoidNeuronExercise } from "../../exercises/sigmoid-neuron";
 import { SeparatingLine } from "./interactives/SeparatingLine";
 import { SigmoidVsStep } from "./interactives/SigmoidVsStep";
@@ -312,7 +312,7 @@ np.exp(-2.0)    # e^(-2); given an array, it does every entry at once`}</pre>
         fractional.
       </p>
 
-      <ExercisePage exercise={sigmoidNeuronExercise} />
+      <ExerciseCard exercise={sigmoidNeuronExercise} />
 
       <Recap
         items={[

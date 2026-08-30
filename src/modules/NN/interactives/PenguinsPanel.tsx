@@ -5,6 +5,7 @@ import { codeReady, loadCode, subscribeProgress } from "../../../state/progress"
 import { prepareExercise } from "../../../exercises/prepare";
 import { trainExercise } from "../../../exercises/train";
 import { EpochChart, type EpochSeries } from "./EpochChart";
+import { lockedBy, speakList } from "./lockedBy";
 
 // Module 10's payoff: the learner's own preparation and their own training
 // loop, on a file that arrives the way data actually does. Two switches,
@@ -21,13 +22,19 @@ import course
 
 _a = json.loads(_args_json)
 
-def _load(code, name):
-    mod = types.ModuleType(name)
-    exec(compile(code, name + ".py", "exec"), mod.__dict__)
-    return mod
-
-_prep = _load(_a["prepare_code"], "your_prep")
-_prog = _load(_a["train_code"], "your_program")
+# Their whole file, once. _prep and _prog are the same module: their
+# standardize, one_hot and split sit below their train in it, and train calls
+# the pieces above it. So "your train from Module 9 does the rest" is now
+# literally what happens.
+#
+# The one_hot collision is harmless and worth naming: the worker's loader has
+# a one_hot(y, num_classes=10) for MNIST, and the learner's Module 10
+# one_hot(values, levels) is a different function with the same name. They
+# never meet, because the file execs into its own module and this panel builds
+# Y itself. Do not inject the worker's globals into that namespace.
+_prep = types.ModuleType("your_code")
+exec(compile(_a["code"], "your_code.py", "exec"), _prep.__dict__)
+_prog = _prep
 
 with open("/penguins.json", "rb") as _f:
     columns, rows = load_penguins(_f.read())
@@ -143,9 +150,10 @@ export function PenguinsPanel() {
   useEffect(() => subscribeProgress(() => setUnlocked(needed())), []);
 
   const run = () => {
-    const prepareCode = loadCode(prepareExercise.id);
-    const trainCode = loadCode(trainExercise.id);
-    if (!prepareCode || !trainCode) return;
+    // One projection: the file through the preparation section holds their
+    // program too, since Module 9 comes before Module 10.
+    const code = loadCode(prepareExercise.id);
+    if (!code) return;
     setRunning(true);
     setRan({ scale, features });
     setPoints([]);
@@ -156,7 +164,7 @@ export function PenguinsPanel() {
       {
         type: "runPython",
         code: SNIPPET,
-        args: { prepare_code: prepareCode, train_code: trainCode, scale, features },
+        args: { code, scale, features },
         dataUrl: assetUrl("data/penguins.json.gz"),
       },
       (msg) => {
@@ -185,14 +193,15 @@ export function PenguinsPanel() {
   };
 
   if (!unlocked) {
-    const missing = [
-      codeReady(prepareExercise.id) ? null : "this module's exercise",
-      codeReady(trainExercise.id) ? null : "Module 9's program",
-    ].filter(Boolean);
+    const missing = speakList(
+      lockedBy([prepareExercise.id, trainExercise.id], {
+        [prepareExercise.id]: "this module's exercise",
+      }),
+    );
     return (
       <p className="payoff-locked">
         This run prepares the file with your own code and trains it with your own
-        loop, so it needs {missing.join(" and ")} passed first.
+        loop, nothing borrowed, so it needs {missing}.
       </p>
     );
   }

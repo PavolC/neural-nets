@@ -9,6 +9,7 @@ import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
 import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
 import { feedforwardExercise } from "../../../exercises/feedforward";
 import { divergingColor, drawMnistDigit } from "./utils";
+import { lockedBy, speakList } from "./lockedBy";
 import { useInViewOnce } from "../../../components/useInViewOnce";
 
 // Module 2 interactive: a 784-15-10 network, rendered compactly. Hovering a
@@ -36,7 +37,9 @@ const PAYOFF_SNIPPET = `
 import json, types
 import numpy as np
 _a = json.loads(_args_json)
-_mod = types.ModuleType("payoff_submission")
+# The learner's file, up to and including their feedforward, so the sigmoid
+# inside it is the one they wrote in Module 1 rather than the course's copy.
+_mod = types.ModuleType("your_code")
 exec(compile(_a["code"], "your_code.py", "exec"), _mod.__dict__)
 _W = [np.array(w) for w in _a["weights"]]
 _B = [np.array(b).reshape(-1, 1) for b in _a["biases"]]
@@ -272,8 +275,12 @@ export function NetworkDiagram() {
       <div className="payoff">
         {!unlocked ? (
           <p className="payoff-locked">
-            This panel runs your own feedforward, so it needs the exercise below
-            passed first. Come back here once its tests are green.
+            This panel runs your own feedforward, with nothing borrowed, so it needs{" "}
+            {speakList(
+              lockedBy([feedforwardExercise.id], {
+                [feedforwardExercise.id]: "the exercise below",
+              }),
+            )}. Come back here once the tests are green.
           </p>
         ) : (
           <>

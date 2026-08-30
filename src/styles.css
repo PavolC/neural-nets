@@ -42,9 +42,15 @@
      the family renders at this scale and is centred, so one with fewer boxes
      in it is smaller rather than differently drawn: same stroke weight, same
      label size, whatever it contains. Each carries its own width as
-     --fig-units, set by fig() in ModuleBits. If a diagram is ever drawn wider
-     than 817 units it will be clamped by the column and drop below this
-     scale, which tools/../figcheck reports as a broken family. */
+     --fig-units, set by fig() in ModuleBits.
+
+     The literal below is the value for a column at its full width, and it is
+     what paints before any script runs. Once the shell has measured the
+     article it publishes the real one on the root, as --col-content / 817,
+     because the workbench can be dragged wider than the room beside the
+     column and the column then narrows. The calibration is the same
+     statement it always was; it is computed now rather than assumed, which
+     is what lets it stay true at more than one column width. */
   --fig-scale: 1.0685px;
   /* The floor it stops shrinking at on a phone, where it pans instead: the
      same 620px the widest one used to take, in the same proportion. */
@@ -84,6 +90,12 @@
   /* The reading column and the gutter table of contents beside it. The toc's
      position is computed from these rather than hardcoded, so moving the
      column cannot silently leave the toc behind. */
+  /* The sticky section bar, and with it the workbench's head: the two sit at
+     the same top when the panel is docked, so their bottom rules have to land
+     on one line. They were 53.4 and 57.1, and four pixels apart reads as a
+     misalignment rather than as two different things. Also what the in-page
+     jump offset clears, keyed to it so the two cannot drift. */
+  --bar-h: 54px;
   --col-width: 920px;
   --toc-width: 190px;
   --toc-gap: 28px;
@@ -197,38 +209,6 @@ button:disabled {
   outline-offset: -1px;
 }
 
-/* Fullscreen workbench: editor + run controls + output + results */
-.workbench-fullscreen {
-  position: fixed;
-  inset: 0;
-  z-index: 50;
-  background: var(--bg);
-  padding: 1rem 1.2rem;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
-.workbench-fullscreen .code-editor {
-  flex: 1 0 45vh;
-  height: auto;
-  resize: none;
-  margin: 0 0 0.6rem;
-}
-
-.workbench-fullscreen .exercise-tip {
-  display: none;
-}
-
-.workbench-fullscreen .output-panel pre {
-  max-height: 24vh;
-  overflow: auto;
-}
-
-.workbench-expand {
-  margin-left: auto;
-}
-
 /* A row of controls, under the editor or beside an interactive. */
 .exercise-controls,
 .interactive-controls {
@@ -301,15 +281,6 @@ button:disabled {
   max-height: 22em;
   margin: 0 0 0.4rem;
   white-space: pre-wrap;
-}
-
-.tests-viewer {
-  margin-top: 1rem;
-}
-
-.tests-viewer pre {
-  max-height: 420px;
-  overflow: auto;
 }
 
 .test-results {
@@ -408,10 +379,6 @@ button:disabled {
 
 .test-fail .test-mark {
   color: var(--loss);
-}
-
-.hints {
-  margin-top: 1.5rem;
 }
 
 .hint {
@@ -968,10 +935,22 @@ button:disabled {
   min-height: 2.9em;
 }
 
+/* A chip at rest is an outline pill: the base button rule fills every button
+   with the accent, so a chip that does not reset the fill is pixel-identical
+   to .chip-active, and all of a group's options read as selected at once.
+   That hid which lambda, start and view were chosen on every panel. Same
+   idiom as .button-secondary: transparent ground, accent ink, its own hover
+   at its own specificity, which never matches the active chip. */
 .chip {
   padding: 0.2rem 0.7rem;
   font-size: 0.85rem;
   border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--accent);
+}
+
+.chip:hover:not(:disabled):not(.chip-active) {
+  background: var(--accent-wash);
 }
 
 .chip-active {
@@ -2085,8 +2064,26 @@ button:disabled {
    they had asked for. */
 @media (max-width: 1399px) {
   .module-section-title {
-    scroll-margin-top: 68px;
+    scroll-margin-top: calc(var(--bar-h) + 14px);
   }
+}
+
+/* The same three rules again, on the one predicate the shell computes, which
+   is what the media queries above were approximating. They asked the window
+   how wide it is; what decides whether the gutter nav fits is how much room
+   is left beside the column, and the workbench takes some of it. Keyed
+   together so the bar and the offset that clears it can never disagree,
+   which is how a heading ends up behind the bar it was chosen from. */
+.shell[data-toc="bar"] .module-toc {
+  display: none;
+}
+
+.shell[data-toc="bar"] .module-jump {
+  display: block;
+}
+
+.shell[data-toc="bar"] .module-section-title {
+  scroll-margin-top: calc(var(--bar-h) + 14px);
 }
 
 /* A short accent rule above each section title. The page is a long single
@@ -2139,8 +2136,11 @@ button:disabled {
      The min() is the guard rail: 190 wide plus a 14px margin is 204, so it can
      never be pushed off the right edge. */
   left: min(
-    calc((100% - var(--col-width)) / 2 + var(--col-width) + var(--toc-gap)),
-    calc(100% - var(--toc-width) - 14px)
+    calc(
+      (100% - var(--dock-w, 0px) - var(--col-width)) / 2 + var(--col-width) +
+        var(--toc-gap)
+    ),
+    calc(100% - var(--dock-w, 0px) - var(--toc-width) - 14px)
   );
   width: var(--toc-width);
   max-height: 80vh;
@@ -2168,6 +2168,7 @@ button:disabled {
   top: 0;
   z-index: 20;
   display: none;
+  min-height: var(--bar-h);
   margin: 0 -1.25rem 1rem;
   background: var(--bg);
   border-bottom: 1px solid var(--rule);
@@ -2228,7 +2229,12 @@ button:disabled {
 
 .module-jump-list .module-toc-item {
   min-height: 44px;
-  padding: 0.5rem 0;
+  /* The left value is not decoration: the active item marks itself with a 2px
+     inset rule, and the base .module-toc-item reserves 0.7rem for it. A
+     padding shorthand here that names only two values resets that to zero and
+     puts the rule flush against the label, which is what the gutter nav does
+     not do and so reads as a mistake in the picker alone. */
+  padding: 0.5rem 0 0.5rem 0.7rem;
   font-size: 0.85rem;
 }
 
@@ -2308,14 +2314,15 @@ button:disabled {
    .scroll-x class on the same element supplies the overflow and the affordance
    that says it scrolls. */
 
-@media (max-width: 720px) {
-  .chain-ripple,
-  .chain-net,
-  .bp-diagram,
-  .ripple-slice {
-    min-width: calc(var(--fig-units) * var(--fig-scale-min));
-  }
-
+/* Unconditional, because the column can now narrow without the window
+   narrowing: dragging the workbench wider does to a figure exactly what a
+   phone does. Below the floor the diagram keeps its size and pans inside
+   .figure-scroll rather than shrinking its labels into illegibility. */
+.chain-ripple,
+.chain-net,
+.bp-diagram,
+.ripple-slice {
+  min-width: calc(var(--fig-units) * var(--fig-scale-min));
 }
 
 /* Module 5's pipeline picture: the implementation being superseded. */
@@ -3223,6 +3230,11 @@ button:disabled {
   .button-secondary,
   .start-outline-title,
   .start-progress-link,
+  .exercise-launcher-open,
+  .wb-section-item,
+  .wb-head button,
+  .wb-head summary,
+  .wb-scratch-controls button,
   .chip {
     min-height: 44px;
   }
@@ -3235,4 +3247,677 @@ button:disabled {
     min-height: 44px;
     padding-block: 0.5rem;
   }
+}
+
+/* ---------- the workbench ---------- */
+
+/* One panel, one editor, one file, for the whole course. Docked beside the
+   reading column on a wide screen and a full-screen sheet below 1360px.
+   Everything here lives in this stylesheet rather than in src/brand/, which
+   the sibling courses share: the panel is this course's, and the brand layer
+   loads first so anything below can override it.
+
+   #root, rather than .shell, holds the reading column away from the panel, so
+   the pre-mount placeholder in index.html is offset by the same rule as the
+   app that replaces it: a returning reader with the panel open does not watch
+   the column jump when React mounts. Padding rather than a grid track, for two
+   reasons: a 1fr track takes a min-content floor from the widest table in the
+   course, so minmax(0, 1fr) would be mandatory, and a grid item stretches by
+   default, which silently defeats position: sticky on the section bar inside
+   it. */
+#root {
+  padding-right: var(--dock-w, 0px);
+}
+
+/* The tab strip folds to the picker when the COLUMN is narrow, which is not
+   the same question as whether the window is. brand.css asks the window,
+   because a sibling course has no panel; this asks the column, and wins by
+   loading after it. */
+.shell[data-narrow="1"] .tabs {
+  display: none;
+}
+
+.shell[data-narrow="1"] .module-picker {
+  display: block;
+}
+
+/* The drag handle between the column and the panel. Wider than it looks: the
+   line is 1px and the grab area is 11, because a 1px target is not one. */
+.wb-grip {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: calc(var(--dock-w, 0px) - 5px);
+  width: 11px;
+  z-index: 31;
+  cursor: col-resize;
+  background: transparent;
+  touch-action: none;
+}
+
+.wb-grip::after {
+  content: "";
+  position: absolute;
+  inset: 0 5px;
+  background: var(--rule);
+}
+
+.wb-grip:hover::after,
+.wb-grip-dragging::after,
+.wb-grip:focus-visible::after {
+  background: var(--accent);
+}
+
+.wb-grip:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+}
+
+/* The tab that opens the panel when it is shut. Only where the panel can
+   dock: below that width it would open a full-screen sheet out of nowhere,
+   and the exercise cards are the way in. */
+.wb-handle {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  /* vertical-rl and nothing else. A rotate(180deg) on top of it was both
+     wrong ways round: it set the text bottom to top, which is the less
+     familiar of the two vertical settings for Latin type, and it turned the
+     whole box over, so the rounded corners authored for the left edge came
+     out on the right and the border left open against the screen edge came
+     out facing the page. */
+  writing-mode: vertical-rl;
+  z-index: 29;
+  padding: 1rem 0.35rem;
+  border: 1px solid var(--rule);
+  border-right: none;
+  border-radius: var(--radius) 0 0 var(--radius);
+  background: var(--surface-card);
+  color: var(--muted);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.wb-handle:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.wb {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--dock-w, 0px);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+  border-left: 1px solid var(--rule);
+  /* The head asks the panel how wide it is, not the window: the reader sets
+     this width by dragging, so a window query would answer the wrong question. */
+  container-type: inline-size;
+  /* Anything inside painting the shared scroll affordance covers its own
+     ground, and the panel's ground is the page's here. Declared rather than
+     inherited: a custom property that references another is substituted where
+     it is declared, so reading it from :root would freeze the page's value. */
+  --fig-ground: var(--bg);
+}
+
+.wb[hidden] {
+  display: none;
+}
+
+/* The one chrome row: the file's name, the button the loop uses, what that
+   button is pointed at, and the things reached for once a session. Two rows
+   were the name-and-buttons row over a controls row, 101px of chrome above a
+   panel that is mostly meant to be code. */
+.wb-head {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: var(--bar-h);
+  padding: 0 0.9rem;
+  border-bottom: 1px solid var(--rule);
+  /* The picker's menu hangs off this, and CodeMirror's own positioned boxes
+     come later in the DOM, so the head needs a layer of its own. */
+  position: relative;
+  z-index: 4;
+}
+
+/* Below 600px of panel the picker takes a row of its own, asked of the panel
+   and not of the window, because the reader sets the panel's width by dragging
+   it. Everything else in the head is fixed width: the file's name, Run tests,
+   Stop, More and Close come to 418px with the gaps and the padding, so under
+   600 there is nothing left to name a section in. Measured at 465px the picker
+   was a 39px box, and on a 390px phone a 20px one showing one letter, which is
+   the one thing in that row a reader needs to read. The threshold counts Stop,
+   which is only there during a run, so the head cannot change height under a
+   reader mid-run. */
+@container (max-width: 600px) {
+  .wb-head {
+    flex-wrap: wrap;
+    min-height: 0;
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+  }
+
+  .wb-sections {
+    order: 1;
+    flex: 1 0 100%;
+  }
+
+  .wb-sections > summary {
+    max-width: none;
+  }
+}
+
+.wb-head button {
+  font-size: 0.82rem;
+  padding: 0.28rem 0.7rem;
+  white-space: nowrap;
+}
+
+.wb-title {
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  margin: 0;
+  white-space: nowrap;
+}
+
+.wb-title code {
+  font-family: var(--font-mono);
+  color: var(--muted);
+}
+
+.wb-title:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* The rail: every section of the file, including the ones not written yet, so
+   the shape of the course is visible from Module 1. */
+.wb-repair {
+  flex: 0 0 auto;
+  padding: 0.6rem 0.9rem;
+  border-bottom: 1px solid var(--rule);
+  background: var(--accent-wash);
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+}
+
+.wb-repair p {
+  margin: 0 0 0.4rem;
+}
+
+/* One scroll for the whole panel: the chrome above it is fixed, and the code,
+   the output and the verdict flow down a single column. It was two scroll
+   boxes with two scrollbars, which meant two keyholes and neither half able to
+   use the other's space. The editor therefore has no height of its own and no
+   scroller of its own; it grows to its content and this is what scrolls. */
+.wb-flow {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.wb-flow .code-editor.wb-editor {
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+  resize: none;
+}
+
+.wb-flow .wb-editor .cm-editor {
+  height: auto;
+}
+
+/* The editor stops being the scroll container, so CodeMirror scrolls the panel
+   instead. Its own scroller must not clip, or the tail of the document is
+   unreachable. */
+.wb-flow .wb-editor .cm-scroller {
+  overflow: visible;
+}
+
+.wb-results {
+  padding: 0.4rem 0.9rem 2rem;
+}
+
+/* What the run is saying, on a line of its own under the head. In the head it
+   was the sixth thing in the row and about 50px wide, so "Running the
+   tests..." rendered as "R...". Nothing renders here at rest, so the chrome is
+   still one row until a run starts. */
+.wb-status {
+  flex: 0 0 auto;
+  margin: 0;
+  /* Kept shallow on purpose. The strip is there only during a run, so the code
+     under it moves by exactly this much when one starts, in the course's
+     tightest loop. */
+  padding: 0.2rem 0.9rem;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.wb-status-error {
+  color: var(--loss);
+  background: color-mix(in srgb, var(--loss) 7%, transparent);
+}
+
+.wb-more {
+  flex: 0 0 auto;
+  /* The status used to be the spring that held these two at the right edge. */
+  margin-left: auto;
+  position: relative;
+  font-family: var(--font-ui);
+}
+
+.wb-more-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 3;
+  width: min(22rem, 80vw);
+  padding: 0.6rem;
+  background: var(--surface-card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+.wb-more-tip {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* Dressed as the secondary buttons beside it, so the right end of the row
+   reads as two controls rather than a control and a line of text. */
+.wb-more > summary {
+  display: inline-block;
+  padding: 0.28rem 0.7rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--muted);
+  white-space: nowrap;
+  cursor: pointer;
+  list-style: none;
+}
+
+.wb-more > summary::-webkit-details-marker {
+  display: none;
+}
+
+.wb-more > summary::after {
+  content: " \25be";
+}
+
+.wb-more > summary:hover,
+.wb-more[open] > summary {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* An explicit display on a child of a closed <details> is laid out anyway in
+   Chromium, so the menu showed with the disclosure shut. Hide it on the same
+   selector that gives it a display, rather than relying on the UA. */
+.wb-more:not([open]) .wb-more-menu {
+  display: none;
+}
+
+.wb-more[open] .wb-more-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.wb-lent {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+  border-left: 3px solid var(--rule);
+  padding-left: 0.6rem;
+  margin: 0.6rem 0;
+}
+
+/* The card that says the failure is not in the section being looked at. An
+   AssertionError carries no line number, so this is the only thing that can
+   point at the section that is really wrong. */
+.wb-blame {
+  border: 1px solid var(--rule);
+  border-left: 3px solid var(--loss);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.75rem;
+  margin: 0.6rem 0;
+  font-size: 0.88rem;
+}
+
+.wb-blame p {
+  margin: 0.3rem 0;
+}
+
+.wb-blame-message {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.wb-goto {
+  margin-top: 0.4rem;
+  font-size: 0.78rem;
+}
+
+.wb-scratch {
+  margin: 0.7rem 0;
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.wb-scratch > summary {
+  cursor: pointer;
+}
+
+.wb-scratch-note {
+  margin: 0.4rem 0;
+}
+
+.wb-scratch-editor {
+  height: 180px;
+  margin: 0.4rem 0 0;
+}
+
+/* Below the dock threshold the panel is a sheet: the one place in the course
+   where reading and coding cannot happen at once, because there is no width
+   in which both fit. Said plainly rather than dressed up. */
+.wb[data-dock="sheet"] {
+  inset: 0;
+  width: auto;
+  border-left: none;
+  z-index: 50;
+}
+
+
+/* The exercise's launcher: what is left in the module page where the editor
+   used to be. Rendered as a <p> so it is a direct child of .exercise and
+   inherits the prose measure through the rule that is already there, rather
+   than needing a selector of its own in the measure list. */
+.exercise-launcher {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  margin: 1rem auto 0.8rem;
+}
+
+.exercise-launcher-open {
+  flex: 0 0 auto;
+}
+
+.exercise-launcher-state {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+
+/* The folded receipts. A passing check is not a finding, so it reads as one
+   line with a count, and the list is one press away for anyone who wants it. */
+.test-passed {
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin: 0.5rem auto;
+}
+
+.test-passed > summary {
+  cursor: pointer;
+  color: var(--accent);
+}
+
+.test-passed .test-mark {
+  margin-right: 0.35rem;
+}
+
+.test-passed ul {
+  margin: 0.4rem 0 0;
+  padding-left: 1.6rem;
+}
+
+.test-passed li {
+  margin: 0.15rem 0;
+}
+
+/* The run marker beside each section line, and the gutter that holds it. */
+.wb-editor .cm-run-gutter {
+  padding: 0 0.15rem 0 0.25rem;
+}
+
+.wb-editor .cm-run-section {
+  display: block;
+  padding: 0 0.15rem;
+  border: none;
+  background: transparent;
+  color: color-mix(in srgb, var(--accent) 45%, transparent);
+  font-size: 0.7rem;
+  line-height: inherit;
+  cursor: pointer;
+}
+
+.wb-editor .cm-run-section:hover,
+.wb-editor .cm-run-section:focus-visible {
+  color: var(--accent);
+}
+
+/* CodeMirror's own spacer element, the one that reserves the column's width,
+   already carries visibility: hidden, so nothing is needed here for it. Noted
+   because the obvious rule to add is dead code. */
+
+/* The scratch pad's own Run. A cell owns its run button, which is the one
+   notebook habit worth copying here: "Run my code" sat in the chrome row
+   beside "Run tests" as if the two were a choice to make every time, when one
+   is the loop and the other is an aside about the block of code just below
+   this button. */
+.wb-scratch-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.wb-scratch-hint {
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+/* The section picker. Eleven rows, each with its state, opened from the head.
+   It replaces a rail of chips that panned: at the dock's own width that rail
+   showed four of the eleven, which is a keyhole onto the course rather than a
+   picture of it, and it cost 50px of every screen to do that. */
+.wb-sections {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-family: var(--font-ui);
+}
+
+.wb-sections > summary {
+  display: block;
+  max-width: 30ch;
+  padding: 0.28rem 0.6rem;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  font-size: 0.82rem;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  list-style: none;
+}
+
+.wb-sections > summary::-webkit-details-marker {
+  display: none;
+}
+
+.wb-sections > summary::after {
+  content: " \25be";
+  color: var(--muted);
+}
+
+.wb-sections > summary:hover,
+.wb-sections[open] > summary {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.wb-sections:not([open]) .wb-sections-menu {
+  display: none;
+}
+
+.wb-sections-menu {
+  /* Anchored to the head, not to the summary: the summary sits after the
+     file's name and the Run button, so a menu hung off its left edge ran past
+     the panel's right edge at the narrow dock and the states were cut off.
+     The head rather than the panel, because on the sheet the head is two rows
+     and the menu has to clear whichever it is. */
+  position: absolute;
+  left: 0.9rem;
+  right: 0.9rem;
+  top: calc(100% + 0.35rem);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding: 0.3rem;
+  background: var(--surface-card);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+.wb-section-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.wb-section-item:hover {
+  background: var(--accent-wash);
+}
+
+.wb-section-current {
+  box-shadow: inset 2px 0 0 var(--accent);
+  color: var(--accent);
+}
+
+.wb-section-mark {
+  flex: 0 0 1em;
+  color: var(--muted);
+}
+
+.wb-section-passing .wb-section-mark {
+  color: var(--accent);
+}
+
+.wb-section-stale .wb-section-mark {
+  color: var(--loss);
+}
+
+.wb-section-name {
+  /* min-width: 0 is what keeps the state visible. A flex item cannot shrink
+     below its content without it, so the longest label (38 characters) pushed
+     "written, not passing yet" off the menu's right edge. */
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.wb-section-state {
+  flex: 0 0 auto;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+
+/* Back to the code, in the output's own heading. One scroll means the code is
+   above whatever a run just produced, sometimes thousands of pixels above. */
+.wb-back {
+  float: right;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--accent);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  text-transform: none;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+
+.wb-back:hover {
+  text-decoration: underline;
+}
+
+/* The hints and the test code, which used to sit in the module page. They are
+   reference for while you are coding, so they belong beside the code. */
+.wb-help {
+  margin: 1rem 0;
+}
+
+.wb-tests {
+  font-family: var(--font-ui);
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.wb-tests > summary {
+  cursor: pointer;
+}
+
+.wb-tests pre {
+  margin: 0.5rem 0 0;
+  padding: 0.7rem;
+  background: var(--surface-sunken);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  font-size: 0.78rem;
+}
+
+.wb-hints {
+  margin-top: 0.8rem;
+}
+
+.wb-hints .hint {
+  margin: 0 0 0.7rem;
+}
+
+.wb-hints .hint h5 {
+  margin: 0 0 0.3rem;
+}
+
+.wb-hints .hint-pre {
+  font-size: 0.78rem;
 }

@@ -1,12 +1,9 @@
 # Reference solution, adapted from Michael Nielsen's network.py (MIT license,
 # github.com/mnielsen/neural-networks-and-deep-learning).
 
-import numpy as np
-from course import sigmoid
-
 
 def sigmoid_prime(z):
-    """Sigmoid's steepness at z: sigmoid(z) * (1 - sigmoid(z)), elementwise."""
+    """The squash's slope at z: sigmoid(z) * (1 - sigmoid(z)), elementwise."""
     s = sigmoid(z)
     return s * (1.0 - s)
 
@@ -34,7 +31,7 @@ def backprop(weights, biases, x, y):
     # BP2: carry the blame backward, one layer at a time.
     for l in range(2, len(weights) + 1):
         delta = (weights[-l + 1].T @ delta) * sigmoid_prime(zs[-l])
-        nabla_b[-l] = delta                        # BP3
+        nabla_b[-l] = delta                          # BP3
         nabla_w[-l] = delta @ activations[-l - 1].T  # BP4
 
     return nabla_w, nabla_b
