@@ -151,6 +151,7 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
   { id: "hop", symbol: <code>the hop</code>, means: "what one backward step of BP2 does to the size of a blame column", from: "Module 8" },
   { id: "relu", symbol: <code>ReLU</code>, means: "max(0, z): a squash with no ceiling, read as ray-loo", from: "Module 8" },
   { id: "argmax", symbol: <code>np.argmax(A, axis=0)</code>, means: "which row holds the largest value, down each column", from: "Module 9" },
+  { id: "boolmean", symbol: <code>(a == b).mean()</code>, means: "compare entry by entry, then average the True/False result: True counts as 1, so the mean is the share that match", from: "Module 9" },
   { id: "derivative", symbol: <code>derivative</code>, means: "the field's word for the slope you have been nudging and measuring since Module 3", from: "Module 9" },
   { id: "standardize", symbol: <code>standardize</code>, means: "shift and scale a feature to sit near 0 and about 1 wide", from: "Module 10" },
   { id: "baseline", symbol: <code>baseline</code>, means: "the score of always answering the commonest class: what any real score has to beat", from: "Module 10" },
