@@ -173,6 +173,25 @@ editor contents never sent; see `src/analytics.ts`).
   in `tools/workbench.py`), and a locked note names what is actually missing
   through one shared phrase map (`interactives/lockedBy.ts`) instead of a
   hand-kept list per panel that could claim to wait on a finished exercise.
+- **A payoff panel that varies settings runs its whole grid on one press**
+  (decided when the primary learner asked plainly: run all the runs, plot it
+  all, drop the buttons). The weight-decay panel is the 2-by-3 grid its
+  section argues from (two starts, lambda 0, 1 and 5) and the depth panel is
+  a 2-by-2 (one hidden layer against four, under each squash); both used to
+  offer the settings as chips and train one pair per press, which left the
+  reader assembling the comparison from memory. Three same-day patches (a
+  drawn-with status, a table accumulating one row per setting trained, a
+  cache so nothing retrains) were explaining that design rather than fixing
+  it: the chips were the problem, not the feedback around them. One button
+  now trains every run, streaming each line as it finishes; hue carries one
+  axis and dash pattern the other; the table lists every row; the only chips
+  left switch what the chart shows, never what the next press trains. Each
+  run draws its start and its shuffle from fresh fixed seeds, so the runs are
+  byte-identical to the runs the old panels trained and every number the
+  modules quote from the benches holds. The snippets take a runs list, and
+  check_panels passes each panel one mixed list that walks both of its code
+  paths. The accepted cost is that a press is minutes rather than seconds,
+  with Stop the way out.
 - **Module 7 asks the learner to edit their own Module 5 backprop** (the BP1
   seam). It is the first time the course asks anyone to change working code, and a
   single file is the only design where that is a two-line edit rather than an

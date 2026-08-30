@@ -8,12 +8,12 @@ import { sgdExercise } from "../../../exercises/sgd";
 import { EpochChart, type EpochSeries } from "./EpochChart";
 import { lockedBy, speakList } from "./lockedBy";
 
-// Module 8's payoff run: the same digit reader at two depths, trained by the
-// learner's own sgd from their own starting point, so the collapse the bars
-// predicted shows up as epochs that go nowhere. The squash is a choice,
-// because the ReLU comparison is the whole point of the section it sits in;
-// with ReLU chosen, the gradient is the course's (their backprop has the
-// sigmoid built into BP2), and the sgd is still theirs.
+// Module 8's payoff run: the same digit reader at two depths under each
+// squash, trained by the learner's own sgd from their own starting point, so
+// the collapse the bars predicted shows up as epochs that go nowhere, with
+// the repair drawn beside it. One button runs the whole experiment: the panel
+// used to offer the squash as chips and train one pair per press, and the
+// four-way comparison the section makes lived in the reader's memory.
 
 const EPOCHS = 15;
 const DEEP = 4;
@@ -21,16 +21,37 @@ const DEEP = 4;
 // Module 7. Found by trying, on the shallow network, at fifteen epochs.
 const ETA: Record<string, number> = { sigmoid: 0.5, relu: 0.05 };
 
+// The fixed experiment, in chart and table order: the sigmoid pair, then the
+// ReLU pair. Hue carries the squash, dash pattern carries the depth. For the
+// sigmoid runs the gradient is the learner's own backprop; for the ReLU runs
+// it is the course's two-line variant of it, written into the snippet.
+const RUNS: { activation: "sigmoid" | "relu"; hidden: number; eta: number }[] = [
+  { activation: "sigmoid", hidden: 1, eta: ETA.sigmoid },
+  { activation: "sigmoid", hidden: DEEP, eta: ETA.sigmoid },
+  { activation: "relu", hidden: 1, eta: ETA.relu },
+  { activation: "relu", hidden: DEEP, eta: ETA.relu },
+];
+
+const runKey = (r: { activation: string; hidden: number }) => `${r.activation}|${r.hidden}`;
+const squashName = (a: string) => (a === "relu" ? "ReLU" : "sigmoid");
+const depthName = (h: number) => (h === 1 ? "1 hidden layer" : `${h} hidden layers`);
+const runName = (r: { activation: string; hidden: number }) =>
+  `${squashName(r.activation)}, ${depthName(r.hidden)}`;
+const lineCls = (r: { activation: string; hidden: number }) =>
+  (r.activation === "sigmoid" ? "m7-line-a" : "m7-line-b") +
+  (r.hidden === 1 ? " m7-line-dashed" : "");
+
+// Each run draws its start and its shuffle from fresh fixed seeds, so the
+// four runs are the same runs however they are grouped, and the numbers the
+// module quotes from bench_depth.py hold.
 const SNIPPET = `
 import json, time, types
 import numpy as np
 
 _a = json.loads(_args_json)
-_act = _a["activation"]
-_eta = _a["eta"]
 
 # The learner's file, once, up to and including their better starting point.
-# With the sigmoid chosen, every gradient below is computed by their own
+# For the sigmoid runs, every gradient below is computed by their own
 # backprop, through the adapter written for them in Module 5.
 _lib = types.ModuleType("your_code")
 exec(compile(_a["code"], "your_code.py", "exec"), _lib.__dict__)
@@ -77,11 +98,6 @@ def _relu_feedforward(weights, biases, X):
         a = sigmoid(z) if i == L - 1 else np.maximum(0.0, z)
     return a
 
-def _one_example(weights, biases, x, y):
-    if _act == "relu":
-        return _relu_backprop(weights, biases, x, y)
-    return _lib.backprop(weights, biases, x, y, _lib.cross_entropy_delta)
-
 def _grad(weights, biases, X, Y):
     if _act == "relu":
         m = X.shape[1]
@@ -94,9 +110,8 @@ def _grad(weights, biases, X, Y):
         return [t / m for t in nw], [t / m for t in nb]
     return _lib.batch_gradient(weights, biases, X, Y, _lib.cross_entropy_delta)
 
-_predict = _relu_feedforward if _act == "relu" else feedforward
-
-# Their sgd, walking on whichever gradient the squash calls for.
+# Their sgd, walking on whichever gradient the run's squash calls for: _grad
+# reads _act, which the loop below sets per run.
 _lib.gradient = _grad
 
 def _layer_speeds(weights, biases, n=100):
@@ -105,21 +120,28 @@ def _layer_speeds(weights, biases, n=100):
     return [float(np.linalg.norm(g)) for g in nb]
 
 _out = {}
-for _key, _hidden in (("shallow", 1), ("deep", ${DEEP})):
+for _i, _cfg in enumerate(_a["runs"]):
+    _act = _cfg["activation"]
+    _eta = float(_cfg["eta"])
+    _hidden = int(_cfg["hidden"])
+    _key = _act + "|" + str(_hidden)
     _sizes = [784] + [30] * _hidden + [10]
-    _label = "1 hidden layer" if _hidden == 1 else str(_hidden) + " hidden layers"
+    _predict = _relu_feedforward if _act == "relu" else feedforward
     weights, biases = _lib.init_network(_sizes, np.random.default_rng(8))
-    _js_report(json.dumps({"kind": "start", "key": _key, "label": _label,
+    _js_report(json.dumps({"kind": "start", "key": _key, "run_index": _i,
+                           "activation": _act, "hidden": _hidden,
                            "sizes": _sizes, "speeds": _layer_speeds(weights, biases)}))
     _rng = np.random.default_rng(2)
     _t0 = time.time()
     for _e in range(1, ${EPOCHS} + 1):
         weights, biases = _lib.sgd(weights, biases, X_train, Y_train, _eta, 1, 10, _rng)
         _acc = float((np.argmax(_predict(weights, biases, X_test), axis=0) == y_test).mean())
-        _js_report(json.dumps({"kind": "epoch", "key": _key, "label": _label,
+        _js_report(json.dumps({"kind": "epoch", "key": _key, "run_index": _i,
+                               "activation": _act, "hidden": _hidden,
                                "epoch": _e, "accuracy": _acc,
                                "elapsed": time.time() - _t0}))
-    _out[_key] = {"accuracy": _acc, "seconds": time.time() - _t0,
+    _out[_key] = {"activation": _act, "hidden": _hidden, "accuracy": _acc,
+                  "seconds": time.time() - _t0,
                   "speeds_end": _layer_speeds(weights, biases)}
 
 json.dumps({"runs": _out, "n_test": int(X_test.shape[1])})
@@ -128,7 +150,9 @@ json.dumps({"runs": _out, "n_test": int(X_test.shape[1])})
 interface StartReport {
   kind: "start";
   key: string;
-  label: string;
+  run_index: number;
+  activation: string;
+  hidden: number;
   sizes: number[];
   speeds: number[];
 }
@@ -136,21 +160,26 @@ interface StartReport {
 interface EpochReport {
   kind: "epoch";
   key: string;
-  label: string;
+  run_index: number;
+  activation: string;
+  hidden: number;
   epoch: number;
   accuracy: number;
   elapsed: number;
 }
 
-interface Summary {
-  runs: Record<string, { accuracy: number; seconds: number; speeds_end: number[] }>;
-  n_test: number;
+interface RunSummary {
+  activation: string;
+  hidden: number;
+  accuracy: number;
+  seconds: number;
+  speeds_end: number[];
 }
 
-const LINES: Record<string, { label: string; cls: string; dashed?: boolean }> = {
-  shallow: { label: "1 hidden layer (Module 7's network)", cls: "m7-line-a", dashed: true },
-  deep: { label: `${DEEP} hidden layers of 30`, cls: "m7-line-b" },
-};
+interface Summary {
+  runs: Record<string, RunSummary>;
+  n_test: number;
+}
 
 const needed = () =>
   codeReady(crossEntropyExercise.id) &&
@@ -159,8 +188,6 @@ const needed = () =>
 
 export function DepthTrainPanel() {
   const [unlocked, setUnlocked] = useState(needed);
-  const [activation, setActivation] = useState("sigmoid");
-  const [ranWith, setRanWith] = useState("sigmoid");
   const [starts, setStarts] = useState<StartReport[]>([]);
   const [points, setPoints] = useState<EpochReport[]>([]);
   const [status, setStatus] = useState("");
@@ -176,7 +203,6 @@ export function DepthTrainPanel() {
     const code = loadCode(smartInitExercise.id);
     if (!code) return;
     setRunning(true);
-    setRanWith(activation);
     setStarts([]);
     setPoints([]);
     setSummary(null);
@@ -186,20 +212,21 @@ export function DepthTrainPanel() {
       {
         type: "runPython",
         code: SNIPPET,
-        args: { code, activation, eta: ETA[activation] },
+        args: { code, runs: RUNS },
         dataUrl: assetUrl("data/mnist_subset.bin.gz"),
       },
       (msg) => {
         if (msg.type === "status") setStatus(msg.text);
         if (msg.type === "report") {
           const r = msg.payload as StartReport | EpochReport;
+          const name = `run ${r.run_index + 1} of ${RUNS.length} (${runName(r)})`;
           if (r.kind === "start") {
             setStarts((prev) => [...prev, r]);
-            setStatus(`${r.label}: measuring every layer before the first step...`);
+            setStatus(`${name}: measuring every layer before the first step...`);
           } else {
             setPoints((prev) => [...prev, r]);
             setStatus(
-              `${r.label}: epoch ${r.epoch}/${EPOCHS}, ` +
+              `${name}: epoch ${r.epoch}/${EPOCHS}, ` +
                 `${(r.accuracy * 100).toFixed(1)}% of the test digits, ${r.elapsed.toFixed(1)}s`,
             );
           }
@@ -229,33 +256,34 @@ export function DepthTrainPanel() {
     );
     return (
       <p className="payoff-locked">
-        This run needs {missing}: it builds both networks with your init_network
-        and trains them with your sgd, with nothing borrowed.
+        This experiment needs {missing}: it builds all four networks with your
+        init_network and trains them with your sgd, with nothing borrowed.
       </p>
     );
   }
 
-  const series: EpochSeries[] = Object.keys(LINES)
-    .map((key) => ({
-      key,
-      label: LINES[key].label,
-      cls: LINES[key].cls,
-      dashed: LINES[key].dashed,
-      values: points.filter((p) => p.key === key).map((p) => p.accuracy),
-    }))
-    .filter((s) => s.values.length > 0);
+  const series: EpochSeries[] = RUNS.map((r) => ({
+    key: runKey(r),
+    label: runName(r),
+    cls: lineCls(r),
+    values: points.filter((p) => p.key === runKey(r)).map((p) => p.accuracy),
+  })).filter((s) => s.values.length > 0);
 
-  const deepStart = starts.find((s) => s.key === "deep");
-  const endSpeeds = summary?.runs["deep"].speeds_end ?? [];
-  const startRatio = deepStart
-    ? deepStart.speeds[deepStart.speeds.length - 1] / deepStart.speeds[0]
-    : 0;
+  // The pre-run table shows the deep networks only: the shallow starts have
+  // two layers to report, and the imbalance the section is about needs five.
+  const deepStarts = starts.filter((s) => s.hidden === DEEP);
+  const ratio = (speeds: number[]) => speeds[speeds.length - 1] / speeds[0];
+  const fmtRatio = (x: number) => (x < 10 ? x.toFixed(1) : x.toFixed(0));
+  const fmtSpeed = (s: number) => (s < 0.01 ? s.toExponential(2) : s.toFixed(4));
+  const sigDeep = summary?.runs[`sigmoid|${DEEP}`];
+  const sigDeepStart = starts.find((s) => s.key === `sigmoid|${DEEP}`);
+  const reluDeepStart = starts.find((s) => s.key === `relu|${DEEP}`);
 
   return (
     <div className="interactive">
       <div className="interactive-controls">
         <button onClick={run} disabled={running}>
-          {running ? "Training..." : summary ? "Run both again" : "Train both depths"}
+          {running ? "Training..." : summary ? "Run all four again" : "Train all four runs"}
         </button>
         {running && (
           <button className="button-secondary" onClick={terminateWorker}>
@@ -267,45 +295,35 @@ export function DepthTrainPanel() {
         </span>
       </div>
       <div className="interactive-controls">
-        <fieldset className="m7-choice">
-          <legend>what the hidden neurons squash with</legend>
-          <button
-            className={`chip ${activation === "sigmoid" ? "chip-active" : ""}`}
-            onClick={() => setActivation("sigmoid")}
-            disabled={running}
-          >
-            sigmoid (your backprop)
-          </button>
-          <button
-            className={`chip ${activation === "relu" ? "chip-active" : ""}`}
-            onClick={() => setActivation("relu")}
-            disabled={running}
-          >
-            ReLU (the course's)
-          </button>
-        </fieldset>
         <p className="m8-eta-note">
-          step size {ETA[activation]}, {EPOCHS} epochs, 5,000 images, mini-batches of 10
+          {EPOCHS} epochs each, 5,000 images, mini-batches of 10; step size{" "}
+          {ETA.sigmoid} for the sigmoid runs and {ETA.relu} for ReLU
         </p>
       </div>
-      {deepStart && (
+      {deepStarts.length > 0 && (
         <div className="table-scroll scroll-x" tabIndex={0}>
           <table className="truth-table">
             <thead>
               <tr>
-                <th>{deepStart.sizes.join("-")}, before a single step</th>
-                {deepStart.speeds.map((_, i) => (
+                <th>{deepStarts[0].sizes.join("-")}, before a single step</th>
+                {deepStarts[0].speeds.map((_, i) => (
                   <th key={i}>layer {i + 2}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>learning speed, from your gradient</td>
-                {deepStart.speeds.map((s, i) => (
-                  <td key={i}>{s < 0.01 ? s.toExponential(2) : s.toFixed(4)}</td>
-                ))}
-              </tr>
+              {deepStarts.map((s) => (
+                <tr key={s.key}>
+                  <td>
+                    {s.activation === "relu"
+                      ? "ReLU, from the course's gradient"
+                      : "sigmoid, from your gradient"}
+                  </td>
+                  {s.speeds.map((v, i) => (
+                    <td key={i}>{fmtSpeed(v)}</td>
+                  ))}
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -325,33 +343,57 @@ export function DepthTrainPanel() {
           ]}
           yLabel="test accuracy"
           xLabel="epoch (one full pass through the 5,000 training images)"
-          ariaLabel="Test accuracy per epoch for a network with one hidden layer and one with four, trained identically."
+          ariaLabel="Test accuracy per epoch for four runs: one hidden layer and four hidden layers, under the sigmoid and under ReLU."
         />
       )}
       {summary && (
         <div className="interactive-status">
-          <p>
-            After {EPOCHS} epochs, out of {summary.n_test.toLocaleString()} held-out
-            digits: one hidden layer reads{" "}
-            <b>{(summary.runs["shallow"].accuracy * 100).toFixed(1)}%</b>, {DEEP} hidden
-            layers read <b>{(summary.runs["deep"].accuracy * 100).toFixed(1)}%</b>. Same
-            images, same shuffle, same step size, same sgd, {DEEP - 1} extra layers of 30
-            neurons and{" "}
-            {ranWith === "relu"
-              ? "a squash with no ceiling on its slope"
-              : "a squash whose slope never exceeds 0.25"}
-            .
-          </p>
-          <p>
-            The deep network's layer speeds have levelled out by the end. Its first
-            hidden layer finishes at {endSpeeds[0].toExponential(2)} against{" "}
-            {endSpeeds[endSpeeds.length - 1].toExponential(2)} at the output, where
-            the table above the chart started them{" "}
-            <b>{startRatio < 10 ? startRatio.toFixed(1) : startRatio.toFixed(0)}</b>{" "}
-            times apart. The imbalance is a condition of the starting point, and the
-            epochs the network spends working out of it are what the left-hand end of
-            the chart is showing.
-          </p>
+          {sigDeep && sigDeepStart && (
+            <p>
+              The deep sigmoid network's layer speeds have levelled out by the
+              end: its first hidden layer finishes at{" "}
+              {fmtSpeed(sigDeep.speeds_end[0])} against{" "}
+              {fmtSpeed(sigDeep.speeds_end[sigDeep.speeds_end.length - 1])} at the
+              output, where the table above the chart started them{" "}
+              <b>{fmtRatio(ratio(sigDeepStart.speeds))}</b> times apart. The
+              imbalance is a condition of the starting point, and the epochs that
+              run spends working out of it are what the flat start of its line is
+              showing.
+              {reluDeepStart && (
+                <>
+                  {" "}
+                  The ReLU start is {fmtRatio(ratio(reluDeepStart.speeds))} times
+                  apart, and its deep line has no such flat start to work out of.
+                </>
+              )}
+            </p>
+          )}
+          <div className="table-scroll scroll-x" tabIndex={0}>
+            <table className="truth-table">
+              <thead>
+                <tr>
+                  <th>after {EPOCHS} epochs</th>
+                  <th>step size</th>
+                  <th>the {summary.n_test.toLocaleString()} held out</th>
+                  <th>first hidden layer's learning speed at the end</th>
+                </tr>
+              </thead>
+              <tbody>
+                {RUNS.map((r) => {
+                  const s = summary.runs[runKey(r)];
+                  if (!s) return null;
+                  return (
+                    <tr key={runKey(r)}>
+                      <td>{runName(r)}</td>
+                      <td>{r.eta}</td>
+                      <td>{(s.accuracy * 100).toFixed(1)}%</td>
+                      <td>{fmtSpeed(s.speeds_end[0])}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
         </div>
       )}
     </div>
