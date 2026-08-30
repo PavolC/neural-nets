@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { assetUrl } from "../../../runtime/assets";
 import { sendRequest, terminateWorker } from "../../../runtime/workerClient";
 import { codeReady, loadCode, subscribeProgress } from "../../../state/progress";
@@ -142,8 +142,14 @@ interface EpochReport {
   elapsed: number;
 }
 
+interface RunSummary {
+  accuracy: number;
+  seconds: number;
+  speeds_end: number[];
+}
+
 interface Summary {
-  runs: Record<string, { accuracy: number; seconds: number; speeds_end: number[] }>;
+  runs: Record<string, RunSummary>;
   n_test: number;
 }
 
@@ -160,7 +166,36 @@ const needed = () =>
 export function DepthTrainPanel() {
   const [unlocked, setUnlocked] = useState(needed);
   const [activation, setActivation] = useState("sigmoid");
-  const [ranWith, setRanWith] = useState("sigmoid");
+  // What the drawn chart was actually trained with. The chips select the NEXT
+  // run, and nothing retrains on a click (a run is fifteen epochs at each
+  // depth), so the panel has to say which squash the lines on screen came
+  // from and which is merely selected.
+  const [drawnWith, setDrawnWith] = useState<string | null>(null);
+  // Every squash trained this session, one row per (squash, depth), a rerun
+  // replacing its own two rows. The chart draws the latest run; the table is
+  // where runs meet, because the comparison the section makes (four hidden
+  // layers against one, under each squash) is across runs, and a summary
+  // that only described the last run erased one side of it. The squash is
+  // the whole key: the step size is a function of it, never chosen on its
+  // own.
+  const [history, setHistory] = useState<
+    { activation: string; depth: "shallow" | "deep"; s: RunSummary }[]
+  >([]);
+  // Everything a finished run drew, keyed by its squash. Same seed and same
+  // settings give byte-identical training, so a squash trained once this
+  // session is never trained again: selecting it back redraws the chart, the
+  // speed table and the summary with no run at all. Unlike the weight-decay
+  // panel there is no partial case (both depths belong to one squash), so
+  // the snippet never needs to be asked for less than both, and stays the
+  // exact path check_panels verifies. The refs mirror what setStarts and
+  // setPoints receive, because the completion callback cannot read fresh
+  // state through its own closure. A stopped run caches nothing, so partial
+  // lines can never be replayed as finished ones.
+  const runCache = useRef(
+    new Map<string, { starts: StartReport[]; points: EpochReport[]; summary: Summary }>(),
+  );
+  const startsRef = useRef<StartReport[]>([]);
+  const reportsRef = useRef<EpochReport[]>([]);
   const [starts, setStarts] = useState<StartReport[]>([]);
   const [points, setPoints] = useState<EpochReport[]>([]);
   const [status, setStatus] = useState("");
@@ -170,17 +205,30 @@ export function DepthTrainPanel() {
 
   useEffect(() => subscribeProgress(() => setUnlocked(needed())), []);
 
+  const squashName = (a: string) =>
+    a === "relu" ? "ReLU (the course's)" : "sigmoid (your backprop)";
+
   const run = () => {
     // One projection: the file through the starting-point section already
     // holds their sgd, their backprop and their cross-entropy blame.
     const code = loadCode(smartInitExercise.id);
     if (!code) return;
+    setError(null);
+    setDrawnWith(activation);
+    const cached = runCache.current.get(activation);
+    if (cached) {
+      // This squash already trained this session: redraw, train nothing.
+      setStarts(cached.starts);
+      setPoints(cached.points);
+      setSummary(cached.summary);
+      return;
+    }
     setRunning(true);
-    setRanWith(activation);
     setStarts([]);
     setPoints([]);
+    startsRef.current = [];
+    reportsRef.current = [];
     setSummary(null);
-    setError(null);
     setStatus("Starting...");
     sendRequest(
       {
@@ -194,9 +242,11 @@ export function DepthTrainPanel() {
         if (msg.type === "report") {
           const r = msg.payload as StartReport | EpochReport;
           if (r.kind === "start") {
+            startsRef.current.push(r);
             setStarts((prev) => [...prev, r]);
             setStatus(`${r.label}: measuring every layer before the first step...`);
           } else {
+            reportsRef.current.push(r);
             setPoints((prev) => [...prev, r]);
             setStatus(
               `${r.label}: epoch ${r.epoch}/${EPOCHS}, ` +
@@ -205,7 +255,28 @@ export function DepthTrainPanel() {
           }
         }
         if (msg.type === "pythonDone") {
-          setSummary(msg.result as Summary);
+          const done = msg.result as Summary;
+          setSummary(done);
+          runCache.current.set(activation, {
+            starts: startsRef.current,
+            points: reportsRef.current,
+            summary: done,
+          });
+          setHistory((prev) => {
+            const next = prev.filter((r) => r.activation !== activation);
+            next.push({ activation, depth: "shallow", s: done.runs["shallow"] });
+            next.push({ activation, depth: "deep", s: done.runs["deep"] });
+            next.sort((a, b) =>
+              a.activation !== b.activation
+                ? a.activation === "sigmoid"
+                  ? -1
+                  : 1
+                : a.depth === "shallow"
+                  ? -1
+                  : 1,
+            );
+            return next;
+          });
           setRunning(false);
           setStatus("");
         }
@@ -251,11 +322,17 @@ export function DepthTrainPanel() {
     ? deepStart.speeds[deepStart.speeds.length - 1] / deepStart.speeds[0]
     : 0;
 
+  const runLabel = runCache.current.has(activation)
+    ? "Redraw this pair"
+    : summary
+      ? "Run both again"
+      : "Train both depths";
+
   return (
     <div className="interactive">
       <div className="interactive-controls">
         <button onClick={run} disabled={running}>
-          {running ? "Training..." : summary ? "Run both again" : "Train both depths"}
+          {running ? "Training..." : runLabel}
         </button>
         {running && (
           <button className="button-secondary" onClick={terminateWorker}>
@@ -263,7 +340,12 @@ export function DepthTrainPanel() {
           </button>
         )}
         <span className={`demo-status status-fixed ${error ? "demo-status-error" : ""}`}>
-          {error ?? status}
+          {error ??
+            (running || !drawnWith
+              ? status
+              : drawnWith === activation
+                ? `drawn with ${squashName(drawnWith)}`
+                : `drawn with ${squashName(drawnWith)}; the chips pick the next run, so press ${runLabel}`)}
         </span>
       </div>
       <div className="interactive-controls">
@@ -337,7 +419,7 @@ export function DepthTrainPanel() {
             layers read <b>{(summary.runs["deep"].accuracy * 100).toFixed(1)}%</b>. Same
             images, same shuffle, same step size, same sgd, {DEEP - 1} extra layers of 30
             neurons and{" "}
-            {ranWith === "relu"
+            {drawnWith === "relu"
               ? "a squash with no ceiling on its slope"
               : "a squash whose slope never exceeds 0.25"}
             .
@@ -352,6 +434,41 @@ export function DepthTrainPanel() {
             epochs the network spends working out of it are what the left-hand end of
             the chart is showing.
           </p>
+          {history.length > 0 && (
+            <div className="table-scroll scroll-x" tabIndex={0}>
+              <table className="truth-table">
+                <thead>
+                  <tr>
+                    <th>after {EPOCHS} epochs</th>
+                    <th>step size</th>
+                    <th>the {summary.n_test.toLocaleString()} held out</th>
+                    <th>first hidden layer's learning speed at the end</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.map((row) => {
+                    const onChart = drawnWith !== null && row.activation === drawnWith;
+                    const label =
+                      `${squashName(row.activation)}, ` +
+                      (row.depth === "shallow" ? "1 hidden layer" : `${DEEP} hidden layers`) +
+                      (onChart ? " (on the chart)" : "");
+                    return (
+                      <tr key={`${row.activation}-${row.depth}`}>
+                        <td>{label}</td>
+                        <td>{ETA[row.activation]}</td>
+                        <td>{(row.s.accuracy * 100).toFixed(1)}%</td>
+                        <td>
+                          {row.s.speeds_end[0] < 0.01
+                            ? row.s.speeds_end[0].toExponential(2)
+                            : row.s.speeds_end[0].toFixed(4)}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
     </div>

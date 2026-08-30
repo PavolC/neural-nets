@@ -505,7 +505,7 @@ export function Module8() {
         1-or-0 squash-slope row of the table above. The sgd around it is still
         yours.
       </p>
-      <Figure caption="One hidden layer against four, trained identically, fifteen epochs each. The table above the chart is every layer's learning speed measured from your own gradient before either run starts. Each run takes a few seconds per epoch, and Stop ends it.">
+      <Figure caption="One hidden layer against four, trained identically, fifteen epochs each. The table above the chart is every layer's learning speed measured from your own gradient before either run starts. The chart shows the latest run; each squash you train adds its two rows to the table below, so the comparison the section makes, four layers against one under each squash, sits in one place. Each run takes a few seconds per epoch, and Stop ends it.">
         <DepthTrainPanel />
       </Figure>
 
