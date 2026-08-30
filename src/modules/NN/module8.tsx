@@ -666,47 +666,170 @@ export function Module8() {
         off a count you already have.
       </p>
       <p>
-        The first weight matrix of your digit reader has 30 rows of 784, so 23,520
-        weights. Every hidden neuron holds a private opinion about every pixel,
+        The first weight matrix of your digit reader has one row per hidden
+        neuron, and a row holds that neuron's incoming weights, one per pixel:
+        30 rows of 784, <M tex="30 \times 784 = 23{,}520" /> weights. Every
+        hidden neuron holds a private opinion about every pixel,
         and each of those opinions is learned separately. Two facts about
         handwriting are missing from that arrangement. A stroke in the top left
         and the same stroke in the middle are the same stroke, and the network has
         to learn it twice. And a pixel's neighbours tell you far more about it than
         a pixel on the other side of the image does, which nothing in a full row of
-        784 weights expresses.
+        784 weights expresses. The column of 784 does not even record which pixels
+        touch: scramble every image's pixels in the same fixed order and your
+        network would learn just as well, because the scramble only relabels which
+        weight reads which pixel.
       </p>
       <p>
         A convolutional layer states both. One neuron looks at a 5-by-5 window of
-        the image, so it has 25 weights and a bias, 26 numbers. Slide that window
-        over the 28-by-28 image one pixel at a time and it fits in 24 positions
-        across and 24 down. Put one neuron at every position, and give all 576 of
-        them the same 26 numbers.
+        the image, 25 pixels, so it has 25 weights and a bias, 26 numbers. The 5
+        is a choice, the way the hidden layer's 30 was: big enough to hold a
+        piece of a stroke, small enough to stay local. Slide that window across
+        the 28-by-28 image one pixel at a time. Its left edge can start anywhere
+        from column 1 to column 24; one further and the 5-wide window would run
+        past the image's edge. The same 24 fits down the page, so the window has{" "}
+        <M tex="24 \times 24 = 576" /> positions. Put one neuron at every
+        position, and give all 576 of them the same 26 numbers. That is weight
+        sharing. Each of the 576 has its own 25 wires into its own patch, but the
+        numbers on those wires come from one stored set, not from 576 private
+        copies, so the window is 576 neurons holding 26 numbers between them. In
+        every layer you have built, those two counts moved together because a
+        neuron owned its weights. Here they come apart.
       </p>
-      <Figure caption="One 5-by-5 window, three of its 576 positions, and the single set of 26 numbers all of them use. The layer's output is a 24-by-24 grid of neurons, one per position, each reporting how well its own patch of the image matches that one window. Twenty such windows make twenty grids.">
+      <Figure caption="One 5-by-5 window, three of its 576 positions, and the single set of 26 numbers all of them use. The layer's output is a 24-by-24 grid of neurons, one per position, each reporting how well its own patch of the image matches that one window.">
         <SharedWeightsFigure />
       </Figure>
       <p>
-        That is weight sharing, and it is a claim about the world rather than a
-        trick for saving memory: a detector that is worth having at one place is
-        worth having at every place. The saving is real too. Twenty different
-        windows, enough to cover a useful set of small shapes, come to{" "}
-        <M tex="20 \times 26 = 520" /> numbers, against 23,520 for one fully
-        connected layer of 30. Fewer numbers to learn is fewer numbers to overfit,
-        which is Module 7's third complaint answered by the architecture instead of
-        by weight decay.
+        Watch what the sharing does, on numbers small enough to hold. Shrink the
+        image to one row of six pixels and the window to three wide; nothing
+        changes but the counts. The window fits at four positions, by the same
+        edge argument as the 24: from position 5, a 3-wide window would run past
+        pixel 6. Pick the three shared weights by hand for the demonstration, 1,
+        0 and −1, set the bias to 0, and leave the squash off so the raw sums
+        stay visible. The row of pixels is 0.2, 0.9, 0.1, 0.0, 0.7, 0.3, and here
+        are all four neurons:
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>position</th>
+              <th>pixels it reads</th>
+              <th>multiply and add</th>
+              <th>output</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>0.2, 0.9, 0.1</td>
+              <td>1 × 0.2 + 0 × 0.9 − 1 × 0.1</td>
+              <td>0.1</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td>0.9, 0.1, 0.0</td>
+              <td>1 × 0.9 + 0 × 0.1 − 1 × 0.0</td>
+              <td>0.9</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td>0.1, 0.0, 0.7</td>
+              <td>1 × 0.1 + 0 × 0.0 − 1 × 0.7</td>
+              <td>−0.6</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td>0.0, 0.7, 0.3</td>
+              <td>1 × 0.0 + 0 × 0.7 − 1 × 0.3</td>
+              <td>−0.3</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        Read the table twice. Along the arithmetic: every row uses the same three
+        weights, no fourth weight appears anywhere, and four outputs cost three
+        weights and a bias. Along the meaning: 1, 0, −1 computes left pixel minus
+        right pixel, which scores high where brightness drops from left to right,
+        an edge. Read that way, the four outputs are one question asked at four
+        places, and the row of them is a map: the bright-to-dark edge sits at
+        position 2, where the pixels fall from 0.9 to 0.0. The map exists because
+        the weights repeat. Give each position its own three weights and each
+        position develops its own private notion of an edge, and the four outputs
+        stop having anything in common. The 24-by-24 grid in the figure above is
+        the same object at full size: one question, answered at 576 places.
+      </p>
+      <p>
+        Outside a demonstration nobody picks the weights. The 26 numbers start
+        random and Module 3's descent moves them like any others, so training
+        decides which question the window ends up asking. The sharing guarantees
+        only the shape of the outcome: whatever the numbers become, they are one
+        question, asked everywhere. And a trained window can be looked at. Draw
+        its 25 weights as a tiny image, the way Module 2 drew each hidden
+        neuron's 784 as a patch of excite and suppress, and the learned questions
+        show up as short edges at various angles, small curves, dots.
+      </p>
+
+      <SectionHeader id="m8-layer" title="A layer of twenty windows" />
+      <p>
+        One window asks one question, so a useful layer runs many, side by side.
+        Twenty is another designer's pick, sized to cover a spread of small
+        shapes: edges at a few angles, corners, the ends of strokes. Each of the
+        twenty has its own 26 numbers, slides over the same original image, and
+        fills its own 24-by-24 grid. None of them reads another's grid; delete
+        one and the other nineteen compute exactly what they did before. The
+        organization is one you already own. Your hidden layer is 30 neurons
+        side by side, all reading the same 784 pixels, none reading each other,
+        and a layer in both networks means that: the units that read one input
+        in parallel. What changed is the repeated unit, there a neuron owning
+        784 weights and reporting one number, here a window holding 26 and
+        reporting a grid.
+      </p>
+      <Figure caption="Inside the window layer: every window reads the same image, hunts its own shape, and fills its own grid. Nothing flows between windows; the twenty run in parallel, the way your hidden layer's 30 neurons all read the same 784 pixels.">
+        <WindowFanFigure />
+      </Figure>
+      <p>
+        So the sharing has a boundary, and the purposes sit exactly on it.
+        Inside one window, 576 positions read one set of 26 numbers: one
+        purpose, applied everywhere. Across windows nothing is shared: twenty
+        sets of 26, twenty purposes. Sharing across windows would buy nothing,
+        which is the check that the boundary is in the right place: a window
+        reading another's numbers would slide the same detector over the same
+        image and fill in an identical grid, a copy paid for twice.
+      </p>
+      <p>
+        Count the layer both ways. Neurons: twenty windows at 576 positions
+        each, <M tex="20 \times 576 = 11{,}520" />, every one an ordinary
+        multiply, add and squash. Numbers to learn:{" "}
+        <M tex="20 \times 26 = 520" />. Put that beside your hidden layer, 30
+        neurons owning 23,520 weights, and the two counts have traded places:
+        far more neurons, far fewer numbers. The trade is not a memory trick;
+        it is a claim about the world, that a detector worth having at one
+        place is worth having at every place. Fewer numbers to learn is also
+        fewer numbers to overfit, which is Module 7's third complaint answered
+        by the architecture instead of by weight decay. The 520 is this layer's
+        count, not the network's: the fully connected tail after the pooling
+        still spends numbers the old way, and the saving lives where the
+        network touches pixels, which is exactly where a private opinion per
+        pixel wastes the most.
       </p>
       <p>
         One more piece usually follows: a pooling layer, which replaces each small
         block of a grid by a single number, typically the largest in the block.
         That halves the grid's width and height and throws away exactly the
         information that was making the layer sensitive to a shape's exact
-        position. Stack window layers and pooling layers alternately and the later
-        layers see larger and larger parts of the image, described in terms of what
-        the earlier ones found.
+        position. The max is meaningful only because a grid answers one question:
+        the largest of a block's four numbers reads as "the shape was somewhere
+        in this block". Stack window layers and pooling layers alternately and
+        the later layers see larger and larger parts of the image, described in
+        terms of what the earlier ones found.
       </p>
+      <Figure caption="The whole network, four working layers. A window layer turns the image into twenty grids, one per window, 520 numbers in total. A pooling layer halves each grid to 12-by-12 and holds no numbers at all: keeping a block's largest needs nothing learned. The tail is the kind of network you trained in Module 5, a fully connected layer reading all twenty grids as one long column, then the 10 outputs.">
+        <ConvNetFigure />
+      </Figure>
       <p>
-        This course does not implement any of it, and the reason is worth saying
-        out loud rather than leaving as a gap. A convolution written from scratch
+        This course does not implement any of it. A convolution written from scratch
         in NumPy inside Pyodide is slow enough that a training run would stop being
         something you watch, and the conceptual return past "the same weights, used
         at every position" is small: BP1 to BP4 are unchanged, and sharing a weight
@@ -773,13 +896,36 @@ export function Module8() {
       />
       <p>
         That table is not written by hand. It is weights, so it starts as a random
-        draw and it is trained by exactly the descent you implemented: predict
-        something about the text, measure the cost, take the slopes, step against
-        them. Words that get used the same way keep receiving the same corrections,
-        so their columns drift toward each other, and words used differently drift
-        apart. What comes out is a space where distance means something, because
-        distance is what training had to arrange in order to lower the cost. The
-        columns are called embeddings, and the space is the embedding space.
+        draw and it is trained by the descent you implemented, on a task plain
+        enough to state in one line: given a word, predict the next one. The
+        input is a word's one-hot column (a real model reads a run of words
+        before it guesses, but one word shows the machinery), and the lookup
+        hands the layers after it that word's column from the table. The output
+        is built the way your digit reader's is, one slot per possible answer:
+        ten slots there, one per digit; here one slot per word in the
+        vocabulary, each holding a score for "the next word is this one". The
+        label is the word that actually came next, as a one-hot column, the
+        same kind your digit reader trains against, and nobody writes those
+        labels: cover the next word in any sentence ever printed, and the
+        sentence itself supplies the answer. From there the loop is Module 5's:
+        compare the output column to the label, take the slopes, step every
+        number against them, the table's columns included.
+      </p>
+      <p>
+        Watch the task shape the table. Tuesday and Wednesday stand in front of
+        nearly the same next words: morning, afternoon, evening, the ninth. The
+        cost therefore asks for nearly the same output whichever of the two
+        arrives. And past the lookup the network cannot see which word arrived:
+        every later layer computes on the looked-up column alone, so the direct
+        way to give two words the same prediction is to give them nearly the
+        same column. That is what descent settles into. Every sentence that
+        uses the two words alike hands their columns another pair of nearly
+        identical corrections, and the columns travel together, step after
+        step; a pair the task must tell apart, Tuesday and yellow, lowers the
+        cost only by holding its columns apart. What comes out is a space where
+        distance means interchangeability, not because anyone asked for that
+        meaning, but because arranging it is what lowered the cost. The columns
+        are called embeddings, and the space is the embedding space.
       </p>
       <p>
         A large language model is that substrate at a size this course cannot
@@ -850,7 +996,10 @@ function SharedWeightsFigure() {
       role="img"
       aria-label="A 5 by 5 window shown at three positions on a 28 by 28 image; all three point at one shared set of 26 numbers, which feeds a 24 by 24 grid of neurons, one per position."
     >
+      {/* Both frames before everything else: the cells and wire ends paint
+          on top, and m8-conv-image's fill is opaque. */}
       <rect x={20} y={40} width={IMG} height={IMG} className="m8-conv-image" />
+      <rect x={ox} y={oy} width={OUT} height={OUT} className="m8-conv-image" />
       {[7, 14, 21].map((k) => (
         <g key={k}>
           <line x1={20 + k * cell} x2={20 + k * cell} y1={40} y2={40 + IMG} className="m8-conv-grid" />
@@ -890,7 +1039,6 @@ function SharedWeightsFigure() {
       <text x={boxX + 59} y={boxY + 28} textAnchor="middle" className="m8-conv-boxtext">
         + 1 bias
       </text>
-      <rect x={ox} y={oy} width={OUT} height={OUT} className="m8-conv-image" />
       <text x={20 + IMG / 2} y={30} textAnchor="middle" className="tiny-net-caption">
         the image, 28 × 28
       </text>
@@ -905,6 +1053,163 @@ function SharedWeightsFigure() {
       </text>
       <text x={boxX + 59} y={boxY + 52} textAnchor="middle" className="tiny-net-caption">
         shared by all 576
+      </text>
+    </svg>
+  );
+}
+
+// The whole small network, once: the image, a window layer of twenty grids,
+// a pooling layer, and the fully connected tail from Module 5. Plot family
+// (CLAUDE.md): natural scale, tight viewBox. Four grids stand in for the
+// twenty; the caption carries the count.
+function ConvNetFigure() {
+  const IMG = 84; // the 28x28 image at 3px per pixel
+  const GRID = 72; // a 24x24 feature map at the same scale
+  const POOL = 36; // the same map after pooling, 12x12
+  const STEP = 7; // stack offset between the drawn grids
+  const N = 4;
+  const iy = 54;
+  const mid = iy + IMG / 2;
+  // Each stack's front grid sits at the footprint's bottom-left; the rest
+  // step up and right behind it. Footprint = size + (N-1)*STEP, centred on
+  // the wire axis.
+  const gridX = 148;
+  const gridFront = mid + (GRID + (N - 1) * STEP) / 2 - GRID; // 71
+  const poolX = 293;
+  const poolFront = mid + (POOL + (N - 1) * STEP) / 2 - POOL; // 89
+  const gridRight = gridX + (N - 1) * STEP + GRID;
+  const poolRight = poolX + (N - 1) * STEP + POOL;
+  const fcX = 400;
+  const outX = 470;
+  const outYs = Array.from({ length: 10 }, (_, i) => iy + 4 + (i * (IMG - 8)) / 9);
+  const capY = 161;
+
+  return (
+    <svg
+      {...fig(8, 8, 481, 178)}
+      className="m8-net"
+      role="img"
+      aria-label="Five columns left to right: the 28 by 28 image, a stack of twenty 24 by 24 grids labelled one window layer, a stack of twenty 12 by 12 grids labelled one pooling layer, then a fully connected layer and 10 output neurons. A bracket groups the two stacks as the new layers."
+    >
+      <path d={`M${gridX},40 L${gridX},36 L${poolRight},36 L${poolRight},40`} className="m8-net-brace" />
+      <text x={(gridX + poolRight) / 2} y={28} textAnchor="middle" className="tiny-net-caption">
+        the new layers
+      </text>
+      <rect x={16} y={iy} width={IMG} height={IMG} className="m8-conv-image" />
+      {Array.from({ length: N }, (_, i) => (
+        <rect
+          key={i}
+          x={gridX + (N - 1 - i) * STEP}
+          y={gridFront - (N - 1 - i) * STEP}
+          width={GRID}
+          height={GRID}
+          className="m8-conv-image"
+        />
+      ))}
+      {Array.from({ length: N }, (_, i) => (
+        <rect
+          key={i}
+          x={poolX + (N - 1 - i) * STEP}
+          y={poolFront - (N - 1 - i) * STEP}
+          width={POOL}
+          height={POOL}
+          className="m8-conv-image"
+        />
+      ))}
+      <rect x={fcX} y={iy} width={18} height={IMG} rx={9} className="tiny-net-neuron" />
+      {outYs.map((y, i) => (
+        <circle key={i} cx={outX} cy={y} r={4} className="tiny-net-neuron" />
+      ))}
+      <path d={`M${16 + IMG + 4},${mid} L${gridX - 4},${mid}`} className="m8-conv-wire" />
+      <path d={`M${gridRight + 4},${mid} L${poolX - 4},${mid}`} className="m8-conv-wire" />
+      <path d={`M${poolRight + 4},${mid} L${fcX - 4},${mid}`} className="m8-conv-wire" />
+      <path d={`M${fcX + 18 + 4},${mid} L${outX - 8},${mid}`} className="m8-conv-wire" />
+      <text x={16 + IMG / 2} y={capY} textAnchor="middle" className="tiny-net-caption">
+        the image
+      </text>
+      <text x={16 + IMG / 2} y={capY + 14} textAnchor="middle" className="tiny-net-caption">
+        28 × 28
+      </text>
+      <text x={(gridX + gridRight) / 2} y={capY} textAnchor="middle" className="tiny-net-caption">
+        one window layer
+      </text>
+      <text x={(gridX + gridRight) / 2} y={capY + 14} textAnchor="middle" className="tiny-net-caption">
+        20 grids of 24 × 24
+      </text>
+      <text x={(poolX + poolRight) / 2} y={capY} textAnchor="middle" className="tiny-net-caption">
+        one pooling layer
+      </text>
+      <text x={(poolX + poolRight) / 2} y={capY + 14} textAnchor="middle" className="tiny-net-caption">
+        20 grids of 12 × 12
+      </text>
+      <text x={(fcX + outX + 4) / 2} y={capY} textAnchor="middle" className="tiny-net-caption">
+        fully connected
+      </text>
+      <text x={(fcX + outX + 4) / 2} y={capY + 14} textAnchor="middle" className="tiny-net-caption">
+        then 10 outputs
+      </text>
+    </svg>
+  );
+}
+
+// The window layer from the inside: parallel windows, none reading another's
+// output. Three are drawn and the captions carry the twenty. Plot family
+// (CLAUDE.md): natural scale, tight viewBox. Shares .m8-net's stylesheet
+// entries with ConvNetFigure.
+function WindowFanFigure() {
+  const IMG = 84; // the 28x28 image at 3px per pixel
+  const BOX_W = 104;
+  const BOX_H = 26;
+  const boxX = 160;
+  const GRID = 48; // a 24x24 grid at 2px per cell
+  const gridX = 320;
+  const rows = [60, 112, 200]; // box and grid centre lines; dots between 2 and 3
+  const labels = ["window 1", "window 2", "window 20"];
+  const iy = 130 - IMG / 2; // the image, centred on the middle of the rows
+  const capY = 246;
+
+  return (
+    <svg
+      {...fig(8, 28, 382, 244)}
+      className="m8-net"
+      role="img"
+      aria-label="The 28 by 28 image on the left. Wires fan out to three boxes named window 1, window 2 and window 20, with dots standing in for the rest, and each box has its own wire to its own small grid on the right. Captions read twenty windows, 26 numbers each, and twenty grids, 24 by 24 each."
+    >
+      <rect x={16} y={iy} width={IMG} height={IMG} className="m8-conv-image" />
+      {rows.map((r, i) => (
+        <g key={i}>
+          <path d={`M${16 + IMG + 4},${130} L${boxX - 4},${r}`} className="m8-conv-wire" />
+          <rect x={boxX} y={r - BOX_H / 2} width={BOX_W} height={BOX_H} rx={4} className="m8-conv-box" />
+          <text x={boxX + BOX_W / 2} y={r + 4} textAnchor="middle" className="m8-conv-boxtext">
+            {labels[i]}
+          </text>
+          <path d={`M${boxX + BOX_W + 4},${r} L${gridX - 4},${r}`} className="m8-conv-wire" />
+          <rect x={gridX} y={r - GRID / 2} width={GRID} height={GRID} className="m8-conv-image" />
+        </g>
+      ))}
+      <text x={boxX + BOX_W / 2} y={166} textAnchor="middle" className="tiny-net-caption">
+        ⋮
+      </text>
+      <text x={gridX + GRID / 2} y={166} textAnchor="middle" className="tiny-net-caption">
+        ⋮
+      </text>
+      <text x={16 + IMG / 2} y={capY} textAnchor="middle" className="tiny-net-caption">
+        the image
+      </text>
+      <text x={16 + IMG / 2} y={capY + 14} textAnchor="middle" className="tiny-net-caption">
+        28 × 28
+      </text>
+      <text x={boxX + BOX_W / 2} y={capY} textAnchor="middle" className="tiny-net-caption">
+        twenty windows
+      </text>
+      <text x={boxX + BOX_W / 2} y={capY + 14} textAnchor="middle" className="tiny-net-caption">
+        26 numbers each
+      </text>
+      <text x={gridX + GRID / 2} y={capY} textAnchor="middle" className="tiny-net-caption">
+        twenty grids
+      </text>
+      <text x={gridX + GRID / 2} y={capY + 14} textAnchor="middle" className="tiny-net-caption">
+        24 × 24 each
       </text>
     </svg>
   );

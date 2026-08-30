@@ -1978,6 +1978,7 @@ button:disabled {
 .shapes-diagram,
 .curve-figure,
 .m8-conv,
+.m8-net,
 .m8-spaces {
   width: min(calc(var(--fig-units) * 1px), 100%);
 }
@@ -2763,9 +2764,17 @@ button:disabled {
 /* Plot family (CLAUDE.md): natural scale, capped at the viewBox width,
    centred. Each of this module's two static figures carries its own width. */
 .m8-conv,
+.m8-net,
 .m8-spaces {
   display: block;
   margin: 0 auto;
+}
+
+/* The thin top bracket that groups the network figure's columns. */
+.m8-net-brace {
+  fill: none;
+  stroke: var(--rule-strong);
+  stroke-width: 1;
 }
 
 .m8-conv-image {
@@ -2846,7 +2855,8 @@ button:disabled {
   }
 
   .m8-conv .tiny-net-caption,
-  .m8-conv .m8-conv-boxtext {
+  .m8-conv .m8-conv-boxtext,
+  .m8-net .tiny-net-caption {
     font-size: 15px;
   }
 
