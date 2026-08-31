@@ -83,7 +83,7 @@ export const backpropExercise: Exercise = {
       "for the output layer with BP1, store its two slope arrays (BP3: " +
       "nabla_b is delta itself; BP4: delta @ activations[-2].T), then " +
       "loop toward the front, each pass replacing delta via BP2 and " +
-      "storing that layer's two arrays. For a two-layer network the loop " +
+      "storing that layer's two arrays. With two weight matrices the loop " +
       "body runs once; write it so it would keep going on a deeper one " +
       "(the gradient check's network has three).",
     "The structure, in pseudocode:\n\n" +
@@ -110,7 +110,7 @@ export const backpropExercise: Exercise = {
       "    One warning about that letter: this l is not the l of the four\n" +
       "    equations. Here it counts steps back from the end, so l = 2 is\n" +
       "    the second-to-last layer whatever the network's depth; there it\n" +
-      "    numbers layers from the front. On a two-layer network the two\n" +
+      "    numbers layers from the front. With two weight matrices the two\n" +
       "    happen to agree, which is exactly why a deeper one catches an\n" +
       "    off-by-one.",
   ],

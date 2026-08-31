@@ -19,9 +19,10 @@ export const prepareExercise: Exercise = {
       "on its own: subtract that row's mean, divide by that row's spread. It " +
       "returns (X_scaled, mean, spread), both of them columns of shape " +
       "(n_features, 1). The two NumPy calls you need are X.mean(axis=1, " +
-      "keepdims=True) and X.std(axis=1, keepdims=True): axis=1 averages along " +
-      "each row, and keepdims=True keeps the answer a column so that X - mean " +
-      "lines up row by row.",
+      "keepdims=True) and X.std(axis=1, keepdims=True), where std is short for " +
+      "standard deviation, the spread: the typical distance of a value from " +
+      "its row's mean. Here axis=1 averages along each row, and keepdims=True " +
+      "keeps the answer a column so that X - mean lines up row by row.",
     "The default arguments carry the rule that keeps a score honest. When " +
       "mean and spread are handed in, use them and measure nothing, which is " +
       "how the validation and test columns get scaled by the training set's " +
@@ -29,7 +30,9 @@ export const prepareExercise: Exercise = {
       "they look like leak into the preparation, and Module 7 already showed " +
       "what happens to a number the network was allowed to peek at. One edge " +
       "case: a feature that never varies has a spread of 0, so leave that row " +
-      "alone instead of dividing by it.",
+      "alone instead of dividing by it. Hand back the 0 you measured rather " +
+      "than the 1 you divided by, because a later call has to make the same " +
+      "decision about the same feature.",
     "one_hot(values, levels) turns a column of category labels into rows: one " +
       "row per level, a single 1.0 per column. Module 5's labels were packed " +
       "this way and the course did the packing; here you do. A value that is " +
@@ -40,7 +43,10 @@ export const prepareExercise: Exercise = {
       "test take round(n * share) from the end, training keeps the rest. The " +
       "shuffle is not decoration. Data usually arrives sorted, and this file " +
       "is sorted by species, so cutting it unshuffled would train on two " +
-      "species and test on a third.",
+      "species and test on a third. Cut from the end rather than the front. " +
+      "After the shuffle either end holds the same kind of rows, so which end " +
+      "you take is a convention. The choice still fixes which penguins land in " +
+      "which set, and the counts the panel below reports come from this cut.",
     "Once the tests pass, look at what scaling does to the file you are about " +
       "to use. Send this to the scratch pad and run it:",
     {
@@ -75,7 +81,9 @@ export const prepareExercise: Exercise = {
     "Take them one at a time; none is longer than four lines.\n\n" +
       "standardize: compute mean and spread only when they arrive as None, so " +
       "that a caller who passes them gets them used. Guard the division by " +
-      "building a copy of spread with its zeros replaced by 1, and return the " +
+      "building a copy of spread with its zeros replaced by 1: " +
+      "np.where(spread == 0, 1.0, spread) picks entry by entry, the 1.0 where " +
+      "the spread is zero and the measured spread where it is not. Return the " +
       "spread you measured rather than the guarded one.\n\n" +
       "one_hot: start from np.zeros((len(levels), len(values))) and walk the " +
       "values with enumerate, writing a 1.0 only when the value is one of the " +

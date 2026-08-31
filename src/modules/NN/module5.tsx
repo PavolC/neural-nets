@@ -63,7 +63,7 @@ export function Module5() {
       </p>
       <Eq
         tex="\frac{\underbrace{0.0460}_{(0,0)\text{, stay}} + \underbrace{(-0.1337)}_{(1,0)\text{, go}} + \underbrace{(-0.1337)}_{(0,1)\text{, go}} + \underbrace{0.0460}_{(1,1)\text{, stay}}}{4} = -0.04385"
-        gloss="Four private slopes, one per corner. The two stay corners pull the bias up, the two go corners pull it down harder, and the average of the four is the -0.044 Module 3 measured on the full four-corner cost, one more digit shown."
+        gloss="Four private slopes, one per corner. A plus sign means the cost rises when the bias goes up, so the two stay corners pull the bias down and the two go corners pull it up harder. The average of the four is the -0.044 Module 3 measured on the full four-corner cost, one more digit shown."
       />
       <p>
         So a mini-batch's gradient is: run backprop on each example separately,
@@ -187,12 +187,12 @@ export function Module5() {
           <tr>
             <td>BP3</td>
             <td><code>nabla_b[l] = delta</code></td>
-            <td>once per layer: (10, 1) then (30, 1), exactly the biases' shapes</td>
+            <td>once per matrix: (10, 1) then (30, 1), exactly the biases' shapes</td>
           </tr>
           <tr>
             <td>BP4</td>
             <td><code>nabla_w[l] = delta @ a_prev.T</code></td>
-            <td>once per layer: (10, 30) then (30, 784), the weights' own shapes</td>
+            <td>once per matrix: (10, 30) then (30, 784), the weights' own shapes</td>
           </tr>
         </tbody>
         </table>
@@ -203,7 +203,7 @@ export function Module5() {
         numbers. Two of them produce nothing you keep: BP1 and BP2 build{" "}
         <M tex="\delta" />, one blame per neuron, and that column lives inside
         the function and is gone once it returns. The other two are the
-        answers, and they run once per layer, so this network's two layers
+        answers, and they run once per matrix, so this network's two matrices
         fill four arrays. Nothing gets combined at the end; the loop fills the
         slots as it walks. Here is everything that comes back:
       </p>
@@ -239,10 +239,10 @@ export function Module5() {
         output), <code>activations[-2]</code> the one before it,{" "}
         <code>zs[-1]</code> the last stored <M tex="z" />. Assignment works the
         same way, so <code>nabla_b[-1] = delta</code> fills the last layer's
-        slot. The figure shows both counting directions on a two-layer network's
-        receipts:
+        slot. The figure shows both counting directions on a three-layer
+        network's receipts:
       </p>
-      <Figure caption="What the forward pass stores, for a network of two layers (like the 2-3-1 fixture in the tests, or the digit reader). Each box shows its entry's positive index on top and its negative index below: both name the same slot. BP1 reads zs[-1]; BP4 at the output layer reads activations[-2].">
+      <Figure caption="What the forward pass stores, for a three-layer network (like the 2-3-1 fixture in the tests, or the digit reader). Each box shows its entry's positive index on top and its negative index below: both name the same slot. BP1 reads zs[-1]; BP4 at the output layer reads activations[-2].">
         <ReceiptsDiagram />
       </Figure>
 
@@ -355,7 +355,7 @@ export function Module5() {
 }
 
 // Static diagram: the two receipt lists after a forward pass through a
-// two-layer network, each entry labeled with both its positive and negative
+// three-layer network, each entry labeled with both its positive and negative
 // index, so the exercise's negative-indexing reads have a picture.
 function ReceiptsDiagram() {
   // 132, not 118: "layer 2's confidences" measures 116 units at 11px, so at
@@ -498,7 +498,7 @@ function PipelineDiagram() {
 }
 
 // Static small-multiple: the backward sweep's two passes over the receipts of
-// a two-layer network, with the slots each pass reads shaded. Makes the
+// a three-layer network, with the slots each pass reads shaded. Makes the
 // loop's one-step-left motion visible instead of asking the reader to
 // imagine it (and the off-by-one the tests diagnose).
 function BackwardWalkDiagram() {

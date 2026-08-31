@@ -61,8 +61,8 @@ def test_fire_returns_float():
     w = np.array([[0.4], [-0.7], [1.2]])
     x = np.array([[0.5], [-1.0], [0.25]])
     got = fire(w, 0.3, x)
-    assert np.ndim(got) == 0, (
-        f"expected a plain number, got an array of shape {np.shape(got)}. "
+    assert isinstance(got, float), (
+        f"expected a plain number, got {type(got).__name__} of shape {np.shape(got)}. "
         "If you used w.T @ x you got a (1, 1) array; a dot product of two "
         "column vectors is a single number, so pull it out with float(...) "
         "or use (w * x).sum()."

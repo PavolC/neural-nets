@@ -1,78 +1,99 @@
 <!doctype html>
 <html>
 <head><meta charset="utf-8"><style>
+  /* The course's social card, 1200x630, screenshotted to public/og-image.png by
+     tools/make_og_image.sh.
+
+     A rendered page rather than a drawn image, for the same reason the rest of
+     the identity is tokens: the card is made of the accent, the two marks and
+     the type roles, so a change to those reaches it. tools/check_brand.py
+     asserts that both marks here are still the ones brand.ts and Monogram.tsx
+     draw.
+
+     It is type and two marks, and it makes no argument. Every claim on it is
+     one the course's own pages make: the heading is COURSE.subject, and the
+     sentence is the start page's opening line with the medium named. An earlier
+     version had three accent-coloured pills counting visualizations and
+     exercises, an accent-coloured phrase in the middle of the tagline, and a
+     450px sigmoid-and-network illustration whose ribbon ran through the third
+     pill. The counts were the only facts on the card and nothing checked them:
+     a count baked into a PNG is a hand-maintained list where nothing can see it
+     go stale.
+
+     The two marks have separate jobs, and this is the only file that draws
+     both. The three bands are the series mark and belong beside the series
+     name, which is what Monogram.tsx does in the masthead and the footer. The
+     sigmoid is the course's mark and identifies Neural Networks, which is what
+     the favicon and this course's card on the series index do with it. The card
+     used to put the sigmoid in the series slot, so it named the series with the
+     course's mark.
+
+     DejaVu leads both stacks because this renders in a headless Chromium, which
+     has no Georgia. Every colour is a literal, the greys included, because
+     nothing in the site's stylesheet reaches a file that is rendered for
+     deployment; the accent, the three bands and the glyph are the ones
+     check_brand.py compares. */
   * { margin:0; padding:0; box-sizing:border-box; }
   html,body { width:1200px; height:630px; overflow:hidden; }
   body { background:#fdfdfb; color:#1a1a1a; font-family:"DejaVu Serif",Georgia,serif; position:relative; }
 
-  .rule { position:absolute; top:0; left:0; right:0; height:8px; background:#0b6e4f; z-index:3; }
-  .art  { position:absolute; right:16px; top:140px; z-index:1; }
+  /* The course's own hue, the way the series index draws it down the left edge
+     of this course's card. The series' own card carries the whole nine-hue
+     family here instead, because the family is the series identity and borrows
+     no one course's. */
+  .rule { position:absolute; top:0; left:0; right:0; height:8px; background:#0b6e4f; }
 
-  .brandrow { position:absolute; top:62px; left:80px; z-index:2;
+  /* The series row, in the masthead's order: the three-band mark, the wordmark,
+     then what the series is. The wordmark is on this card and not on the
+     series' own, where the heading below it is already the series name. */
+  .brandrow { position:absolute; top:96px; left:110px;
               display:flex; align-items:center; gap:14px; }
-  .tile { width:44px; height:44px; flex:none; }
+  .series-tile { width:40px; height:40px; flex:none; }
   .wordmark { font-family:"DejaVu Sans",sans-serif; font-size:21px; font-weight:700;
               letter-spacing:.13em; text-transform:uppercase; color:#0b6e4f; }
   .note { font-family:"DejaVu Sans",sans-serif; font-size:14px; letter-spacing:.1em;
           text-transform:uppercase; color:#5a5a5a; padding-left:14px; border-left:1px solid #d8d8d2; }
 
-  h1 { position:absolute; top:148px; left:80px; z-index:2;
-       font-size:90px; line-height:1.0; letter-spacing:-.02em; font-weight:400; }
+  /* The course mark, directly above the name it identifies and on the same left
+     axis as everything else, so each mark sits with its own name and the card
+     still reads down one line. */
+  .course-tile { position:absolute; top:196px; left:110px; width:56px; height:56px; }
 
-  .tagline { position:absolute; top:268px; left:80px; z-index:2;
-             font-size:27px; line-height:1.5; color:#3a3a3a; width:700px; }
-  .tagline i { color:#0b6e4f; }
+  h1 { position:absolute; top:288px; left:110px;
+       font-size:92px; line-height:1; letter-spacing:-.02em; font-weight:400; }
 
-  .chips { position:absolute; left:80px; top:452px; z-index:2; display:flex; gap:11px; }
-  .chip { font-family:"DejaVu Sans",sans-serif; font-size:16px; font-weight:600;
-          color:#0b6e4f; line-height:1; white-space:nowrap;
-          background:rgba(11,110,79,.075); border:1px solid rgba(11,110,79,.28);
-          border-radius:999px; padding:12px 20px; }
+  /* The start page's opening sentence, with the medium named. Its line break is
+     explicit so the composition holds at this size. */
+  .tagline { position:absolute; top:428px; left:113px;
+             font-size:30px; line-height:1.45; color:#3a3a3a; width:980px; }
 </style></head>
 <body>
   <div class="rule"></div>
 
-  <svg class="art" width="450" height="390" viewBox="0 0 450 390" fill="none">
-    <path d="M12 330 C124 330 172 248 222 190 C272 132 322 48 438 48"
-          stroke="rgba(11,110,79,.12)" stroke-width="38" stroke-linecap="round"/>
-    <path d="M12 330 C124 330 172 248 222 190 C272 132 322 48 438 48"
-          stroke="#0b6e4f" stroke-width="4.5" stroke-linecap="round" opacity=".42"/>
-    <g>
-      <line x1="112" y1="146" x2="228" y2="108" stroke="rgba(11,110,79,.42)" stroke-width="2.4"/>
-      <line x1="112" y1="146" x2="228" y2="204" stroke="rgba(11,110,79,.42)" stroke-width="2.4"/>
-      <line x1="112" y1="242" x2="228" y2="108" stroke="rgba(11,110,79,.42)" stroke-width="2.4"/>
-      <line x1="112" y1="242" x2="228" y2="204" stroke="rgba(11,110,79,.42)" stroke-width="2.4"/>
-      <line x1="228" y1="108" x2="344" y2="156" stroke="rgba(11,110,79,.42)" stroke-width="2.4"/>
-      <line x1="228" y1="204" x2="344" y2="156" stroke="rgba(11,110,79,.42)" stroke-width="2.4"/>
-      <circle cx="112" cy="146" r="15" fill="#fdfdfb" stroke="#a9aca7" stroke-width="2.4"/>
-      <circle cx="112" cy="242" r="15" fill="#fdfdfb" stroke="#a9aca7" stroke-width="2.4"/>
-      <circle cx="228" cy="108" r="18" fill="#fdfdfb" stroke="#0b6e4f" stroke-width="2.8"/>
-      <circle cx="228" cy="204" r="18" fill="#fdfdfb" stroke="#0b6e4f" stroke-width="2.8"/>
-      <circle cx="344" cy="156" r="18" fill="#0b6e4f"/>
-    </g>
-  </svg>
-
   <div class="brandrow">
-    <svg class="tile" viewBox="0 0 32 32">
-      <rect width="32" height="32" rx="7" fill="#0b6e4f"/>
-      <path d="M5 24C12 24 15 19 16 16C17 13 20 8 27 8" fill="none"
-            stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+    <svg class="series-tile" viewBox="0 0 32 32">
+      <clipPath id="band-clip"><rect width="32" height="32" rx="7"/></clipPath>
+      <g clip-path="url(#band-clip)">
+        <rect width="11" height="32" x="0" fill="#0b6e4f"/>
+        <rect width="11" height="32" x="11" fill="#12648d"/>
+        <rect width="10" height="32" x="22" fill="#83456a"/>
+      </g>
     </svg>
     <span class="wordmark">Moving Parts</span>
     <span class="note">build-it-yourself courses</span>
   </div>
 
+  <svg class="course-tile" viewBox="0 0 32 32">
+    <rect width="32" height="32" rx="7" fill="#0b6e4f"/>
+    <path d="M5 24C12 24 15 19 16 16C17 13 20 8 27 8" fill="none"
+          stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
+  </svg>
+
   <h1>Neural&nbsp;Networks</h1>
 
   <p class="tagline">
-    Build one from first principles, in <i>real Python</i>,<br>
-    in your browser. No installs, no accounts.
+    A course on neural networks that you finish<br>
+    by building one, in Python, in your browser.
   </p>
-
-  <div class="chips">
-    <span class="chip">25 live visualizations</span>
-    <span class="chip">9 coding exercises</span>
-    <span class="chip">trains on real MNIST</span>
-  </div>
 </body>
 </html>

@@ -32,8 +32,9 @@ export function Module2() {
         they form a layer, and this module is about computing a whole layer at once.
         Start small. Take the concert neuron, weights 6 and 2, and give it a
         colleague with weights 1 and 5. Feed both the input <M tex="x_1 = 1" />,{" "}
-        <M tex="x_2 = 0" /> and do the multiply-and-add twice by hand: the first
-        neuron's evidence is <M tex="6 \cdot 1 + 2 \cdot 0 = 6" />, the second's is{" "}
+        <M tex="x_2 = 0" /> and do the multiply-and-add twice by hand, biases set
+        aside for a moment: the first neuron's total is{" "}
+        <M tex="6 \cdot 1 + 2 \cdot 0 = 6" />, the second's is{" "}
         <M tex="1 \cdot 1 + 5 \cdot 0 = 1" />. Nothing new happened; it happened
         twice. Math has a compact notation for exactly this: stack the two weight
         rows into a grid of numbers, called a matrix, and write the input as the
@@ -49,7 +50,7 @@ export function Module2() {
       </p>
       <Eq
         tex="a' = \sigma(W a + b)"
-        gloss="The next layer's activations a' come from multiplying the weight matrix by the current activations a, adding the biases, and squashing every entry with sigmoid."
+        gloss="The next layer's activations, written a' and read a-prime, come from multiplying the weight matrix by the current activations a, adding the biases, and squashing every entry with sigmoid."
       />
       <p>
         A network is just that rule repeated. Each layer takes the previous layer's
@@ -88,7 +89,10 @@ export function Module2() {
         times <M tex="(2, 1)" /> works because 2 meets 2, and the outer numbers,{" "}
         <M tex="(1, 1)" />, are the answer's shape. With columns everywhere,{" "}
         <M tex="Wa" /> is <M tex="(m, 1)" />, the biases are <M tex="(m, 1)" />,
-        and everything adds up cleanly. Here is the whole contract as a picture:
+        and everything adds up cleanly. A bias column added to several columns
+        side by side lands on each of them, and a plain number added to an array
+        lands on every entry: NumPy stretches the smaller shape to fit, and calls
+        it broadcasting. Here is the whole contract as a picture:
       </p>
       <Figure caption="How the shapes lock together. Teal is the input side: W is n wide because a is n tall, one weight per input, and the two must match or the multiply is impossible. Purple is the neuron side: W has m rows, so Wa, b, and a' are all m tall, one entry per neuron. The shaded strip shows one neuron's whole story: its row of W, times all of a, plus its own bias entry, becomes its entry of a'. For Module 2's hidden layer, m = 15 and n = 784.">
         <ShapesDiagram />

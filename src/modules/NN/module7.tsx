@@ -92,8 +92,8 @@ export function Module7() {
       <p>
         Leave the argument out at a call and your function does exactly what it
         did in Module 5, so every test it passed then it passes now. The first
-        exercise below checks that edit before anything else, because everything
-        in this module and the three after it swaps a BP1 through that opening.
+        exercise below checks that edit, because everything in this module and
+        the three after it swaps a BP1 through that opening.
       </p>
 
       <SectionHeader id="m7-slowdown" title="Badly wrong, barely learning" />
@@ -231,7 +231,8 @@ export function Module7() {
         cannot be read that way, because what arrives at it differs. Ask
         instead what fraction of its input it passes on. Where the neuron is
         unsure it turns 0.122 of answer into 0.069 of score, 56 percent. Where
-        the neuron is confidently wrong it turns 0.008 into 0.008, 98 percent.
+        the neuron is confidently wrong it turns 0.008 into 0.008, 98 percent
+        (that row is rounded; the answer moves 0.00777 and the score 0.00765).
         The second link is not weak out there. It passes on more than it does
         in the middle.
       </p>
@@ -793,7 +794,7 @@ export function Module7() {
       </p>
       <Eq
         tex="C_{\text{total}} = \underbrace{C}_{\text{the cross-entropy cost}} + \underbrace{\frac{\lambda}{2n} \sum_w w^2}_{\text{the new term}}"
-        gloss="Lambda is a positive number you choose, the exchange rate between fitting the data and keeping the weights small: zero recovers the old cost exactly, and large values care more about small weights than about right answers. n is the number of training examples, there so that the same lambda means the same thing whatever the dataset size. The sum runs over every weight in the network; biases are not included."
+        gloss="Lambda is a positive number you choose, the exchange rate between fitting the data and keeping the weights small: zero recovers the old cost exactly, and large values care more about small weights than about right answers. n is the number of training examples, there so that the same lambda means the same thing whatever the dataset size. The sum runs over every weight in the network, each one squared: the 2 is a power here, not the layer label a superscript carries elsewhere. Biases are not included."
       />
       <p>
         Descent needs the new term's slope for one weight, which means the
@@ -1014,7 +1015,7 @@ export function Module7() {
         items={[
           "A descent step reaches the score through two links: the knobs move the answer, and the answer moves the score. BP1 multiplies their two rates, the squash's slope and the gap, which is why blame is just how steeply the land rises under a neuron's knobs. Where an output neuron is confidently wrong the first link goes slack: the blame peaks at 0.148 two thirds of the way wrong and falls away past it, and at an answer of 0.999 it is 0.001.",
           "The first link is the neuron's own machinery and is not open to change; the second is the yardstick, and it is. The quadratic yardstick has a ceiling of 0.5 per output, so its rate can never grow enough to cover for a slack first link. The cross-entropy cost charges -ln of the confidence in the right answer, which rises without limit, at a rate of exactly the gap divided by the squash's slope. The two multiply out to the gap everywhere, so BP1 becomes delta = a - y with nothing struck out. BP2 keeps its own sigma-prime, which is a hidden neuron's own first link and out of the yardstick's reach.",
-          "A hundred standard-bell weights pile up to about the square root of a hundred, so a hidden neuron's evidence starts 7 or more from zero on a typical image, leaving 62 percent of the readings flatter than 0.01 before training starts. Dividing each layer's weights by the square root of its input count puts the typical evidence within 1 of zero, with no neuron below 0.01, and is worth 4.3 points of accuracy against the same cost started undivided.",
+          "A hundred standard-bell weights pile up to about the square root of a hundred, so a hidden neuron's evidence starts 7 or more from zero on a typical image, leaving 62 percent of the readings flatter than 0.01 before training starts. Dividing each layer's weights by the square root of its input count puts the typical evidence within 1 of zero, with no reading flatter than 0.01, and is worth 4.3 points of accuracy against the same cost started undivided.",
           "Training on 1,000 images reaches 100 percent on those images while the held-out accuracy stops improving and the held-out cost turns around and rises: the network is buying confidence, not recognition. Weight decay multiplies every weight by a factor just under 1 each step, which reliably holds the weights and the held-out cost down, and buys accuracy only where something else left the weights too large.",
           "Every constant here was found by trying, and the grid shows the step size mattering more than the cost. Module 8 takes the four equations into deep networks and finds a limit that no choice of cost fixes.",
         ]}

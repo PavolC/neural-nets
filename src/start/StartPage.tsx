@@ -87,7 +87,6 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
 		from: "Module 1",
 	},
 	{ id: "z", symbol: <M tex="z" />, means: "a neuron's evidence: its inputs times its weights, plus its bias", from: "Module 1" },
-	{ id: "a", symbol: <M tex="a" />, means: "a neuron's answer, the squash applied to its evidence", from: "Module 1" },
 	{ id: "sigma", symbol: <M tex="\sigma(z)" />, means: "the sigmoid, which squashes any number into 0 to 1", from: "Module 1" },
 	{ id: "wb", symbol: <M tex="w,\; b" />, means: "a weight (one per wire) and a bias (one per neuron)", from: "Module 1" },
 	{ id: "col", symbol: <code>(n, 1)</code>, means: "a column: n rows, 1 column. Every activation in this course is one", from: "Module 1" },
@@ -97,7 +96,21 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
 	{ id: "mat", symbol: <code>(m, n)</code>, means: "a matrix: m rows, n columns. The rows name the receiving layer first", from: "Module 2" },
 	{ id: "W", symbol: <M tex="W" />, means: "a layer's weight matrix: row j is neuron j's incoming wires", from: "Module 2" },
 	{ id: "at", symbol: <code>@</code>, means: "matrix multiplication in NumPy. A plain * stays elementwise", from: "Module 2" },
+	{ id: "a", symbol: <M tex="a" />, means: "a neuron's answer, the squash applied to its evidence", from: "Module 2" },
+	{ id: "aprime", symbol: <M tex="a'" />, means: "a-prime: the next layer's answers. On an activation the tick marks the layer along, not a slope", from: "Module 2" },
+	{
+		id: "broadcast",
+		symbol: <code>broadcasting</code>,
+		means: "NumPy stretching a smaller array to fit a bigger one: a bias column lands on every column of a batch, a single number on every entry",
+		from: "Module 2",
+	},
 	{ id: "C", symbol: <M tex="C" />, means: "the cost: one number scoring the whole network on the data", from: "Module 3" },
+	{
+		id: "norm",
+		symbol: <M tex="\lVert v \rVert" />,
+		means: "the size of a column: square every entry, add them up, take the square root. The cost writes it squared, which leaves the sum of squares",
+		from: "Module 3",
+	},
 	{ id: "eta", symbol: <M tex="\eta" />, means: "eta, the learning rate: how far each step moves", from: "Module 3" },
 	{ id: "nabla", symbol: <M tex="\nabla C" />, means: "nabla C, the gradient: the whole list of slopes, one per parameter", from: "Module 3" },
 	{ id: "nablacode", symbol: <code>nabla_w, nabla_b</code>, means: "that same list in code, split into the weights' and biases' halves", from: "Module 3" },
@@ -106,7 +119,7 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
 	{ id: "sigprime", symbol: <M tex="\sigma'(z)" />, means: "sigma-prime: the squash's slope at z, how much the answer moves when the evidence moves, equal to a(1 - a)", from: "Module 4" },
 	{ id: "delta", symbol: <M tex="\delta" />, means: "delta, a neuron's blame: how much the cost cares about its evidence", from: "Module 4" },
 	{ id: "odot", symbol: <M tex="\odot" />, means: "multiply matching entries, NumPy's plain *. No adding", from: "Module 4" },
-	{ id: "sup", symbol: <M tex="w^2,\; a^3" />, means: "a superscript is the layer number, never a power", from: "Module 4" },
+	{ id: "sup", symbol: <M tex="w^2,\; a^3" />, means: "on a weight or an activation, a superscript is the layer number rather than a power", from: "Module 4" },
 	{ id: "T", symbol: <M tex="(w)^T" />, means: "transpose: the same wires regrouped by sender instead of receiver", from: "Module 4" },
 	{ id: "partial", symbol: <M tex="\partial C / \partial w" />, means: "one parameter's slope, read as a single name", from: "Module 4" },
 	{ id: "receipts", symbol: <code>zs, activations</code>, means: "the receipts: every evidence and answer the forward pass computed", from: "Module 5" },
@@ -116,6 +129,13 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
 	{ id: "universality", symbol: <code>universality</code>, means: "one hidden layer, made wide enough, can express any relationship to any accuracy", from: "Module 6" },
 	{ id: "ln", symbol: <M tex="\ln a" />, means: "the natural logarithm, np.log: the power of e that gives a", from: "Module 7" },
 	{ id: "lmbda", symbol: <M tex="\lambda" />, means: "lambda, the regularization strength. Spelled lmbda in code", from: "Module 7" },
+	{
+		id: "standardnormal",
+		symbol: <code>rng.standard_normal(shape)</code>,
+		means: "an array of that shape, every entry an independent draw from the standard bell: centred on zero, typical size 1",
+		from: "Module 7",
+	},
+	{ id: "spread", symbol: <code>spread</code>, means: "a kind of average size for a set of numbers: square every one, average the squares, take the square root", from: "Module 7" },
 	{ id: "nin", symbol: <M tex="n_{\text{in}}" />, means: "how many inputs feed a layer: the count the starting draw divides by", from: "Module 7" },
 	{ id: "heldout", symbol: <code>held-out</code>, means: "data never trained on, which every score in the course is measured on", from: "Module 7" },
 	{ id: "hyper", symbol: <code>hyperparameter</code>, means: "a number you choose rather than one descent finds", from: "Module 7" },
@@ -134,6 +154,7 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
 		from: "Module 9",
 	},
 	{ id: "derivative", symbol: <code>derivative</code>, means: "the field's word for the slope you have been nudging and measuring since Module 3", from: "Module 9" },
+	{ id: "feature", symbol: <code>feature</code>, means: "one row of X: one measured thing across every example, a pixel in Module 2 and a bill length here", from: "Module 10" },
 	{ id: "standardize", symbol: <code>standardize</code>, means: "shift and scale a feature to sit near 0 and about 1 wide", from: "Module 10" },
 	{ id: "baseline", symbol: <code>baseline</code>, means: "the score of always answering the commonest class: what any real score has to beat", from: "Module 10" },
 ];
@@ -287,7 +308,8 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
 					page. The first run downloads about 10 MB of runtime and the browser caches it after that.
 				</li>
 				<li>
-					<b>Nothing to install, and nothing to sign up for.</b> There is no server and no account. The only thing that leaves your machine is the runtime download.
+					<b>Nothing to install, and nothing to sign up for.</b> There is no server and no account. Your code and your progress never leave this browser, and the only things coming down are
+					this page, the runtime and the data the modules train on.
 				</li>
 				<li>
 					<b>Your work lives in this browser.</b> Your file, the hints you have opened and the sections that have passed are stored in this browser's local storage, per browser and per

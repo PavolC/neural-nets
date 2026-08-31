@@ -30,9 +30,13 @@ export function Module9() {
       </p>
       <p>
         Module 3's <code>sgd</code> came closest: the right loop, shuffle, cut,
-        step, repeat, running on your own gradient since Module 5. But the course
-        only ever called it one epoch at a time, and it has never drawn the network
-        it trains, never scored one, and never taken a decayed step.
+        step, repeat, running on your own gradient in every panel that has trained
+        it since Module 5. But the course only ever called it one epoch at a time,
+        and it has never drawn the network it trains, never scored one, and never
+        taken a decayed step. In your file, <code>sgd</code> still calls Module 3's
+        nudge-and-measure <code>gradient</code>, and <code>train</code>, the
+        function you are about to write, is the one that reaches your{" "}
+        <code>backprop</code>.
       </p>
       <p>
         So write it. The exercise below is two functions, and the second one is the
@@ -133,8 +137,9 @@ guesses == y                      ->  array([True, True, False])
       </p>
       <SectionHeader id="m9-step-size" title="The step size, from the inside" />
       <p>
-        The other two settings reach past Module 7's grid: 3.0 is one of its four
-        columns, and 0.1 is smaller than any step size that table tried. At 0.1 the
+        Only one of the other two settings reaches past Module 7's grid: 3.0
+        re-runs one of its four columns with the decay switched on, and 0.1 is
+        below every step size that table tried. At 0.1 the
         first epoch reads 77.2 percent against 0.5's 85.5, and by
         the end the two are level: a smaller step is not a worse answer here, only
         a slower start. At 3.0 the last five epochs average 86.6, and the per-epoch

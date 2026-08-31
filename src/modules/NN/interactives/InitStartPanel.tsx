@@ -47,7 +47,7 @@ _lib.gradient = lambda w, b, X, Y: _lib.batch_gradient(
     w, b, X, Y, _lib.cross_entropy_delta)
 
 def _saturation(w, b):
-    """Share of hidden neurons flatter than 0.01, over the training images."""
+    """Share of hidden readings flatter than 0.01, over the training images."""
     _a2 = 1.0 / (1.0 + np.exp(-(w[0] @ X_train + b[0])))
     _steep = _a2 * (1.0 - _a2)
     return float((_steep < 0.01).mean()), float(np.median(_steep))
@@ -217,7 +217,7 @@ export function InitStartPanel() {
               <tr>
                 <th>before a single step</th>
                 <th>median hidden squash slope</th>
-                <th>share of hidden neurons flatter than 0.01</th>
+                <th>share of hidden readings flatter than 0.01</th>
               </tr>
             </thead>
             <tbody>
@@ -264,7 +264,7 @@ export function InitStartPanel() {
           <p>
             Saturation is not gone by the end, and it is not meant to be:{" "}
             {(summary.runs["yours"].flat_share_end * 100).toFixed(1)}% of the divided run's hidden
-            neurons are flatter than 0.01 after training, against{" "}
+            readings are flatter than 0.01 after training, against{" "}
             {(summary.runs["plain"].flat_share_end * 100).toFixed(1)}% for the undivided one. A
             hidden neuron that has learned to answer one kind of stroke should be decisive
             about it. What the division fixed is saturation before anything has been

@@ -7,7 +7,7 @@ export const l2Exercise: Exercise = {
   id: "l2",
   title: "The decaying update step",
   prompt: [
-    "The smallest exercise in the course: your Module 3 update step with one " +
+    "Your Module 3 update step with one " +
       "factor added to one of its two lines.",
     "The contract: l2_step(weights, biases, nabla_w, nabla_b, eta, lmbda, n) " +
       "performs one descent step and returns (new_weights, new_biases). The " +

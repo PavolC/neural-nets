@@ -164,7 +164,10 @@ export function Module4() {
         steep middle, nearly deaf out on the flat ends. The booth's rate is the
         squash's slope at that exact spot. It has a shorthand,{" "}
         <M tex="\sigma'(z)" /> (the tick mark is read "prime" and means "the slope
-        of"), and a convenient formula:
+        of"). The same tick did a different job in Module 2, where{" "}
+        <M tex="a'" /> meant the next layer's activations; on a function's name it
+        means that function's slope. The shorthand comes with a convenient
+        formula:
       </p>
       <Eq
         tex="\sigma'(z) = \sigma(z)\,(1 - \sigma(z))"

@@ -173,7 +173,7 @@ export function Module10() {
       </p>
       <Eq
         tex="\sqrt{\underbrace{4200^2}_{\text{mass}} + \underbrace{200^2}_{\text{flipper}} + \underbrace{44^2}_{\text{bill length}} + \underbrace{17^2}_{\text{bill depth}}} = \sqrt{17{,}682{,}225} \approx 4{,}200"
-        gloss="The four averages from the file, squared and added, then square-rooted: that is the spread of a hidden neuron's evidence when its weights are drawn at spread 1. Module 7's draw divides those weights by the square root of the input count, which is 3 for nine input rows. Dividing 4,200 by 3 still leaves the evidence near 1,400, where the same division landed MNIST's at 0.33."
+        gloss="The four averages from the file, squared and added, then square-rooted: that is the spread of a hidden neuron's evidence when its weights are drawn at spread 1. The two word columns become five more rows of 0 and 1, so the network reads nine input rows in all, and a row that holds at most a 1 cannot move a sum of 17,682,225. Module 7's draw divides those weights by the square root of the input count, which is 3 for nine rows. Dividing 4,200 by 3 still leaves the evidence near 1,400, where the same division landed MNIST's at 0.33."
       />
       <p>
         Every hidden neuron is saturated flat before training starts, and the
@@ -183,7 +183,7 @@ export function Module10() {
       </p>
       <Eq
         tex="x' = \frac{x - \text{mean}}{\text{spread}}"
-        gloss="For each feature separately: subtract that feature's average across the training examples, then divide by its typical distance from that average. Every feature comes out centred on 0 and about 1 wide, whatever it was measured in. The name for it is standardizing."
+        gloss="For each feature separately: subtract that feature's average across the training examples, then divide by the spread of what that leaves, Module 7's spread taken over the centred values rather than the raw ones. Every feature comes out centred on 0 and about 1 wide, whatever it was measured in. The name for it is standardizing."
       />
       <p>
         One detail in that formula decides whether your final number means
@@ -223,12 +223,13 @@ export function Module10() {
       />
       <p>
         Holes need a decision rather than a formula. The two penguins with no
-        measurements at all cannot be fed to anything, so they leave. The eleven
-        with no recorded sex still have every measurement, so throwing them away
-        would cost real information to avoid a small gap; instead their sex
-        column becomes all zeros, which says none of these rather than guessing.
-        Both choices are judgement, and the useful habit is to write down which
-        one you made and why.
+        measurements at all cannot be fed to anything, so they leave. Eleven
+        rows have no recorded sex, and those two are among the eleven, so nine
+        of the birds that stay have every measurement and no sex. Throwing those
+        nine away would cost real information to avoid a small gap; instead
+        their sex column becomes all zeros, which says none of these rather than
+        guessing. Both choices are judgement, and the useful habit is to write
+        down which one you made and why.
       </p>
       <p>
         Scaling and one-hot rows together turn the first penguin in the file at
@@ -271,10 +272,11 @@ export function Module10() {
       <p>
         Then the split, and it has to be shuffled. This file is sorted by
         species, the way files usually arrive sorted by something. Cut it 60, 20
-        and 20 without shuffling and the training rows are 151 Adelie and 54
-        Gentoo, while the held-back rows are 68 Chinstrap and a single Gentoo: a
-        network trained on two species and scored on a third it has never seen.
-        Shuffling once, before cutting, is the whole defence.
+        and 20 without shuffling and the training rows are 151 Adelie and 55
+        Gentoo. The 68 validation rows are the Gentoo left over, and the 68 test
+        rows are every Chinstrap in the file: a network trained on two species
+        and scored on a third it has never seen. Shuffling once, before cutting,
+        is the whole defence.
       </p>
       <Aside>
         <p>
@@ -294,10 +296,12 @@ export function Module10() {
         The panel below runs the whole pipeline out of one file: your{" "}
         <code>standardize</code>, <code>one_hot</code> and <code>split</code> turn
         the file into a matrix, and your <code>train</code> from Module 9 does the
-        rest, down to the sigmoid you wrote in Module 1. Nothing in the run is the
-        course's except the mini-batch adapter.
+        rest, down to the sigmoid you wrote in Module 1. Nothing in the training
+        is the course's except the mini-batch adapter. The score at the end is
+        read through the course's own feedforward, so the number reported does
+        not come from the accuracy function that drew the curve.
       </p>
-      <Figure caption="The penguin file, prepared by your code and trained by your loop. The switches change the preparation, not the network: same shape, same step size, same epochs, same seeds.">
+      <Figure caption="The penguin file, prepared by your code and trained by your loop. The switches change the preparation, not the training: same hidden layer, same step size, same epochs, same seeds, and the input layer takes however many rows the preparation produces.">
         <PenguinsPanel />
       </Figure>
       <p>
@@ -306,9 +310,10 @@ export function Module10() {
         read 42.6 percent too, because 29 of those 68 are Adelie. (The whole file
         is 44.2 percent Adelie, 152 of 344, so one shuffled fifth of it landing a
         little under that is ordinary.) Turn the scaling on and the same network,
-        on the same rows, reads 100 percent, with 80.9 percent after a single
-        epoch. One preprocessing step is the difference between a network that
-        works and a network that does not.
+        on the same rows, reads 100 percent, and it was already reading 80.9
+        percent of the validation penguins after a single epoch. One
+        preprocessing step is the difference between a network that works and a
+        network that does not.
       </p>
       <p>
         Why does the unscaled network match that score exactly, rather than
@@ -444,7 +449,7 @@ export function Module10() {
             <tr>
               <td>NaN appears and stays</td>
               <td>a logarithm of zero, or a step size that overflowed</td>
-              <td>Module 7's clip</td>
+              <td>the clip in Module 7's exercise</td>
             </tr>
             <tr>
               <td>the score equals the commonest class</td>
@@ -515,12 +520,13 @@ opt = torch.optim.SGD(model.parameters(), lr=0.5)   # your l2_step
 for epoch in range(15):                    # your train
     for x, y in loader:                    # your shuffle and mini-batches
         loss = loss_fn(model(x), y)        # your feedforward, then the cost
-        opt.zero_grad()
+        opt.zero_grad()                    # your zeroed nabla_w and nabla_b
         loss.backward()                    # your backprop: BP1 to BP4
         opt.step()                         # your update rule`}</pre>
       </div>
       <p>
-        Fourteen lines, and there is nothing in them you have not implemented.{" "}
+        Thirteen lines of code, and there is nothing in them you have not
+        implemented.{" "}
         <code>nn.Linear</code> holds a weight matrix and a bias column and
         computes <M tex="Wa + b" />. <code>loss.backward()</code> is the backward
         sweep, worked out by the automatic differentiation Module 9 named, from

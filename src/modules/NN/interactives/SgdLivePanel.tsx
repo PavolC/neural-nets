@@ -169,9 +169,9 @@ export function SgdLivePanel() {
         <p className="interactive-status">
           Done: cost {result.final_cost.toFixed(4)}, {Math.round(result.accuracy * 100)}%
           of the toy points classified correctly, in {result.seconds.toFixed(1)} seconds.
-          The count: {result.steps} steps, and every step estimated {result.params} partial
-          derivatives by nudging each parameter twice, which cost{" "}
-          {result.forward_passes.toLocaleString()} forward passes in total. This tiny
+          The count: {result.steps} steps, and every step estimated {result.params} slopes
+          by nudging each parameter twice, which cost{" "}
+          {result.forward_passes.toLocaleString()} passes over the batch in total. This tiny
           network has {result.params} parameters; the digit reader from Module 2 has
           11,935, roughly 360 times this cost on every single step. That is why
           Module 5 exists.

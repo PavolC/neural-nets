@@ -6,7 +6,7 @@
 		<title>Neural Networks · Moving Parts</title>
 		<meta
 			name="description"
-			content="An interactive course on neural networks from first principles: read a little, play with live visualizations, and implement feedforward, gradient descent and backpropagation in Python in your browser."
+			content="An interactive course on neural networks from first principles: read a little, manipulate live visualizations, and implement feedforward, gradient descent and backpropagation in Python in your browser."
 		/>
 		<meta name="theme-color" content="#0b6e4f" />
 		<!-- The course mark, inline so the tab has an icon without costing a
@@ -34,12 +34,21 @@
 		<meta property="og:title" content="Neural Networks · Moving Parts" />
 		<meta
 			property="og:description"
-			content="Build a neural network from first principles in your browser. Read a little, play with live visualizations, and write real Python that trains on handwritten digits. No installs, no accounts."
+			content="Build a neural network from first principles in your browser. Read a little, manipulate live visualizations, and write real Python that trains on handwritten digits. No installs, no accounts."
 		/>
 		<meta property="og:image" content="https://pavolc.github.io/neural-nets/og-image.png" />
 		<meta property="og:image:width" content="1200" />
 		<meta property="og:image:height" content="630" />
-		<meta property="og:image:alt" content="Moving Parts: Neural Networks. Twenty-five live visualizations, nine coding exercises, trains on real MNIST." />
+		<!-- What a reader gets instead of the image: a screen reader, a client that
+         blocks images, a crawler that only reads the tags. It has to describe
+         the card that exists, so it changes when tools/og_card.html changes.
+         It carried the three counts the card used to print in chips, and those
+         chips are gone; a count in an alt tag is the same hand-maintained
+         number as a count in a PNG, in a second place nothing checks. -->
+		<meta
+			property="og:image:alt"
+			content="Moving Parts, build-it-yourself courses: Neural Networks. A course on neural networks that you finish by building one, in Python, in your browser."
+		/>
 		<link rel="canonical" href="https://pavolc.github.io/neural-nets/" />
 
 		<meta name="twitter:card" content="summary_large_image" />

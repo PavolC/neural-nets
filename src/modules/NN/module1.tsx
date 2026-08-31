@@ -116,7 +116,8 @@ export function Module1() {
         their dataset, then place the line so it reproduces their rule on all four
         dots. And this is the part to internalize: dragging the line IS choosing{" "}
         <M tex="w_1, w_2, b" />; the readout under the chart shows, live, which
-        three numbers your line corresponds to. OR and AND go quickly.
+        three numbers your line corresponds to. Each of those two rules has a
+        line that works.
       </p>
       <p>
         Before you drag anything, settle how to read this kind of picture, because
@@ -129,7 +130,7 @@ export function Module1() {
         every point on one side, no for the other, whether or not a dot sits
         there. Learning means making side and color agree on every dot.
       </p>
-      <Figure caption="Drag the two round handles to place the line. Position = the inputs, color = the required answer, side of the line = the neuron's answer. OR and AND fall in seconds; then switch to XOR and keep trying: no single straight cut ever puts both green points on one side and both gold points on the other.">
+      <Figure caption="Drag the two round handles to place the line. Position = the inputs, color = the required answer, side of the line = the neuron's answer. A single line works for OR and for AND; then switch to XOR and keep trying: no single straight cut ever puts both green points on one side and both gold points on the other.">
         <SeparatingLine />
       </Figure>
       <Aside>
@@ -308,8 +309,8 @@ np.exp(-2.0)    # e^(-2); given an array, it does every entry at once`}</pre>
         a flat array, neither row nor column: in this course, that is a bug. Second, write numbers with decimal
         points: 6.0, or its lazy shorthand 6. (yes, a bare trailing dot). The dot
         tells NumPy to store fractions; np.array([6, 2, 1]) would quietly build an
-        integer-only array, and weights, activations, and gradients are all
-        fractional.
+        integer-only array, and weights, biases, and the confidences a sigmoid
+        neuron outputs are all fractional.
       </p>
 
       <ExerciseCard exercise={sigmoidNeuronExercise} />

@@ -16,7 +16,9 @@
 #   When mean and spread are passed in, use them and do not measure anything:
 #   that is how the validation and test columns get the training set's
 #   scaling rather than their own. A feature that never varies has a spread
-#   of 0; leave those rows alone rather than dividing by zero.
+#   of 0; leave those rows alone rather than dividing by zero, and hand back
+#   the 0 you measured rather than the 1 you divided by, because a later call
+#   has to make the same decision about the same feature.
 #
 # - one_hot(values, levels): values is a list of m labels (strings), levels is
 #   the list of the possible ones, in the order you want the rows. Returns an
@@ -30,6 +32,9 @@
 #   (train_idx, val_idx, test_idx). The last two hold round(n * val_share)
 #   and round(n * test_share) entries, taken from the END of the shuffled
 #   order, and training keeps the rest. Every index appears exactly once.
+#   Either end holds the same kind of rows after the shuffle, so which end
+#   you take is a convention, but it fixes which rows land in which set and
+#   the tests check for it.
 #
 # Nothing above you in this file is needed here. np is all it takes.
 

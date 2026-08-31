@@ -6,10 +6,7 @@ because only some of it is adapted from a NonCommercial source. In short:
 
     Code                       MIT
       the application (src/, except the two exclusions below), the brand
-      layer, tools/, and course-kit/brand/. Full text in LICENSE-MIT.
-
-    The method kit's documents  CC BY 4.0
-      course-kit/*.md and course-kit/.claude/commands/.
+      layer, and tools/. Full text in LICENSE-MIT.
 
     Course content             CC BY-NC 3.0
       src/modules/ and the exercise prompts and hints in
@@ -23,8 +20,8 @@ because only some of it is adapted from a NonCommercial source. In short:
 
 The reason for the split is that the course content is adapted from a
 NonCommercial source and carries that restriction, while the application that
-runs it, the brand layer and course-kit/ are original work containing none of
-Nielsen's material, so nothing reaches them.
+runs it and the brand layer are original work containing none of Nielsen's
+material, so nothing reaches them.
 
 Course content (prose, pedagogical sequence, visualizations)
 ------------------------------------------------------------
@@ -44,8 +41,8 @@ the source rather than an obligation to. What does bind is narrower: no use of
 Nielsen's material for commercial advantage, and no granting of rights in his
 material beyond those held.
 
-The software: the application, the brand layer, tools, course-kit/brand
-----------------------------------------------------------------------
+The software: the application, the brand layer, tools
+-----------------------------------------------------
 
 Copyright (c) 2026 Pavol Chvala, and licensed under the MIT License, whose
 full text is in LICENSE-MIT beside this file.
@@ -57,7 +54,7 @@ reaches the Pyodide worker and its protocol, the exercise harness and its UI,
 the editor, the progress layer, the start page, the stylesheet, the app shell,
 and each exercise's skeleton.py and tests.py, which are original work rather
 than adapted from anything. It also covers the series brand layer in
-src/brand/, everything in tools/, and course-kit/brand/.
+src/brand/ and everything in tools/.
 
 The exercise solution.py files are the exception inside the exception: they
 are MIT as well, but adapted from Nielsen, so his notice travels with them.
@@ -72,31 +69,28 @@ code" below: they are MIT as well, and Nielsen's copyright notice travels with
 them.
 
 
-The method kit's documents
---------------------------
+The method kit
+--------------
 
-course-kit/CLAUDE.md, METHOD.md, CASEBOOK.md, BRAND.md, DESIGN-DOC-TEMPLATE.md,
-README.md and the files in course-kit/.claude/commands/ are licensed under the
-Creative Commons Attribution 4.0 International License (CC BY 4.0):
-https://creativecommons.org/licenses/by/4.0/
-
-Share and adapt them for any purpose, including commercially, with attribution.
-They are documents rather than software, which is why they carry a Creative
-Commons licence rather than the MIT one above; adapting a rules file into your
-own project is exactly the intended use.
-
-course-kit/brand/ is code and is MIT, as stated above.
+The kit (the method, the casebook, the design-doc template, the brand files and
+the slash commands) was extracted from this repository and now lives in the
+series repository, at PavolC/moving-parts under course-kit/. Its licence travels
+inside it, at course-kit/LICENSE there: the documents CC BY 4.0, the brand files
+MIT. Nothing in this file grants anything over it, because none of it is here
+any more.
 
 
 The series name and mark
 ------------------------
 
 Not licensed by any grant in this file: the name "Moving Parts", the names of
-courses published under it, and the sigmoid glyph used as the series mark.
+courses published under it, the three-band Moving Parts mark, and the sigmoid
+glyph used as this course's own mark.
 
-The MIT grant covers the code that draws the mark. It does not grant the mark.
-Copy the brand layer, change the accent and the glyph in brand.ts, and publish
-under your own name; that is what the layer is built for.
+The MIT grant covers the code that draws those marks. It does not grant them.
+Copy the brand layer, change the accent and the glyph in brand.ts, replace the
+three bands in Monogram.tsx, and publish under your own name; that is what the
+layer is built for.
 
 
 Reference code
