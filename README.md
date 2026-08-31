@@ -193,10 +193,11 @@ none of Nielsen's material, so the CC BY-NC grant does not reach them. They are 
 ([LICENSE-MIT](LICENSE-MIT)). The method kit's documents are **CC BY 4.0**. Take the
 harness, take the worker, take the brand layer, and build something else with them.
 
-Not granted by either: the name _Moving Parts_ and the sigmoid glyph. The MIT licence
-covers the code that draws the mark, not the mark. Copy `src/brand/`, change the accent
-and the glyph in `brand.ts`, and publish under your own name; that is what the layer is
-for. Full terms in [LICENSE](LICENSE).
+Not granted by either: the name _Moving Parts_, its three-band mark, and the sigmoid
+glyph that marks this course. The MIT licence covers the code that draws them, not the
+marks themselves. Copy `src/brand/`, change the accent and the glyph in `brand.ts`,
+replace the three bands in `Monogram.tsx`, and publish under your own name; that is what
+the layer is for. Full terms in [LICENSE](LICENSE).
 
 Reference implementations are adapted from Nielsen's MIT-licensed code at
 [github.com/mnielsen/neural-networks-and-deep-learning](https://github.com/mnielsen/neural-networks-and-deep-learning).

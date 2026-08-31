@@ -3,9 +3,10 @@
 
 The masthead and footer use the fixed three-band series mark from
 Monogram.tsx. The course mark is declared in brand.ts and copied into the
-favicon and social card, where no component can generate it. The browser
-chrome colour is another literal in a meta tag. Those copies are the ones
-that go stale.
+favicon and social card, where no component can generate it. The card draws
+both marks, since it is a screenshot and reaches neither component. The
+browser chrome colour is another literal in a meta tag. Those copies are the
+ones that go stale.
 
 The course kit carries its own copy of the shared brand files, so somebody can
 drop them into an empty repo and start a sibling course. A kit that has
@@ -142,8 +143,11 @@ def main() -> int:
 
         # The pre-mount skeleton spells the wordmark out too, because it has to
         # paint before the masthead component exists.
+        # Matched on content rather than layout: a formatter that reflows this
+        # file (8aae5fc collapsed the three-line <p> onto one) must not turn a
+        # brand check red, because this script gates the deploy.
         series = re.search(r'name:\s*"([^"]+)"', ts).group(1)
-        if f">\n          {series}\n        </p>" not in html.replace("\r\n", "\n"):
+        if not re.search(rf">\s*{re.escape(series)}\s*</p>", html):
             fail(problems, f"index.html's loading skeleton does not carry the wordmark {series!r}")
 
     theme = re.search(r'name="theme-color"\s+content="(#[0-9a-fA-F]{6})"', html)
@@ -207,6 +211,13 @@ def main() -> int:
                     fail(problems, f"public/{card.name} is {width}x{height}; the summary_large_image "
                                    f"slot wants 1200x630")
 
+        # What a reader gets when the image does not arrive: a screen reader, a
+        # client that blocks images, a crawler that only reads the tags. The
+        # tag is here today and nothing kept it here, which is the same silent
+        # failure as the four URLs above.
+        if not re.search(r'property="og:image:alt"\s*\n?\s*content="[^"]+"', html):
+            fail(problems, "og:image has no og:image:alt")
+
         twitter_title = re.search(r'name="twitter:title"\s+content="([^"]+)"', html)
         if title and twitter_title and twitter_title.group(1) != wanted:
             fail(problems, f"index.html's twitter:title is {twitter_title.group(1)!r}, "
@@ -225,6 +236,21 @@ def main() -> int:
         if not card_d or card_d.group(1) != glyph_d.group(1):
             got_d = card_d.group(1) if card_d else "(none)"
             fail(problems, f"the social card's course-glyph path is\n    {got_d}\n  but brand.ts draws\n    {glyph_d.group(1)}")
+        # And one more copy of the series mark, for the same reason: a
+        # screenshot reaches no component, so the three bands are a literal
+        # here. The card used to draw the course glyph beside the series name,
+        # which named the series with the course's mark.
+        want_bands = []
+        for token in SERIES_MARK:
+            hue = re.search(rf"--{token}:\s*(#[0-9a-fA-F]{{6}});", css)
+            want_bands.append(hue.group(1).lower() if hue else f"(no --{token})")
+        card_bands = [
+            band.lower()
+            for band in re.findall(r'<rect width="\d+" height="32" x="\d+" fill="(#[0-9a-fA-F]{6})"', src)
+        ]
+        if card_bands != want_bands:
+            fail(problems, f"the social card's series mark is {', '.join(card_bands) or '(none)'}, "
+                           f"but Monogram.tsx draws {', '.join(want_bands)}")
 
     if not KIT.exists():
         fail(problems, f"{KIT.relative_to(ROOT)} does not exist, so the kit carries no brand")
@@ -253,8 +279,8 @@ def main() -> int:
         return 1
 
     print(f"Brand agrees: accent --hue-{hue_name} ({accent}), series mark in the "
-          "masthead and footer, course glyph in the favicon and social card, "
-          "the title in 4 places, kit in step.")
+          "masthead, the footer and the social card, course glyph in the favicon "
+          "and the card, the title in 4 places, kit in step.")
     return 0
 
 

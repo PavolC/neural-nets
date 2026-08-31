@@ -1,23 +1,21 @@
-/* The series brand layer: the accent family, the type roles, the masthead,
-   the tab strip and the footer. Loaded first so everything below can override
-   it; see src/brand/brand.css for what a sibling course changes. */
+/* The series brand layer: the accent family, the ground, the two inks, the two
+   rule weights, the type roles, the masthead, the tab strip and the footer.
+   Loaded first so everything below can override it; see src/brand/brand.css
+   for what a sibling course changes.
+
+   --bg, --ink, --muted, --rule and --rule-strong are declared there, not here.
+   They used to be declared here and referenced there, which meant the layer
+   only worked in this repo, by load order, and a sibling that dropped the
+   folder into an empty one got three invalid accent mixes. */
 @import "./brand/brand.css";
 
 :root {
-	--ink: #1a1a1a;
-	--muted: #5a5a5a;
 	--loss: #b3423a;
 	/* The accuracy line's hue, which happens to equal this course's accent
      today. Kept as its own literal rather than aliased to --accent: one is a
      brand colour and one names a quantity in a chart, and a sibling course
      that picks a different accent must not silently repaint its charts. */
 	--acc: #0b6e4f;
-	--rule: #e2e2e2;
-	/* For boundaries that identify a control (a quiz option, a digit
-     thumbnail): --rule sits at 1.27:1 against the page, which is fine for a
-     decorative container edge and too faint to mark something clickable. */
-	--rule-strong: #c4cac2;
-	--bg: #fdfdfb;
 	/* Disabled controls, as explicit colors rather than an opacity wash. A
      faded control still has to be readable: the label is often the only thing
      explaining why it is disabled. */

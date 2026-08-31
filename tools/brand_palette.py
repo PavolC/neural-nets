@@ -1,11 +1,16 @@
 #!/usr/bin/env python3
-"""Regenerate and check the series accent family in src/brand/brand.css.
+"""Regenerate and check the series accent family and inks in src/brand/brand.css.
 
 The family is nine hues at one OKLCH lightness and one chroma, taken from the
 first course's green. Holding lightness and chroma is what makes sibling
 courses read as a set, and it is also what guarantees their contrast: this
 script prints the ratio of every hue against the page ground and under white
 ink, so a hue cannot enter the family without its numbers being seen.
+
+The two greys the pages set text in are hand-picked rather than computed, so
+they are measured against the ground instead. That half is not decoration: the
+series index carried a third grey once and it was below AA, with nothing in any
+repository to say so.
 
     python3 tools/brand_palette.py            # print the family and its ratios
     python3 tools/brand_palette.py --check    # fail if brand.css has drifted
@@ -19,7 +24,10 @@ import pathlib
 import re
 import sys
 
-# The page ground and the ink used on a filled accent, from src/styles.css.
+# The page ground and the ink a filled accent carries. The family's ratios are
+# computed against these literals, because the family can be printed without
+# reading any CSS; the ink check under --check reads --bg back out of brand.css
+# instead, so the greys are measured against the ground the pages really set.
 GROUND = "#fdfdfb"
 ON_ACCENT = "#ffffff"
 
@@ -45,6 +53,13 @@ FAMILY = [
     ("oxide", 252),
     ("moss", 324),
 ]
+
+
+# The inks the pages set text in, which unlike the family are hand-picked and
+# so are checked rather than constructed. The series index carried a third grey
+# here once, #767a77, for its card meta lines: 4.28:1, below AA at the 0.78rem
+# those are set in, and nothing in either repository would have said so.
+TEXT_INKS = ["ink", "muted"]
 
 
 def to_linear(c: float) -> float:
@@ -131,9 +146,13 @@ def build() -> list[tuple[str, str, float, float, float]]:
 
 
 def read_css() -> dict[str, str]:
+    """Every `--token: #hex;` in brand.css, keyed without the dashes.
+
+    Not just the hues: the ground and the inks live in the brand layer too, so
+    one read covers both halves of the check."""
     css = pathlib.Path(__file__).resolve().parent.parent / "src" / "brand" / "brand.css"
     text = css.read_text()
-    return {m.group(1): m.group(2).lower() for m in re.finditer(r"--hue-([a-z]+):\s*(#[0-9a-fA-F]{6});", text)}
+    return {m.group(1): m.group(2).lower() for m in re.finditer(r"--([a-z-]+):\s*(#[0-9a-fA-F]{6});", text)}
 
 
 def main() -> int:
@@ -163,19 +182,33 @@ def main() -> int:
     in_css = read_css()
     problems = []
     for name, hex_colour, _, _, _ in family:
-        if name not in in_css:
-            problems.append(f"--hue-{name} is missing from brand.css")
-        elif in_css[name] != hex_colour:
-            problems.append(f"--hue-{name} is {in_css[name]} in brand.css, computes to {hex_colour}")
+        token = f"hue-{name}"
+        if token not in in_css:
+            problems.append(f"--{token} is missing from brand.css")
+        elif in_css[token] != hex_colour:
+            problems.append(f"--{token} is {in_css[token]} in brand.css, computes to {hex_colour}")
     for name in in_css:
-        if name not in {f[0] for f in family}:
-            problems.append(f"--hue-{name} is in brand.css but not in this script's family")
+        if name.startswith("hue-") and name[4:] not in {f[0] for f in family}:
+            problems.append(f"--{name} is in brand.css but not in this script's family")
+
+    ground = in_css.get("bg", GROUND)
+    print()
+    print(f"Text inks on the ground ({ground}):")
+    for token in TEXT_INKS:
+        if token not in in_css:
+            problems.append(f"--{token} is missing from brand.css")
+            continue
+        ratio = contrast(in_css[token], ground)
+        print(f"--{token:10} {in_css[token]:9} {ratio:10.2f}")
+        if ratio < 4.5:
+            problems.append(f"--{token} is {in_css[token]}, {ratio:.2f}:1 on the ground, below AA")
+
     if problems:
         print()
         for p in problems:
             print(f"FAIL: {p}", file=sys.stderr)
         return 1
-    print(f"brand.css matches: all {len(family)} hues.")
+    print(f"brand.css matches: all {len(family)} hues, and both inks clear AA.")
     return 0
 
 

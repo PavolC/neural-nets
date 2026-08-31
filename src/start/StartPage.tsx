@@ -308,7 +308,8 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
 					page. The first run downloads about 10 MB of runtime and the browser caches it after that.
 				</li>
 				<li>
-					<b>Nothing to install, and nothing to sign up for.</b> There is no server and no account. The only thing that leaves your machine is the runtime download.
+					<b>Nothing to install, and nothing to sign up for.</b> There is no server and no account. Your code and your progress never leave this browser, and the only things coming down are
+					this page, the runtime and the data the modules train on.
 				</li>
 				<li>
 					<b>Your work lives in this browser.</b> Your file, the hints you have opened and the sections that have passed are stored in this browser's local storage, per browser and per

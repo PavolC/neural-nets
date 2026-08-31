@@ -92,11 +92,13 @@ The series name and mark
 ------------------------
 
 Not licensed by any grant in this file: the name "Moving Parts", the names of
-courses published under it, and the sigmoid glyph used as the series mark.
+courses published under it, the three-band Moving Parts mark, and the sigmoid
+glyph used as this course's own mark.
 
-The MIT grant covers the code that draws the mark. It does not grant the mark.
-Copy the brand layer, change the accent and the glyph in brand.ts, and publish
-under your own name; that is what the layer is built for.
+The MIT grant covers the code that draws those marks. It does not grant them.
+Copy the brand layer, change the accent and the glyph in brand.ts, replace the
+three bands in Monogram.tsx, and publish under your own name; that is what the
+layer is built for.
 
 
 Reference code
