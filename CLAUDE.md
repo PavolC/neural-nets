@@ -797,8 +797,8 @@ the footer. Rules that follow from it:
 - **The masthead compresses on inner pages at phone width.** `Masthead` takes a
   `compact` flag (App passes it for every page but the start page) and below
   560px that drops the tagline and sizes the title down to a running head. The
-  tagline is the course's pitch, which is what the front door is for; on page
-  seven it costs four lines. Measured on Module 2 at 390x844, the whole
+  tagline summarizes the course's concrete arc, which belongs on the front
+  door; on page seven it costs four lines. Measured on Module 2 at 390x844, the whole
   first-screenful chrome was 329px and the first line of prose sat at 892px, off
   the bottom of the screen: it is 459px now, and no module is past 600px.
 - **The module opener folds on a phone.** `AfterThis` is a `<details>`, open
