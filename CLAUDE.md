@@ -623,17 +623,18 @@ the footer. Rules that follow from it:
   `var(--font-ui)` for chrome, `var(--font-display)` for the wordmark and labels,
   `var(--font-mono)` for code. A literal font stack in `styles.css` is a bug: it makes
   `--font-ui` a decoration rather than a switch.
-- **The mark exists in seven places and three of them are literals.** The masthead
-  monogram and the footer monogram render from `COURSE.glyph`, but `index.html`'s favicon
-  and `theme-color` have to be literals, because a tab needs its icon before any
-  JavaScript runs, and `tools/og_card.html` draws the monogram again because the social
-  card is rendered to a PNG at author time rather than in the page.
-  `python3 tools/check_brand.py` is what keeps them equal.
+- **The series mark and the course mark have separate jobs.** `Monogram.tsx` draws the
+  three-band Moving Parts mark beside the series name in the masthead and footer. The
+  sigmoid belongs to Neural Networks, so `COURSE.glyph` identifies the course in
+  `index.html`'s favicon and `tools/og_card.html`; the series index repeats it on the
+  course card. `theme-color` is also a literal because browser chrome needs it before
+  JavaScript runs. `python3 tools/check_brand.py` checks both marks and the literals it
+  can reach from this repository.
 - **The social card is a rendered page, and its URLs are absolute.** A share is unfurled
   by a crawler that has no page to resolve a relative path against, so `og:image`,
   `og:url`, `twitter:image` and the canonical link all spell out the deployed origin,
   which is the one place `base: "./"` cannot save. `tools/og_card.html` is the card's
-  source, built from the same accent, monogram and type roles as the site, so a rebrand
+  source, built from the same accent, course glyph and type roles as the site, so a rebrand
   reaches it; `bash tools/make_og_image.sh` redraws it and `check_brand.py` fails if the
   four URLs disagree, if the image named is missing from `public/`, or if it is not the
   1200x630 the tags declare. A course that ships without this is not unstyled, it is

@@ -22,17 +22,17 @@ Contrast is a consequence rather than a hope. Every hue lands between 6.1:1 and 
 against the page ground and between 6.2:1 and 6.9:1 under white ink, so any one of them
 works as text, as a rule, and as a button fill. AA wants 4.5:1.
 
-| token | hex | on the ground | under white ink |
-|---|---|---|---|
-| `--hue-green` | `#0b6e4f` | 6.14 | 6.25 |
-| `--hue-teal` | `#016a70` | 6.25 | 6.37 |
-| `--hue-blue` | `#12648d` | 6.38 | 6.50 |
-| `--hue-indigo` | `#4b5894` | 6.60 | 6.72 |
-| `--hue-violet` | `#6d4d87` | 6.73 | 6.86 |
-| `--hue-plum` | `#83456a` | 6.82 | 6.94 |
-| `--hue-crimson` | `#8c4445` | 6.81 | 6.94 |
-| `--hue-oxide` | `#864d1e` | 6.66 | 6.79 |
-| `--hue-moss` | `#4c6726` | 6.30 | 6.41 |
+| token           | hex       | on the ground | under white ink |
+| --------------- | --------- | ------------- | --------------- |
+| `--hue-green`   | `#0b6e4f` | 6.14          | 6.25            |
+| `--hue-teal`    | `#016a70` | 6.25          | 6.37            |
+| `--hue-blue`    | `#12648d` | 6.38          | 6.50            |
+| `--hue-indigo`  | `#4b5894` | 6.60          | 6.72            |
+| `--hue-violet`  | `#6d4d87` | 6.73          | 6.86            |
+| `--hue-plum`    | `#83456a` | 6.82          | 6.94            |
+| `--hue-crimson` | `#8c4445` | 6.81          | 6.94            |
+| `--hue-oxide`   | `#864d1e` | 6.66          | 6.79            |
+| `--hue-moss`    | `#4c6726` | 6.30          | 6.41            |
 
 `tools/brand_palette.py` regenerates the family and prints these ratios; `--check` fails if
 `brand.css` has drifted from what it computes. One stop on the circle is deliberately
@@ -43,9 +43,9 @@ Washes are mixed from whatever the accent is, so a course that changes one line 
 matching set instead of hand-picked near-whites that now clash:
 
 ```css
---accent-wash:  color-mix(in oklab, var(--accent) 6%,  var(--bg));  /* tinted paper */
---accent-panel: color-mix(in oklab, var(--accent) 14%, var(--bg));  /* a visible panel */
---accent-rule:  color-mix(in oklab, var(--accent) 30%, var(--bg));  /* a visible rule */
+--accent-wash: color-mix(in oklab, var(--accent) 6%, var(--bg)); /* tinted paper */
+--accent-panel: color-mix(in oklab, var(--accent) 14%, var(--bg)); /* a visible panel */
+--accent-rule: color-mix(in oklab, var(--accent) 30%, var(--bg)); /* a visible rule */
 ```
 
 **2. The rule across the top.** Three pixels of the course's own hue, at the very top of
@@ -57,10 +57,10 @@ that is chrome. The contrast between them is what tells a reader that a piece of
 machinery rather than prose, and it costs nothing:
 
 ```css
---font-prose:   Georgia, "Times New Roman", serif;
---font-ui:      system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+--font-prose: Georgia, "Times New Roman", serif;
+--font-ui: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 --font-display: var(--font-ui);
---font-mono:    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+--font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 ```
 
 Georgia is a choice, not a fallback: the most consistently available serif with a real
@@ -74,7 +74,9 @@ It marks the series wordmark, the aside and nav labels, the passed badge, and ev
 "this is a kind of thing" marker.
 
 ```css
---label-size: 0.72rem;  --label-tracking: 0.09em;  --label-weight: 600;
+--label-size: 0.72rem;
+--label-tracking: 0.09em;
+--label-weight: 600;
 ```
 
 **4. The reading measure, and one axis.** Two widths on a page, and only two. Everything
@@ -130,13 +132,13 @@ references another is substituted **where it is declared**: `--cover: var(--grou
 still gets the page's. Read the token on the element that paints. And an invalid `var()`
 makes the whole declaration invalid at computed-value time, so a width built that way
 silently falls back to `auto`, which for an SVG with a viewBox means 100 percent. That
-scaled every plot figure to twice its drawn size, and the page looked *better*, not broken.
+scaled every plot figure to twice its drawn size, and the page looked _better_, not broken.
 Compare drawn sizes before and after a change like this; a screenshot will not tell you.
 
 **Labels on lines need clearance, not a halo.** A background-coloured stroke behind the
 glyphs (`paint-order: stroke`) covers the line beside each glyph and not in the gaps
 between them, so a line running through a label still reads through it. Move the label
-clear, remembering that an offset moves the *baseline* while the glyphs stand above it, and
+clear, remembering that an offset moves the _baseline_ while the glyphs stand above it, and
 draw every label in a pass after every line or a later line paints over an earlier label.
 
 **Phones: the header is the thing to cut.** Measured on the first course at 390x844, the
@@ -173,11 +175,11 @@ Nothing is lost, because a jump of thousands of pixels animates a blur with noth
 in it. Sections also need `scroll-margin-top` clearing whatever sticky bar is on screen, or
 the heading lands behind the bar it was chosen from.
 
-**5. The lockup.** A monogram tile, the series wordmark, and the course subject on the
+**5. The lockup.** The series mark, the series wordmark, and the course subject on the
 line below:
 
 ```
-[▮]  MOVING PARTS  |  BUILD-IT-YOURSELF COURSES
+[series mark]  MOVING PARTS  |  BUILD-IT-YOURSELF COURSES
 Neural Networks
 An interactive course on neural networks: read a little, ...
 ```
@@ -195,10 +197,13 @@ reader reaches the series name first and then the course. The document title rev
 ("Neural Networks · Moving Parts"), since the subject is the word that has to survive being
 one tab of eight.
 
-The monogram is the course's glyph in white on a rounded tile of its accent. **Pick
-something the course itself draws.** The first course uses the sigmoid curve, which is the
-first figure in its chapter 1 and the shape every unit in the course is built from. A glyph
-that means nothing is worse than a letter.
+The monogram beside Moving Parts is the series mark: three bands sampled across the accent
+family. It stays the same in every course because the adjacent name is the series name.
+The course has a separate glyph for places that identify the course itself: its favicon,
+its social card, and its card on the series index. **Pick something the course itself
+draws.** The first course uses the sigmoid curve, which is the first figure in its chapter
+1 and the shape every unit in the course is built from. A glyph that means nothing is worse
+than a letter.
 
 ## Three details that carry more than they look like
 
@@ -234,19 +239,21 @@ than the stylesheet, because the editor generates its own class names:
 
 ## The files
 
-| file | lines | what a course changes |
-|---|---|---|
-| `brand.css` | ~300 | one line: which hue `--accent` points at |
-| `brand.ts` | ~67 | all of it: name, note, glyph, sibling list |
-| `Monogram.tsx` | ~26 | nothing |
-| `Masthead.tsx` | ~44 | nothing |
-| `SeriesFooter.tsx` | ~43 | nothing |
+| file               | lines | what a course changes                      |
+| ------------------ | ----- | ------------------------------------------ |
+| `brand.css`        | ~300  | one line: which hue `--accent` points at   |
+| `brand.ts`         | ~67   | all of it: name, note, glyph, sibling list |
+| `Monogram.tsx`     | ~26   | nothing                                    |
+| `Masthead.tsx`     | ~44   | nothing                                    |
+| `SeriesFooter.tsx` | ~43   | nothing                                    |
 
 `brand.css` is loaded first, so a course can still override anything in it:
 
 ```css
 @import "./brand/brand.css";
-:root { /* the course's own tokens */ }
+:root {
+	/* the course's own tokens */
+}
 ```
 
 The footer's legal text arrives as children rather than from `brand.ts`, because every
@@ -306,7 +313,7 @@ The card is the one piece of the identity that is seen by people who have not ar
 Course one draws it as a rendered HTML page (`tools/og_card.html`, screenshotted to
 `public/og-image.png` by `tools/make_og_image.sh`) rather than as a drawn image, for the
 same reason the rest of the identity is tokens: the card is then made of the accent, the
-monogram path and the type roles, and a rebrand reaches it. Copy both files, change the
+course glyph and the type roles, and a rebrand reaches it. Copy both files, change the
 subject line and the three chips, and run the script.
 
 Two things a sibling course must get right, because both fail silently:

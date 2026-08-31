@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Check that every copy of the brand agrees with every other copy.
 
-The series mark exists in more places than one component can reach. The
-masthead and the footer draw it from src/brand/brand.ts, but the favicon has
-to be a literal data URI in index.html (a tab needs its icon before any
-JavaScript runs), and the browser chrome colour has to be a literal in a meta
-tag for the same reason. Those literals are the ones that go stale.
+The masthead and footer use the fixed three-band series mark from
+Monogram.tsx. The course mark is declared in brand.ts and copied into the
+favicon and social card, where no component can generate it. The browser
+chrome colour is another literal in a meta tag. Those copies are the ones
+that go stale.
 
 The course kit carries its own copy of the shared brand files, so somebody can
 drop them into an empty repo and start a sibling course. A kit that has
@@ -31,6 +31,7 @@ KIT = ROOT / "course-kit" / "brand"
 # not here: it is the file a course does edit, so the kit's copy is a template
 # with different values and comparing them would always fail.
 SHARED = ["brand.css", "Masthead.tsx", "Monogram.tsx", "SeriesFooter.tsx"]
+SERIES_MARK = ["hue-green", "hue-blue", "hue-plum"]
 
 
 def fail(problems: list[str], message: str) -> None:
@@ -55,6 +56,7 @@ def main() -> int:
     css = (BRAND / "brand.css").read_text()
     ts = (BRAND / "brand.ts").read_text()
     html = (ROOT / "index.html").read_text()
+    monogram = (BRAND / "Monogram.tsx").read_text()
 
     hue_name, accent = resolve_accent(css)
 
@@ -65,6 +67,25 @@ def main() -> int:
     view_box = re.search(r'viewBox:\s*"([^"]+)"', ts)
     if not (glyph_d and stroke_width and view_box):
         raise SystemExit("could not read the glyph out of brand.ts")
+
+    # The mark beside the series name is the series' three bands, not the
+    # course glyph. Check both its palette order and its 32-unit geometry.
+    series_fills = re.findall(r'fill="var\(--(hue-[a-z]+)\)"', monogram)
+    if series_fills != SERIES_MARK:
+        fail(problems, f"Monogram.tsx bands {', '.join(series_fills) or '(none)'}, "
+                       f"but the series mark is {', '.join(SERIES_MARK)}")
+    series_bands = re.findall(
+        r'<rect width="(\d+)" height="32" x="(\d+)" fill="var\(--hue-[a-z]+\)"',
+        monogram,
+    )
+    if series_bands != [("11", "0"), ("11", "11"), ("10", "22")]:
+        fail(problems, f"Monogram.tsx has band geometry {series_bands}, expected "
+                       "[(11, 0), (11, 11), (10, 22)]")
+    if not re.search(r'<rect width="32" height="32" rx="7"', monogram):
+        fail(problems, "Monogram.tsx has no 32-unit rounded clipping tile")
+    for placement in ("Masthead.tsx", "SeriesFooter.tsx"):
+        if "<Monogram />" not in (BRAND / placement).read_text():
+            fail(problems, f"{placement} does not render the series mark")
 
     # The favicon, as index.html declares it.
     icon = re.search(r'rel="icon"\s*\n?\s*href="data:image/svg\+xml,([^"]+)"', html)
@@ -203,7 +224,7 @@ def main() -> int:
         card_d = re.search(r'd="(M5 24[^"]*)"', src)
         if not card_d or card_d.group(1) != glyph_d.group(1):
             got_d = card_d.group(1) if card_d else "(none)"
-            fail(problems, f"the social card's monogram path is\n    {got_d}\n  but brand.ts draws\n    {glyph_d.group(1)}")
+            fail(problems, f"the social card's course-glyph path is\n    {got_d}\n  but brand.ts draws\n    {glyph_d.group(1)}")
 
     if not KIT.exists():
         fail(problems, f"{KIT.relative_to(ROOT)} does not exist, so the kit carries no brand")
@@ -231,8 +252,9 @@ def main() -> int:
             print(f"  {p}", file=sys.stderr)
         return 1
 
-    print(f"Brand agrees: accent --hue-{hue_name} ({accent}), one glyph in "
-          f"{len(SHARED) + 3} places, the title in 4, the social card, kit in step.")
+    print(f"Brand agrees: accent --hue-{hue_name} ({accent}), series mark in the "
+          "masthead and footer, course glyph in the favicon and social card, "
+          "the title in 4 places, kit in step.")
     return 0
 
 
