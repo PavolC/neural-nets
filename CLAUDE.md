@@ -716,9 +716,10 @@ the footer. Rules that follow from it:
   three-band Moving Parts mark beside the series name in the masthead and footer. The
   sigmoid belongs to Neural Networks, so `COURSE.glyph` identifies the course in
   `index.html`'s favicon and `tools/og_card.html`; the series index repeats it on the
-  course card. `theme-color` is also a literal because browser chrome needs it before
-  JavaScript runs. `python3 tools/check_brand.py` checks both marks and the literals it
-  can reach from this repository.
+  course card. A mark and the name it identifies always form one horizontal lockup;
+  descriptors and taglines sit outside that pair. `theme-color` is also a literal because
+  browser chrome needs it before JavaScript runs. `python3 tools/check_brand.py` checks
+  both marks and the literals it can reach from this repository.
 - **The social card is a rendered page, and its URLs are absolute.** A share is unfurled
   by a crawler that has no page to resolve a relative path against, so `og:image`,
   `og:url`, `twitter:image` and the canonical link all spell out the deployed origin,

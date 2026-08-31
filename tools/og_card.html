@@ -30,7 +30,7 @@
      used to put the sigmoid in the series slot, so it named the series with the
      course's mark.
 
-     DejaVu leads both stacks because this renders in a headless Chromium, which
+	DejaVu supplies both faces because this renders in a headless Chromium, which
      has no Georgia. Every colour is a literal, the greys included, because
      nothing in the site's stylesheet reaches a file that is rendered for
      deployment; the accent, the three bands and the glyph are the ones
@@ -100,21 +100,22 @@
 				border-left: 1px solid #d8d8d2;
 			}
 
-			/* The course mark, directly above the name it identifies and on the same left
-     axis as everything else, so each mark sits with its own name and the card
-     still reads down one line. */
-			.course-tile {
+			/* The course mark and name are one horizontal lockup at display size. */
+			.course-lockup {
 				position: absolute;
-				top: 196px;
+				top: 230px;
 				left: 110px;
-				width: 56px;
-				height: 56px;
+				display: flex;
+				align-items: center;
+				gap: 24px;
+			}
+			.course-tile {
+				width: 64px;
+				height: 64px;
+				flex: none;
 			}
 
 			h1 {
-				position: absolute;
-				top: 288px;
-				left: 110px;
 				font-size: 92px;
 				line-height: 1;
 				letter-spacing: -0.02em;
@@ -125,7 +126,7 @@
      explicit so the composition holds at this size. */
 			.tagline {
 				position: absolute;
-				top: 428px;
+				top: 380px;
 				left: 113px;
 				font-size: 30px;
 				line-height: 1.45;
@@ -150,12 +151,13 @@
 			<span class="note">build-it-yourself courses</span>
 		</div>
 
-		<svg class="course-tile" viewBox="0 0 32 32">
-			<rect width="32" height="32" rx="7" fill="#0b6e4f" />
-			<path d="M5 24C12 24 15 19 16 16C17 13 20 8 27 8" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
-		</svg>
-
-		<h1>Neural&nbsp;Networks</h1>
+		<div class="course-lockup">
+			<svg class="course-tile" viewBox="0 0 32 32">
+				<rect width="32" height="32" rx="7" fill="#0b6e4f" />
+				<path d="M5 24C12 24 15 19 16 16C17 13 20 8 27 8" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+			</svg>
+			<h1>Neural&nbsp;Networks</h1>
+		</div>
 
 		<p class="tagline">
 			Build a neural network from its smallest parts,<br />
