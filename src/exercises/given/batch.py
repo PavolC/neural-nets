@@ -4,11 +4,11 @@
 #
 # Your backprop above answers for one example. Training walks mini-batches,
 # so something has to call it once per column and average the slopes. This is
-# that adapter, and it is what Module 5's training panel runs on your behalf.
+# that adapter, and it is what Chapter 5's training panel runs on your behalf.
 #
-# The output_delta argument is for later: Module 7 swaps BP1 out, and this is
+# The output_delta argument is for later: Chapter 7 swaps BP1 out, and this is
 # what hands the replacement through. Until then it stays None and backprop
-# is called the way you wrote it in Module 5, with four arguments.
+# is called the way you wrote it in Chapter 5, with four arguments.
 
 
 def batch_gradient(weights, biases, X, Y, output_delta=None):

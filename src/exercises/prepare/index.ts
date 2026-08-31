@@ -27,14 +27,14 @@ export const prepareExercise: Exercise = {
       "mean and spread are handed in, use them and measure nothing, which is " +
       "how the validation and test columns get scaled by the training set's " +
       "numbers rather than their own. Measuring on those rows would let what " +
-      "they look like leak into the preparation, and Module 7 already showed " +
+      "they look like leak into the preparation, and Chapter 7 already showed " +
       "what happens to a number the network was allowed to peek at. One edge " +
       "case: a feature that never varies has a spread of 0, so leave that row " +
       "alone instead of dividing by it. Hand back the 0 you measured rather " +
       "than the 1 you divided by, because a later call has to make the same " +
       "decision about the same feature.",
     "one_hot(values, levels) turns a column of category labels into rows: one " +
-      "row per level, a single 1.0 per column. Module 5's labels were packed " +
+      "row per level, a single 1.0 per column. Chapter 5's labels were packed " +
       "this way and the course did the packing; here you do. A value that is " +
       "not in levels, including a missing one, gets a column of all zeros, " +
       "which says none of these rather than inventing a category.",
@@ -70,7 +70,7 @@ export const prepareExercise: Exercise = {
     "Body mass arrives averaging 4,201 with a spread of 800, and bill depth " +
       "averaging 17.15 with a spread of 1.97. A weight into the first hidden " +
       "layer meets numbers 245 times apart depending on which row it is on, " +
-      "and Module 7's whole argument for dividing the starting weights assumed " +
+      "and Chapter 7's whole argument for dividing the starting weights assumed " +
       "inputs of about the same size. After scaling every row reads 0.00 and " +
       "1.00. The panel below is what that is worth.",
   ],

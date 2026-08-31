@@ -35,6 +35,25 @@ editor contents never sent; see `src/analytics.ts`).
   every suite. Running the suites cannot detect that; only the mutation check in
   `tools/check_exercises.py` (assertion G) can, which is why it exists and why
   its docstring says so.
+- **A reader-facing unit is a chapter, while shared code still says module.** The
+  series settled on one word, and it is the kit's rule rather than this course's
+  (`course-kit/CLAUDE.md` and `METHOD.md` in `PavolC/moving-parts`): "Chapter N" in
+  headings, navigation and pickers, with `cN-` section ids. The stylesheet and the
+  shared components keep the `module` vocabulary they were written with (`.module > p`,
+  `ModuleBits`, `ModuleToc`, `module-picker`, `MODULES`, the `module` field in
+  `registry.ts` and `sections.json`, and `src/modules/NN/module1.tsx`), which is what
+  makes them liftable into a sibling course. A reader never sees any of it, so renaming
+  the code buys nothing and breaks that lift.
+  This course predated the word and shipped ten modules, addressed `#m1` to `#m10`. Those
+  addresses are in bookmarks and in links already sent, so `tabFromHash` in `App.tsx`
+  **aliases** them to `#c1` to `#c10` and rewrites the bar, rather than swapping them.
+  Do not delete that alias: a straight swap is what the rename was written to avoid.
+  Two things stay stale on purpose, because both live inside a learner's saved file and
+  rewriting a body is the one edit that could destroy work. `refreshMarkers` in
+  `state/workbench.ts` fixes the marker lines and the prelude's indented example, which
+  are course-authored and carry the word; the section bodies keep whatever they were
+  saved with, so a file written before the rename still has "Chapter 3" in the picker
+  above "Module 3" inside a docstring the course supplied. New readers get neither.
 - **Attribution and license requirements must never be removed.** The app footer, README,
   and LICENSE carry the CC BY-NC 3.0 attribution to Michael A. Nielsen's _Neural Networks
   and Deep Learning_ (Determination Press, 2015). The **course content** follows its
@@ -76,7 +95,7 @@ editor contents never sent; see `src/analytics.ts`).
   layer computes `sigmoid(w @ a + b)`. Biases are column vectors `(n, 1)`.
 - Labels are one-hot column vectors `(10, 1)` for training, integer class ids for
   evaluation.
-- These match Nielsen's conventions. Notation drift between modules is a bug.
+- These match Nielsen's conventions. Notation drift between chapters is a bug.
 
 ## Exercise tests
 
@@ -100,7 +119,7 @@ editor contents never sent; see `src/analytics.ts`).
 
 ## Decisions
 
-- **Module content is authored in TSX, not MDX** (decided in Milestone 1): prose beats
+- **Chapter content is authored in TSX, not MDX** (decided in Milestone 1): prose beats
   are short and always interleaved with components, so MDX would add a dependency
   without saving friction. Exercise prompts and hints live in each exercise's
   `index.ts`.
@@ -118,10 +137,10 @@ editor contents never sent; see `src/analytics.ts`).
   "written for you", which is what lets the file import NumPy and nothing else.
 - **Exercise test contract**: tests import the learner's code via
   `from submission import ...`, which is now the whole document exec'd as one
-  module. A section the learner has not touched is **lent**: the course sets its
+  chapter. A section the learner has not touched is **lent**: the course sets its
   own copy of that section's names onto `submission` for the run, and the panel
   says what it borrowed. Never a name the target section owns, and never one the
-  target's own tests examine (`checks` in the section table; Module 7's seam test
+  target's own tests examine (`checks` in the section table; Chapter 7's seam test
   is the only case). Test functions are named `test_*`, run in definition order,
   and fail by raising `AssertionError` with a teaching message; the first
   docstring line is the test's display title. Test fixtures are hardcoded
@@ -132,14 +151,14 @@ editor contents never sent; see `src/analytics.ts`).
   at the first that fails. That is sound because a section that breaks its
   dependants always breaks its own suite too.
 - **Pretrained weights are gzipped JSON** (`pretrained_weights.json.gz`), not npz:
-  the Module 2 diagram reads the weights in JS (weight-image patches, edge colors)
+  the Chapter 2 diagram reads the weights in JS (weight-image patches, edge colors)
   and Python reads the same file for the payoff run, and JS has no npz parser.
   Regenerate with `tools/pretrain_weights.py` (needs NumPy).
 - **Interactive Python snippets** (payoff runs, live toy training) go through the
   worker's `runPython` request: the snippet reads input via
   `json.loads(_args_json)`, may stream progress with `_js_report(json_string)`, and
   must evaluate to a JSON string. First-party snippets only.
-- **Module 10 teaches applying the network to data of the learner's own**
+- **Chapter 10 teaches applying the network to data of the learner's own**
   (added after the teaching review, and a change to the design doc's original
   non-goals): a second bundled dataset (Palmer penguins, CC0) that arrives the
   way data actually does, with words, holes, unequal classes and measurements
@@ -148,41 +167,41 @@ editor contents never sent; see `src/analytics.ts`).
   unscaled the network scores exactly the majority-class baseline, and a
   73.5 percent score hides a class it never predicts. Numbers regenerated by
   `python3 tools/bench_penguins.py`.
-- **Module 9 assembles the program, and Module 10 ends the course.** Module 9 is
+- **Chapter 9 assembles the program, and Chapter 10 ends the course.** Chapter 9 is
   where the learner writes `train` and `accuracy`, the course's only assessment of
   assembly, and the payoff it cashes out is the download: before `train` exists the
   file is fifteen definitions that nothing calls, and after it the same file trains
   a network from a Python prompt with NumPy as its only import. `m9-program` says
   that, because no page said it before and the panel's own button is the only place
-  the file's name appears. Module 9 also names the two jobs nobody does by hand
-  (automatic differentiation, modern optimizers) and hands off to Module 10.
+  the file's name appears. Chapter 9 also names the two jobs nobody does by hand
+  (automatic differentiation, modern optimizers) and hands off to Chapter 10.
   **The where-to-go-next list belongs to the last page in the course, whichever
-  that is.** It ended Module 8, then Module 9, and Modules 9 and 10 were both
-  written while it sat in the middle: Module 9 closed with a reading list and then
-  had to open that list by saying "Module 10 is still ahead of you", which is a page
+  that is.** It ended Chapter 8, then Chapter 9, and Chapters 9 and 10 were both
+  written while it sat in the middle: Chapter 9 closed with a reading list and then
+  had to open that list by saying "Chapter 10 is still ahead of you", which is a page
   admitting it is in the wrong place. A reader who reaches an exit door takes it, and
-  the primary learner reported skimming both modules. It is now `m10-next`, last
+  the primary learner reported skimming both chapters. It is now `m10-next`, last
   before the data credit, and the `.course-next-list` class is named for the course
-  rather than for a module so that the next move costs nothing.
-  Neither module follows a Nielsen chapter, so neither has a `<Recap>` or a
-  "Go deeper" link; everything else about a module page applies to both. Both open
+  rather than for a chapter so that the next move costs nothing.
+  Neither chapter follows a Nielsen chapter, so neither has a `<Recap>` or a
+  "Go deeper" link; everything else about a chapter page applies to both. Both open
   on a number rather than on a summary of what came before, which is the same rule
-  Module 6 was rewritten to: Module 9 on the file that does nothing, Module 10 on
+  Chapter 6 was rewritten to: Chapter 9 on the file that does nothing, Chapter 10 on
   the 42.6 percent that is exactly the majority-class baseline.
 - **`course_helpers.py` is now only what gets lent.** Its seven reference copies
   (`sigmoid`, `feedforward`, `sigmoid_prime`, `backprop`, `cross_entropy_delta`,
-  `init_network`, `l2_step`) exist so a reader who opens Module 9 first gets a run
+  `init_network`, `l2_step`) exist so a reader who opens Chapter 9 first gets a run
   rather than a `NameError`. Nothing imports from it any more: no skeleton, no
   solution, and no panel. Three test suites still reach into it from inside a test
   body, deliberately and with a comment saying why, because a correctness
-  guarantee whose oracle shares the code under test is not a guarantee: Module 3's
-  downhill checks, Module 5's gradient check and Module 7's. The prompts' play
+  guarantee whose oracle shares the code under test is not a guarantee: Chapter 3's
+  downhill checks, Chapter 5's gradient check and Chapter 7's. The prompts' play
   snippets also import from it by name (`from course import gradient`) for any
   name owned by a section their exercise does not require, because the scratch
   pad lends only the current section's requires closure and a snippet has to run
-  for a reader who skipped a module.
+  for a reader who skipped a chapter.
 - **A payoff panel waits for everything its projection runs, not only its own
-  page's exercises.** A pass can be earned with borrowed names (open Module 3
+  page's exercises.** A pass can be earned with borrowed names (open Chapter 3
   first and sgd goes green with `feedforward` on loan), but the panels exec the
   projection raw, with no lending, so a gate that asks only "did sgd pass?"
   hands the panel a file with no `feedforward` in it and the run dies on a bare
@@ -206,22 +225,22 @@ editor contents never sent; see `src/analytics.ts`).
   left switch what the chart shows, never what the next press trains. Each
   run draws its start and its shuffle from fresh fixed seeds, so the runs are
   byte-identical to the runs the old panels trained and every number the
-  modules quote from the benches holds. The snippets take a runs list, and
+  chapters quote from the benches holds. The snippets take a runs list, and
   check_panels passes each panel one mixed list that walks both of its code
   paths. The accepted cost is that a press is minutes rather than seconds,
   with Stop the way out.
-- **Module 7 asks the learner to edit their own Module 5 backprop** (the BP1
+- **Chapter 7 asks the learner to edit their own Chapter 5 backprop** (the BP1
   seam). It is the first time the course asks anyone to change working code, and a
   single file is the only design where that is a two-line edit rather than an
   impossibility. The prompt ships the two lines; there is deliberately no button
   that splices them, because a splice into a function the learner has written
   themselves is the one edit that could destroy work. The adapter written for them
-  in Module 5 calls `backprop` with four arguments until a replacement BP1 is
-  actually handed over, so nothing needs the edit before Module 7, and
+  in Chapter 5 calls `backprop` with four arguments until a replacement BP1 is
+  actually handed over, so nothing needs the edit before Chapter 7, and
   `test_backprop_takes_the_blame_argument` in the cross-entropy suite names the
   section and the lines when it is missing. `src/exercises/backprop/seam.py` is the
   course's copy of the post-edit state, used only by the checker to prove the edit
-  keeps every Module 5 test green.
+  keeps every Chapter 5 test green.
 
 - **The visual identity is a shared series layer, not this course's stylesheet**
   (added after the course was finished, when a second course became likely). `src/brand/`
@@ -241,28 +260,28 @@ editor contents never sent; see `src/analytics.ts`).
   which would be a guess about a topic that does not exist yet. What the kit says instead
   is which of this repo's ~2,900 topic-free lines to crib, and from where.
   It lived here while it was still being refined by building this course, because every
-  refinement was discovered by writing a module rather than by thinking about the kit, and
+  refinement was discovered by writing a chapter rather than by thinking about the kit, and
   moving it out earlier would have turned each of those into a pair of cross-repository
   changes. With a second course starting it belongs above both, so it is now at
   `course-kit/` in the series repository (`PavolC/moving-parts`), with its own licence
   travelling inside it. Two things this repo lost in the move and should not pretend to
   still have: the byte-equality guard on the brand files, and a local copy to edit when a
-  module teaches the kit something new. The second one is now a pull request against the
+  chapter teaches the kit something new. The second one is now a pull request against the
   series.
-- **The front page's module outline is rendered from the module registry, not from its own
-  list** (same change). Modules 9 and 10 were added after the outline was written and were
+- **The front page's chapter outline is rendered from the chapter registry, not from its own
+  list** (same change). Chapters 9 and 10 were added after the outline was written and were
   missing from it, under a heading that said ten, so the only page showing the whole course
-  showed eight of it. `COVERS` in `StartPage.tsx` is now a lookup keyed by module id, read
-  through `MODULES`, and the heading counts the registry. A module with no entry still
+  showed eight of it. `COVERS` in `StartPage.tsx` is now a lookup keyed by chapter id, read
+  through `MODULES`, and the heading counts the registry. A chapter with no entry still
   appears under its nav label, so the worst a gap can cost is a missing sentence.
   `tools/check_exercises.py` checks the same seam from the other side: every exercise's
-  module id has to exist in the registry.
+  chapter id has to exist in the registry.
 
-## Module authoring playbook (learned from the primary learner, follow it)
+## Chapter authoring playbook (learned from the primary learner, follow it)
 
-The primary learner has high-school algebra, Python but no NumPy before Module 1,
-and no vectors, dot products, matrices, or calculus. Modules 1-2 were rewritten to
-this floor after direct feedback; every later module must be written to it too.
+The primary learner has high-school algebra, Python but no NumPy before Chapter 1,
+and no vectors, dot products, matrices, or calculus. Chapters 1-2 were rewritten to
+this floor after direct feedback; every later chapter must be written to it too.
 
 - **Numbers before notation.** Compute a concrete example by hand first, then name
   the operation and its shorthand. The dot product appeared only after multiplying
@@ -281,7 +300,7 @@ this floor after direct feedback; every later module must be written to it too.
   captions state counts and label what is and is not a neuron.
 - **Tally explicitly.** Count parameters and costs in the text: nine numbers in the
   XOR net, 11,935 in 784-15-10, two cost evaluations per parameter per step. The
-  tallies are load-bearing for motivation (why Module 3, why Module 5).
+  tallies are load-bearing for motivation (why Chapter 3, why Chapter 5).
 - **Succeed before failing.** The learner solves OR and AND before meeting XOR;
   "press Show a solution, break it one slider at a time, then rebuild" is a valid
   on-ramp for a fiddly interactive.
@@ -291,7 +310,7 @@ this floor after direct feedback; every later module must be written to it too.
   stylesheet is derived from that, so no rule repeats a number that lives in
   the markup. Box-and-arrow diagrams (chain-ripple / chain-net / bp-diagram /
   ripple-slice) render at one scale for the whole course, `--fig-scale`,
-  calibrated so the widest of them fills the column exactly (Module 4's ripple
+  calibrated so the widest of them fills the column exactly (Chapter 4's ripple
   log, 817 units across 873px): a diagram with fewer boxes in it is narrower,
   never differently drawn. Plot-family figures (concert-plot, tiny-net,
   shapes-diagram, curve-figure, m8-conv, m8-spaces) render at natural scale,
@@ -320,7 +339,7 @@ this floor after direct feedback; every later module must be written to it too.
   drawn width caught it.
 - **A label on a wire needs clearance, not just a halo.** The halo (`paint-order:
 stroke`) covers the line beside each glyph and not in the gaps between them,
-  so a line running through a label still reads through it: Module 4's fork
+  so a line running through a label still reads through it: Chapter 4's fork
   diagram showed "w = =4:0". Put the label clear of the line (the offset moves
   the text's _baseline_, and its digits stand about 9 units above that, so a
   label below a line needs roughly 15 units and one above it needs 6), and draw
@@ -333,9 +352,9 @@ stroke`) covers the line beside each glyph and not in the gaps between them,
   and require 4 units of room. Five box captions were 1 to 3 units wider than
   their own boxes, and a caption that merely fits still reads as clipped.
 - **A score gets a breakdown.** Accuracy alone hides which class a network
-  fails at, and the course teaches the habit twice: Module 5's training panel
+  fails at, and the course teaches the habit twice: Chapter 5's training panel
   shows per-digit counts and the eight mistakes the network was surest about
-  (drawn from the test images it sent back), and Module 10 shows a 73.5 percent
+  (drawn from the test images it sent back), and Chapter 10 shows a 73.5 percent
   score that never once answers the minority class. A new panel that reports one
   number should report the breakdown beside it.
 - **Interactives must not jump.** Fixed-basis flex columns (wrap depends on window
@@ -346,7 +365,7 @@ stroke`) covers the line beside each glyph and not in the gaps between them,
 - **Exercises are visible.** The Output panel shows everything printed (worker logs
   are tagged runtime vs stdout); "Run my code" executes the editor without tests;
   the test code is viewable in a collapsible; prompts include a concrete
-  "Run my code" experiment that ties back to an earlier module's numbers,
+  "Run my code" experiment that ties back to an earlier chapter's numbers,
   shipped as a code block with Copy and Append-to-my-code buttons (a prompt
   entry of `{ code: "..." }`), never as code woven into a prose sentence.
 - **Notation down to the punctuation.** Anything that could read as a typo is
@@ -363,26 +382,26 @@ stroke`) covers the line beside each glyph and not in the gaps between them,
   code names at their own first use.
 - **Quoted measurements must come from the code the reader runs, and the bench
   that produces them is committed.** `tools/bench_depth.py` and
-  `npm run bench:speeds` regenerate every number Modules 7 and 8 quote, each
+  `npm run bench:speeds` regenerate every number Chapters 7 and 8 quote, each
   section printing the prose sentence it backs; extend one of them rather than
-  writing a throwaway. A module's numbers can come from two different engines
+  writing a throwaway. A chapter's numbers can come from two different engines
   (the Pyodide panels use NumPy's PCG64, the layer-speed panel its own
   mulberry32), and they are not meant to agree: never quote a number from one
   engine for a measurement the reader makes with the other, and say which panel
   a table came from when both are on the page. Prefer statistics that hold
   still: the mean and the middle 90 percent of 200 draws reproduce, the extremes
   of that same stream do not. The bench has to match the browser exactly, not
-  just mathematically. Two traps, both found while writing Module 8: `init_network` draws every weight and then every bias,
+  just mathematically. Two traps, both found while writing Chapter 8: `init_network` draws every weight and then every bias,
   so a bench that interleaves them builds a different network from the same
   seed; and `batch_gradient` sums per-example gradients in a loop, so a
   vectorized bench rounds differently. The second one matters because a deep
   sigmoid network amplifies it: two mathematically identical runs agree for
   about seven epochs and then drift a point or two apart. Where a run is still
-  moving at the end, quote an average over the last several epochs (Module 7's
-  regularization section and Module 8's depth tables both do) rather than a
+  moving at the end, quote an average over the last several epochs (Chapter 7's
+  regularization section and Chapter 8's depth tables both do) rather than a
   single epoch's score that will not reproduce.
 - **No unexplained constants.** Every number in the prose is either derived in
-  front of the reader, quoted from an earlier module, or explicitly labeled a
+  front of the reader, quoted from an earlier chapter, or explicitly labeled a
   free design choice with its trade-off (hidden layer size: more detectors vs
   slower training). An unexplained "15" or an unestablished "the nine numbers"
   is a bug.
@@ -399,30 +418,30 @@ stroke`) covers the line beside each glyph and not in the gaps between them,
   with h1 as the at-least-one detector.
 - **Recognize, do not rebuild.** The primary learner asked how the course gets
   from "a neuron is a straight line trying to divide data up" to "pairs of them
-  with sigmoids making bars", and the answer was that Module 6 had been
-  rebuilding three things he already owned. The switchover at -b/w is Module 1's
+  with sigmoids making bars", and the answer was that Chapter 6 had been
+  rebuilding three things he already owned. The switchover at -b/w is Chapter 1's
   decision boundary with one input removed (the line has nowhere to run, so it
-  shrinks to a point). The bump is Module 1's XOR network with the squash taken
+  shrinks to a point). The bump is Chapter 1's XOR network with the squash taken
   off: two hidden neurons stepping at 0.5 and 1.5 along the total x1 + x2, wires
   out carrying +8 and -8, low then high then low. The tower's thresholding
-  neuron is Module 1's output neuron doing what its bias of -4 did. A module
+  neuron is Chapter 1's output neuron doing what its bias of -4 did. A chapter
   that re-derives an artifact the learner built by hand says so, with the
   numbers restated, because a reader who is not told sees new machinery and asks
-  why the ground moved. Watch for silent axis swaps in the same way: Module 1
-  plots input space with a second input up the page, Module 6 plots one input
+  why the ground moved. Watch for silent axis swaps in the same way: Chapter 1
+  plots input space with a second input up the page, Chapter 6 plots one input
   with the output up, and the identical-looking square means two different
   things.
 - **A callback earns prose only if it removes work or carries the argument.**
   Removing work means the reader has nothing new to learn because it is the same
   object (the three identities above). Carrying the argument means the page's
-  conclusion depends on it: Module 6's bars, towers and boxes are one lookup
+  conclusion depends on it: Chapter 6's bars, towers and boxes are one lookup
   table growing in dimension, which is why the box network fits every training
   image and reads nothing new, so "the weights now hold a lookup table" belongs
   in the bars section and pays off at the boxes. A callback that only says
   "remember this from before" costs attention and returns nothing; cut it. Two
   callbacks to the same earlier figure inside one section are clutter. Density
-  check: callbacks per paragraph across Modules 2 to 8 runs 0.4 to 1.2, so a
-  module below that band is under-connected rather than at risk of pointing
+  check: callbacks per paragraph across Chapters 2 to 8 runs 0.4 to 1.2, so a
+  chapter below that band is under-connected rather than at risk of pointing
   backwards too often.
 - **One anatomy, stated everywhere ownership comes up.** Weights live on wires
   (exactly one per wire into a neuron: the wire is where the multiplication
@@ -435,23 +454,23 @@ stroke`) covers the line beside each glyph and not in the gaps between them,
   with neurons (counts, matrix rows) must reconcile against this anatomy in
   place.
 - **A hand-built network gets its wiring drawn, and its parts named the way
-  Modules 1 to 5 name them.** Module 6 built its bump out of "two steps" and
+  Chapters 1 to 5 name them.** Chapter 6 built its bump out of "two steps" and
   gave "the output neuron the weights +6 and -6", with no wiring diagram in
   the section; the primary learner read it and asked "is this a single neuron
   per layer? what are we talking about here?". Two bugs behind one question.
   The prose never said that the two steps are two neurons side by side in one
   hidden layer, so the shape had to be inferred from a plot of curves: a
-  module that places numbers by hand shows the network those numbers live in,
-  in Module 1's tiny-net idiom (gray input circles, green-bordered neurons,
+  chapter that places numbers by hand shows the network those numbers live in,
+  in Chapter 1's tiny-net idiom (gray input circles, green-bordered neurons,
   one weight per arrow, a two-line caption under each column, biases beside
   the neuron that holds them). And "output weight" was a coined term the
   course never establishes, filing weights with a neuron; the established
   phrasing is the wire's ("the wire out of h1 carries +6"). Before coining a
-  noun, check what the earlier modules already call the thing, and check the
-  reverse too: Module 6 had "band" meaning a step's switchover in one section
+  noun, check what the earlier chapters already call the thing, and check the
+  reverse too: Chapter 6 had "band" meaning a step's switchover in one section
   and a strip of the concert plane in another.
 - **Derive at the size of the step, and suspect a missing picture when a
-  count will not land.** Two findings from one Module 8 exchange. The
+  count will not land.** Two findings from one Chapter 8 exchange. The
   fencepost 24 (a 5-wide window on a 28-wide image) did need deriving, but in
   one clause ("one further and the 5-wide window would run past the image's
   edge"); the column-by-column walkthrough written first was read back as
@@ -459,17 +478,17 @@ stroke`) covers the line beside each glyph and not in the gaps between them,
   patches because the learner's real question was architectural ("how many
   layers are we talking about", are twenty windows twenty layers?), which no
   sentence about the count could settle: it took drawing the whole network
-  (ConvNetFigure: image, window layer, pooling layer, the tail from Module 5,
+  (ConvNetFigure: image, window layer, pooling layer, the tail from Chapter 5,
   a bracket marking the only new part). When a number that names a component
   keeps not landing, the missing thing is usually the assembly it belongs to,
   drawn.
 - **Mind vocabulary collisions.** "Line" means the decision boundary in this
   course; never reuse it for an equation or a row of code. Prefer short
   sentences over connective-heavy ones; wordiness reads as weirdness. A word
-  must also not appear before the section that defines it: Module 6's bump
+  must also not appear before the section that defines it: Chapter 6's bump
   payoff said "outside its own slice" one section ahead of "Slice the dial into
   equal pieces", so it leaned on a word the reader did not have yet.
-- **Interactives carry the algorithm; equations recap it.** Module 4's first
+- **Interactives carry the algorithm; equations recap it.** Chapter 4's first
   draft put nine equations and 1,200 words before its centerpiece stepper, and
   the learner reported it "over my head". The fix that worked: teach the one
   genuinely new concept in prose with concrete numbers, reach the interactive by
@@ -490,36 +509,36 @@ stroke`) covers the line beside each glyph and not in the gaps between them,
   checks in the multiplying direction (factor times change = next change), not
   the dividing direction.
 - **Departures wear the Aside box.** Anything that pauses the main thread (a
-  borrowed analogy, a scope note, a why-digression like Module 2's
+  borrowed analogy, a scope note, a why-digression like Chapter 2's
   loop-vs-matrix) goes in the shared <Aside> component from ModuleBits, never
   in a long parenthetical; the shaded box tells the reader the lesson pauses
-  and resumes. Models: Module 3's nudge-size trade-off, Module 4's currency
-  chain, Module 1's how-special-is-this-toy notes.
+  and resumes. Models: Chapter 3's nudge-size trade-off, Chapter 4's currency
+  chain, Chapter 1's how-special-is-this-toy notes.
 - **A borrowed mini-world is allowed when the home story has no carrier.** The
-  concert world has no natural chain-of-conversions, so Module 4 teaches
+  concert world has no natural chain-of-conversions, so Chapter 4 teaches
   factors as posted exchange rates in a two-booth currency chain (a raise:
   euros -> dollars -> pesos), proven with the primary learner live, then maps
   back explicitly (raise = nudge, pesos = cost, factor = posted rate,
   through-rate = slope). Keep such a world to one beat plus one figure, map
   every element back by name, and let its vocabulary (booth, posted rate,
   through-rate) run through the section it serves.
-- **Demonstrate on numbers where the mechanism is visible.** Module 4 first
+- **Demonstrate on numbers where the mechanism is visible.** Chapter 4 first
   proved "the change comes out multiplied by the partner" on the hop whose
   partner was 1.0, and the learner read it as "changing by 0.01 changes it by
   0.01, so what?". A worked example whose value makes the key effect a no-op
   (multiply by 1, add 0, gap of 0) teaches that nothing happened. Lead with an
   instance where the effect shows (the times-2 wire), then explain the no-op
   value as the special case it is.
-- **A module about a property, not a technique, must be motivated by the
-  learner's own number and cashed out on the learner's own artifact.** Module
+- **A chapter about a property, not a technique, must be motivated by the
+  learner's own number and cashed out on the learner's own artifact.** Chapter
   6's first draft opened with "the question is what a network of these neurons
   can express", posed a curve-fitting problem in a new world (continuous input,
   a 0-to-10 rating, an unsquashed output, no training), and put its only
   connection to the course in the closing beat. The learner stopped five
-  sections in: "we're just talking about curves..... why??". Modules 1-5 each
-  deliver a thing the learner then owns, so a module that delivers a fact has
+  sections in: "we're just talking about curves..... why??". Chapters 1-5 each
+  deliver a thing the learner then owns, so a chapter that delivers a fact has
   to work harder, in this order: open with a number the learner produced
-  (Module 5's 89 percent), name the competing explanations for it, say which
+  (Chapter 5's 89 percent), name the competing explanations for it, say which
   one this page settles and which it leaves standing, and then, at the end,
   spend the result back on the same artifact (the 7.8 million-neuron box
   network against the trained 30). Anything that looks like a departure
@@ -527,37 +546,37 @@ stroke`) covers the line beside each glyph and not in the gaps between them,
   exercise) gets named as a deliberate shrink in the opener, with the reason,
   plus the sentence that the small case is a sub-case and not a detour: hold
   783 pixels still, turn one, and the outputs trace curves.
-- **Three sentence shapes to keep out of module prose, all found by the
-  primary learner in Module 6 ("dense, backwards, vague, clippy").** First,
+- **Three sentence shapes to keep out of chapter prose, all found by the
+  primary learner in Chapter 6 ("dense, backwards, vague, clippy").** First,
   clefts and abstract-first openers: "What no part of the argument provides
   is...", "Nothing in that argument stops anywhere", "The claim is about
   relationships". They front a placeholder and delay the content, which reads
   as backwards. Give every sentence a concrete subject and a verb, in that
   order. Second, short pronoun aphorisms, especially as paragraph openers:
-  Module 6's limits section had four consecutive paragraphs beginning "It
+  Chapter 6's limits section had four consecutive paragraphs beginning "It
   covers...", "It promises...", "It says can, not will", with the antecedent
   five paragraphs away. Name the subject each time, even at the cost of a
   longer sentence. Third, meta-narration of the exposition ("this section
   makes X, the next turns it into Y", "now the question this page opened
   with", "shrink it to one input"): describe the thing, not the plan for
-  describing it. The measurable signature, comparing against Modules 1 to 5:
+  describing it. The measurable signature, comparing against Chapters 1 to 5:
   cleft openers at or under 5 percent of sentences, pronoun aphorisms at or
   under 5 percent, median sentence length 19 to 23 words. Cutting words is
-  not the fix when prose reads badly; Module 6 got clippy precisely because
+  not the fix when prose reads badly; Chapter 6 got clippy precisely because
   two rounds of cutting turned full sentences into telegraphese. Rejoin
   clauses instead.
-- **State what a section buys before proving it.** Module 4's factor
+- **State what a section buys before proving it.** Chapter 4's factor
   paragraphs read to the learner as "simple math, overexplained" until the
   stakes came first: every factor is computable from the first run alone, so
   the nudge and its second run become unnecessary. When a stretch of prose
   verifies something, open with the one-sentence payoff the verification
   earns, and close by cashing it out; checks without stated stakes read as
   arithmetic for its own sake.
-- **Teach kinds, not instances.** When several facts repeat one pattern (Module
+- **Teach kinds, not instances.** When several facts repeat one pattern (Chapter
   4's five ripple factors), position-by-position derivations read as N separate
   proofs and lose the learner even when each line checks out. Instead: name the
   pattern once, framed in a concept already taught ("every factor is a slope,
-  Module 3's kind of number"), sort the instances into their few kinds, and give
+  Chapter 3's kind of number"), sort the instances into their few kinds, and give
   each kind one plain-words why plus an extreme case (x = 0: the nudge dies
   here). Color-code the kinds in the figure so the picture carries the grouping.
 - **Multi-factor arithmetic never sits inline.** Chains like 0.235 x 2.0 x
@@ -571,8 +590,8 @@ stroke`) covers the line beside each glyph and not in the gaps between them,
   the point of use). The prose before it keeps only what sections cannot say:
   the connection to earlier material and the single carrying idea. Prose that
   narrates an interactive's own labels is duplication to delete.
-- **Assume weeks pass between modules.** Never lean on a bare name from an
-  earlier module (fire, the contrarian, the nine numbers) as a load-bearing
+- **Assume weeks pass between chapters.** Never lean on a bare name from an
+  earlier chapter (fire, the contrarian, the nine numbers) as a load-bearing
   reference; either restate the thing in a few plain words or drop the
   callback entirely. Callbacks are seasoning, not structure.
 - Housekeeping: learners paste rendered math as doubled text ("x1x1", "WW").
@@ -582,36 +601,36 @@ stroke`) covers the line beside each glyph and not in the gaps between them,
   folded lookup (`NOTATION` in `src/start/StartPage.tsx`): symbol, one line of
   meaning, the field's name for it (`also`, rendered as a muted line under the
   meaning rather than as a fourth column, which would pan the whole lookup at the
-  measure), and the module that introduced it, in the order a reader meets them.
-  The course's own rule is that weeks pass between modules, and a symbol defined
+  measure), and the chapter that introduced it, in the order a reader meets them.
+  The course's own rule is that weeks pass between chapters, and a symbol defined
   once four thousand words ago is not defined for that reader. Introducing
-  notation in a module means adding a row there in the same change.
-- **A coined word hands over to the field's word in the module that earned it, not
-  at the end of the course.** Every module from 1 to 8 carries a naming note: one
+  notation in a chapter means adding a row there in the same change.
+- **A coined word hands over to the field's word in the chapter that earned it, not
+  at the end of the course.** Every chapter from 1 to 8 carries a naming note: one
   short paragraph, at the first use of the thing, saying what everyone else calls
   it, after which both words are in play. The note is deliberately not labelled as
-  one, and does not wear an `<Aside>`. Seven of them opened with "this module's
+  one, and does not wear an `<Aside>`. Seven of them opened with "this chapter's
   naming note is" in the first draft, which is both meta-narration of the exposition
   and a formula a reader learns to skip after the second one; and a shaded box says
   the lesson pauses here, which for the one paragraph whose whole job is to put a
   word into the reader's working vocabulary is the wrong signal. Each note leads with
   its content instead. The squash becomes the activation
-  function and the line becomes the decision boundary (Module 1), `a` becomes an
-  activation and `W` a weight matrix (Module 2), a knob becomes a parameter, the
-  cost the loss and one knob's slope a partial derivative (Module 3), a factor
-  becomes a local derivative and blame the error (Module 4), receipts become the
-  cached forward pass (Module 5), the divided start becomes Xavier initialization
-  and the decay factor L2 regularization (Module 7), learning speed becomes the
-  gradient norm and a hop under 1 the vanishing gradient problem (Module 8).
+  function and the line becomes the decision boundary (Chapter 1), `a` becomes an
+  activation and `W` a weight matrix (Chapter 2), a knob becomes a parameter, the
+  cost the loss and one knob's slope a partial derivative (Chapter 3), a factor
+  becomes a local derivative and blame the error (Chapter 4), receipts become the
+  cached forward pass (Chapter 5), the divided start becomes Xavier initialization
+  and the decay factor L2 regularization (Chapter 7), learning speed becomes the
+  gradient norm and a hop under 1 the vanishing gradient problem (Chapter 8).
   The primary learner read the course and reported that the terms arrive as "a big
   brain dump of all of these terms that I now need to swap in my head". The dump
-  was a twenty-row table in Module 9, at the point of lowest energy in the course
+  was a twenty-row table in Chapter 9, at the point of lowest energy in the course
   and after the last exercise, asking for the highest-effort operation in it:
   re-index twenty concepts learned under other names. Worse, the course was already
   bilingual and never said so. The equation glosses used the field's words while the
-  prose beside them used the coined ones ("the weight matrix" in Module 2's gloss
+  prose beside them used the coined ones ("the weight matrix" in Chapter 2's gloss
   for `a' = sigma(Wa+b)`, "the layer's wire ledger" twenty lines below it), and
-  before Module 9 the two phrases appeared seven times each. So the field's words
+  before Chapter 9 the two phrases appeared seven times each. So the field's words
   were arriving unlabelled either way; the handover only declares an equivalence
   the reader was already being shown.
   Three tiers, and the tier decides how much prose changes. **Switch**: the coined
@@ -622,10 +641,10 @@ stroke`) covers the line beside each glyph and not in the gaps between them,
   comprehensible, so it stays primary and the field's word rides along in equations
   and code (blame and the error, cost and loss). **Local only**: scaffolding for one
   beat with no counterpart anywhere (booths, posted rates, the through-rate, the
-  dial, bars and towers and boxes, the hop). Module 9's table is now the inverted
+  dial, bars and towers and boxes, the hop). Chapter 9's table is now the inverted
   one, six rows long: these are ours, do not go looking for them. Do not replace a
   coined word everywhere downstream of its handover; two rounds of that is what made
-  Module 6 read as telegraphese, and `knob` alone has 135 uses.
+  Chapter 6 read as telegraphese, and `knob` alone has 135 uses.
 - **Skeleton docstrings freeze into saved code.** The editor persists the
   learner's copy, so improving a skeleton never reaches anyone who already
   opened the exercise. Anything essential to understanding the contract must
@@ -639,18 +658,18 @@ stroke`) covers the line beside each glyph and not in the gaps between them,
 - Plain, direct, second person, no hype. Define every symbol at first use.
 - Math rendered with KaTeX; every equation gets a one-sentence plain-language gloss
   immediately after it.
-- Each module opens with "What you'll be able to do after this" (2-3 items) and closes
+- Each chapter opens with "What you'll be able to do after this" (2-3 items) and closes
   with a recap and a "Go deeper" link to the corresponding Nielsen chapter.
-- Module bodies are broken into sections with <SectionHeader id title /> markers
-  (ids unique across modules, prefixed "m4-"), and each module mounts <ModuleToc />
+- Chapter bodies are broken into sections with <SectionHeader id title /> markers
+  (ids unique across chapters, prefixed "c4-"), and each chapter mounts <ModuleToc />
   once after its AfterThis block: a floating on-this-page nav in the right gutter
-  (self-hides on narrow screens) that discovers that module's headers from the DOM
+  (self-hides on narrow screens) that discovers that chapter's headers from the DOM
   and scrollspies them. Section titles are short noun phrases, 5-8 sections per
-  module.
+  chapter.
 
-### Register: plotted, narrator muted (adopted after Module 4; applies to all modules)
+### Register: plotted, narrator muted (adopted after Chapter 4; applies to all chapters)
 
-Modules are plotted like a story (setup, tally, payoff, callbacks): keep that. What
+Chapters are plotted like a story (setup, tally, payoff, callbacks): keep that. What
 must go is the audible narrator, the voice that sells, promises, and points at its
 own storytelling. Concretely:
 
@@ -671,7 +690,7 @@ own storytelling. Concretely:
   which teaches more. Punchlines compress by discarding information.
 - Test for a borderline sentence: could it appear unchanged in a careful colleague's
   explanation email? "The bill is fatal" fails; "stops being realistic" passes.
-- Exception: a module's final beat may carry one slightly hot sentence. Endings do
+- Exception: a chapter's final beat may carry one slightly hot sentence. Endings do
   gating work in a self-paced course, and they are the two-minute-demo moments.
 
 ## Visual identity
@@ -763,7 +782,7 @@ the footer. Rules that follow from it:
   The eye judges alignment by ragged left text edges, so everything that has one puts
   that edge on the prose axis at `--measure`: prose, headings, captions, the cards, the
   exercise's h4, the display equations, the blocks that hold code (the play snippets,
-  the torch listings, Module 1's five-ideas block), and the start page's rows of
+  the torch listings, Chapter 1's five-ideas block), and the start page's rows of
   buttons. The full column belongs only to ink that centres or to boxes that show their
   own extent: figures, tables, interactive panels, the editor. A centred figure reads as
   a picture sized to its content however wide it is; code and buttons cannot centre
@@ -798,13 +817,13 @@ the footer. Rules that follow from it:
   `compact` flag (App passes it for every page but the start page) and below
   560px that drops the tagline and sizes the title down to a running head. The
   tagline summarizes the course's concrete arc, which belongs on the front
-  door; on page seven it costs four lines. Measured on Module 2 at 390x844, the whole
+  door; on page seven it costs four lines. Measured on Chapter 2 at 390x844, the whole
   first-screenful chrome was 329px and the first line of prose sat at 892px, off
-  the bottom of the screen: it is 459px now, and no module is past 600px.
-- **The module opener folds on a phone.** `AfterThis` is a `<details>`, open
+  the bottom of the screen: it is 459px now, and no chapter is past 600px.
+- **The chapter opener folds on a phone.** `AfterThis` is a `<details>`, open
   everywhere except below 560px, where three items ran to between 250 and 390px
-  and Module 8's card alone was 46 percent of the first screenful. Folded, the
-  module still opens by naming what it will teach. The state is read once at
+  and Chapter 8's card alone was 46 percent of the first screenful. Folded, the
+  chapter still opens by naming what it will teach. The state is read once at
   mount, not watched, so a reader who opens it does not have it shut again by a
   rotation. A `<summary>` is `display: list-item`, and `display: flex` on it
   (which is a tempting way to centre it in a 44px touch target) removes the
@@ -832,7 +851,7 @@ the footer. Rules that follow from it:
   is set once and never touched; the index is the only thing that knows what else exists.
   There is deliberately no list of courses in `brand.ts`: carrying one would mean editing
   and redeploying every course's repository on each new course, which is the same
-  hand-maintained-list failure as the front page's module outline, once per repository.
+  hand-maintained-list failure as the front page's chapter outline, once per repository.
 - **A section title carries a short accent rule above it.** It is the one piece of
   structural furniture a sibling course inherits already recoloured, and the start page's
   plain h3s wear it too, so a reader cannot tell which sections are scrollspied.
@@ -866,7 +885,7 @@ the footer. Rules that follow from it:
   actually runs. "Run my code" sat beside "Run tests" as if the two were a
   choice to make every time, when one is the loop and the other is an aside;
   the name also implied the other button did not run your code. They are not
-  merged, and should not be: the tests are the expensive path (Module 5's
+  merged, and should not be: the tests are the expensive path (Chapter 5's
   gradient check nudges 54 parameters twice), so making every print-a-value
   experiment pay for them would be a real regression. A cell owning its own run
   button is the notebook habit worth copying. Sending a snippet from a prompt
@@ -929,7 +948,7 @@ the footer. Rules that follow from it:
   visible in it, and Chromium did not, which is why the rule is written down
   rather than trusted.
 - **The hints and the test code live in the panel, beside the code they
-  describe.** They sat in the module page under the prompt, which is where they
+  describe.** They sat in the chapter page under the prompt, which is where they
   were written before there was a panel: reference material for while you are
   coding, a scroll away from the code. The prompt stays in the reading column
   at the measure, because it is course prose and is read, and several hundred
@@ -996,7 +1015,7 @@ tokens from the start.
 /src/                React app
 /src/brand/          the series brand layer, shared with sibling courses
 /src/start/          the front door: what the course is, the outline, stored progress
-/src/modules/NN/     one folder per module: content, interactives/
+/src/modules/NN/     one folder per chapter: content, interactives/
 /src/exercises/      per exercise: skeleton.py, tests.py, solution.py, index.ts (prompt, hints)
 /src/exercises/sections.json  the section table, read by the app AND by tools/
 /src/exercises/given/         the two sections written for the learner
@@ -1035,7 +1054,7 @@ tokens from the start.
   suite to notice. `--quick` skips it. Needs NumPy.
 - `python3 tools/check_panels.py`: every payoff panel's Python, lifted out of its
   `.tsx` and run against the assembled document with the worker's globals in
-  place. Nothing else checks that these run, and several modules quote their
+  place. Nothing else checks that these run, and several chapters quote their
   numbers. `--fast` caps every loop at two epochs. Needs NumPy.
 - `node tools/check_run_path.mjs`: what the panel does with a verdict once it
   has one, driven in a real browser against a stub Pyodide (the worker needs
@@ -1046,16 +1065,16 @@ tokens from the start.
   browser and a dev server, which is the bargain `make_og_image.sh` already
   makes.
 - `python3 tools/make_penguins.py`: regenerate `public/data/penguins.json.gz`
-  (Module 10's dataset; stdlib only, downloads from the palmerpenguins repo,
+  (Chapter 10's dataset; stdlib only, downloads from the palmerpenguins repo,
   deterministic output, written RAW because preparing it is the exercise).
-- `python3 tools/bench_penguins.py`: re-measure every number Module 10 quotes,
+- `python3 tools/bench_penguins.py`: re-measure every number Chapter 10 quotes,
   on the panel's own code path (needs NumPy).
-- `python3 tools/bench_depth.py`: re-measure every Python-side number Modules 7
+- `python3 tools/bench_depth.py`: re-measure every Python-side number Chapters 7
   and 8 quote, on the browser's own code path (needs NumPy; `--quick` for 5
   epochs, `--only <section>` for one section). Each section prints the prose
   sentence it backs, so a number that has drifted is visible without holding
-  the module open beside it. Every section but `grid` mirrors a panel the reader
-  can run; `grid` is Module 7's sixteen-cell hyperparameter table, which no panel
+  the chapter open beside it. Every section but `grid` mirrors a panel the reader
+  can run; `grid` is Chapter 7's sixteen-cell hyperparameter table, which no panel
   trains, so the bench is the only place those numbers come from.
 - `npm run bench:speeds`: the same for the layer-speed and hop tables, by
   importing `deepNet.ts` (the panel's own arithmetic) into Node. No new
@@ -1072,8 +1091,8 @@ tokens from the start.
 - `python3 tools/brand_palette.py`: print the accent family and every contrast ratio in
   it; `--check` fails if `src/brand/brand.css` has drifted from what the OKLCH arithmetic
   computes. Stdlib only.
-- `npm run bench:bumps`: every number Module 6 quotes (the bars-to-area table,
+- `npm run bench:bumps`: every number Chapter 6 quotes (the bars-to-area table,
   the sharpness experiment, the bump's biases and peak), by importing
   `bumpMath.ts`, which is the arithmetic CurveSculptor and BumpBuilder both
-  run. Module 6's figures come from a browser panel rather than Pyodide, so
+  run. Chapter 6's figures come from a browser panel rather than Pyodide, so
   this is the bench that keeps them honest.

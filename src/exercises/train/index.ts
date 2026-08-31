@@ -9,7 +9,7 @@ export const trainExercise: Exercise = {
   prompt: [
     "Every training run so far has been started for you. The panels loaded the " +
       "data, built the network, ran the epochs, called your gradient, applied " +
-      "your update and scored the result. Your Module 3 sgd shuffled and cut " +
+      "your update and scored the result. Your Chapter 3 sgd shuffled and cut " +
       "the mini-batches inside that, one epoch per call, and the loop around it " +
       "was the course's. This exercise is that loop.",
     "The contract, in two functions. accuracy(weights, biases, X, y) returns " +
@@ -22,7 +22,7 @@ export const trainExercise: Exercise = {
     "train(sizes, X, Y, X_test, y_test, epochs, eta, lmbda, batch_size, rng) " +
       "builds a network and trains it, returning (weights, biases, history) " +
       "with one held-out score per epoch. Everything it calls is your own work " +
-      "from earlier modules, sitting above this section in your file: " +
+      "from earlier chapters, sitting above this section in your file: " +
       "init_network draws the network, batch_gradient runs your backprop once " +
       "per column of a mini-batch and averages the slopes, cross_entropy_delta " +
       "is the BP1 it hands to your backprop, and l2_step is the update.",
@@ -66,7 +66,7 @@ export const trainExercise: Exercise = {
     "It starts at two thirds and reaches every one of the six held-out points " +
       "by the twentieth epoch. Then change one thing at a time and rerun: a " +
       "step size of 0.1, or 8.0; a hidden layer of 2 neurons instead of 6; " +
-      "lmbda at 8.0. That is the search Module 7 described, and it is now " +
+      "lmbda at 8.0. That is the search Chapter 7 described, and it is now " +
       "yours to run.",
   ],
   skeleton,
@@ -102,6 +102,6 @@ export const trainExercise: Exercise = {
       "            history.append(accuracy(weights, biases, X_test, y_test))\n" +
       "        return weights, biases, history\n\n" +
       "    X[:, batch] takes those columns of X, in that order: the same\n" +
-      "    indexing your Module 3 sgd used to cut its mini-batches.",
+      "    indexing your Chapter 3 sgd used to cut its mini-batches.",
   ],
 };

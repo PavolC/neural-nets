@@ -1,14 +1,14 @@
 /**
- * Reproduce every number Module 6 quotes, from the interactives' own code.
+ * Reproduce every number Chapter 6 quotes, from the interactives' own code.
  *
- * Module 6 is the one module whose numbers come from a browser panel rather
+ * Chapter 6 is the one chapter whose numbers come from a browser panel rather
  * than from Pyodide, so this bench imports the panel's arithmetic directly
  * (src/modules/NN/interactives/bumpMath.ts, which CurveSculptor and
  * BumpBuilder both call) instead of reimplementing it. A number that moves
- * here has moved in the module.
+ * here has moved in the chapter.
  *
  * Each section prints the prose sentence it backs, so a figure that has
- * drifted is visible without holding the module open beside it.
+ * drifted is visible without holding the chapter open beside it.
  *
  * Run it with the repo's own TypeScript compiler, no new dependency:
  *
@@ -35,7 +35,7 @@ function section(title: string, claim: string): void {
   console.log("-".repeat(78));
 }
 
-/** The module's own target: the reader's rating of an outdoor concert. */
+/** The chapter's own target: the reader's rating of an outdoor concert. */
 const mine = sampleTarget(PRESETS.mine.f);
 const friend = sampleTarget(PRESETS.friend.f);
 
@@ -134,14 +134,14 @@ console.log();
 
 // ---------------------------------------------------------------- 7
 section(
-  "7. Module 1's XOR network, read as a bump (the m6-bump recognition table)",
+  "7. Chapter 1's XOR network, read as a bump (the m6-bump recognition table)",
   "two hidden neurons with weights 6 and 6 and biases -3 and -9, wires out +8 and -8 " +
     "and an output bias of -4, report 0.05/0.00, 0.95/0.05 and 1.00/0.95 at the totals " +
     "0, 1 and 2, so the evidence into the output runs -3.6, +3.2, -3.6; the bump reaches " +
     "about 7.2 rather than 8 because a weight of 6 makes each switchover 6/6 = 1 wide " +
     "while the two steps sit 1 apart",
 );
-// The same bumpAt the playground draws with, at Module 1's arguments: height 8,
+// The same bumpAt the playground draws with, at Chapter 1's arguments: height 8,
 // steepness 6, steps at 0.5 and 1.5 along the total x1 + x2. That the identity
 // checks out through the panel's own function is the point of the beat.
 const XOR = { w: 6, s1: 0.5, s2: 1.5, h: 8, outBias: -4 };

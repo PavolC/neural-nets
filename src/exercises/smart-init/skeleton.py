@@ -18,7 +18,7 @@
 #
 #   Draw order matters, because the tests and the panel reproduce exact
 #   numbers: draw every weight matrix first, front to back, and then every
-#   bias column, front to back. That is the order Module 5's training panel
+#   bias column, front to back. That is the order Chapter 5's training panel
 #   used, so the only difference between its start and yours is the scaling.
 #
 # NumPy tools: rng.standard_normal(shape) draws an array of that shape,

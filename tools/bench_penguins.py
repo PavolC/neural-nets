@@ -1,8 +1,8 @@
-"""Reproduce every number Module 10 quotes, on the panel's own code path.
+"""Reproduce every number Chapter 10 quotes, on the panel's own code path.
 
-Module 10's claims are all about data preparation, so this bench runs the same
+Chapter 10's claims are all about data preparation, so this bench runs the same
 pipeline PenguinsPanel runs: the exercise's own standardize, one_hot and split,
-the learner's train and accuracy from Module 9, and the bundled penguin file
+the learner's train and accuracy from Chapter 9, and the bundled penguin file
 exactly as it ships. Each section prints the prose sentence it backs.
 
 Needs NumPy:

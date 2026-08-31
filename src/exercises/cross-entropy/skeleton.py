@@ -2,9 +2,9 @@
 # over a batch, the second is a subtraction.
 #
 # Before either of them, one edit to code you already wrote. See the prompt
-# on the page: your backprop from Module 5 needs to accept a swapped-in BP1.
+# on the page: your backprop from Chapter 5 needs to accept a swapped-in BP1.
 #
-# Already in this file, above you: feedforward, from Module 2. Works on one
+# Already in this file, above you: feedforward, from Chapter 2. Works on one
 # column or a whole batch of columns.
 #
 # Contract:

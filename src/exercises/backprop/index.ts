@@ -8,7 +8,7 @@ export const backpropExercise: Exercise = {
   title: "Backpropagation",
   prompt: [
     "Two functions to add to your file. sigmoid_prime is a single formula: " +
-      "Module 4's squash slope, sigmoid(z) times one minus sigmoid(z), " +
+      "Chapter 4's squash slope, sigmoid(z) times one minus sigmoid(z), " +
       "elementwise like sigmoid itself. backprop is the algorithm, and " +
       "every statement in it is one of the four equations above.",
     "The contract, precisely: backprop(weights, biases, x, y) handles ONE " +
@@ -22,7 +22,7 @@ export const backpropExercise: Exercise = {
       "parameter. Read the parameters, never change them; moving them is " +
       "your sgd's job.",
     "The code has two halves. The forward half is your feedforward from " +
-      "Module 2 with receipts: append each z to a list zs and each " +
+      "Chapter 2 with receipts: append each z to a list zs and each " +
       "activation to a list activations (started as [x]) as you go. The " +
       "backward half is BP1 once, then BP2, BP3, BP4 in a loop that " +
       "walks from the last layer toward the first, filling nabla_w and " +
@@ -36,18 +36,18 @@ export const backpropExercise: Exercise = {
       "the strictest test in this course. It builds a 3-5-4-2 network: " +
       "two hidden layers, so your backward loop has to actually loop, " +
       "with 54 knobs by the usual count (weights 15 + 20 + 8, biases " +
-      "5 + 4 + 2). The check measures all 54 slopes the slow Module 3 " +
+      "5 + 4 + 2). The check measures all 54 slopes the slow Chapter 3 " +
       "way, nudging every parameter both ways, and compares them to " +
       "yours one by one, demanding agreement to within one part in ten " +
       "million. Passing it means your backpropagation is correct. Last, " +
-      "your slopes drive a descent that retrains Module 1's XOR network.",
-    "Once the tests pass, point your code at Module 4's by-hand numbers, " +
+      "your slopes drive a descent that retrains Chapter 1's XOR network.",
+    "Once the tests pass, point your code at Chapter 4's by-hand numbers, " +
       "the two-neuron chain. Send this to the scratch pad and run it:",
     {
       code:
         "from course import gradient\n" +
         "\n" +
-        "weights = [np.array([[1.0]]), np.array([[2.0]])]   # w1, w2 from Module 4's chain\n" +
+        "weights = [np.array([[1.0]]), np.array([[2.0]])]   # w1, w2 from Chapter 4's chain\n" +
         "biases = [np.array([[-0.5]]), np.array([[-1.0]])]  # b1, b2\n" +
         "x = np.array([[1.0]])\n" +
         "y = np.array([[1.0]])\n" +
@@ -56,10 +56,10 @@ export const backpropExercise: Exercise = {
         'print("w1 slope:", nabla_w[0][0, 0], "  b1 slope:", nabla_b[0][0, 0])\n' +
         'print("w2 slope:", nabla_w[1][0, 0], "  b2 slope:", nabla_b[1][0, 0])\n' +
         "\n" +
-        "nudge_w, nudge_b = gradient(weights, biases, x, y)  # Module 3's slow way\n" +
+        "nudge_w, nudge_b = gradient(weights, biases, x, y)  # Chapter 3's slow way\n" +
         'print("w1 slope, nudge-measured:", nudge_w[0][0, 0])',
     },
-    "The four slopes should be Module 4's table exactly: -0.0508 for both " +
+    "The four slopes should be Chapter 4's table exactly: -0.0508 for both " +
       "of neuron A's knobs, -0.0673 and -0.1081 for neuron B's. And the " +
       "two w1 printouts agree to about ten decimal places: the nudge method " +
       "approximates, from two reruns per knob, what your code now " +

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { scale } from "./utils";
 
-// Module 3 interactive: the true cost of the Module 1 XOR network (at its
+// Chapter 3 interactive: the true cost of the Chapter 1 XOR network (at its
 // slider-start values) along ONE chosen knob, the other eight frozen. Makes
 // "a knob's slope, measured where you stand" a picture instead of a claim.
 // The numbers must match the prose: cost 0.0876 at the start, slope -0.044
@@ -15,8 +15,8 @@ const START: Record<Knob, number> = {
   w11: 2, w12: 2, w21: 2, w22: 2, b1: -1, b2: -3, v1: 4, v2: -4, c: -2,
 };
 
-// One group per neuron, in the same order as Module 1's slider panel and
-// the module's gradient list: h1, h2, then the output neuron.
+// One group per neuron, in the same order as Chapter 1's slider panel and
+// the chapter's gradient list: h1, h2, then the output neuron.
 const GROUPS: { name: string; short: string; knobs: { key: Knob; label: string }[] }[] = [
   {
     name: "hidden neuron h1",

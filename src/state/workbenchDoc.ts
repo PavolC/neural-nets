@@ -25,9 +25,9 @@ export type SectionKind = "exercise" | "given";
 export interface SectionDef {
   id: string;
   kind: SectionKind;
-  /** The module this section is written in, for linking and for labels. */
+  /** The chapter this section is written in, for linking and for labels. */
   module: string;
-  /** "Module 5, Backpropagation": what the reader sees in the rail. */
+  /** "Chapter 5, Backpropagation": what the reader sees in the rail. */
   label: string;
   /** The exact marker line. Stored rather than templated, so the app and the
    * checker cannot format it two ways. */
@@ -41,8 +41,8 @@ export interface SectionDef {
    * into the file, so the file is runnable as it stands at every point. */
   pulledInBy: string[];
   /** Names owned by an EARLIER section that this one's tests examine
-   * directly, so the course must not lend its own copy of them. Module 7's
-   * seam test is the only one: it asks whether the learner's own Module 5
+   * directly, so the course must not lend its own copy of them. Chapter 7's
+   * seam test is the only one: it asks whether the learner's own Chapter 5
    * backprop has been opened up, and a lent copy already has been. */
   checks: string[];
 }
@@ -282,7 +282,7 @@ export function upsertSection(text: string, id: string, body: string): Splice {
 export function projection(text: string, throughId: string): string {
   const doc = parseDocument(text);
   // Through the section itself and anything written for you that arrives
-  // with it: Module 5's adapter sits below backprop in the file, and a panel
+  // with it: Chapter 5's adapter sits below backprop in the file, and a panel
   // asked for the backprop projection needs it.
   const rank = Math.max(
     SECTION_ORDER.indexOf(throughId),

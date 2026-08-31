@@ -1,9 +1,9 @@
 import { sigmoid } from "./utils";
 
-// The arithmetic behind Module 6's two interactives, kept out of the React
+// The arithmetic behind Chapter 6's two interactives, kept out of the React
 // components so that tools/bench_bumps.ts can import the panel's own code
 // rather than a copy of it (the same arrangement deepNet.ts has with
-// tools/bench_layer_speeds.ts). Every number Module 6 quotes comes from
+// tools/bench_layer_speeds.ts). Every number Chapter 6 quotes comes from
 // here, through one or the other caller.
 
 export const TN = 161; // target samples, one every 1/160 of the dial

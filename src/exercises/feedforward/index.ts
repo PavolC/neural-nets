@@ -28,16 +28,16 @@ export const feedforwardExercise: Exercise = {
       "(weights[0] and biases[0] describe the same layer). feedforward is: " +
       "start with a = x; for each pair from zip(weights, biases), replace a " +
       "with sigmoid(w @ a + b); return the final a. Looping over the few " +
-      "layers is fine; the loop the module banned was over the neurons " +
+      "layers is fine; the loop the chapter banned was over the neurons " +
       "inside a layer, and @ already does those.",
     "Keep every activation a column, shape (n, 1); the tests check that " +
       "first. They also hand your function a whole batch, X of shape (n, m) " +
-      "with one example per column, because that is how every module from 3 " +
+      "with one example per column, because that is how every chapter from 3 " +
       "on calls it. There is nothing extra to write: w @ a + b computes " +
       "every column at once, as long as the loop never reshapes a or picks " +
-      "out a single column. sigmoid is the one you wrote in Module 1, higher " +
+      "out a single column. sigmoid is the one you wrote in Chapter 1, higher " +
       "up the same file: call it by name, there is nothing to import.",
-    "A satisfying way to play before (or after) the tests: rebuild Module 1's " +
+    "A satisfying way to play before (or after) the tests: rebuild Chapter 1's " +
       "XOR solution with your own function, and ask it about the corners. " +
       "Send this to the scratch pad and run it:",
     {
@@ -50,7 +50,7 @@ export const feedforwardExercise: Exercise = {
         "print(feedforward(weights, biases, np.array([[1.], [0.]])))",
     },
     "You should see roughly 0.96: the contrarian says go for good weather " +
-      "alone, exactly as Module 1's table promised. Try all four corners.",
+      "alone, exactly as Chapter 1's table promised. Try all four corners.",
   ],
   skeleton,
   tests,

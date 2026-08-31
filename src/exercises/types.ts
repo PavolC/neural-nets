@@ -10,14 +10,14 @@ export interface Exercise {
   skeleton: string;
   tests: string;
   solution: string;
-  /** A test whose pass deserves a prominent banner (Module 5's gradient
+  /** A test whose pass deserves a prominent banner (Chapter 5's gradient
    * check is the course's flagship correctness guarantee). */
   flagship?: { test: string; note: string };
   /** Three-stage reveal: [conceptual nudge, pseudocode/structure]. Stage 3
    * is the full solution above. */
   hints: [string, string];
   /** A bundled dataset this exercise's snippets read, fetched into the
-   * runtime before a run. Module 10's prompt says to open /penguins.json,
+   * runtime before a run. Chapter 10's prompt says to open /penguins.json,
    * and nothing had ever put it there. */
   dataUrl?: string;
 }

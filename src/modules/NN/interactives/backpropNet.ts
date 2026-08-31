@@ -1,13 +1,13 @@
 import { sigmoid } from "./utils";
 
-// Module 4's fixed demonstration network: the contrarian's 2-2-1 grown by a
+// Chapter 4's fixed demonstration network: the contrarian's 2-2-1 grown by a
 // third hidden neuron (2-3-1), so no two layers share a size and every shape
 // stays honest. Both the step-through visualization and the quiz compute
 // from this one definition, so their numbers can never drift apart.
 //
 // JS mirrors of the course's column-vector conventions: a "column" here is a
 // plain number[], and a weight matrix is number[][] with one row per
-// receiving neuron (shape (receiving layer, sending layer), as in Module 2).
+// receiving neuron (shape (receiving layer, sending layer), as in Chapter 2).
 
 export interface Net {
   W2: number[][]; // (3, 2): weights into the hidden layer

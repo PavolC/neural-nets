@@ -76,7 +76,7 @@ export function TrainingDemo() {
       <p>
         This is the finished thing, running the course's own reference code rather than
         yours: a 784-30-10 sigmoid network trained on 5,000 MNIST digits (1,000 held out
-        for testing) with plain stochastic gradient descent. By Module 5 you will have
+        for testing) with plain stochastic gradient descent. By Chapter 5 you will have
         written the parts that make it work. Python and NumPy run in a Web Worker via
         Pyodide, so the page stays responsive while it trains, and loss and test accuracy
         stream in live after every epoch.

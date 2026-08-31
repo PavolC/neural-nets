@@ -8,8 +8,8 @@ export const smartInitExercise: Exercise = {
   title: "A better starting point",
   prompt: [
     "One function, and it builds a network rather than running one. Until " +
-      "now the starting parameters arrived from outside: Module 1's sliders, " +
-      "Module 2's file, Module 5's panel drawing standard normal numbers. " +
+      "now the starting parameters arrived from outside: Chapter 1's sliders, " +
+      "Chapter 2's file, Chapter 5's panel drawing standard normal numbers. " +
       "This is that last step, written out and scaled.",
     "The contract: init_network(sizes, rng) takes a list of layer sizes " +
       "front to back, so [784, 30, 10] is the digit reader, and a NumPy " +
@@ -22,7 +22,7 @@ export const smartInitExercise: Exercise = {
       "reads no inputs and so has nothing to divide by.",
     "Draw order is part of the contract, as it was for your sgd's shuffle: " +
       "every weight matrix first, front to back, then every bias column, " +
-      "front to back. That is the order Module 5's panel used, so with the " +
+      "front to back. That is the order Chapter 5's panel used, so with the " +
       "same seed your network gets the same random numbers it did, each one " +
       "divided by its layer's square root. The comparison below is exactly " +
       "that: identical draws, one set scaled.",
@@ -45,7 +45,7 @@ export const smartInitExercise: Exercise = {
         "for k in range(200):\n" +
         "    X[pixels.choice(784, size=103, replace=False), k] = 1.0\n" +
         "\n" +
-        "plain = np.random.default_rng(8)               # the undivided start, Module 5's\n" +
+        "plain = np.random.default_rng(8)               # the undivided start, Chapter 5's\n" +
         "plain_w = [plain.standard_normal((30, 784)), plain.standard_normal((10, 30))]\n" +
         "plain_b = [plain.standard_normal((30, 1)), plain.standard_normal((10, 1))]\n" +
         "\n" +

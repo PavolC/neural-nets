@@ -2,7 +2,7 @@ import { scale } from "./utils";
 import { fig } from "../../../components/ModuleBits";
 
 // Static figure: how big the output layer's blame is, plotted against how
-// wrong the answer is. Rendered twice in Module 7, first with the quadratic
+// wrong the answer is. Rendered twice in Chapter 7, first with the quadratic
 // curve alone (the problem) and then with the cross-entropy line added (the
 // fix), so the same axes carry both halves of the argument.
 //

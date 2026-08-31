@@ -8,7 +8,7 @@ import { PixelsInteractive } from "./interactives/PixelsInteractive";
 export function Module2() {
   return (
     <article className="module">
-      <h2>Module 2: Feedforward</h2>
+      <h2>Chapter 2: Feedforward</h2>
       <AfterThis
         items={[
           "Turn a digit image into the column of 784 numbers a network actually sees.",
@@ -24,12 +24,12 @@ export function Module2() {
         second layer behind them reading their answers.
       </p>
 
-      <SectionHeader id="m2-layer" title="A layer is one formula" />
+      <SectionHeader id="c2-layer" title="A layer is one formula" />
       <p>
-        Module 1 ended with three neurons wired into a network, and one phrase did
+        Chapter 1 ended with three neurons wired into a network, and one phrase did
         the heavy lifting: <M tex="h_1" /> and <M tex="h_2" /> both read the same two
         inputs. Whenever several neurons sit side by side reading the same inputs,
-        they form a layer, and this module is about computing a whole layer at once.
+        they form a layer, and this chapter is about computing a whole layer at once.
         Start small. Take the concert neuron, weights 6 and 2, and give it a
         colleague with weights 1 and 5. Feed both the input <M tex="x_1 = 1" />,{" "}
         <M tex="x_2 = 0" /> and do the multiply-and-add twice by hand, biases set
@@ -56,14 +56,14 @@ export function Module2() {
         A network is just that rule repeated. Each layer takes the previous layer's
         output column as its input, computes <M tex="\sigma(Wa + b)" /> with its own{" "}
         <M tex="W" /> and <M tex="b" />, and passes the result on. (Same idea as
-        Module 1, where the output neuron read <M tex="h_1" />'s and{" "}
+        Chapter 1, where the output neuron read <M tex="h_1" />'s and{" "}
         <M tex="h_2" />'s reports instead of the raw inputs.) Running an input
         through every layer in order is called feedforward, and it is everything a
         network does when it answers. The rest of the course is about finding good
         numbers to put in the <M tex="W" />'s and <M tex="b" />'s.
       </p>
       <p>
-        Module 1 called a neuron's answer its confidence. The field's word for it
+        Chapter 1 called a neuron's answer its confidence. The field's word for it
         is the neuron's{" "}
         <b>activation</b>, and a layer's <M tex="a" /> is that layer's{" "}
         <b>activations</b>, one per neuron. Read the formula above in those words
@@ -74,7 +74,7 @@ export function Module2() {
         machinery.
       </p>
 
-      <SectionHeader id="m2-shapes" title="Shape discipline" />
+      <SectionHeader id="c2-shapes" title="Shape discipline" />
       <p>
         The shapes deserve slow reading, because nearly every bug you will
         write in this course is a shape bug. NumPy describes every array by its
@@ -83,7 +83,7 @@ export function Module2() {
         inputs made <M tex="W" /> of shape <M tex="(2, 2)" />; in general a layer
         of <M tex="m" /> neurons reading <M tex="n" /> inputs has <M tex="W" /> of
         shape <M tex="(m, n)" />, and activations are always columns, shape{" "}
-        <M tex="(n, 1)" />, never flat: Module 1's trailing-comma rule stands, and
+        <M tex="(n, 1)" />, never flat: Chapter 1's trailing-comma rule stands, and
         it matters more here, because a flat array in a matrix product misbehaves
         silently instead of failing loudly.
       </p>
@@ -91,7 +91,7 @@ export function Module2() {
         One warning on top of that, because everyone trips here once: the shape
         names the receiving layer first. Data may flow from 2 inputs to 1 neuron,
         but that layer's matrix is <M tex="(1, 2)" />: rows first, and the rows
-        belong to the layer being computed. Said with Module 1's anatomy,{" "}
+        belong to the layer being computed. Said with Chapter 1's anatomy,{" "}
         <M tex="W" /> is the layer's wire ledger: the entry in row j, column k is
         the weight on the wire from input k to neuron j, so a row collects one
         neuron's incoming wires, and a column collects one input's outgoing
@@ -107,7 +107,7 @@ export function Module2() {
         lands on every entry: NumPy stretches the smaller shape to fit, and calls
         it broadcasting. Here is the whole contract as a picture:
       </p>
-      <Figure caption="How the shapes lock together. Teal is the input side: W is n wide because a is n tall, one weight per input, and the two must match or the multiply is impossible. Purple is the neuron side: W has m rows, so Wa, b, and a' are all m tall, one entry per neuron. The shaded strip shows one neuron's whole story: its row of W, times all of a, plus its own bias entry, becomes its entry of a'. For Module 2's hidden layer, m = 15 and n = 784.">
+      <Figure caption="How the shapes lock together. Teal is the input side: W is n wide because a is n tall, one weight per input, and the two must match or the multiply is impossible. Purple is the neuron side: W has m rows, so Wa, b, and a' are all m tall, one entry per neuron. The shaded strip shows one neuron's whole story: its row of W, times all of a, plus its own bias entry, becomes its entry of a'. For Chapter 2's hidden layer, m = 15 and n = 784.">
         <ShapesDiagram />
       </Figure>
       <Aside>
@@ -122,7 +122,7 @@ export function Module2() {
         </p>
       </Aside>
 
-      <SectionHeader id="m2-digits" title="A digit is 784 numbers" />
+      <SectionHeader id="c2-digits" title="A digit is 784 numbers" />
       <p>
         Time to leave four-dot toy worlds. The real task of this course is reading
         handwritten digits from MNIST, a classic collection of 70,000 of them
@@ -137,12 +137,12 @@ export function Module2() {
         <PixelsInteractive />
       </Figure>
 
-      <SectionHeader id="m2-design" title="The 784-15-10 design" />
+      <SectionHeader id="c2-design" title="The 784-15-10 design" />
       <p>
         What about the other end? Give the network ten output neurons, one per
         digit, each answering its own yes-or-no question: is this a 0? is this a 1?
         and so on up to 9. Each answer is an ordinary sigmoid confidence between 0
-        and 1, exactly like the outputs you watched in Module 1, and the network's
+        and 1, exactly like the outputs you watched in Chapter 1, and the network's
         final verdict is simply the question that got the most confident yes.
       </p>
 
@@ -153,22 +153,22 @@ export function Module2() {
         little pattern-detectors, which usually means more accuracy and always
         means slower training; fewer means the opposite. The network on this page
         uses 15 because 15 circles fit in a diagram and train in seconds (the
-        classic setup you will train in Module 5 uses 30). So how many numbers do
+        classic setup you will train in Chapter 5 uses 30). So how many numbers do
         15 hidden neurons leave us to choose? Count layer by layer, the way we
-        counted Module 1's nine:
+        counted Chapter 1's nine:
       </p>
       <Eq
         tex="\begin{aligned} &\underbrace{15 \times 784}_{\text{hidden } W} + \underbrace{15}_{\text{hidden } b} + \underbrace{10 \times 15}_{\text{output } W} + \underbrace{10}_{\text{output } b} \\[0.8em] &= 11{,}760 + 15 + 150 + 10 = 11{,}935 \end{aligned}"
-        gloss="The hidden layer's W has one row per neuron (15) and one column per input (784), plus one bias per neuron; the output layer reads the 15 hidden activations the same way. Nearly twelve thousand knobs, far too many to set by hand; Module 3 is about finding them automatically."
+        gloss="The hidden layer's W has one row per neuron (15) and one column per input (784), plus one bias per neuron; the output layer reads the 15 hidden activations the same way. Nearly twelve thousand knobs, far too many to set by hand; Chapter 3 is about finding them automatically."
       />
 
       <p>
-        And where did Module 1's geometry go? Nowhere: it scaled. A point in a
+        And where did Chapter 1's geometry go? Nowhere: it scaled. A point in a
         784-axis space sounds exotic, but it is nothing deeper than the column you
         unrolled above: a list of 784 ink levels in order. So every image is one
         point in that space, one axis per pixel (move along an axis and one pixel
         brightens). The training images are dots scattered through that space, each
-        labeled with the digit it shows. Module 1's four concert dots were the same
+        labeled with the digit it shows. Chapter 1's four concert dots were the same
         thing in two axes, green for the go answers and gold for the stay answers. Each hidden neuron still makes one
         straight cut through the space, yes on one side and no on the other. Aiming
         that cut now takes 784 weights instead of two, one weight for every pixel
@@ -178,7 +178,7 @@ export function Module2() {
         The hidden layer's 15 reports are themselves a list of numbers, one per
         hidden neuron, exactly like the 784 pixels. Read that list the way you read
         the pixels and each image becomes one point in a space of 15 axes instead
-        of 784. Module 1's two hidden neurons did this on a smaller scale. Their
+        of 784. Chapter 1's two hidden neurons did this on a smaller scale. Their
         pair of reports became the axes of a second plot, and on it the two go dots
         ended up almost on top of each other. Trading each image's 784 numbers for
         its 15 reports deserves a name, re-description, because every network does
@@ -190,10 +190,10 @@ export function Module2() {
         arranged for each digit class to be separable from the rest.
       </p>
 
-      <SectionHeader id="m2-weights" title="What learned weights look like" />
+      <SectionHeader id="c2-weights" title="What learned weights look like" />
       <p>
         The network below has already been trained for you (86% test accuracy; the
-        network you train in Module 5 does better), so you can study what learned
+        network you train in Chapter 5 does better), so you can study what learned
         numbers actually look
         like. Focus on a single hidden neuron. It works like every neuron so far:
         784 incoming wires, one per pixel, each carrying its weight, and its
@@ -213,12 +213,12 @@ export function Module2() {
         <NetworkDiagram />
       </Figure>
 
-      <SectionHeader id="m2-code" title="Implement feedforward" />
+      <SectionHeader id="c2-code" title="Implement feedforward" />
       <p>
         Now implement feedforward yourself; the exercise below spells out the plan
-        and the two NumPy tools it needs. It goes into the same file as Module 1's
+        and the two NumPy tools it needs. It goes into the same file as Chapter 1's
         work, under its own section line, so the sigmoid you call is the one you
-        wrote a module ago rather than a copy of it. When the tests pass, come back
+        wrote a chapter ago rather than a copy of it. When the tests pass, come back
         up to the diagram: the button there runs your code on real digits with the
         trained weights, and every activation it lights up will have been computed
         by your function.
@@ -231,9 +231,9 @@ export function Module2() {
           "A layer is several neurons reading the same inputs; stack their weight rows into W and the layer is one formula: a' = sigmoid(Wa + b).",
           "The weight matrix W has one row per neuron and one column per input, shape (m, n); activations stay columns, and one layer's activations are the next layer's input.",
           "A digit image is already numbers: a 28x28 grid of ink levels, unrolled into a (784, 1) column; ten output confidences, and the answer is the largest.",
-          "Your feedforward plus trained weights already reads digits; learning the 11,935 numbers yourself is Modules 3 to 5.",
+          "Your feedforward plus trained weights already reads digits; learning the 11,935 numbers yourself is Chapters 3 to 5.",
         ]}
-        chapter="Chapter 1 (the architecture of neural networks)"
+        deeper="Chapter 1 (the architecture of neural networks)"
         href="http://neuralnetworksanddeeplearning.com/chap1.html"
       />
     </article>

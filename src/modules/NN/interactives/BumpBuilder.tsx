@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { scale, sigmoid } from "./utils";
 
-// Module 6 interactive (a): one bump out of two sigmoid neurons. A large
+// Chapter 6 interactive (a): one bump out of two sigmoid neurons. A large
 // weight turns each neuron into a step, and opposite weights on the two
 // outgoing wires leave a flat-topped bump between them. The readout keeps the
 // two neurons' actual weights and biases on screen, because the point of
@@ -22,7 +22,7 @@ function curve(f: (x: number) => number): string {
 }
 
 export function BumpBuilder() {
-  const [wi, setWi] = useState(5); // weight 400: the step regime the module builds in
+  const [wi, setWi] = useState(5); // weight 400: the step regime the chapter builds in
   const [s1, setS1] = useState(0.4);
   const [s2, setS2] = useState(0.6);
   const [h, setH] = useState(6);

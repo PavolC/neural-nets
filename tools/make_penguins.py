@@ -1,6 +1,6 @@
 """Build public/data/penguins.json.gz, the course's second dataset.
 
-Module 10 is about applying the network to a problem of the learner's own, and
+Chapter 10 is about applying the network to a problem of the learner's own, and
 MNIST is useless for teaching that: its pixels arrive already scaled to 0 and 1,
 already numeric, already complete, already split. This one arrives the way data
 actually does.
@@ -8,8 +8,8 @@ actually does.
     344 penguins, three species, and:
       * four measurements on wildly different scales (body mass in grams runs
         about 4,200; bill depth in millimetres runs about 17, a factor of 245),
-        which is what makes Module 7's initialization argument break and makes
-        input scaling the module's central lesson
+        which is what makes Chapter 7's initialization argument break and makes
+        input scaling the chapter's central lesson
       * two categorical columns (island, sex) that have to be encoded
       * holes: two rows with no measurements at all, eleven with no sex
       * classes in unequal numbers (152 / 124 / 68), so accuracy has to be read
@@ -22,7 +22,7 @@ Preparing it is the exercise.
 Data: the Palmer Station Antarctica LTER penguin study, collected by Dr Kristen
 Gorman and published as the palmerpenguins R package by Allison Horst, Alison
 Hill and Kristen Gorman, released CC0 (public domain). Please keep the citation
-in the module and the README.
+in the chapter and the README.
 
 Pure standard library, needs network access:
 

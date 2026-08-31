@@ -8,10 +8,10 @@ import { sgdExercise } from "../../../exercises/sgd";
 import { EpochChart, type EpochSeries } from "./EpochChart";
 import { lockedBy, speakList } from "./lockedBy";
 
-// Module 7, second cycle: the same digit reader, the same cross-entropy cost,
-// the same sgd, the same random draws, started twice. Once at Module 5's
+// Chapter 7, second cycle: the same digit reader, the same cross-entropy cost,
+// the same sgd, the same random draws, started twice. Once at Chapter 5's
 // scale and once at yours, divided by the square root of each layer's input
-// count. This is the module's payoff run.
+// count. This is the chapter's payoff run.
 
 const EPOCHS = 15;
 
@@ -98,7 +98,7 @@ interface Summary {
 }
 
 const LINES: Record<string, { label: string; cls: string; dashed?: boolean }> = {
-  plain: { label: "the undivided start (Module 5's draw, used as it comes)", cls: "m7-line-a", dashed: true },
+  plain: { label: "the undivided start (Chapter 5's draw, used as it comes)", cls: "m7-line-a", dashed: true },
   yours: { label: "the divided start (each weight divided by the square root of its layer's inputs)", cls: "m7-line-b" },
 };
 

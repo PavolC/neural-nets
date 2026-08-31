@@ -1,18 +1,18 @@
 /**
- * Reproduce every layer-speed number Module 8 quotes, from the panel's own code.
+ * Reproduce every layer-speed number Chapter 8 quotes, from the panel's own code.
  *
- * Module 8's tables come from two engines, and this is the second of the two
+ * Chapter 8's tables come from two engines, and this is the second of the two
  * benches that regenerate them (see tools/bench_depth.py for the first):
  *
  *   * tools/bench_depth.py mirrors DepthTrainPanel, the Pyodide run: accuracy
  *     tables, the step-size sweep, dead units, ratios measured during training.
  *   * tools/bench_layer_speeds.ts (this file) mirrors LayerSpeedBars by
  *     importing the panel's own measure() from deepNet.ts. Everything in the
- *     module's learning-speed and hop tables is quoted from here.
+ *     chapter's learning-speed and hop tables is quoted from here.
  *
  * The two engines draw their weights from different generators (NumPy's PCG64
  * against the panel's mulberry32), so their numbers are not meant to agree.
- * They agree on the pattern, which is the module's whole claim; a number from
+ * They agree on the pattern, which is the chapter's whole claim; a number from
  * one engine must never be quoted as if it came from the other.
  *
  * Run it with the repo's own TypeScript compiler, no new dependency:
@@ -148,7 +148,7 @@ function benchLedgerSpread() {
 	const mean = factors.reduce((a, b) => a + b, 0) / factors.length;
 	console.log(`  mean ${mean.toFixed(3)}, min ${factors[0].toFixed(2)}, max ${factors[199].toFixed(2)}`);
 	console.log(`  middle 90%: ${factors[10].toFixed(2)} to ${factors[189].toFixed(2)}`);
-	console.log("  (the middle 90% is what the module quotes: the extremes of one");
+	console.log("  (the middle 90% is what the chapter quotes: the extremes of one");
 	console.log("   200-draw stream move by a lot from run to run, the quantiles do not)");
 }
 
@@ -179,7 +179,7 @@ function benchScale(batch: Batch) {
 			const m = speeds(batch, 4, activation, scale);
 			const first = m.layers[0]; // layer 2, the hop into it
 			const out = m.layers[m.layers.length - 1];
-			// The module quotes the squash slope averaged over ALL the hidden layers,
+			// The chapter quotes the squash slope averaged over ALL the hidden layers,
 			// not layer 2's alone: it is being read against the sigmoid's 0.25
 			// ceiling, which is a fact about the squash rather than about one layer.
 			const hiddenSteep = m.layers.filter((l) => !l.isOutput).map((l) => l.meanSteepness ?? 0);

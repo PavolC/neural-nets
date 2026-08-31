@@ -1,4 +1,4 @@
-// Shared chart for Module 7's training panels: several runs of the same
+// Shared chart for Chapter 7's training panels: several runs of the same
 // network, one line each, plotted against the epoch. Kept separate from the
 // panels because three of them draw exactly this picture with different
 // series in it. The legend is HTML below the plot rather than text inside it,

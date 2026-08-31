@@ -34,10 +34,10 @@ site in `dist/` that any static host will serve.
 
 ## What you build
 
-Ten modules, each a few readings interleaved with figures, most ending in an exercise
-whose output every later module uses.
+Ten chapters, each a few readings interleaved with figures, most ending in an exercise
+whose output every later chapter uses.
 
-| #   | Module                      | You write                                                              |
+| #   | Chapter                     | You write                                                              |
 | --- | --------------------------- | ---------------------------------------------------------------------- |
 | 1   | From neurons to networks    | `sigmoid`, `fire`                                                      |
 | 2   | Feedforward                 | `feedforward`                                                          |
@@ -50,32 +50,32 @@ whose output every later module uses.
 | 9   | Assembling the program      | `train`, `accuracy`                                                    |
 | 10  | Your own problem            | `standardize`, `one_hot`, `split`                                      |
 
-Module 5 is the summit: the learner's `backprop` is checked entry by entry against
+Chapter 5 is the summit: the learner's `backprop` is checked entry by entry against
 central-difference numerical gradients on a fixed 3-5-4-2 network, to one part in ten
 million, and then trains 784-30-10 to about 89% of a held-out thousand in a few seconds.
-Module 7's three one-line changes take that to about 92%. Module 8 takes the same
+Chapter 7's three one-line changes take that to about 92%. Chapter 8 takes the same
 network deeper and measures what breaks: four hidden layers of 30 score 12.6% after a
 full epoch, which is exactly the share of the held-out digits that are 1s.
 
-Module 9 is the capstone: the training loop itself, which the course's panels had been
+Chapter 9 is the capstone: the training loop itself, which the course's panels had been
 running around the learner's functions until then, and what the file becomes once that
 loop is in it, which is a program that trains a network from a Python prompt with NumPy
-as its only import. Module 10 turns the whole thing on data that arrives the way data
+as its only import. Chapter 10 turns the whole thing on data that arrives the way data
 does: a second bundled dataset with words, holes, unequal classes and measurements on
 scales 245 times apart, where leaving out one preprocessing step drops the network to the
 majority-class baseline and a 73.5% score turns out to contain a species it never once
 predicts. It is the last page, so it carries the where-to-go-next list.
 
-Every module names the field's word for its own ideas as it goes, in a short naming note
+Every chapter names the field's word for its own ideas as it goes, in a short naming note
 at the first use: the squash is an activation function, a knob is a parameter, blame is
 the error. There is no glossary at the end, because a vocabulary handed over twenty rows
 at a time on the last page is a memorization task rather than a translation.
 
-Nothing is locked. Every module is reachable at any time; what an exercise gates is the
-panel that trains with your own code. Later modules genuinely run on earlier ones: Module
-9's program calls the backprop from Module 5, which calls the sigmoid from Module 1. A
+Nothing is locked. Every chapter is reachable at any time; what an exercise gates is the
+panel that trains with your own code. Later chapters genuinely run on earlier ones: Chapter
+9's program calls the backprop from Chapter 5, which calls the sigmoid from Chapter 1. A
 section that has not been written yet is filled in from the course's own copy for the run,
-and the panel names what it borrowed, so a learner who opens Module 9 first still gets a
+and the panel names what it borrowed, so a learner who opens Chapter 9 first still gets a
 run rather than a `NameError`.
 
 Progress (your file, revealed hints, passed marks) lives in this browser's local storage.
@@ -99,7 +99,7 @@ a one-time manual step for the reason the workflow file records.
 /src/                React app
 /src/brand/          the series brand layer: accent family, masthead, series footer
 /src/start/          the start page: what the course is, the outline, stored progress
-/src/modules/NN/     one file per course module, plus interactives/
+/src/modules/NN/     one file per course chapter, plus interactives/
 /src/exercises/      per exercise: skeleton.py, tests.py, solution.py, index.ts
 /src/python/         shared Python: course helpers, data loader, reference network, harness
 /src/runtime/        Pyodide Web Worker, message protocol, shared worker client
@@ -111,7 +111,7 @@ a one-time manual step for the reason the workflow file records.
 ```
 
 `CLAUDE.md` holds the working conventions: shape conventions all Python obeys, the
-exercise and test contract, the module authoring playbook, and the voice rules.
+exercise and test contract, the chapter authoring playbook, and the voice rules.
 `nn-course-design-doc.md` is the original design. The transferable part of all of this was
 extracted after the course was finished and now lives in the series repository, at
 [course-kit/](https://github.com/PavolC/moving-parts/tree/main/course-kit): the rules with
@@ -129,7 +129,7 @@ python3 tools/pretrain_weights.py      # public/data/pretrained_weights.json.gz,
 python3 tools/make_penguins.py         # public/data/penguins.json.gz, stdlib only
 ```
 
-Every measurement quoted in Modules 7 and 8 is regenerated by a bench that runs the same
+Every measurement quoted in Chapters 7 and 8 is regenerated by a bench that runs the same
 code path the browser does, each section printing the prose sentence it backs. The
 exercises have a checker that runs the app's own harness outside the browser:
 
@@ -139,10 +139,10 @@ npm run check:doc                     # the document format: splices, projection
 python3 tools/check_exercises.py       # the workbench: 54 tests, twelve assertions
 python3 tools/check_panels.py --fast   # every payoff panel runs on the learner's file
 node tools/check_run_path.mjs          # browser run and saved-state paths (needs Playwright + Chromium)
-python3 tools/bench_depth.py           # Modules 7 and 8's Pyodide numbers (needs NumPy)
-python3 tools/bench_penguins.py        # Module 10's numbers (needs NumPy)
+python3 tools/bench_depth.py           # Chapters 7 and 8's Pyodide numbers (needs NumPy)
+python3 tools/bench_penguins.py        # Chapter 10's numbers (needs NumPy)
 npm run bench:speeds                   # the layer-speed panel's numbers
-npm run bench:bumps                    # Module 6's numbers
+npm run bench:bumps                    # Chapter 6's numbers
 python3 tools/check_brand.py           # the mark, the title and the social card agree
 bash tools/make_og_image.sh            # redraw public/og-image.png (needs a Chromium)
 python3 tools/brand_palette.py --check # the accent family matches what OKLCH computes
@@ -154,7 +154,7 @@ Chrome, Pyodide 314.0.5, 2026-08-23: 30 epochs of mini-batch SGD on the bundled 
 (5,000 training and 1,000 test images) complete in about 4.5 seconds and reach 88.6% test
 accuracy, deterministic at seed 1. That is well inside the 60-second budget the design
 doc set, so no dataset or architecture shrinking was needed. Accuracy plateaus just under
-90% because of the subsampled data and the quadratic cost; Module 7 reaches about 92%
+90% because of the subsampled data and the quadratic cost; Chapter 7 reaches about 92%
 once the cross-entropy cost is paired with weights scaled by 1/sqrt(inputs).
 
 The course has been opened in Firefox and Safari and it runs; that is a smoke test rather
@@ -169,7 +169,7 @@ versions and up, but that is inference, not a test.
 The course ships with no analytics and sets no cookie, so out of the box a deploy tells
 its author nothing about who reached it. That was the right default while the course had
 one reader who could simply be asked, and it is the wrong one for a course meant to be
-found: "two hundred people opened Module 1 and stopped" and "nobody arrived" are opposite
+found: "two hundred people opened Chapter 1 and stopped" and "nobody arrived" are opposite
 problems with opposite fixes, and an uninstrumented build cannot tell them apart.
 
 `src/analytics.ts` will load [GoatCounter](https://www.goatcounter.com/) if, and only if,
@@ -179,7 +179,7 @@ problems with opposite fixes, and an uninstrumented build cannot tell them apart
 VITE_GOATCOUNTER=https://yourcode.goatcounter.com/count npm run build
 ```
 
-With the variable unset the module compiles away and the bundle contains no reference to
+With the variable unset the chapter compiles away and the bundle contains no reference to
 it, which is verifiable: `grep -r gc.zgo.at dist/` finds nothing. With it set, a page view
 is counted. It never sends your file, the stored progress, or anything a
 learner typed; it sets no cookie, stores no personal data, skips the dev server, and
@@ -190,7 +190,7 @@ honours `navigator.doNotTrack`. GoatCounter is free for non-commercial use, whic
 Adapted from Michael A. Nielsen, _Neural Networks and Deep Learning_, Determination
 Press, 2015, licensed [CC BY-NC 3.0](https://creativecommons.org/licenses/by-nc/3.0/).
 
-The **course content** (the module prose, the pedagogical sequence and the interactive
+The **course content** (the chapter prose, the pedagogical sequence and the interactive
 figures under `src/modules/`) follows its source: **CC BY-NC 3.0, so it may not be used
 commercially.**
 
@@ -210,7 +210,7 @@ the layer is for. Full terms in [LICENSE](LICENSE).
 Reference implementations are adapted from Nielsen's MIT-licensed code at
 [github.com/mnielsen/neural-networks-and-deep-learning](https://github.com/mnielsen/neural-networks-and-deep-learning).
 
-Module 10's dataset is the Palmer Station Antarctica LTER penguin survey collected by
+Chapter 10's dataset is the Palmer Station Antarctica LTER penguin survey collected by
 Dr Kristen Gorman, published as
 [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/) by Allison Horst,
 Alison Hill and Kristen Gorman, and released CC0 (public domain).

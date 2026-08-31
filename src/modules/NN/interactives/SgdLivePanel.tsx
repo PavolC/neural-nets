@@ -4,7 +4,7 @@ import { codeReady, loadCode, subscribeProgress } from "../../../state/progress"
 import { sgdExercise } from "../../../exercises/sgd";
 import { lockedBy, speakList } from "./lockedBy";
 
-// Module 3 payoff: run the learner's own sgd on a toy 2D dataset, live.
+// Chapter 3 payoff: run the learner's own sgd on a toy 2D dataset, live.
 // It works, and it is visibly slow; the numbers reported here set up the
 // case for backpropagation.
 
@@ -19,7 +19,7 @@ _a = json.loads(_args_json)
 
 # The learner's file, up to and including their sgd. One exec, and every name
 # below comes out of it: their sgd, their feedforward, their sigmoid, and the
-# nudge-and-measure gradient written for them in Module 3. Nothing is borrowed,
+# nudge-and-measure gradient written for them in Chapter 3. Nothing is borrowed,
 # which is what makes the count this panel prints true rather than nearly true:
 # the slow gradient is the one their own sgd_step calls, by construction.
 _lib = types.ModuleType("your_code")
@@ -172,9 +172,9 @@ export function SgdLivePanel() {
           The count: {result.steps} steps, and every step estimated {result.params} slopes
           by nudging each parameter twice, which cost{" "}
           {result.forward_passes.toLocaleString()} passes over the batch in total. This tiny
-          network has {result.params} parameters; the digit reader from Module 2 has
+          network has {result.params} parameters; the digit reader from Chapter 2 has
           11,935, roughly 360 times this cost on every single step. That is why
-          Module 5 exists.
+          Chapter 5 exists.
         </p>
       )}
     </div>

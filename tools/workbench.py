@@ -58,7 +58,7 @@ def section_text(section_id, kind):
 def assemble(ids, kind="solution", kinds=None):
     """The document holding exactly these sections, in table order.
 
-    kinds overrides kind for named sections, which is how the post-Module-7
+    kinds overrides kind for named sections, which is how the post-Chapter-7
     document gets the seamed backprop while everything else stays a solution.
     """
     kinds = kinds or {}
@@ -103,11 +103,11 @@ def with_givens(ids):
 
 
 def needs_seam(ids):
-    """True when the document must carry Module 7's opened-up backprop.
+    """True when the document must carry Chapter 7's opened-up backprop.
 
     The adapter written for you calls backprop with four arguments until a
     replacement BP1 is actually handed to it, so the seam is needed exactly
-    when something passes one: Module 7's cross-entropy work onward.
+    when something passes one: Chapter 7's cross-entropy work onward.
     """
     return "cross-entropy" in set(ids) or "train" in set(ids)
 

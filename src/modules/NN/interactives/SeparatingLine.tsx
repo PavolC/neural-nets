@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { scale } from "./utils";
 
-// Module 1 interactive (a): drag a line and try to separate two classes of
+// Chapter 1 interactive (a): drag a line and try to separate two classes of
 // points. AND and OR are separable; XOR is not, which is the point.
 
 type DatasetId = "OR" | "AND" | "XOR";

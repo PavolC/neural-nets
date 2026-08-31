@@ -1,6 +1,6 @@
 """Helpers the course provides to exercises via `from course import ...`.
 
-These are functions the learner has already built in an earlier module (or
+These are functions the learner has already built in an earlier chapter (or
 that the course supplies as given). The harness registers this file as the
 `course` module inside Pyodide, so skeletons never contain solution logic
 for the current exercise (see CLAUDE.md hard rules).
@@ -16,7 +16,7 @@ import numpy as np
 def sigmoid(z):
     """The sigmoid function 1 / (1 + exp(-z)), applied elementwise.
 
-    Built by the learner in Module 1.
+    Built by the learner in Chapter 1.
     """
     return 1.0 / (1.0 + np.exp(-z))
 
@@ -24,7 +24,7 @@ def sigmoid(z):
 def feedforward(weights, biases, x):
     """Return the network's output activation for input x.
 
-    Built by the learner in Module 2. Works on a single column vector
+    Built by the learner in Chapter 2. Works on a single column vector
     (n, 1) or a batch (n, m).
     """
     a = x
@@ -55,7 +55,7 @@ def gradient(weights, biases, X, Y, eps=1e-5):
     nabla_b): lists of arrays shaped like weights and biases, where each
     entry is that parameter's slope. Measured numerically, the hand way:
     nudge the parameter by eps, rescore the batch, divide (two cost
-    evaluations per parameter; Module 5 replaces this with
+    evaluations per parameter; Chapter 5 replaces this with
     backpropagation).
     """
     def cost_fn(ws, bs):
@@ -73,7 +73,7 @@ def numerical_gradient(cost_fn, weights, biases, eps=1e-5):
     respect to that parameter.
 
     This is the expensive way to get gradients: two cost evaluations (two
-    full forward passes) per parameter. Module 5 replaces it with
+    full forward passes) per parameter. Chapter 5 replaces it with
     backpropagation.
     """
     def grad_of(params, index):
@@ -99,7 +99,7 @@ def numerical_gradient(cost_fn, weights, biases, eps=1e-5):
 def sigmoid_prime(z):
     """The squash's slope at z: sigmoid(z) * (1 - sigmoid(z)), elementwise.
 
-    Built by the learner in Module 5.
+    Built by the learner in Chapter 5.
     """
     s = sigmoid(z)
     return s * (1.0 - s)
@@ -108,7 +108,7 @@ def sigmoid_prime(z):
 def quadratic_output_delta(a, y, z):
     """BP1 under the quadratic cost: the gap times the output's squash slope.
 
-    The output layer's blame, exactly as the learner wrote it in Module 5's
+    The output layer's blame, exactly as the learner wrote it in Chapter 5's
     backprop. Provided as a function so it can be swapped (see backprop's
     output_delta argument).
     """
@@ -118,10 +118,10 @@ def quadratic_output_delta(a, y, z):
 def backprop(weights, biases, x, y, output_delta=None):
     """Every parameter's slope for ONE example, via BP1 to BP4.
 
-    The learner's Module 5 algorithm with BP1 lifted into an argument:
+    The learner's Chapter 5 algorithm with BP1 lifted into an argument:
     output_delta(a, y, z) supplies the output layer's blame. It defaults to
-    quadratic_output_delta, which reproduces Module 5's function exactly;
-    Module 7 passes a different one. Everything after BP1 is untouched,
+    quadratic_output_delta, which reproduces Chapter 5's function exactly;
+    Chapter 7 passes a different one. Everything after BP1 is untouched,
     which is the point.
 
     x is one input column (n_in, 1), y its right answer (n_out, 1).
@@ -159,7 +159,7 @@ def backprop(weights, biases, x, y, output_delta=None):
 def cross_entropy_delta(a, y, z):
     """BP1 under the cross-entropy cost: the gap, with nothing multiplying it.
 
-    Built by the learner in Module 7. z is in the signature because backprop
+    Built by the learner in Chapter 7. z is in the signature because backprop
     passes it; this blame has no use for it.
     """
     return a - y
@@ -168,7 +168,7 @@ def cross_entropy_delta(a, y, z):
 def init_network(sizes, rng):
     """A fresh network: weights divided by the square root of their inputs.
 
-    Built by the learner in Module 7. sizes runs front to back, so
+    Built by the learner in Chapter 7. sizes runs front to back, so
     [784, 30, 10] is the digit reader. Draw order is part of the contract:
     every weight matrix first, front to back, then every bias column, so
     that a given seed builds the same network here as it does there.
@@ -186,8 +186,8 @@ def init_network(sizes, rng):
 def l2_step(weights, biases, nabla_w, nabla_b, eta, lmbda, n):
     """One descent step with weight decay.
 
-    Built by the learner in Module 7. Every weight is multiplied by
-    (1 - eta * lmbda / n) before the usual step; biases keep Module 3's
+    Built by the learner in Chapter 7. Every weight is multiplied by
+    (1 - eta * lmbda / n) before the usual step; biases keep Chapter 3's
     rule, since the regularization term does not mention them. n is the
     size of the whole training set, not of this mini-batch.
     """
@@ -200,7 +200,7 @@ def l2_step(weights, biases, nabla_w, nabla_b, eta, lmbda, n):
 def batch_gradient(weights, biases, X, Y, output_delta=None):
     """A mini-batch's gradient: backprop per column, slopes averaged.
 
-    The adapter Module 5's training panel used, in one place. X is
+    The adapter Chapter 5's training panel used, in one place. X is
     (n_in, m), Y is (n_out, m). Returns (nabla_w, nabla_b).
     """
     m = X.shape[1]

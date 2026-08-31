@@ -7,7 +7,7 @@ export const l2Exercise: Exercise = {
   id: "l2",
   title: "The decaying update step",
   prompt: [
-    "Your Module 3 update step with one " +
+    "Your Chapter 3 update step with one " +
       "factor added to one of its two lines.",
     "The contract: l2_step(weights, biases, nabla_w, nabla_b, eta, lmbda, n) " +
       "performs one descent step and returns (new_weights, new_biases). The " +
@@ -19,13 +19,13 @@ export const l2Exercise: Exercise = {
       "averaged over all n examples, so the same n belongs here whatever the " +
       "batch size.",
     "The weights are the changed line, w becomes " +
-      "(1 - eta * lmbda / n) * w - eta * nabla_w. The biases keep Module 3's " +
+      "(1 - eta * lmbda / n) * w - eta * nabla_w. The biases keep Chapter 3's " +
       "line exactly, b becomes b - eta * nabla_b. Return new lists of new " +
       "arrays and leave the inputs alone, as your sgd_step did: the panel " +
       "below keeps two runs' parameters side by side.",
     "The tests check the arithmetic on numbers small enough to verify by " +
       "hand, that biases are untouched, that lmbda = 0 reproduces your " +
-      "Module 3 step exactly (the panel's baseline run goes through this " +
+      "Chapter 3 step exactly (the panel's baseline run goes through this " +
       "same function, so that case has to be right), and that a weight left " +
       "with no gradient at all shrinks by the same fraction every step.",
     "Once the tests pass, watch a weight decay on its own, with the data " +
@@ -57,7 +57,7 @@ export const l2Exercise: Exercise = {
   tests,
   solution,
   hints: [
-    "Start from your Module 3 sgd_step and delete the line that measured the " +
+    "Start from your Chapter 3 sgd_step and delete the line that measured the " +
       "gradient, since it now arrives as an argument. That leaves two list " +
       "comprehensions, one per parameter list. The bias one is unchanged. In " +
       "the weight one, compute the factor once before the comprehension, " +

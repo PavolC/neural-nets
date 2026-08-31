@@ -1,21 +1,21 @@
-"""Reproduce every Python-side number Modules 5, 7 and 8 quote, on the browser's code path.
+"""Reproduce every Python-side number Chapters 5, 7 and 8 quote, on the browser's code path.
 
-Module 8's prose reports measurements from two engines, and this script is the
+Chapter 8's prose reports measurements from two engines, and this script is the
 first of the two benches that regenerate them:
 
   * tools/bench_depth.py (this file) mirrors DepthTrainPanel's snippet: the
     learner's own init_network, sgd and cross-entropy blame, the course's
     backprop, and the bundled MNIST subset. It produces the accuracy tables,
     the step-size sweep, the ReLU comparison, the dead-unit counts and the
-    learning-speed ratios measured during training. It also runs Module 7's
+    learning-speed ratios measured during training. It also runs Chapter 7's
     weight decay, which is RegularizePanel's six runs on the 1,000-image
-    slice, and Module 7's hyperparameter grid, which has no panel behind it.
+    slice, and Chapter 7's hyperparameter grid, which has no panel behind it.
   * tools/bench_layer_speeds.ts mirrors LayerSpeedBars: the same measurement
-    written in TypeScript, which is what the module's layer-speed tables and
+    written in TypeScript, which is what the chapter's layer-speed tables and
     hop factors are quoted from.
 
 Two traps make a "mathematically equivalent" bench print different numbers than
-the browser (both were found while writing Module 8, and both are why this file
+the browser (both were found while writing Chapter 8, and both are why this file
 exists rather than a fresh reimplementation):
 
   1. init_network draws EVERY weight matrix and THEN every bias vector, so a
@@ -35,7 +35,7 @@ Needs NumPy (the only dependency outside the standard library):
     .venv/bin/python tools/bench_depth.py --only depth relu
 
 Every section prints the prose sentence it backs, so a number that has drifted
-is visible without holding the module open beside it.
+is visible without holding the chapter open beside it.
 """
 
 import argparse
@@ -67,16 +67,16 @@ ETA = {"sigmoid": 0.5, "relu": 0.05}
 L2_EPOCHS = 80
 L2_SLICE = 1000
 L2_ETA = 0.5
-L2_TAIL = 20        # the window Module 7 averages its two readings over
+L2_TAIL = 20        # the window Chapter 7 averages its two readings over
 # The panel pins its shuffle at SHUFFLE_SEED and offers no way to change it, so
-# the two further shuffles Module 7 quotes are this bench's choice rather than
+# the two further shuffles Chapter 7 quotes are this bench's choice rather than
 # the panel's. They are the next two seeds, fixed here before anything was run,
 # so the pair cannot have been picked after seeing what it printed.
 L2_EXTRA_SHUFFLES = (3, 4)
 
-# Module 7's hyperparameter grid: two costs by two starting points, each at
+# Chapter 7's hyperparameter grid: two costs by two starting points, each at
 # four step sizes, on the same 5,000 images and the same fifteen epochs as the
-# rest of the module. Nothing in the app runs this one, so this is the only
+# rest of the chapter. Nothing in the app runs this one, so this is the only
 # place its sixteen numbers come from.
 GRID_ETAS = (0.5, 1.0, 3.0, 6.0)
 GRID_SETUPS = (("quadratic", "undivided"), ("cross-entropy", "undivided"),
@@ -136,14 +136,14 @@ def make_engine(lib, ce, activation, cost="cross-entropy"):
     """The panel's two code paths, returned as (per_example, batch, predict).
 
     With the sigmoid the gradient is the learner's own backprop, reached
-    through the adapter written for them in Module 5. With ReLU it is the same
+    through the adapter written for them in Chapter 5. With ReLU it is the same
     four equations with one line changed, written out here and in the panel,
     because a learner's BP2 has sigmoid_prime in it.
 
     cost picks which BP1 the adapter hands down. Quadratic is the adapter's own
-    default, backprop called with four arguments, which is the shape Module 5
+    default, backprop called with four arguments, which is the shape Chapter 5
     runs in; cross-entropy passes the replacement through, which is the shape
-    everything from Module 7 on runs in.
+    everything from Chapter 7 on runs in.
     """
     sigmoid = lib.sigmoid
 
@@ -216,7 +216,7 @@ class Bench:
         self.Y_test = loader.one_hot(self.y_test)
 
     def start(self, sizes, which="divided", seed=INIT_SEED):
-        """One of the two starting points Module 7 compares.
+        """One of the two starting points Chapter 7 compares.
 
         The divided start is the learner's own init_network. The undivided one
         is that same draw with the division left out, so for a 784-30-10
@@ -369,7 +369,7 @@ def bench_dead(b):
     def silent_fractions(weights, biases):
         """Per hidden layer: the share of neurons that answer 0 on all 5,000 images.
 
-        Layers are numbered Module 4's way, so the four hidden layers of a
+        Layers are numbered Chapter 4's way, so the four hidden layers of a
         784-30-30-30-30-10 network are layers 2 to 5 and the output is layer 6.
         """
         out = {}
@@ -392,14 +392,14 @@ def bench_dead(b):
 
 def bench_mistakes(b):
     section(
-        "0. Module 5's run, and where its misses are",
+        "0. Chapter 5's run, and where its misses are",
         "108 of the thousand are read wrong; 1 comes back at 122 of 126 and 0 at "
         "82 of 85, while 8 manages 68 of 89; of the eight most confident mistakes, "
         "three are 3s read as 5 and two are 4s read as 9, all above 98 percent",
     )
-    # Module 5's panel exactly: the learner's backprop inside their sgd, the
+    # Chapter 5's panel exactly: the learner's backprop inside their sgd, the
     # quadratic cost, eta 3.0, the undivided draw, init seed 8, shuffle seed 2.
-    # The adapter written for the learner in Module 5, which is what the panel
+    # The adapter written for the learner in Chapter 5, which is what the panel
     # calls: one backprop per column, slopes averaged, summed in that order.
     def grad(w, bs, X, Y):
         return b.lib.batch_gradient(w, bs, X, Y)
@@ -429,7 +429,7 @@ def bench_mistakes(b):
 
 def bench_module7(b):
     section(
-        "7. Module 7's numbers that Module 8 opens by quoting",
+        "7. Chapter 7's numbers that Chapter 8 opens by quoting",
         "the digit reader stands at 92.1 percent; the hidden layer's median squash slope at "
         "the divided start is 0.22",
     )
@@ -454,7 +454,7 @@ def bench_module7(b):
             print(f"    the draw itself: {pct(float((w < 0).mean()))} negative, "
                   f"typical size {float(np.abs(w).mean()):.1f}, "
                   f"{pct(float((np.abs(w) > 3).mean()))} past 3")
-        # The distance histogram the module's first table quotes.
+        # The distance histogram the chapter's first table quotes.
         d = np.abs(z)
         shares = " / ".join(
             f"{float(((d >= lo) & (d < hi)).mean()) * 100:.1f}%"
@@ -464,7 +464,7 @@ def bench_module7(b):
 
 def bench_regularize(b):
     section(
-        "8. Module 7's weight decay, on the 1,000-image slice",
+        "8. Chapter 7's weight decay, on the 1,000-image slice",
         "from the divided start, lambda 1 averages 85.7 over the last twenty epochs "
         "against 86.4 without it, where the epoch-80 rows read 84.7 and 86.3; two "
         "other shuffles of the unregularized run give 86.0 and 85.4; decay ends the "
@@ -523,7 +523,7 @@ def bench_regularize(b):
 
 def bench_grid(b):
     section(
-        "9. Module 7's hyperparameter grid: two costs, two starts, four step sizes",
+        "9. Chapter 7's hyperparameter grid: two costs, two starts, four step sizes",
         "at eta 0.5 / 1.0 / 3.0 / 6.0 the quadratic cost from the undivided start "
         "reads 70.8 / 79.4 / 89.2 / 89.9, cross-entropy from the undivided start "
         "87.8 / 89.3 / 87.6 / 80.9, the quadratic cost from the divided start "
@@ -533,11 +533,11 @@ def bench_grid(b):
     )
     # Two of the sixteen cells are covered elsewhere in this file and should
     # print the same numbers here: the quadratic cost from the undivided start
-    # at 3.0 is Module 5's own run (bench_mistakes, 89.2), and cross-entropy
-    # from the divided start at 0.5 is the 92.1 Module 8 opens by quoting
+    # at 3.0 is Chapter 5's own run (bench_mistakes, 89.2), and cross-entropy
+    # from the divided start at 0.5 is the 92.1 Chapter 8 opens by quoting
     # (bench_module7). The table quotes the epoch-15 score, so that is what
     # `best` reads; the last-five average is beside it because one epoch of
-    # one run is the statistic Module 8 says wobbles by a point or two.
+    # one run is the statistic Chapter 8 says wobbles by a point or two.
     for cost, start in GRID_SETUPS:
         finals = []
         cells = []
@@ -553,7 +553,7 @@ def bench_grid(b):
 
 def bench_capstone(b):
     section(
-        "10. Module 9's panel: the learner's own loop on the digit reader",
+        "10. Chapter 9's panel: the learner's own loop on the digit reader",
         "at 0.5 the last five epochs average 90.4; at 0.1 the first epoch reads 77.2 "
         "against 0.5's 85.5, and by the end the two are level; at 3.0 the last five "
         "average 86.6, and consecutive passes read 80.9, then 89.3, then 85.1",

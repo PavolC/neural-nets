@@ -1,4 +1,4 @@
-// What an exercise looks like in the module page now that the editor lives in
+// What an exercise looks like in the chapter page now that the editor lives in
 // the panel: the prompt, the runnable snippets, and a button that opens the
 // section.
 //

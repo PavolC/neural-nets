@@ -1,6 +1,6 @@
 # Reference solution. The loop is the one Nielsen's network.py runs (MIT
 # license, github.com/mnielsen/neural-networks-and-deep-learning), assembled
-# here out of the functions the learner wrote across Modules 2 to 7.
+# here out of the functions the learner wrote across Chapters 2 to 7.
 
 
 def accuracy(weights, biases, X, y):

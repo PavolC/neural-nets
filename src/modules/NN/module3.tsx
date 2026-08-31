@@ -10,7 +10,7 @@ import { SgdLivePanel } from "./interactives/SgdLivePanel";
 export function Module3() {
   return (
     <article className="module">
-      <h2>Module 3: Learning as descent</h2>
+      <h2>Chapter 3: Learning as descent</h2>
       <AfterThis
         items={[
           "Read a cost function as a landscape and gradient descent as walking downhill in it.",
@@ -20,19 +20,19 @@ export function Module3() {
       />
       <ModuleToc />
 
-      <SectionHeader id="m3-cost" title="Scoring a network" />
+      <SectionHeader id="c3-cost" title="Scoring a network" />
       <p>
         So far the weights were given. Learning means finding them, and the first step
         is admitting you need a score. Here is a network to score: the little
-        three-neuron network that beat XOR in Module 1 (two hidden neurons h1 and h2,
+        three-neuron network that beat XOR in Chapter 1 (two hidden neurons h1 and h2,
         one output neuron, nine numbers in total), with its numbers set where that
-        module's sliders start: hidden weights all 2, hidden biases -1 and -3, output
+        chapter's sliders start: hidden weights all 2, hidden biases -1 and -3, output
         weights 4 and -4, output bias -2. Ask it about good weather alone, the corner
-        (1, 0), by running the two layers the way your feedforward from Module 2 does:
+        (1, 0), by running the two layers the way your feedforward from Chapter 2 does:
       </p>
       <Eq
         tex="\begin{aligned} h_1 &= \sigma(2 \cdot 1 + 2 \cdot 0 - 1) = \sigma(1) = 0.731 \\ h_2 &= \sigma(2 \cdot 1 + 2 \cdot 0 - 3) = \sigma(-1) = 0.269 \\ \text{output} &= \sigma(4 \cdot 0.731 - 4 \cdot 0.269 - 2) = \sigma(-0.152) = 0.462 \end{aligned}"
-        gloss="sigma is the sigmoid from Module 1, and each line is one neuron doing the usual move: multiply each input by its weight, add everything up including the bias, squash. The two hidden neurons read the corner's inputs 1 and 0; the output neuron reads their confidences 0.731 and 0.269."
+        gloss="sigma is the sigmoid from Chapter 1, and each line is one neuron doing the usual move: multiply each input by its weight, add everything up including the bias, squash. The two hidden neurons read the corner's inputs 1 and 0; the output neuron reads their confidences 0.731 and 0.269."
       />
       <p>
         The right answer on (1, 0) is 1, and the network says 0.462: just under one
@@ -46,7 +46,7 @@ export function Module3() {
       </p>
       <Eq
         tex="\begin{aligned} C &= \frac{\underbrace{(0 - 0.247)^2}_{(0,0)\text{, stay}} + \underbrace{(1 - 0.462)^2}_{(1,0)\text{, go}} + \underbrace{(1 - 0.462)^2}_{(0,1)\text{, go}} + \underbrace{(0 - 0.247)^2}_{(1,1)\text{, stay}}}{2 \times 4} \\[0.8em] &= \frac{0.700}{8} \approx 0.0875 \end{aligned}"
-        gloss="One term per corner of the truth table: the squared gaps are 0.061, 0.289, 0.289 and 0.061, which sum to 0.700. The 4 below the line is the number of examples (an average, so a bigger dataset does not automatically score worse). The extra 2 is a bookkeeping choice with a delayed payoff: in Module 4 it will make the cost's slope work out to exactly the gap between output and right answer, with no stray factor of 2."
+        gloss="One term per corner of the truth table: the squared gaps are 0.061, 0.289, 0.289 and 0.061, which sum to 0.700. The 4 below the line is the number of examples (an average, so a bigger dataset does not automatically score worse). The extra 2 is a bookkeeping choice with a delayed payoff: in Chapter 4 it will make the cost's slope work out to exactly the gap between output and right answer, with no stray factor of 2."
       />
       <p>
         One number for the whole network: 0.0875. Lower is better, and a perfect
@@ -76,7 +76,7 @@ export function Module3() {
         this course is a parameter count. Knob stays in the prose because you can
         turn a knob.
       </p>
-      <SectionHeader id="m3-slope" title="The slope of one knob" />
+      <SectionHeader id="c3-slope" title="The slope of one knob" />
       <p>
         The way in is a question you can ask of each knob separately: if I nudge this
         one knob a tiny bit, does the cost go up or down, and how steeply? Try it on
@@ -116,13 +116,13 @@ export function Module3() {
         The curve is the real cost of this network as one chosen knob moves, the
         other eight frozen at their start values; the tilted segment through the
         ball is the slope you would measure at that spot. Each knob still has the
-        geometric job Module 1 gave it: a hidden neuron's weights tilt its line, its
+        geometric job Chapter 1 gave it: a hidden neuron's weights tilt its line, its
         bias slides the line, and the output neuron's knobs re-blend the two
         half-planes into the shaded go region. So each curve below is one of those
         motions, scored: how the total mismatch between the shading and the four
         dots changes as that one line tilts, slides, or re-blends.
       </p>
-      <Figure caption="The cost along one knob at a time; the nine knobs are grouped by the neuron they belong to, as in Module 1's sliders. Pick a knob, drag its slider; the gray dot marks the start value from the prose, and switching knobs puts the previous one back. On the output neuron's bias at -2.00 the readout shows the 0.0876 and -0.044 you computed by hand. Try the output neuron's weight from h2: its curve is nearly level, a knob that barely matters right now.">
+      <Figure caption="The cost along one knob at a time; the nine knobs are grouped by the neuron they belong to, as in Chapter 1's sliders. Pick a knob, drag its slider; the gray dot marks the start value from the prose, and switching knobs puts the previous one back. On the output neuron's bias at -2.00 the readout shows the 0.0876 and -0.044 you computed by hand. Try the output neuron's weight from h2: its curve is nearly level, a knob that barely matters right now.">
         <CostVsKnob />
       </Figure>
       <p>
@@ -142,12 +142,12 @@ export function Module3() {
         The way you got those nine numbers has a name too: measuring a slope by
         nudging one input and rescoring is the method of <b>finite differences</b>,
         and a gradient built that way is a <b>numerical gradient</b>. It needs no
-        calculus and works on any network and any cost, which is why Module 5 uses
+        calculus and works on any network and any cost, which is why Chapter 5 uses
         it to check the fast method entry by entry, and why the section at the end
-        of this module can price it.
+        of this chapter can price it.
       </p>
 
-      <SectionHeader id="m3-descent" title="Walking downhill" />
+      <SectionHeader id="c3-descent" title="Walking downhill" />
       <p>
         Read the signs. Six slopes are negative: for those knobs the cost falls when
         the knob goes up, so they should be pushed up. Three are positive (the second
@@ -172,7 +172,7 @@ export function Module3() {
         above? Because every curve was drawn with the other eight knobs frozen. The
         moment any knob moves, all the other curves are redrawn and their old bottoms
         stop being true; each neuron's best setting depends on what the rest are
-        doing, as Module 1's playground made visible. Try the shortcut anyway: jump
+        doing, as Chapter 1's playground made visible. Try the shortcut anyway: jump
         all nine knobs to the bottoms of their current curves at once, and the cost
         lands at 0.1665, nearly double the 0.0876 you started from, because all nine
         jumps broke each other's assumptions. A slope is a compass, not a map: it
@@ -208,7 +208,7 @@ export function Module3() {
         <Descent2D />
       </Figure>
 
-      <SectionHeader id="m3-sgd" title="Mini-batches" />
+      <SectionHeader id="c3-sgd" title="Mini-batches" />
       <p>
         One more idea and you can build it. Look at what one step of descent costs.
         Every slope needs the cost measured twice (once for each side of the nudge),
@@ -216,7 +216,7 @@ export function Module3() {
         that pass is one complete trip through the network. For the XOR network that
         multiplies out to nine knobs, times two rescores each, times four corners per
         rescore: 72 trips per step, nothing. Now price the digit reader, whose
-        training set is the standard 50,000 images (Module 5 trains on a slice of
+        training set is the standard 50,000 images (Chapter 5 trains on a slice of
         it):
       </p>
       <Eq
@@ -234,7 +234,7 @@ export function Module3() {
       </p>
       <Eq
         tex="\underbrace{11{,}935}_{\text{knobs}} \times \underbrace{2}_{\text{rescores per slope}} \times \underbrace{10}_{\text{trips per rescore}} = 238{,}700 \text{ trips}"
-        gloss="Same first two factors: SGD does not touch the cost of measuring slopes, it only shrinks the crowd, and the step gets five thousand times cheaper. The 11,935 times 2 that remains is the factor backpropagation removes, in Modules 4 and 5."
+        gloss="Same first two factors: SGD does not touch the cost of measuring slopes, it only shrinks the crowd, and the step gets five thousand times cheaper. The 11,935 times 2 that remains is the factor backpropagation removes, in Chapters 4 and 5."
       />
       <p>
         The handful's verdict about which way is downhill is only roughly right. Take
@@ -255,11 +255,11 @@ export function Module3() {
         <BatchVsSgd />
       </Figure>
 
-      <SectionHeader id="m3-code" title="Implement SGD" />
+      <SectionHeader id="c3-code" title="Implement SGD" />
       <p>
         Time to implement it. First, meet the dataset as your code will receive it.
         One situation stands up as a column of numbers, exactly like the input
-        columns in Module 2. A whole dataset is those columns side by side, a matrix
+        columns in Chapter 2. A whole dataset is those columns side by side, a matrix
         called <M tex="X" />, and the right answers line up in a second matrix{" "}
         <M tex="Y" />, so that column k of Y grades column k of X. For the
         contrarian's four corners:
@@ -288,7 +288,7 @@ export function Module3() {
 
       <ExerciseCard exercise={sgdExercise} />
 
-      <SectionHeader id="m3-bill" title="The bill" />
+      <SectionHeader id="c3-bill" title="The bill" />
       <p>
         The panel below points your sgd at a concert-shaped dataset, forty noisy
         copies of the contrarian's four corners, and hands it a network with two
@@ -298,7 +298,7 @@ export function Module3() {
       </p>
       <Eq
         tex="\underbrace{8 \times 2}_{\text{hidden } W} + \underbrace{8}_{\text{hidden } b} + \underbrace{1 \times 8}_{\text{output } W} + \underbrace{1}_{\text{output } b} = 16 + 8 + 8 + 1 = 33"
-        gloss="Same counting as Module 2's 11,935: each layer's weight matrix is (neurons in this layer) times (inputs feeding it), plus one bias per neuron."
+        gloss="Same counting as Chapter 2's 11,935: each layer's weight matrix is (neurons in this layer) times (inputs feeding it), plus one bias per neuron."
       />
       <p>
         Training works, and it is visibly slow. The slowness is the factor SGD left
@@ -318,7 +318,7 @@ export function Module3() {
           "Mini-batch SGD buys many cheap noisy steps instead of few exact ones, and it wins.",
           "Nudge-and-measure, which is the method of finite differences, costs two cost measurements per parameter per step: the motivation for backpropagation.",
         ]}
-        chapter="Chapter 1 (learning with gradient descent)"
+        deeper="Chapter 1 (learning with gradient descent)"
         href="http://neuralnetworksanddeeplearning.com/chap1.html"
       />
     </article>

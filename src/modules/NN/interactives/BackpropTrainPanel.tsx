@@ -6,16 +6,16 @@ import { backpropExercise } from "../../../exercises/backprop";
 import { sgdExercise } from "../../../exercises/sgd";
 import { lockedBy, speakList } from "./lockedBy";
 
-// Module 5 payoff: train the 784-30-10 digit reader on the bundled MNIST
+// Chapter 5 payoff: train the 784-30-10 digit reader on the bundled MNIST
 // subset, driven by the learner's own backprop plugged into the learner's
-// own Module 3 sgd. Before training, one mini-batch is priced both ways
+// own Chapter 3 sgd. Before training, one mini-batch is priced both ways
 // (backprop vs nudge-and-measure) for the wall-clock comparison.
 
 const EPOCHS = 15;
 
 // Seeds are fixed so every correct implementation reproduces the same run:
 // init rng 8, sgd rng 2, eta 3.0, mini-batches of 10 (verified to reach
-// about 89% test accuracy; see the module prose).
+// about 89% test accuracy; see the chapter prose).
 const SNIPPET = `
 import json, time, types
 import numpy as np
@@ -29,9 +29,9 @@ exec(compile(_a["code"], "your_code.py", "exec"), _lib.__dict__)
 feedforward = _lib.feedforward
 quadratic_cost = _lib.quadratic_cost
 
-# The swap this module is about: their sgd_step asks for gradient(...) and
-# gets the nudge-and-measure one written for them in Module 3. Rebinding the
-# name in their own module after it has been read, rather than before, is
+# The swap this chapter is about: their sgd_step asks for gradient(...) and
+# gets the nudge-and-measure one written for them in Chapter 3. Rebinding the
+# name in their own chapter after it has been read, rather than before, is
 # enough, because Python looks a global up when the call happens. Their sgd
 # runs unmodified and now walks on their backprop.
 def _bp_gradient(weights, biases, X, Y):
@@ -137,7 +137,7 @@ interface Mistake {
   truth: number;
   guess: number;
   confidence: number;
-  /** 784 ink levels, 0 to 255, in the row-by-row order Module 2 unrolled. */
+  /** 784 ink levels, 0 to 255, in the row-by-row order Chapter 2 unrolled. */
   pixels: number[];
 }
 
@@ -171,7 +171,7 @@ export function BackpropTrainPanel() {
 
   const run = () => {
     // One projection: the file through backprop already contains their sgd,
-    // because sgd is Module 3 and backprop is Module 5.
+    // because sgd is Chapter 3 and backprop is Chapter 5.
     const code = loadCode(backpropExercise.id);
     if (!code) return;
     setRunning(true);
@@ -234,7 +234,7 @@ export function BackpropTrainPanel() {
       <p className="payoff-locked">
         This run is your own backprop driving your own sgd, with nothing borrowed,
         so it needs {missing}. Come back here once the tests are green; nothing in
-        Modules 6 to 8 waits on this run, so reading on is fine.
+        Chapters 6 to 8 waits on this run, so reading on is fine.
       </p>
     );
   }
@@ -283,7 +283,7 @@ export function BackpropTrainPanel() {
 
 /** What the accuracy does not say: which digits it misses, and what its most
  * confident errors look like. The images are the test digits themselves,
- * sent back as ink levels and drawn the way Module 2 drew them. */
+ * sent back as ink levels and drawn the way Chapter 2 drew them. */
 function Mistakes({ result }: { result: TrainResult }) {
   const worst = result.per_digit.reduce((a, b) =>
     b.right / b.total < a.right / a.total ? b : a,

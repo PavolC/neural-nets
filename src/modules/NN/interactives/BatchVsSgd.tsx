@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { mulberry32, scale } from "./utils";
 
-// Module 3 interactive (b): full-batch gradient descent vs SGD on the same
+// Chapter 3 interactive (b): full-batch gradient descent vs SGD on the same
 // cost surface. The surface is the average of 12 per-example bowls; the
 // batch step uses the average gradient, the SGD step uses one example's.
 

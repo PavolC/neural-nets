@@ -8,7 +8,7 @@ import { sgdExercise } from "../../../exercises/sgd";
 import { EpochChart, type EpochSeries } from "./EpochChart";
 import { lockedBy, speakList } from "./lockedBy";
 
-// Module 8's payoff run: the same digit reader at two depths under each
+// Chapter 8's payoff run: the same digit reader at two depths under each
 // squash, trained by the learner's own sgd from their own starting point, so
 // the collapse the bars predicted shows up as epochs that go nowhere, with
 // the repair drawn beside it. One button runs the whole experiment: the panel
@@ -18,7 +18,7 @@ import { lockedBy, speakList } from "./lockedBy";
 const EPOCHS = 15;
 const DEEP = 4;
 // Each squash gets the step size that suits it, the same way each cost did in
-// Module 7. Found by trying, on the shallow network, at fifteen epochs.
+// Chapter 7. Found by trying, on the shallow network, at fifteen epochs.
 const ETA: Record<string, number> = { sigmoid: 0.5, relu: 0.05 };
 
 // The fixed experiment, in chart and table order: the sigmoid pair, then the
@@ -43,7 +43,7 @@ const lineCls = (r: { activation: string; hidden: number }) =>
 
 // Each run draws its start and its shuffle from fresh fixed seeds, so the
 // four runs are the same runs however they are grouped, and the numbers the
-// module quotes from bench_depth.py hold.
+// chapter quotes from bench_depth.py hold.
 const SNIPPET = `
 import json, time, types
 import numpy as np
@@ -52,7 +52,7 @@ _a = json.loads(_args_json)
 
 # The learner's file, once, up to and including their better starting point.
 # For the sigmoid runs, every gradient below is computed by their own
-# backprop, through the adapter written for them in Module 5.
+# backprop, through the adapter written for them in Chapter 5.
 _lib = types.ModuleType("your_code")
 exec(compile(_a["code"], "your_code.py", "exec"), _lib.__dict__)
 feedforward = _lib.feedforward

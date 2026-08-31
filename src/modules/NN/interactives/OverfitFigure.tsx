@@ -4,7 +4,7 @@ import { fig } from "../../../components/ModuleBits";
 // Static figure: the measured log of one run, the 784-30-10 digit reader
 // trained on 1,000 images for 80 epochs (cross-entropy cost, weights scaled
 // by 1/sqrt(inputs), step size 0.5, mini-batches of 10, the same seeds the
-// panel later in the module uses). Four numbers per epoch, so the split
+// panel later in the chapter uses). Four numbers per epoch, so the split
 // between what the network learns and what it knows is visible in one
 // picture. The panel reproduces this run and adds the second one.
 //
