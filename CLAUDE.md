@@ -976,7 +976,9 @@ tokens from the start.
   and 8 quote, on the browser's own code path (needs NumPy; `--quick` for 5
   epochs, `--only <section>` for one section). Each section prints the prose
   sentence it backs, so a number that has drifted is visible without holding
-  the module open beside it.
+  the module open beside it. Every section but `grid` mirrors a panel the reader
+  can run; `grid` is Module 7's sixteen-cell hyperparameter table, which no panel
+  trains, so the bench is the only place those numbers come from.
 - `npm run bench:speeds`: the same for the layer-speed and hop tables, by
   importing `deepNet.ts` (the panel's own arithmetic) into Node. No new
   dependency: it compiles through `tools/tsconfig.bench.json` into `.bench/`.

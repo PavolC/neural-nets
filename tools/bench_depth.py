@@ -7,7 +7,9 @@ first of the two benches that regenerate them:
     learner's own init_network, sgd and cross-entropy blame, the course's
     backprop, and the bundled MNIST subset. It produces the accuracy tables,
     the step-size sweep, the ReLU comparison, the dead-unit counts and the
-    learning-speed ratios measured during training.
+    learning-speed ratios measured during training. It also runs Module 7's
+    weight decay, which is RegularizePanel's six runs on the 1,000-image
+    slice, and Module 7's hyperparameter grid, which has no panel behind it.
   * tools/bench_layer_speeds.ts mirrors LayerSpeedBars: the same measurement
     written in TypeScript, which is what the module's layer-speed tables and
     hop factors are quoted from.
@@ -61,6 +63,25 @@ SHUFFLE_SEED = 2
 SPEED_SAMPLES = 100
 ETA = {"sigmoid": 0.5, "relu": 0.05}
 
+# RegularizePanel's constants (src/modules/NN/interactives/RegularizePanel.tsx).
+L2_EPOCHS = 80
+L2_SLICE = 1000
+L2_ETA = 0.5
+L2_TAIL = 20        # the window Module 7 averages its two readings over
+# The panel pins its shuffle at SHUFFLE_SEED and offers no way to change it, so
+# the two further shuffles Module 7 quotes are this bench's choice rather than
+# the panel's. They are the next two seeds, fixed here before anything was run,
+# so the pair cannot have been picked after seeing what it printed.
+L2_EXTRA_SHUFFLES = (3, 4)
+
+# Module 7's hyperparameter grid: two costs by two starting points, each at
+# four step sizes, on the same 5,000 images and the same fifteen epochs as the
+# rest of the module. Nothing in the app runs this one, so this is the only
+# place its sixteen numbers come from.
+GRID_ETAS = (0.5, 1.0, 3.0, 6.0)
+GRID_SETUPS = (("quadratic", "undivided"), ("cross-entropy", "undivided"),
+               ("quadratic", "divided"), ("cross-entropy", "divided"))
+
 
 def load_module(path, name):
     """Execute a course .py file as a module, the way the worker does."""
@@ -111,13 +132,18 @@ def relu(z):
     return np.maximum(0.0, z)
 
 
-def make_engine(lib, ce, activation):
+def make_engine(lib, ce, activation, cost="cross-entropy"):
     """The panel's two code paths, returned as (per_example, batch, predict).
 
     With the sigmoid the gradient is the learner's own backprop, reached
     through the adapter written for them in Module 5. With ReLU it is the same
     four equations with one line changed, written out here and in the panel,
     because a learner's BP2 has sigmoid_prime in it.
+
+    cost picks which BP1 the adapter hands down. Quadratic is the adapter's own
+    default, backprop called with four arguments, which is the shape Module 5
+    runs in; cross-entropy passes the replacement through, which is the shape
+    everything from Module 7 on runs in.
     """
     sigmoid = lib.sigmoid
 
@@ -163,8 +189,10 @@ def make_engine(lib, ce, activation):
     if activation == "relu":
         return relu_backprop, relu_grad, relu_feedforward
 
+    delta = None if cost == "quadratic" else ce.cross_entropy_delta
+
     def sigmoid_grad(weights, biases, X, Y):
-        return lib.batch_gradient(weights, biases, X, Y, ce.cross_entropy_delta)
+        return lib.batch_gradient(weights, biases, X, Y, delta)
 
     return None, sigmoid_grad, lib.feedforward
 
@@ -176,29 +204,51 @@ def layer_speeds(grad, weights, biases, X, Y, n=SPEED_SAMPLES):
 
 
 class Bench:
-    def __init__(self, epochs):
+    def __init__(self, epochs, quick=False):
         self.epochs = epochs
+        self.quick = quick
         self.course, loader, self.ce, self.init = bootstrap()
         self.lib = self.ce
         with gzip.open(DATA, "rb") as f:
             raw = f.read()
         self.X_train, self.y_train, self.X_test, self.y_test = loader.load_mnist_subset(raw)
         self.Y_train = loader.one_hot(self.y_train)
+        self.Y_test = loader.one_hot(self.y_test)
+
+    def start(self, sizes, which="divided", seed=INIT_SEED):
+        """One of the two starting points Module 7 compares.
+
+        The divided start is the learner's own init_network. The undivided one
+        is that same draw with the division left out, so for a 784-30-10
+        network the two scales 28 and sqrt(30) are simply never applied. The
+        panels build it by drawing it rather than by multiplying init_network's
+        weights back up by those two numbers, and so does this: dividing by 28
+        and multiplying by 28 is not the identity in floating point, and a
+        start a few last bits away from the panel's is not the panel's run.
+        Every weight and then every bias, which is init_network's own order, so
+        both starts take the same numbers off the same generator.
+        """
+        rng = np.random.default_rng(seed)
+        if which == "divided":
+            return self.init.init_network(sizes, rng)
+        weights = [rng.standard_normal((sizes[i + 1], sizes[i]))
+                   for i in range(len(sizes) - 1)]
+        biases = [rng.standard_normal((sizes[i + 1], 1))
+                  for i in range(len(sizes) - 1)]
+        return weights, biases
 
     def run(self, hidden, activation="sigmoid", eta=None, epochs=None,
-            init_seed=INIT_SEED, weight_scale=1.0, watch=()):
+            init_seed=INIT_SEED, cost="cross-entropy", start="divided", watch=()):
         """One training run, reporting per-epoch test accuracy.
 
         watch: epochs after which to record every layer's learning speed.
         """
         eta = ETA[activation] if eta is None else eta
         epochs = self.epochs if epochs is None else epochs
-        _, grad, predict = make_engine(self.lib, self.ce, activation)
+        _, grad, predict = make_engine(self.lib, self.ce, activation, cost)
         sgd = load_sgd(self.lib, grad)
         sizes = [784] + [HIDDEN_SIZE] * hidden + [10]
-        weights, biases = self.init.init_network(sizes, np.random.default_rng(init_seed))
-        if weight_scale != 1.0:
-            weights = [w * weight_scale for w in weights]
+        weights, biases = self.start(sizes, start, init_seed)
         speeds = {0: layer_speeds(grad, weights, biases, self.X_train, self.Y_train)}
         rng = np.random.default_rng(SHUFFLE_SEED)
         accs = []
@@ -412,11 +462,101 @@ def bench_module7(b):
         print(f"    distance bins 0-1 / 1-2 / 2-4 / 4-8 / 8+: {shares}")
 
 
+def bench_regularize(b):
+    section(
+        "8. Module 7's weight decay, on the 1,000-image slice",
+        "from the divided start, lambda 1 averages 85.7 over the last twenty epochs "
+        "against 86.4 without it, where the epoch-80 rows read 84.7 and 86.3; two "
+        "other shuffles of the unregularized run give 86.0 and 85.4; decay ends the "
+        "held-out cost at 0.86 instead of 1.09 and the total of the squared weights "
+        "at 655 instead of 1,926; the undivided start begins at 23,538 of squared "
+        "weight and stays there without decay, 25,528 and 77.8 percent, against 679 "
+        "and 85.1 percent with it",
+    )
+    # RegularizePanel's loop, written out the way the panel writes it rather
+    # than called through sgd: the panel varies lambda, so the update line has
+    # to be the learner's l2_step. The shuffle follows the sgd contract,
+    # rng.permutation and then consecutive slices of ten, and each run draws
+    # its start and its shuffle from fresh generators.
+    epochs = 8 if b.quick else L2_EPOCHS
+    tail = min(L2_TAIL, epochs)
+    n = L2_SLICE
+    X, y, Y = b.X_train[:, :n], b.y_train[:n], b.Y_train[:, :n]
+    lib, sizes = b.lib, [784, HIDDEN_SIZE, 10]
+
+    def squared(weights):
+        return sum(float((w ** 2).sum()) for w in weights)
+
+    def train(start, lmbda, shuffle_seed=SHUFFLE_SEED):
+        weights, biases = b.start(sizes, start)
+        rng = np.random.default_rng(shuffle_seed)
+        accs = []
+        for _ in range(epochs):
+            order = rng.permutation(n)
+            for k in range(0, n, BATCH):
+                batch = order[k:k + BATCH]
+                nabla_w, nabla_b = lib.batch_gradient(
+                    weights, biases, X[:, batch], Y[:, batch], lib.cross_entropy_delta)
+                weights, biases = lib.l2_step(
+                    weights, biases, nabla_w, nabla_b, L2_ETA, lmbda, n)
+            out = lib.feedforward(weights, biases, b.X_test)
+            accs.append(float((np.argmax(out, axis=0) == b.y_test).mean()))
+        return accs, weights, biases
+
+    for start in ("divided", "undivided"):
+        opening, _ = b.start(sizes, start)
+        print(f"  the {start} start, {squared(opening):,.0f} of squared weight before a step:")
+        for lmbda in (0.0, 1.0, 5.0):
+            accs, weights, biases = train(start, lmbda)
+            hits = np.argmax(lib.feedforward(weights, biases, X), axis=0) == y
+            print(f"    lambda {lmbda:g}: last {tail} epochs {pct(tail_mean(accs, tail))}, "
+                  f"epoch {epochs} {pct(accs[-1])}, on the {n:,} it trained on "
+                  f"{pct(float(hits.mean()))}, held-out cost "
+                  f"{lib.cross_entropy_cost(weights, biases, b.X_test, b.Y_test):.2f}, "
+                  f"squared weights {squared(weights):,.0f}")
+    for seed in L2_EXTRA_SHUFFLES:
+        accs, _, _ = train("divided", 0.0, seed)
+        print(f"  the divided start with no decay, shuffle seed {seed}: "
+              f"last {tail} epochs {pct(tail_mean(accs, tail))}, "
+              f"epoch {epochs} {pct(accs[-1])}")
+
+
+def bench_grid(b):
+    section(
+        "9. Module 7's hyperparameter grid: two costs, two starts, four step sizes",
+        "at eta 0.5 / 1.0 / 3.0 / 6.0 the quadratic cost from the undivided start "
+        "reads 70.8 / 79.4 / 89.2 / 89.9, cross-entropy from the undivided start "
+        "87.8 / 89.3 / 87.6 / 80.9, the quadratic cost from the divided start "
+        "90.0 / 90.3 / 91.0 / 91.3, and cross-entropy from the divided start "
+        "92.1 / 92.3 / 87.7 / 69.4; the best of each row runs 89.9, 89.3, 91.3, 92.3, "
+        "and two of the four rows span nineteen points or more",
+    )
+    # Two of the sixteen cells are covered elsewhere in this file and should
+    # print the same numbers here: the quadratic cost from the undivided start
+    # at 3.0 is Module 5's own run (bench_mistakes, 89.2), and cross-entropy
+    # from the divided start at 0.5 is the 92.1 Module 8 opens by quoting
+    # (bench_module7). The table quotes the epoch-15 score, so that is what
+    # `best` reads; the last-five average is beside it because one epoch of
+    # one run is the statistic Module 8 says wobbles by a point or two.
+    for cost, start in GRID_SETUPS:
+        finals = []
+        cells = []
+        for eta in GRID_ETAS:
+            r = b.run(1, eta=eta, cost=cost, start=start)
+            finals.append(r["acc"][-1])
+            cells.append(f"eta {eta}: {pct(r['acc'][-1])} (last 5 {pct(tail_mean(r['acc']))})")
+        print(f"  {cost} cost, the {start} start: " + " | ".join(cells))
+        print(f"    best {pct(max(finals))} at eta {GRID_ETAS[int(np.argmax(finals))]}, "
+              f"worst {pct(min(finals))}, spanning "
+              f"{100 * (max(finals) - min(finals)):.1f} points")
+
+
 def bench_capstone(b):
     section(
-        "8. Module 9's panel: the learner's own loop on the digit reader",
-        "at 0.5 it lands near 90 percent; at 0.1 it is still climbing at the end; "
-        "at 3.0 it is worse than either",
+        "10. Module 9's panel: the learner's own loop on the digit reader",
+        "at 0.5 the last five epochs average 90.4; at 0.1 the first epoch reads 77.2 "
+        "against 0.5's 85.5, and by the end the two are level; at 3.0 the last five "
+        "average 86.6, and consecutive passes read 80.9, then 89.3, then 85.1",
     )
     # FullTrainPanel's exact configuration: ONE generator seeded at 8 draws the
     # network and then shuffles every epoch, lambda is 1, and the loop is the
@@ -440,17 +580,20 @@ SECTIONS = {
     "relu": bench_relu,
     "dead": bench_dead,
     "module7": bench_module7,
+    "regularize": bench_regularize,
+    "grid": bench_grid,
     "capstone": bench_capstone,
 }
 
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--quick", action="store_true", help="5 epochs instead of 15")
+    ap.add_argument("--quick", action="store_true",
+                    help="5 epochs instead of 15, and 8 instead of 80 for the weight decay")
     ap.add_argument("--only", nargs="+", choices=sorted(SECTIONS),
                     help="run only these sections")
     args = ap.parse_args()
-    b = Bench(epochs=5 if args.quick else EPOCHS)
+    b = Bench(epochs=5 if args.quick else EPOCHS, quick=args.quick)
     print(f"NumPy {np.__version__}; {b.X_train.shape[1]} training and "
           f"{b.X_test.shape[1]} test images; {b.epochs} epochs; "
           f"init seed {INIT_SEED}, shuffle seed {SHUFFLE_SEED}")

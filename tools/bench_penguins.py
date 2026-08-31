@@ -186,10 +186,18 @@ def main():
     )
     order = [r[index["species"]] for r in usable]
     n = len(order)
-    a, b = int(0.6 * n), int(0.8 * n)
+    # The exercise's own cut, not an approximation of it: round(n * share) for
+    # each held-back set, taken from the END, training keeps the rest. int(0.6
+    # * n) put the boundaries one row off and quoted a Gentoo into the test set
+    # that the reader's own split never sends there.
+    n_val = round(n * VAL_SHARE)
+    n_test = round(n * TEST_SHARE)
+    a = n - n_val - n_test
+    b = a + n_val
     print(f"  first 10 rows of the file: {order[:10]}")
     print(f"  an unshuffled 60/20/20 cut would give:")
     print(f"    train {dict(collections.Counter(order[:a]))}")
+    print(f"    val   {dict(collections.Counter(order[a:b]))}")
     print(f"    test  {dict(collections.Counter(order[b:]))}")
     print()
 
