@@ -62,6 +62,17 @@ export function Module2() {
         network does when it answers. The rest of the course is about finding good
         numbers to put in the <M tex="W" />'s and <M tex="b" />'s.
       </p>
+      <p>
+        Module 1 called a neuron's answer its confidence. The field's word for it
+        is the neuron's{" "}
+        <b>activation</b>, and a layer's <M tex="a" /> is that layer's{" "}
+        <b>activations</b>, one per neuron. Read the formula above in those words
+        and it says: a layer's activations are the activation function applied to{" "}
+        <M tex="Wa + b" />. That sentence, in almost those words, opens most
+        treatments of the subject. This course will use both, confidence when the
+        point is what the number means to you and activation when the point is the
+        machinery.
+      </p>
 
       <SectionHeader id="m2-shapes" title="Shape discipline" />
       <p>
@@ -84,7 +95,9 @@ export function Module2() {
         <M tex="W" /> is the layer's wire ledger: the entry in row j, column k is
         the weight on the wire from input k to neuron j, so a row collects one
         neuron's incoming wires, and a column collects one input's outgoing
-        wires. The payoff is that multiplication just
+        wires. Everyone calls <M tex="W" /> the layer's <b>weight matrix</b>, this
+        course included; wire ledger is not a rival name for it but a reminder of
+        what its rows and columns are for. The payoff is that multiplication just
         works, by the rule that the inner numbers must touch: <M tex="(1, 2)" />{" "}
         times <M tex="(2, 1)" /> works because 2 meets 2, and the outer numbers,{" "}
         <M tex="(1, 1)" />, are the answer's shape. With columns everywhere,{" "}
@@ -216,7 +229,7 @@ export function Module2() {
       <Recap
         items={[
           "A layer is several neurons reading the same inputs; stack their weight rows into W and the layer is one formula: a' = sigmoid(Wa + b).",
-          "W has one row per neuron and one column per input, shape (m, n); activations stay columns, and one layer's output column is the next layer's input.",
+          "The weight matrix W has one row per neuron and one column per input, shape (m, n); activations stay columns, and one layer's activations are the next layer's input.",
           "A digit image is already numbers: a 28x28 grid of ink levels, unrolled into a (784, 1) column; ten output confidences, and the answer is the largest.",
           "Your feedforward plus trained weights already reads digits; learning the 11,935 numbers yourself is Modules 3 to 5.",
         ]}

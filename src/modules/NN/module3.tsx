@@ -58,12 +58,23 @@ export function Module3() {
         gloss="For each training input x, compare the desired output y(x) with the network's actual output a(x): the double bars squared mean take the gap in every output entry, square each gap, and add them up. Average that over all n examples, with the same bookkeeping half as above."
       />
       <p>
+        That number has other names, and they are the commoner ones. The course
+        says cost throughout, following Nielsen; most of the field says{" "}
+        <b>loss</b>, and
+        formal treatments say the <b>objective function</b>. All three name the one
+        number this equation computes, so a sentence elsewhere about minimizing the
+        loss is a sentence about the recipe above. The particular cost above has its
+        own second name, <b>mean squared error</b>, for the obvious reason.
+      </p>
+      <p>
         You scored one particular choice of the nine numbers. But nothing stops you
         changing them: pick any other nine values, run the same recipe, and you get a
         score for that version of the network too. Learning is now a search problem:
         out of all possible settings of the nine knobs, find the one with the
-        smallest cost. (The knobs, all the weights and biases together, get their
-        proper name here: the network's parameters.)
+        smallest cost. The knobs get their real name here: all of a network's weights
+        and biases together are its <b>parameters</b>, so every count of knobs in
+        this course is a parameter count. Knob stays in the prose because you can
+        turn a knob.
       </p>
       <SectionHeader id="m3-slope" title="The slope of one knob" />
       <p>
@@ -76,6 +87,15 @@ export function Module3() {
         nudge: (0.08714 - 0.08758) / 0.01, about -0.044. That number is the knob's
         slope, the same m as in y = mx + c, measured at the point where you currently
         stand. Its minus sign says the cost falls when this knob goes up.
+      </p>
+      <p>
+        One knob's slope with every other knob held still is called a{" "}
+        <b>partial derivative</b>, and it is written <M tex="\partial C / \partial b" />{" "}
+        for the bias you just nudged: read it "the partial derivative of C with
+        respect to b". The curly <M tex="\partial" /> is an ordinary derivative's d
+        with a note attached, and the note says the other eight numbers are frozen.
+        Calling it that changes nothing about it. The -0.044 you just computed is a
+        partial derivative, measured rather than derived.
       </p>
       <Aside>
         <p>
@@ -118,6 +138,15 @@ export function Module3() {
         tex="\begin{gathered} \nabla C = (\underbrace{-0.024,\; -0.024,\; -0.041}_{\text{h1's knobs}},\; \underbrace{0.017,\; 0.017,\; 0.041}_{\text{h2's knobs}}, \\[0.8em] \underbrace{-0.035,\; -0.009,\; -0.044}_{\text{output's knobs}}) \end{gathered}"
         gloss="Nine slopes, three per neuron in the interactive's order: each neuron's two weights then its bias, h1 first, the output neuron last. The final entry is the -0.044 you measured on the output bias. A different setting of the knobs would give a different list: the gradient is a local reading, taken where you stand."
       />
+      <p>
+        The way you got those nine numbers has a name too: measuring a slope by
+        nudging one input and rescoring is the method of <b>finite differences</b>,
+        and a gradient built that way is a <b>numerical gradient</b>. It needs no
+        calculus and works on any network and any cost, which is why Module 5 uses
+        it to check the fast method entry by entry, and why the section at the end
+        of this module can price it.
+      </p>
+
       <SectionHeader id="m3-descent" title="Walking downhill" />
       <p>
         Read the signs. Six slopes are negative: for those knobs the cost falls when
@@ -284,10 +313,10 @@ export function Module3() {
 
       <Recap
         items={[
-          "The cost function turns learning into search; the gradient turns search into walking downhill.",
+          "The cost function (the loss, elsewhere) turns learning into search; the gradient, the list of one partial derivative per parameter, turns search into walking downhill.",
           "The learning rate trades speed against stability, and elongated valleys punish any single choice.",
           "Mini-batch SGD buys many cheap noisy steps instead of few exact ones, and it wins.",
-          "Nudge-measured gradients cost two cost measurements per parameter per step: the motivation for backpropagation.",
+          "Nudge-and-measure, which is the method of finite differences, costs two cost measurements per parameter per step: the motivation for backpropagation.",
         ]}
         chapter="Chapter 1 (learning with gradient descent)"
         href="http://neuralnetworksanddeeplearning.com/chap1.html"

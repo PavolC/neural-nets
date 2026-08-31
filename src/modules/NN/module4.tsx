@@ -174,8 +174,10 @@ export function Module4() {
         gloss="Sigmoid's slope at z is its own output times one minus its output: confidence times doubt. Biggest at the fence (a quarter, when the output is one half), and nearly zero once the neuron is sure either way."
       />
       <p>
-        The formula turns a confidence the log already holds into that booth's
-        rate, with no wiggle involved. Neuron A's confidence is{" "}
+        The formula is the sigmoid's <b>derivative</b>, which is the field's word
+        for the slope of a function, so <M tex="\sigma'(z)" /> spoken in those words
+        is the derivative of the activation function. It turns a confidence the log
+        already holds into that booth's rate, with no wiggle involved. Neuron A's confidence is{" "}
         <M tex="a_1 = 0.6225" /> (the log's <M tex="a_1" /> box), so its doubt
         is <M tex="1 - 0.6225 = 0.3775" />, and its rate is{" "}
         <M tex="0.6225 \times 0.3775 = 0.235" />: exactly the × 0.235 posted on
@@ -234,6 +236,16 @@ export function Module4() {
         called the chain rule, and it is the only piece of mathematics
         backpropagation needs.
       </p>
+      <p>
+        The factors have a name of their own. A posted rate, one arrow's factor,
+        is a <b>local derivative</b>: local because it describes one
+        step of the chain and nothing beyond it, derivative because it is a slope. A
+        through-rate, the product of every factor along a path, is the partial
+        derivative Module 3 measured. Written in those words the chain rule says
+        that a partial derivative is the product of the local derivatives along the
+        path, which is how other treatments state it, and it says exactly what the
+        five booths above just did.
+      </p>
 
       <SectionHeader id="m4-blame" title="Blame: price the road once" />
       <p>
@@ -277,6 +289,15 @@ export function Module4() {
         cares about this neuron's total. The T you just computed is exactly
         neuron A's blame, and the chain has two neurons, so two blames; neuron
         A's is built from neuron B's:
+      </p>
+      <p>
+        Everyone else calls <M tex="\delta" /> the neuron's <b>error</b>, or the{" "}
+        <b>error signal</b> at that layer, Nielsen's Chapter 2 included. This course
+        says blame because error suggests a mistake the neuron made, when{" "}
+        <M tex="\delta" /> is a share of the cost's sensitivity assigned to that
+        neuron whatever it answered. Both words name the same column of numbers, and
+        the symbol is the same one, so a page that says "the error at layer l" is
+        talking about the blame the next equations compute.
       </p>
       <Eq
         tex="\begin{aligned} \delta_B &= \underbrace{0.2463}_{\text{own } \sigma'} \times \underbrace{(-0.4391)}_{\text{gap}} = -0.1081 \\[0.8em] \delta_A &= \underbrace{0.2350}_{\text{own } \sigma'} \times \underbrace{2.0}_{\text{wire}} \times \underbrace{(-0.1081)}_{\delta_B} = -0.0508 \end{aligned}"

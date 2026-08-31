@@ -2868,14 +2868,17 @@ button:disabled {
 	stroke-dasharray: 5 3;
 }
 
+/* The inventory that closes Module 9, and the reading list that closes Module
+   10: the reading list lived in Module 9 until the course had a page after it,
+   so the class is named for the course rather than for a module. */
 .m9-built-list,
-.m9-next-list {
+.course-next-list {
 	margin: 0.4rem 0 0.9rem;
 	padding-left: 1.2rem;
 }
 
 .m9-built-list li,
-.m9-next-list li {
+.course-next-list li {
 	margin-bottom: 0.5rem;
 }
 
@@ -3131,6 +3134,17 @@ button:disabled {
 
 .notation-symbol {
 	white-space: nowrap;
+}
+
+/* The field's name for a symbol, on its own line under the meaning rather than
+   in a fourth column: two prose columns at the meaning column's 12rem floor
+   pan the whole lookup inside a card at the measure, which is the failure the
+   note below already fixed once. */
+.notation-also {
+	display: block;
+	margin-top: 0.2rem;
+	color: var(--muted);
+	font-style: italic;
 }
 
 /* A floor, not a width: the meaning column wraps to what the card leaves it

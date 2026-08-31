@@ -17,6 +17,17 @@ export function Module10() {
       />
       <ModuleToc />
 
+      <p>
+        Your program reads about 90 percent of the held-out digits. Point the same
+        program, unchanged, at the file this module uses, and it reads 42.6 percent
+        of the penguins held back from it, which is exactly what answering Adelie
+        for every one of them would have scored. Nothing is wrong with your code,
+        and nothing about the problem is hard: three species, four measurements,
+        344 birds. One preparation step is missing. This module is about which one,
+        and about everything else that had already been done to the digits before
+        you saw them.
+      </p>
+
       <SectionHeader id="m10-file" title="A file, not a dataset" />
       <p>
         Every number your network has seen so far arrived ready. MNIST's pixels
@@ -554,6 +565,63 @@ for epoch in range(15):                    # your train
         millisecond. That is the difference between using a tool and operating
         one, and it is the whole reason this course made you write the parts.
       </p>
+      <SectionHeader id="m10-next" title="Where to go next" />
+      <p>
+        In rough order of how far each one is from where you now stand.
+      </p>
+      <ul className="course-next-list">
+        <li>
+          <a href="http://neuralnetworksanddeeplearning.com/chap5.html">
+            Nielsen, Chapter 5
+          </a>{" "}
+          and{" "}
+          <a href="http://neuralnetworksanddeeplearning.com/chap6.html">Chapter 6</a>.
+          The two chapters Module 8 summarized, at full length: the unstable
+          gradient argument with the algebra written out, then convolutional
+          networks built up to above 99 percent on MNIST. The book this course is
+          adapted from, and the smallest step from here.
+        </li>
+        <li>
+          <a href="https://karpathy.ai/zero-to-hero.html">
+            Andrej Karpathy, Neural Networks: Zero to Hero
+          </a>
+          . A video series that builds automatic differentiation from scratch, then
+          a language model, in the same implement-it-yourself spirit. It starts with
+          the first of the two jobs Module 9 named, and ends where attention begins,
+          which is exactly the gap this course leaves.
+        </li>
+        <li>
+          <a href="https://pytorch.org/tutorials/beginner/basics/intro.html">
+            The PyTorch tutorials
+          </a>
+          . The thirteen lines above, at length, and everything around them: data
+          loaders, devices, checkpoints, and the optimizers Module 9 named.
+        </li>
+        <li>
+          <a href="https://jalammar.github.io/illustrated-transformer/">
+            Jay Alammar, The Illustrated Transformer
+          </a>
+          , and then the paper it explains,{" "}
+          <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a>.
+          The one ingredient Module 8 named and did not cover.
+        </li>
+        <li>
+          <a href="https://www.deeplearningbook.org/">
+            Goodfellow, Bengio and Courville, Deep Learning
+          </a>
+          . The reference textbook, free online. Heavier on mathematics than
+          anything here, and the place to look up a technique properly.
+        </li>
+      </ul>
+      <p>
+        Whichever you open, the arithmetic is the arithmetic in your file. A column
+        of numbers goes in, a weight matrix multiplies it, an activation function
+        bends it, a loss scores the answer, a chain of local derivatives says which
+        way each parameter should move, and a small step is taken. You have written
+        all of it, under both sets of names, and the rest of this field is that
+        machine, built larger and arranged better.
+      </p>
+
       <p className="m10-credit">
         The penguin data is from the Palmer Station Antarctica LTER survey by Dr
         Kristen Gorman, published as the palmerpenguins package by Allison Horst,

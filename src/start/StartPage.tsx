@@ -67,11 +67,11 @@ const COVERS: Record<string, { title: string; covers: string }> = {
 	},
 	m9: {
 		title: "Assembling the program",
-		covers: "The training loop itself, which the panels had been running around your functions until now, a glossary from this course's words to the field's, and what the course did not teach.",
+		covers: "The training loop itself, which the panels had been running around your functions until now, the file that becomes a program you can run outside this page, and the two jobs every framework does that you did by hand.",
 	},
 	m10: {
 		title: "Your own problem",
-		covers: "A second dataset that arrives the way data does, with words, holes, unequal classes and measurements 245 times apart in scale, and what one missing step costs.",
+		covers: "A second dataset that arrives the way data does, with words, holes, unequal classes and measurements 245 times apart in scale, what one missing step costs, and where to go next.",
 	},
 };
 
@@ -79,24 +79,30 @@ const COVERS: Record<string, { title: string; covers: string }> = {
  * weeks pass between them, and every symbol below is defined once, thousands
  * of words before a reader comes back wanting it. In the order they are met.
  */
-const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[] = [
+const NOTATION: { id: string; symbol: ReactNode; means: string; also?: string; from: string }[] = [
 	{
 		id: "section-line",
 		symbol: <code>{"# ---- [section:...] ----"}</code>,
 		means: "a section line in your file: the course reads the name in the brackets to find where each piece starts, and everything else on it is yours",
 		from: "Module 1",
 	},
-	{ id: "z", symbol: <M tex="z" />, means: "a neuron's evidence: its inputs times its weights, plus its bias", from: "Module 1" },
-	{ id: "sigma", symbol: <M tex="\sigma(z)" />, means: "the sigmoid, which squashes any number into 0 to 1", from: "Module 1" },
+	{ id: "z", symbol: <M tex="z" />, means: "a neuron's evidence: its inputs times its weights, plus its bias", also: "the weighted input, or the pre-activation", from: "Module 1" },
+	{ id: "sigma", symbol: <M tex="\sigma(z)" />, means: "the sigmoid, which squashes any number into 0 to 1", also: "one choice of activation function", from: "Module 1" },
 	{ id: "wb", symbol: <M tex="w,\; b" />, means: "a weight (one per wire) and a bias (one per neuron)", from: "Module 1" },
 	{ id: "col", symbol: <code>(n, 1)</code>, means: "a column: n rows, 1 column. Every activation in this course is one", from: "Module 1" },
 	{ id: "flat", symbol: <code>(n,)</code>, means: "a flat array, neither row nor column. In this course, a bug", from: "Module 1" },
 	{ id: "dot", symbol: <code>6.</code>, means: "a number with a decimal point, so NumPy stores fractions not integers", from: "Module 1" },
 	{ id: "dotprod", symbol: <M tex="w \cdot x" />, means: "the dot product: multiply each pair, add the results", from: "Module 1" },
+	{
+		id: "boundary",
+		symbol: <code>decision boundary</code>,
+		means: "the line a neuron is exactly undecided about, yes on one side and no on the other. A plane with three inputs, a hyperplane with more",
+		from: "Module 1",
+	},
 	{ id: "mat", symbol: <code>(m, n)</code>, means: "a matrix: m rows, n columns. The rows name the receiving layer first", from: "Module 2" },
 	{ id: "W", symbol: <M tex="W" />, means: "a layer's weight matrix: row j is neuron j's incoming wires", from: "Module 2" },
 	{ id: "at", symbol: <code>@</code>, means: "matrix multiplication in NumPy. A plain * stays elementwise", from: "Module 2" },
-	{ id: "a", symbol: <M tex="a" />, means: "a neuron's answer, the squash applied to its evidence", from: "Module 2" },
+	{ id: "a", symbol: <M tex="a" />, means: "a neuron's answer, the squash applied to its evidence", also: "the neuron's activation, or its output", from: "Module 2" },
 	{ id: "aprime", symbol: <M tex="a'" />, means: "a-prime: the next layer's answers. On an activation the tick marks the layer along, not a slope", from: "Module 2" },
 	{
 		id: "broadcast",
@@ -104,31 +110,49 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
 		means: "NumPy stretching a smaller array to fit a bigger one: a bias column lands on every column of a batch, a single number on every entry",
 		from: "Module 2",
 	},
-	{ id: "C", symbol: <M tex="C" />, means: "the cost: one number scoring the whole network on the data", from: "Module 3" },
+	{ id: "C", symbol: <M tex="C" />, means: "the cost: one number scoring the whole network on the data", also: "the loss, or the objective function. This particular cost: mean squared error", from: "Module 3" },
+	{
+		id: "parameter",
+		symbol: <code>parameter</code>,
+		means: "one of the numbers descent adjusts: every weight and every bias. This course calls them knobs, and a knob count is a parameter count",
+		from: "Module 3",
+	},
 	{
 		id: "norm",
 		symbol: <M tex="\lVert v \rVert" />,
 		means: "the size of a column: square every entry, add them up, take the square root. The cost writes it squared, which leaves the sum of squares",
+		also: "the norm of a vector", from: "Module 3",
+	},
+	{ id: "eta", symbol: <M tex="\eta" />, means: "eta, the learning rate: how far each step moves", also: "lr, in framework code", from: "Module 3" },
+	{ id: "nabla", symbol: <M tex="\nabla C" />, means: "nabla C, the gradient: the whole list of slopes, one per parameter", also: "a numerical gradient when measured by nudging, an analytic one when computed by backprop", from: "Module 3" },
+	{
+		id: "finitediff",
+		symbol: <code>finite differences</code>,
+		means: "measuring a slope by nudging one number and rescoring, which is what Module 3 does by hand and what Module 5's tests check backprop against",
 		from: "Module 3",
 	},
-	{ id: "eta", symbol: <M tex="\eta" />, means: "eta, the learning rate: how far each step moves", from: "Module 3" },
-	{ id: "nabla", symbol: <M tex="\nabla C" />, means: "nabla C, the gradient: the whole list of slopes, one per parameter", from: "Module 3" },
 	{ id: "nablacode", symbol: <code>nabla_w, nabla_b</code>, means: "that same list in code, split into the weights' and biases' halves", from: "Module 3" },
 	{ id: "epoch", symbol: <code>epoch</code>, means: "one full pass through the training data", from: "Module 3" },
 	{ id: "batch", symbol: <code>mini-batch</code>, means: "the handful of examples one step is scored on", from: "Module 3" },
-	{ id: "sigprime", symbol: <M tex="\sigma'(z)" />, means: "sigma-prime: the squash's slope at z, how much the answer moves when the evidence moves, equal to a(1 - a)", from: "Module 4" },
-	{ id: "delta", symbol: <M tex="\delta" />, means: "delta, a neuron's blame: how much the cost cares about its evidence", from: "Module 4" },
+	{ id: "sigprime", symbol: <M tex="\sigma'(z)" />, means: "sigma-prime: the squash's slope at z, how much the answer moves when the evidence moves, equal to a(1 - a)", also: "the derivative of the activation function", from: "Module 4" },
+	{
+		id: "derivative",
+		symbol: <code>derivative</code>,
+		means: "the slope of a function, which is the field's word for what you have been nudging and measuring since Module 3. A local derivative is one arrow's factor; a partial derivative is a whole path's",
+		from: "Module 4",
+	},
+	{ id: "delta", symbol: <M tex="\delta" />, means: "delta, a neuron's blame: how much the cost cares about its evidence", also: "the error, or the error signal at that layer", from: "Module 4" },
 	{ id: "odot", symbol: <M tex="\odot" />, means: "multiply matching entries, NumPy's plain *. No adding", from: "Module 4" },
 	{ id: "sup", symbol: <M tex="w^2,\; a^3" />, means: "on a weight or an activation, a superscript is the layer number rather than a power", from: "Module 4" },
 	{ id: "T", symbol: <M tex="(w)^T" />, means: "transpose: the same wires regrouped by sender instead of receiver", from: "Module 4" },
-	{ id: "partial", symbol: <M tex="\partial C / \partial w" />, means: "one parameter's slope, read as a single name", from: "Module 4" },
-	{ id: "receipts", symbol: <code>zs, activations</code>, means: "the receipts: every evidence and answer the forward pass computed", from: "Module 5" },
+	{ id: "partial", symbol: <M tex="\partial C / \partial w" />, means: "one parameter's slope, read as a single name", also: "a partial derivative", from: "Module 4" },
+	{ id: "receipts", symbol: <code>zs, activations</code>, means: "the receipts: every evidence and answer the forward pass computed", also: "the cached activations, or the cached forward pass", from: "Module 5" },
 	{ id: "neg", symbol: <code>a[-1]</code>, means: "the last entry of a list; a[-2] the one before it", from: "Module 5" },
 	{ id: "onehot", symbol: <code>one-hot</code>, means: "a column that is 1 in one slot and 0 everywhere else: a label in Module 5, an input category in Module 10", from: "Module 5" },
 	{ id: "zeroslike", symbol: <code>np.zeros_like(w)</code>, means: "an array of zeros shaped exactly like w", from: "Module 5" },
-	{ id: "universality", symbol: <code>universality</code>, means: "one hidden layer, made wide enough, can express any relationship to any accuracy", from: "Module 6" },
+	{ id: "universality", symbol: <code>universality</code>, means: "one hidden layer, made wide enough, can express any relationship to any accuracy", also: "the universal approximation theorem", from: "Module 6" },
 	{ id: "ln", symbol: <M tex="\ln a" />, means: "the natural logarithm, np.log: the power of e that gives a", from: "Module 7" },
-	{ id: "lmbda", symbol: <M tex="\lambda" />, means: "lambda, the regularization strength. Spelled lmbda in code", from: "Module 7" },
+	{ id: "lmbda", symbol: <M tex="\lambda" />, means: "lambda, the regularization strength. Spelled lmbda in code", also: "the strength of the L2 penalty, weight_decay in framework code", from: "Module 7" },
 	{
 		id: "standardnormal",
 		symbol: <code>rng.standard_normal(shape)</code>,
@@ -136,15 +160,21 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
 		from: "Module 7",
 	},
 	{ id: "spread", symbol: <code>spread</code>, means: "a kind of average size for a set of numbers: square every one, average the squares, take the square root", from: "Module 7" },
-	{ id: "nin", symbol: <M tex="n_{\text{in}}" />, means: "how many inputs feed a layer: the count the starting draw divides by", from: "Module 7" },
+	{ id: "nin", symbol: <M tex="n_{\text{in}}" />, means: "how many inputs feed a layer: the count the starting draw divides by", also: "fan-in", from: "Module 7" },
+	{
+		id: "scaledinit",
+		symbol: <code>scaled initialization</code>,
+		means: "sizing the starting draw from a layer's fan-in. Dividing by the square root of it is Xavier (or Glorot) initialization; the ReLU version is He initialization",
+		from: "Module 7",
+	},
 	{ id: "heldout", symbol: <code>held-out</code>, means: "data never trained on, which every score in the course is measured on", from: "Module 7" },
 	{ id: "hyper", symbol: <code>hyperparameter</code>, means: "a number you choose rather than one descent finds", from: "Module 7" },
 	{ id: "generalizing", symbol: <code>generalizing</code>, means: "doing well on data you were not trained on, the only thing anyone wants", from: "Module 7" },
 	{ id: "overfitting", symbol: <code>overfitting</code>, means: "getting better on the training data while the held-out score stops improving", from: "Module 7" },
-	{ id: "decay", symbol: <code>weight decay</code>, means: "multiplying every weight by a number just under 1 before each step", from: "Module 7" },
+	{ id: "decay", symbol: <code>weight decay</code>, means: "multiplying every weight by a number just under 1 before each step", also: "L2 regularization, or an L2 penalty", from: "Module 7" },
 	{ id: "validation", symbol: <code>validation set</code>, means: "a third split you may look at as often as you like, so the test set stays untouched", from: "Module 7" },
-	{ id: "speed", symbol: <code>learning speed</code>, means: "the size of a layer's bias gradient: how far it moves in one step, per unit of step size", from: "Module 8" },
-	{ id: "hop", symbol: <code>the hop</code>, means: "what one backward step of BP2 does to the size of a blame column", from: "Module 8" },
+	{ id: "speed", symbol: <code>learning speed</code>, means: "the size of a layer's bias gradient: how far it moves in one step, per unit of step size", also: "the norm of that layer's gradient", from: "Module 8" },
+	{ id: "hop", symbol: <code>the hop</code>, means: "what one backward step of BP2 does to the size of a blame column", also: "the factor behind vanishing and exploding gradients", from: "Module 8" },
 	{ id: "relu", symbol: <code>ReLU</code>, means: "max(0, z): a squash with no ceiling, read as ray-loo", from: "Module 8" },
 	{ id: "argmax", symbol: <code>np.argmax(A, axis=0)</code>, means: "which row holds the largest value, down each column", from: "Module 9" },
 	{
@@ -153,7 +183,6 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; from: string }[]
 		means: "compare entry by entry, then average the True/False result: True counts as 1, so the mean is the share that match",
 		from: "Module 9",
 	},
-	{ id: "derivative", symbol: <code>derivative</code>, means: "the field's word for the slope you have been nudging and measuring since Module 3", from: "Module 9" },
 	{ id: "feature", symbol: <code>feature</code>, means: "one row of X: one measured thing across every example, a pixel in Module 2 and a bill length here", from: "Module 10" },
 	{ id: "standardize", symbol: <code>standardize</code>, means: "shift and scale a feature to sit near 0 and about 1 wide", from: "Module 10" },
 	{ id: "baseline", symbol: <code>baseline</code>, means: "the score of always answering the commonest class: what any real score has to beat", from: "Module 10" },
@@ -264,8 +293,9 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
 				needed.
 			</p>
 			<p>
-				You will not meet the words derivative or calculus until Module 9, where a table translates what you have been doing into what everyone else calls it. That is deliberate. The names are
-				worth having at the end, when there is something for them to name, and they are an obstacle at the start.
+				The names come second, on purpose. Each idea is built and used under a plain word first, and then, in the module that built it, a paragraph says what everyone else calls it and the
+				course starts using both words: the squash becomes the activation function in Module 1, a knob becomes a parameter in Module 3, blame becomes the error in Module 4. By Module 9 they
+				are words you have been reading for eight modules rather than a list to memorize at the end, and the reference below is the lookup either way round.
 			</p>
 			<div className="start-cta">
 				<button onClick={() => onGoTo("m1")}>Begin Module 1 →</button>
@@ -277,14 +307,17 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
 			</div>
 
 			<details className="notation">
-				<summary>Notation and NumPy reference: every symbol, and where it was introduced</summary>
-				<p className="notation-note">The course defines each of these once, at the moment it first matters. This is the lookup for when weeks have passed since then.</p>
+				<summary>Notation and NumPy reference: every symbol, what the field calls it, and where it was introduced</summary>
+				<p className="notation-note">
+					The course defines each of these once, at the moment it first matters, and names the field&rsquo;s word for it in the same breath. This is the lookup for when weeks have
+					passed since then.
+				</p>
 				<div className="table-scroll scroll-x" tabIndex={0}>
 					<table className="truth-table">
 						<thead>
 							<tr>
 								<th>you will see</th>
-								<th>it means</th>
+								<th>it means, and what the field calls it</th>
 								<th>from</th>
 							</tr>
 						</thead>
@@ -292,7 +325,10 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
 							{NOTATION.map((row) => (
 								<tr key={row.id}>
 									<td className="notation-symbol">{row.symbol}</td>
-									<td>{row.means}</td>
+									<td>
+										{row.means}
+										{row.also && <span className="notation-also">also called {row.also}</span>}
+									</td>
 									<td>{row.from}</td>
 								</tr>
 							))}

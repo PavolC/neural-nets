@@ -318,6 +318,14 @@ export function Module6() {
         bill comes to two neurons and six numbers per bar.
       </p>
       <p>
+        Universality is already the field's word for what you just built. Stated
+        formally it is the{" "}
+        <b>universal approximation theorem</b>, and a network able to reach any
+        accuracy this way is called a <b>universal function approximator</b>. Those
+        are the phrases to search for, and both of them promise a great deal less
+        than they sound like they do.
+      </p>
+      <p>
         One experiment before moving on. At 16 bars, lower the sharpness from 400
         to 100: the area falls from 0.204 to 0.110, because rounded shoulders
         follow a smooth curve better than square steps do. Bars are the version

@@ -60,6 +60,12 @@ export function Module1() {
         artificial neuron. Everything it believes about the world is stored in a few
         numbers, and learning will mean adjusting those numbers.
       </p>
+      <p>
+        This course calls <M tex="z" /> the neuron's evidence, because points for
+        and against is what it adds up. Everyone else calls it the <b>weighted input</b>, or the
+        neuron's <b>pre-activation</b>. Both names mean the number this equation
+        computes, and this course uses them beside its own word from here on.
+      </p>
 
       <SectionHeader id="m1-line" title="A neuron is a line" />
       <p>
@@ -92,6 +98,14 @@ export function Module1() {
         same object in two costumes. Change a weight and the line tilts; change the
         bias and it slides. Keep that translation in your head for the rest of the
         course.
+      </p>
+      <p>
+        The field's name for that line is the neuron's <b>decision boundary</b>: the
+        set of inputs it is exactly undecided about, with a yes on one side and a no
+        on the other. With three inputs the boundary is a flat plane instead of a
+        line, and with 784 of them it is called a <b>hyperplane</b>, which is the
+        same object in a room with more directions in it. This course will keep
+        saying line while there are two inputs and a picture to point at.
       </p>
 
       <SectionHeader id="m1-learning" title="Learning: place the line" />
@@ -211,6 +225,16 @@ export function Module1() {
         little and the output moves a little, visibly. Every neuron in this course
         from here on is a sigmoid neuron.
       </p>
+      <p>
+        Two more names, since both are unavoidable. The squashing step, the part
+        that takes <M tex="z" /> and bends it into an answer, is an{" "}
+        <b>activation function</b>, and sigmoid is one choice of it: Module 8 swaps
+        in a different one. A neuron's answer is its <b>activation</b>, which is
+        why the same word names both the function and its output. This course says
+        the squash and a confidence when it wants you to picture what is happening,
+        and activation function and activation when it wants the words you will
+        read everywhere else.
+      </p>
 
       <SectionHeader id="m1-network" title="Three neurons beat XOR" />
       <p>
@@ -318,8 +342,8 @@ np.exp(-2.0)    # e^(-2); given an array, it does every entry at once`}</pre>
       <Recap
         items={[
           "Learning means adjusting numbers until answers match examples, not writing rules.",
-          "A neuron computes sigmoid(w . x + b): multiply each input by its weight, add, add the bias, squash smoothly into (0, 1).",
-          "With two inputs, a neuron is a straight line on graph paper: that is why XOR, whose classes sit on crossing diagonals, defeats any single neuron.",
+          "A neuron computes sigmoid(w . x + b): multiply each input by its weight, add, add the bias, then squash smoothly into (0, 1). The total before the squash is the weighted input z; the squash is an activation function; its result is the neuron's activation.",
+          "With two inputs, a neuron is a straight line on graph paper, its decision boundary: that is why XOR, whose classes sit on crossing diagonals, defeats any single neuron.",
           "Hidden neurons turn each input into a pair of reports, and one straight cut among the reports can look bent back in the input picture.",
         ]}
         chapter="Chapter 1 (perceptrons and sigmoid neurons)"
