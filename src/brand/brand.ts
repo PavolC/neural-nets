@@ -66,7 +66,7 @@ export const COURSE = {
 	subject: "Neural Networks",
 	/** Under the title, which now carries the topic itself, so this says what the
 	 *  reader does here rather than repeating the subject back at them. */
-	tagline: "Read a little, manipulate live visualizations, and implement feedforward, " + "gradient descent and backpropagation in Python, right here in your browser.",
+	tagline: "Build a neural network from its smallest parts, then teach it to recognize handwritten digits.",
 	/** The sigmoid curve: flat, steepest in the middle, flat. Two cubics
 	 *  meeting at the tile's centre, each horizontal at its outer end and
 	 *  sharing the same slope where they join, which is the one property that

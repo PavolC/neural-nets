@@ -1,7 +1,9 @@
 <!doctype html>
 <html>
-<head><meta charset="utf-8"><style>
-  /* The course's social card, 1200x630, screenshotted to public/og-image.png by
+	<head>
+		<meta charset="utf-8" />
+		<style>
+			/* The course's social card, 1200x630, screenshotted to public/og-image.png by
      tools/make_og_image.sh.
 
      A rendered page rather than a drawn image, for the same reason the rest of
@@ -12,7 +14,7 @@
 
      It is type and two marks, and it makes no argument. Every claim on it is
      one the course's own pages make: the heading is COURSE.subject, and the
-     sentence is the start page's opening line with the medium named. An earlier
+    sentence is the start page's opening line. An earlier
      version had three accent-coloured pills counting visualizations and
      exercises, an accent-coloured phrase in the middle of the tagline, and a
      450px sigmoid-and-network illustration whose ribbon ran through the third
@@ -33,67 +35,131 @@
      nothing in the site's stylesheet reaches a file that is rendered for
      deployment; the accent, the three bands and the glyph are the ones
      check_brand.py compares. */
-  * { margin:0; padding:0; box-sizing:border-box; }
-  html,body { width:1200px; height:630px; overflow:hidden; }
-  body { background:#fdfdfb; color:#1a1a1a; font-family:"DejaVu Serif",Georgia,serif; position:relative; }
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			html,
+			body {
+				width: 1200px;
+				height: 630px;
+				overflow: hidden;
+			}
+			body {
+				background: #fdfdfb;
+				color: #1a1a1a;
+				font-family: "DejaVu Serif", Georgia, serif;
+				position: relative;
+			}
 
-  /* The course's own hue, the way the series index draws it down the left edge
+			/* The course's own hue, the way the series index draws it down the left edge
      of this course's card. The series' own card carries the whole nine-hue
      family here instead, because the family is the series identity and borrows
      no one course's. */
-  .rule { position:absolute; top:0; left:0; right:0; height:8px; background:#0b6e4f; }
+			.rule {
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				height: 8px;
+				background: #0b6e4f;
+			}
 
-  /* The series row, in the masthead's order: the three-band mark, the wordmark,
+			/* The series row, in the masthead's order: the three-band mark, the wordmark,
      then what the series is. The wordmark is on this card and not on the
      series' own, where the heading below it is already the series name. */
-  .brandrow { position:absolute; top:96px; left:110px;
-              display:flex; align-items:center; gap:14px; }
-  .series-tile { width:40px; height:40px; flex:none; }
-  .wordmark { font-family:"DejaVu Sans",sans-serif; font-size:21px; font-weight:700;
-              letter-spacing:.13em; text-transform:uppercase; color:#0b6e4f; }
-  .note { font-family:"DejaVu Sans",sans-serif; font-size:14px; letter-spacing:.1em;
-          text-transform:uppercase; color:#5a5a5a; padding-left:14px; border-left:1px solid #d8d8d2; }
+			.brandrow {
+				position: absolute;
+				top: 96px;
+				left: 110px;
+				display: flex;
+				align-items: center;
+				gap: 14px;
+			}
+			.series-tile {
+				width: 40px;
+				height: 40px;
+				flex: none;
+			}
+			.wordmark {
+				font-family: "DejaVu Sans", sans-serif;
+				font-size: 21px;
+				font-weight: 700;
+				letter-spacing: 0.13em;
+				text-transform: uppercase;
+				color: #0b6e4f;
+			}
+			.note {
+				font-family: "DejaVu Sans", sans-serif;
+				font-size: 14px;
+				letter-spacing: 0.1em;
+				text-transform: uppercase;
+				color: #5a5a5a;
+				padding-left: 14px;
+				border-left: 1px solid #d8d8d2;
+			}
 
-  /* The course mark, directly above the name it identifies and on the same left
+			/* The course mark, directly above the name it identifies and on the same left
      axis as everything else, so each mark sits with its own name and the card
      still reads down one line. */
-  .course-tile { position:absolute; top:196px; left:110px; width:56px; height:56px; }
+			.course-tile {
+				position: absolute;
+				top: 196px;
+				left: 110px;
+				width: 56px;
+				height: 56px;
+			}
 
-  h1 { position:absolute; top:288px; left:110px;
-       font-size:92px; line-height:1; letter-spacing:-.02em; font-weight:400; }
+			h1 {
+				position: absolute;
+				top: 288px;
+				left: 110px;
+				font-size: 92px;
+				line-height: 1;
+				letter-spacing: -0.02em;
+				font-weight: 400;
+			}
 
-  /* The start page's opening sentence, with the medium named. Its line break is
+			/* The start page's opening sentence, with the medium named. Its line break is
      explicit so the composition holds at this size. */
-  .tagline { position:absolute; top:428px; left:113px;
-             font-size:30px; line-height:1.45; color:#3a3a3a; width:980px; }
-</style></head>
-<body>
-  <div class="rule"></div>
+			.tagline {
+				position: absolute;
+				top: 428px;
+				left: 113px;
+				font-size: 30px;
+				line-height: 1.45;
+				color: #3a3a3a;
+				width: 980px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="rule"></div>
 
-  <div class="brandrow">
-    <svg class="series-tile" viewBox="0 0 32 32">
-      <clipPath id="band-clip"><rect width="32" height="32" rx="7"/></clipPath>
-      <g clip-path="url(#band-clip)">
-        <rect width="11" height="32" x="0" fill="#0b6e4f"/>
-        <rect width="11" height="32" x="11" fill="#12648d"/>
-        <rect width="10" height="32" x="22" fill="#83456a"/>
-      </g>
-    </svg>
-    <span class="wordmark">Moving Parts</span>
-    <span class="note">build-it-yourself courses</span>
-  </div>
+		<div class="brandrow">
+			<svg class="series-tile" viewBox="0 0 32 32">
+				<clipPath id="band-clip"><rect width="32" height="32" rx="7" /></clipPath>
+				<g clip-path="url(#band-clip)">
+					<rect width="11" height="32" x="0" fill="#0b6e4f" />
+					<rect width="11" height="32" x="11" fill="#12648d" />
+					<rect width="10" height="32" x="22" fill="#83456a" />
+				</g>
+			</svg>
+			<span class="wordmark">Moving Parts</span>
+			<span class="note">build-it-yourself courses</span>
+		</div>
 
-  <svg class="course-tile" viewBox="0 0 32 32">
-    <rect width="32" height="32" rx="7" fill="#0b6e4f"/>
-    <path d="M5 24C12 24 15 19 16 16C17 13 20 8 27 8" fill="none"
-          stroke="#ffffff" stroke-width="3" stroke-linecap="round"/>
-  </svg>
+		<svg class="course-tile" viewBox="0 0 32 32">
+			<rect width="32" height="32" rx="7" fill="#0b6e4f" />
+			<path d="M5 24C12 24 15 19 16 16C17 13 20 8 27 8" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+		</svg>
 
-  <h1>Neural&nbsp;Networks</h1>
+		<h1>Neural&nbsp;Networks</h1>
 
-  <p class="tagline">
-    A course on neural networks that you finish<br>
-    by building one, in Python, in your browser.
-  </p>
-</body>
+		<p class="tagline">
+			Build a neural network from its smallest parts,<br />
+			then teach it to recognize handwritten digits.
+		</p>
+	</body>
 </html>

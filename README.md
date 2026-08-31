@@ -4,8 +4,8 @@ A course in the **Moving Parts** series.
 
 **[Open the course](https://pavolc.github.io/neural-nets/)**
 
-A self-contained, browser-based course that teaches neural networks by having you build
-one. You read short explanations, manipulate live visualizations, and write real Python
+Build a neural network from its smallest parts, then teach it to recognize handwritten
+digits. This self-contained, browser-based course pairs short explanations and live visualizations with real Python
 (NumPy) in a workbench that docks beside the reading, so the explanation stays on screen
 while you type. Every exercise adds a section to one growing file, checked by automated
 tests including a numerical gradient check, and by the end that file is a small neural

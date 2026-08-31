@@ -110,7 +110,13 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; also?: string; f
 		means: "NumPy stretching a smaller array to fit a bigger one: a bias column lands on every column of a batch, a single number on every entry",
 		from: "Module 2",
 	},
-	{ id: "C", symbol: <M tex="C" />, means: "the cost: one number scoring the whole network on the data", also: "the loss, or the objective function. This particular cost: mean squared error", from: "Module 3" },
+	{
+		id: "C",
+		symbol: <M tex="C" />,
+		means: "the cost: one number scoring the whole network on the data",
+		also: "the loss, or the objective function. This particular cost: mean squared error",
+		from: "Module 3",
+	},
 	{
 		id: "parameter",
 		symbol: <code>parameter</code>,
@@ -121,10 +127,17 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; also?: string; f
 		id: "norm",
 		symbol: <M tex="\lVert v \rVert" />,
 		means: "the size of a column: square every entry, add them up, take the square root. The cost writes it squared, which leaves the sum of squares",
-		also: "the norm of a vector", from: "Module 3",
+		also: "the norm of a vector",
+		from: "Module 3",
 	},
 	{ id: "eta", symbol: <M tex="\eta" />, means: "eta, the learning rate: how far each step moves", also: "lr, in framework code", from: "Module 3" },
-	{ id: "nabla", symbol: <M tex="\nabla C" />, means: "nabla C, the gradient: the whole list of slopes, one per parameter", also: "a numerical gradient when measured by nudging, an analytic one when computed by backprop", from: "Module 3" },
+	{
+		id: "nabla",
+		symbol: <M tex="\nabla C" />,
+		means: "nabla C, the gradient: the whole list of slopes, one per parameter",
+		also: "a numerical gradient when measured by nudging, an analytic one when computed by backprop",
+		from: "Module 3",
+	},
 	{
 		id: "finitediff",
 		symbol: <code>finite differences</code>,
@@ -134,7 +147,13 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; also?: string; f
 	{ id: "nablacode", symbol: <code>nabla_w, nabla_b</code>, means: "that same list in code, split into the weights' and biases' halves", from: "Module 3" },
 	{ id: "epoch", symbol: <code>epoch</code>, means: "one full pass through the training data", from: "Module 3" },
 	{ id: "batch", symbol: <code>mini-batch</code>, means: "the handful of examples one step is scored on", from: "Module 3" },
-	{ id: "sigprime", symbol: <M tex="\sigma'(z)" />, means: "sigma-prime: the squash's slope at z, how much the answer moves when the evidence moves, equal to a(1 - a)", also: "the derivative of the activation function", from: "Module 4" },
+	{
+		id: "sigprime",
+		symbol: <M tex="\sigma'(z)" />,
+		means: "sigma-prime: the squash's slope at z, how much the answer moves when the evidence moves, equal to a(1 - a)",
+		also: "the derivative of the activation function",
+		from: "Module 4",
+	},
 	{
 		id: "derivative",
 		symbol: <code>derivative</code>,
@@ -146,13 +165,31 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; also?: string; f
 	{ id: "sup", symbol: <M tex="w^2,\; a^3" />, means: "on a weight or an activation, a superscript is the layer number rather than a power", from: "Module 4" },
 	{ id: "T", symbol: <M tex="(w)^T" />, means: "transpose: the same wires regrouped by sender instead of receiver", from: "Module 4" },
 	{ id: "partial", symbol: <M tex="\partial C / \partial w" />, means: "one parameter's slope, read as a single name", also: "a partial derivative", from: "Module 4" },
-	{ id: "receipts", symbol: <code>zs, activations</code>, means: "the receipts: every evidence and answer the forward pass computed", also: "the cached activations, or the cached forward pass", from: "Module 5" },
+	{
+		id: "receipts",
+		symbol: <code>zs, activations</code>,
+		means: "the receipts: every evidence and answer the forward pass computed",
+		also: "the cached activations, or the cached forward pass",
+		from: "Module 5",
+	},
 	{ id: "neg", symbol: <code>a[-1]</code>, means: "the last entry of a list; a[-2] the one before it", from: "Module 5" },
 	{ id: "onehot", symbol: <code>one-hot</code>, means: "a column that is 1 in one slot and 0 everywhere else: a label in Module 5, an input category in Module 10", from: "Module 5" },
 	{ id: "zeroslike", symbol: <code>np.zeros_like(w)</code>, means: "an array of zeros shaped exactly like w", from: "Module 5" },
-	{ id: "universality", symbol: <code>universality</code>, means: "one hidden layer, made wide enough, can express any relationship to any accuracy", also: "the universal approximation theorem", from: "Module 6" },
+	{
+		id: "universality",
+		symbol: <code>universality</code>,
+		means: "one hidden layer, made wide enough, can express any relationship to any accuracy",
+		also: "the universal approximation theorem",
+		from: "Module 6",
+	},
 	{ id: "ln", symbol: <M tex="\ln a" />, means: "the natural logarithm, np.log: the power of e that gives a", from: "Module 7" },
-	{ id: "lmbda", symbol: <M tex="\lambda" />, means: "lambda, the regularization strength. Spelled lmbda in code", also: "the strength of the L2 penalty, weight_decay in framework code", from: "Module 7" },
+	{
+		id: "lmbda",
+		symbol: <M tex="\lambda" />,
+		means: "lambda, the regularization strength. Spelled lmbda in code",
+		also: "the strength of the L2 penalty, weight_decay in framework code",
+		from: "Module 7",
+	},
 	{
 		id: "standardnormal",
 		symbol: <code>rng.standard_normal(shape)</code>,
@@ -173,8 +210,20 @@ const NOTATION: { id: string; symbol: ReactNode; means: string; also?: string; f
 	{ id: "overfitting", symbol: <code>overfitting</code>, means: "getting better on the training data while the held-out score stops improving", from: "Module 7" },
 	{ id: "decay", symbol: <code>weight decay</code>, means: "multiplying every weight by a number just under 1 before each step", also: "L2 regularization, or an L2 penalty", from: "Module 7" },
 	{ id: "validation", symbol: <code>validation set</code>, means: "a third split you may look at as often as you like, so the test set stays untouched", from: "Module 7" },
-	{ id: "speed", symbol: <code>learning speed</code>, means: "the size of a layer's bias gradient: how far it moves in one step, per unit of step size", also: "the norm of that layer's gradient", from: "Module 8" },
-	{ id: "hop", symbol: <code>the hop</code>, means: "what one backward step of BP2 does to the size of a blame column", also: "the factor behind vanishing and exploding gradients", from: "Module 8" },
+	{
+		id: "speed",
+		symbol: <code>learning speed</code>,
+		means: "the size of a layer's bias gradient: how far it moves in one step, per unit of step size",
+		also: "the norm of that layer's gradient",
+		from: "Module 8",
+	},
+	{
+		id: "hop",
+		symbol: <code>the hop</code>,
+		means: "what one backward step of BP2 does to the size of a blame column",
+		also: "the factor behind vanishing and exploding gradients",
+		from: "Module 8",
+	},
 	{ id: "relu", symbol: <code>ReLU</code>, means: "max(0, z): a squash with no ceiling, read as ray-loo", from: "Module 8" },
 	{ id: "argmax", symbol: <code>np.argmax(A, axis=0)</code>, means: "which row holds the largest value, down each column", from: "Module 9" },
 	{
@@ -272,10 +321,10 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
 		<article className="module start-page">
 			<h2>Start here</h2>
 			<p>
-				This is a course on neural networks that you finish by building one. Each module is a few short readings interleaved with figures you can drag, and most of them add a piece of Python
-				to one file that you write across the whole course. It opens in a panel beside the reading, so the explanation stays on screen while you type. Each piece is checked by tests and then
-				used by every piece after it: by Module 5 the file is training a network that reads handwritten digits, by Module 8 it is the thing being measured when depth stops working, and at the
-				end you can download it and run it anywhere NumPy is installed.
+				Build a neural network from its smallest parts, then teach it to recognize handwritten digits. Each module is a few short readings interleaved with figures you can drag, and most of
+				them add a piece of Python to one file that you write across the whole course. It opens in a panel beside the reading, so the explanation stays on screen while you type. Each piece is
+				checked by tests and then used by every piece after it: by Module 5 the file is training a network that reads handwritten digits, by Module 8 it is the thing being measured when depth
+				stops working, and at the end you can download it and run it anywhere NumPy is installed.
 			</p>
 			<p>
 				The sequence follows Michael Nielsen's <em>Neural Networks and Deep Learning</em>, with the explanations rewritten around the interactive parts.
@@ -309,8 +358,8 @@ export function StartPage({ onGoTo }: { onGoTo: (moduleId: string) => void }) {
 			<details className="notation">
 				<summary>Notation and NumPy reference: every symbol, what the field calls it, and where it was introduced</summary>
 				<p className="notation-note">
-					The course defines each of these once, at the moment it first matters, and names the field&rsquo;s word for it in the same breath. This is the lookup for when weeks have
-					passed since then.
+					The course defines each of these once, at the moment it first matters, and names the field&rsquo;s word for it in the same breath. This is the lookup for when weeks have passed
+					since then.
 				</p>
 				<div className="table-scroll scroll-x" tabIndex={0}>
 					<table className="truth-table">
