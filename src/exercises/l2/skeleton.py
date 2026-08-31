@@ -1,4 +1,4 @@
-# One function, one changed line. Your sgd_step from Module 3 moved every
+# One function, one changed line. Your sgd_step from Chapter 3 moved every
 # parameter against its slope; this one shrinks every weight a little first.
 #
 # Contract:
@@ -13,7 +13,7 @@
 #
 #   Return (new_weights, new_biases) as NEW lists of NEW arrays; do not
 #   modify the inputs. With lmbda = 0 the weight line has to reduce exactly
-#   to Module 3's plain step, since the factor becomes 1.
+#   to Chapter 3's plain step, since the factor becomes 1.
 
 
 def l2_step(weights, biases, nabla_w, nabla_b, eta, lmbda, n):

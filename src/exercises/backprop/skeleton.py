@@ -1,7 +1,7 @@
-# Module 4's four equations as code. Two functions; the first is a single
+# Chapter 4's four equations as code. Two functions; the first is a single
 # formula.
 #
-# Already in this file, above you: sigmoid(z), from Module 1, elementwise,
+# Already in this file, above you: sigmoid(z), from Chapter 1, elementwise,
 # any shape.
 #
 # Contract:
@@ -15,7 +15,7 @@
 #   Read the parameters only; never modify them.
 #
 # The plan (the four equations, in the order the code meets them):
-# 1. Forward pass, keeping receipts: your feedforward from Module 2, but
+# 1. Forward pass, keeping receipts: your feedforward from Chapter 2, but
 #    append every z to a list zs and every activation to a list activations
 #    (which starts as [x]).
 # 2. BP1: the output layer's delta is (a - y) * sigmoid_prime(z), using

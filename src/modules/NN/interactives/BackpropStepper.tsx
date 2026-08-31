@@ -16,7 +16,7 @@ import {
   type Trace,
 } from "./backpropNet";
 
-// Module 4 centerpiece: a 2-3-1 network stepped through one forward pass and
+// Chapter 4 centerpiece: a 2-3-1 network stepped through one forward pass and
 // one backward pass. Each step reveals the numbers it computes and shows the
 // equation being applied; the learner can select any of the 13 parameters
 // (click a wire or a neuron circle) and nudge it, watching every revealed
@@ -40,7 +40,7 @@ const STEPS: Step[] = [
     title: "Forward: the hidden layer",
     tex: "z^2 = w^2 x + b^2, \\qquad a^2 = \\sigma(z^2)",
     gloss: (t) =>
-      `Three multiply-adds at once (Module 2's Wa + b), then sigmoid on each entry: ` +
+      `Three multiply-adds at once (Chapter 2's Wa + b), then sigmoid on each entry: ` +
       `h₁: z = ${fmt(t.z2[0])} → a = ${fmt(t.a2[0])}; ` +
       `h₂: z = ${fmt(t.z2[1])} → a = ${fmt(t.a2[1])}; ` +
       `h₃: z = ${fmt(t.z2[2])} → a = ${fmt(t.a2[2])}.`,
@@ -79,7 +79,7 @@ const STEPS: Step[] = [
     title: "Every slope, read off",
     tex: "\\frac{\\partial C}{\\partial b^l} = \\delta^l, \\qquad \\frac{\\partial C}{\\partial w^l} = \\delta^l (a^{l-1})^T",
     gloss: () =>
-      "All 13 slopes at once (∂C/∂b is read as one name: the slope of C per nudge of b, Module 3's " +
+      "All 13 slopes at once (∂C/∂b is read as one name: the slope of C per nudge of b, Chapter 3's " +
       "nudge-and-divide number). A bias's slope is its neuron's blame; a wire's slope is the " +
       "receiver's blame times the activation the wire carried. Select any knob (click a wire or " +
       "circle) to read its slope below, then drag its slider and watch every number react.",

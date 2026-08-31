@@ -1,7 +1,7 @@
 // The workbench's state, and the context the exercise cards reach it through.
 //
 // One panel, one editor, one run at a time, for the whole course. The
-// exercises are cards in the module pages that point at it; everything that
+// exercises are cards in the chapter pages that point at it; everything that
 // runs, prints or reports lives here.
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";

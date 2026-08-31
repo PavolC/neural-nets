@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { sigmoid } from "./utils";
 
-// Module 1 interactive (b): a 2-2-1 sigmoid network on the XOR points,
+// Chapter 1 interactive (b): a 2-2-1 sigmoid network on the XOR points,
 // shown as three stacked sections, one per stage of the pipeline. Each
 // section holds its chart AND the sliders that own it: phase 1 = input
 // space with the hidden layer's cuts and report-tints (hidden sliders),

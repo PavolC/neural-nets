@@ -37,7 +37,7 @@ def test_biases_are_left_alone():
     expected = np.array([[0.39], [-0.58]])
     assert np.allclose(new_b[0], expected, atol=1e-12), (
         f"expected\n{expected}\ngot\n{new_b[0]}\n"
-        "The bias line is untouched from Module 3: 0.4 - 0.5 * 0.02 = 0.39. "
+        "The bias line is untouched from Chapter 3: 0.4 - 0.5 * 0.02 = 0.39. "
         "Only weights decay. A bias multiplies no input, so shrinking it "
         "buys none of what this technique is for, and large biases are not "
         "what makes a network fragile."
@@ -45,14 +45,14 @@ def test_biases_are_left_alone():
 
 
 def test_lmbda_zero_is_the_old_step():
-    """l2_step: with lmbda = 0 it is exactly Module 3's update"""
+    """l2_step: with lmbda = 0 it is exactly Chapter 3's update"""
     weights, biases, nabla_w, nabla_b = _fixture()
     new_w, new_b = l2_step(weights, biases, nabla_w, nabla_b, 0.5, 0.0, 1000)
     assert np.allclose(new_w[0], np.array([[0.95, -2.1], [0.65, 0.225]]), atol=1e-12), (
         f"with lmbda = 0 the weights should move by the slope alone, to "
         f"[[0.95, -2.1], [0.65, 0.225]], and yours went to\n{new_w[0]}\n"
         "The factor 1 - eta * 0 / n is exactly 1, so this case has to "
-        "reproduce your Module 3 step. Every comparison in the panel below "
+        "reproduce your Chapter 3 step. Every comparison in the panel below "
         "runs both settings through this one function, so a wrong lmbda = 0 "
         "case would make the baseline wrong too."
     )

@@ -14,7 +14,7 @@ import { SlowNeuron } from "./interactives/SlowNeuron";
 export function Module7() {
   return (
     <article className="module">
-      <h2>Module 7: Making it actually work</h2>
+      <h2>Chapter 7: Making it actually work</h2>
       <AfterThis
         items={[
           "Read one descent step as two links, find the one that goes slack when an output neuron is confidently wrong, and pick a scoring rule that covers for it.",
@@ -24,17 +24,17 @@ export function Module7() {
       />
       <ModuleToc />
 
-      <SectionHeader id="m7-plan" title="Three complaints" />
+      <SectionHeader id="c7-plan" title="Three complaints" />
       <p>
-        Module 5 finished a working digit reader: your feedforward, your sgd,
+        Chapter 5 finished a working digit reader: your feedforward, your sgd,
         your backprop, 89 percent of a thousand held-out digits read
         correctly. Nielsen's Chapter 1 trains this same 784-30-10 shape on the
-        full 50,000 images and reports about 95 percent. Module 6 crossed one
+        full 50,000 images and reports about 95 percent. Chapter 6 crossed one
         explanation for that gap off the list: a hidden layer, made wide
         enough, can express the pixels-to-digit rule, so the shape of the
         network is not what caps the score. Some of the gap is the bundled
         slice being ten times smaller, which is fixed here so the run fits in
-        a browser tab. The rest is the setup, and this module makes three
+        a browser tab. The rest is the setup, and this chapter makes three
         specific complaints about it.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
@@ -68,7 +68,7 @@ export function Module7() {
       <p>
         Each fix is one line, and each one comes with a measurement of what it
         bought. To keep them one-liners, one step comes out of the algorithm you
-        wrote in Module 5: the output layer's blame, BP1, becomes something you
+        wrote in Chapter 5: the output layer's blame, BP1, becomes something you
         pass in.
       </p>
       <div className="play-snippet">
@@ -91,12 +91,12 @@ export function Module7() {
       </div>
       <p>
         Leave the argument out at a call and your function does exactly what it
-        did in Module 5, so every test it passed then it passes now. The first
-        exercise below checks that edit, because everything in this module and
+        did in Chapter 5, so every test it passed then it passes now. The first
+        exercise below checks that edit, because everything in this chapter and
         the three after it swaps a BP1 through that opening.
       </p>
 
-      <SectionHeader id="m7-slowdown" title="Badly wrong, barely learning" />
+      <SectionHeader id="c7-slowdown" title="Badly wrong, barely learning" />
       <p>
         Start with one neuron, because the effect is easiest to see there and
         it is the same effect in the digit reader. One input, pinned at 1. One
@@ -109,7 +109,7 @@ export function Module7() {
       <p>
         The neuron answers 0.982 when its job is to answer 0. Now train by
         descent, the same rule as everywhere else: measure both knobs' slopes,
-        step against them at <M tex="\eta = 0.15" /> (eta, Module 3's step
+        step against them at <M tex="\eta = 0.15" /> (eta, Chapter 3's step
         size), repeat. Here is the log, one line per checkpoint, and the figure
         below walks the same run at those settings.
       </p>
@@ -160,10 +160,10 @@ export function Module7() {
       <Figure caption="One neuron learning to answer 0, with the input pinned at 1, under the quadratic cost. Press Play to walk the run, and drag w and b to start it somewhere else: the further the starting answer is from 0, the longer the flat stretch at the beginning.">
         <SlowNeuron />
       </Figure>
-      <SectionHeader id="m7-flat" title="The land under the knobs" />
+      <SectionHeader id="c7-flat" title="The land under the knobs" />
       <p>
         That run was a walk on a landscape, and it pays to be exact about what
-        the landscape is. Module 3 drew it as a hiking map: the floor is every
+        the landscape is. Chapter 3 drew it as a hiking map: the floor is every
         possible setting of the knobs, and the height above a spot is the
         score. To find the height at one spot, freeze the knobs there, run the
         images through the network as it stands, and add up the penalties. The
@@ -206,7 +206,7 @@ export function Module7() {
       <p>
         Which half of the step went slack? A step reaches the score through two
         links. Turning the knobs moves the answer, and the answer moves the
-        score. Module 4's chain has this shape, and its rule holds here too:
+        score. Chapter 4's chain has this shape, and its rule holds here too:
         what each link passes on multiplies.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
@@ -240,7 +240,7 @@ export function Module7() {
         So the shelf is the first link's doing, and the first link is the
         sigmoid's own shape: steep in the middle, nearly level at both ends,
         which is what squashing means. Its rate is the squash's slope, which
-        Module 4 wrote <M tex="\sigma'(z)" /> and gave the formula{" "}
+        Chapter 4 wrote <M tex="\sigma'(z)" /> and gave the formula{" "}
         <M tex="a(1-a)" />: 0.25 at an answer of 0.5, and 0.0196 at 0.98.
       </p>
       <p>
@@ -250,7 +250,7 @@ export function Module7() {
       </p>
       <Eq
         tex="\delta^L = \underbrace{(a - y)}_{\text{the gap}} \odot \underbrace{\sigma'(z^L)}_{\text{the squash's slope}}"
-        gloss="Module 4's BP1, read as the two links multiplied. The gap does double duty here: it is how wrong the answer is, and under the quadratic cost it is also what the score charges for one more unit of answer. The squash's slope is what the first link passes on. The circled dot is the elementwise product, NumPy's plain star. Every slope in the network is built from this number, so whatever happens to it happens to all of them."
+        gloss="Chapter 4's BP1, read as the two links multiplied. The gap does double duty here: it is how wrong the answer is, and under the quadratic cost it is also what the score charges for one more unit of answer. The squash's slope is what the first link passes on. The circled dot is the elementwise product, NumPy's plain star. Every slope in the network is built from this number, so whatever happens to it happens to all of them."
       />
       <p>
         Both rates depend on the answer, and they pull in opposite directions.
@@ -301,19 +301,19 @@ export function Module7() {
         gloss="In order: the blame, the step each knob takes against it, and how far the answer moves once the evidence has fallen by both steps together. The log's first step takes the answer from 0.9820 to 0.9819, a drop of 0.00009, and 500 steps at that rate would leave the answer above 0.93. The walk finishes in 469 because the blame grows as the answer falls back toward two thirds, not because that first rate holds."
       />
       <p>
-        Module 4's quiz already met this on its little 2-3-1 network: drag the
+        Chapter 4's quiz already met this on its little 2-3-1 network: drag the
         output bias to −8 and the network answers 0.0036 when the right answer is 1,
         while its blame collapses to almost nothing. The same neuron, at the
         same time, is as wrong as it can be and as slow to learn as it can be.
       </p>
 
-      <SectionHeader id="m7-ce" title="A cost that notices" />
+      <SectionHeader id="c7-ce" title="A cost that notices" />
       <p>
         The first link is not yours to change. It is what a sigmoid neuron
         does, and squashing is also what you want at the output, where the
         answer has to be a confidence between 0 and 1. The second link is not
         part of the network at all. It is the cost, the yardstick you grade
-        answers with, chosen in Module 3 as half the squared gap because
+        answers with, chosen in Chapter 3 as half the squared gap because
         squaring was the obvious way to score. Swap the yardstick and every
         weight, wire and neuron stays exactly as it was, while the land
         underneath them is replaced. The replacement is the cross-entropy
@@ -331,12 +331,12 @@ export function Module7() {
         shelf, and this is the plainest of them.
       </p>
       <p>
-        Module 3's rule already charges at that rate, since the slope of half
+        Chapter 3's rule already charges at that rate, since the slope of half
         the squared gap is the gap. The multiplication that follows is what
         ruins it, and any fix has to survive that multiplication:
       </p>
       <Eq
-        tex="\begin{gathered} \underbrace{0.98}_{\text{Module 3 charges}} \times \underbrace{0.0196}_{\text{the squash's slope}} = \underbrace{0.0192}_{\text{the land's slope}} \\[0.8em] \underbrace{50}_{\text{the new rule charges}} \times \underbrace{0.0196}_{\text{the squash's slope}} = \underbrace{0.98}_{\text{the gap, as asked}} \end{gathered}"
+        tex="\begin{gathered} \underbrace{0.98}_{\text{Chapter 3 charges}} \times \underbrace{0.0196}_{\text{the squash's slope}} = \underbrace{0.0192}_{\text{the land's slope}} \\[0.8em] \underbrace{50}_{\text{the new rule charges}} \times \underbrace{0.0196}_{\text{the squash's slope}} = \underbrace{0.98}_{\text{the gap, as asked}} \end{gathered}"
         gloss="Both lines sit at an answer of 0.98 against a right answer of 0, and the middle factor is the same in both, because the neuron has not changed. The top line is what the land does now. The bottom line is what it has to do, and the only number free to move is the charge."
       />
       <p>
@@ -344,7 +344,7 @@ export function Module7() {
         <M tex="(a - y) / (a(1-a))" />.
       </p>
       <p>
-        Module 3's rule cannot be stretched to charge that, and the obstacle
+        Chapter 3's rule cannot be stretched to charge that, and the obstacle
         is a ceiling. The
         most one output can ever cost under half the squared gap is 0.5,
         reached by answering 1 when the right answer is 0. At an answer of 0.98
@@ -359,7 +359,7 @@ export function Module7() {
       </Figure>
       <p>
         A charge that rises without limit needs one function the course has not
-        used yet. Module 1 met <M tex="e" />, the number 2.718, inside the
+        used yet. Chapter 1 met <M tex="e" />, the number 2.718, inside the
         sigmoid. The natural logarithm <M tex="\ln a" /> is the reverse
         question: the power you have to raise <M tex="e" /> to in order to get{" "}
         <M tex="a" />. For answers between 0 and 1 it is negative, and it dives
@@ -409,7 +409,7 @@ export function Module7() {
         gloss="The cross-entropy cost, for one output neuron. With y = 1 the second term vanishes and the charge is -ln a; with y = 0 the first vanishes and the charge is -ln(1-a). A network's cost is this summed over the output neurons and averaged over the examples, the same shape of bookkeeping as the quadratic cost, with no bookkeeping half."
       />
       <p>
-        Check its rate by nudging, the way Module 3 measured every rate. At an
+        Check its rate by nudging, the way Chapter 3 measured every rate. At an
         answer of 0.98 against a right answer of 0 the charge is{" "}
         <M tex="-\ln(0.02) = 3.912" />. Nudge the answer up by 0.001 and the
         charge becomes <M tex="-\ln(0.019) = 3.963" />. The rise is 0.051, and
@@ -445,10 +445,10 @@ export function Module7() {
       </p>
       <Eq
         tex="\delta^L = \underbrace{\frac{a - y}{a(1-a)}}_{\text{the yardstick's rate}} \times \underbrace{a(1-a)}_{\text{the squash's slope}} = a - y"
-        gloss="The squash's slope sits once in the yardstick's denominator and once as itself, so it divides out: the output layer's blame is the gap alone. At an answer of 0.98 against a right answer of 0 that is 50 times 0.0196, which is 0.98. Module 4's identity that sigma-prime equals a(1-a) is what makes the cancellation exact rather than approximate."
+        gloss="The squash's slope sits once in the yardstick's denominator and once as itself, so it divides out: the output layer's blame is the gap alone. At an answer of 0.98 against a right answer of 0 that is 50 times 0.0196, which is 0.98. Chapter 4's identity that sigma-prime equals a(1-a) is what makes the cancellation exact rather than approximate."
       />
       <p>
-        The land has changed shape. Under Module 3's rule it climbs away from
+        The land has changed shape. Under Chapter 3's rule it climbs away from
         the bottom and then levels off at 0.5 in every wrong direction, so a
         network far enough out stands on a tabletop with no downhill left to
         find. Under the new rule it keeps climbing, at a rate that approaches 1
@@ -468,7 +468,7 @@ export function Module7() {
         Swap the blame and run the same neuron again. From the saturated start
         it is below 0.1 in 50 steps instead of 469.
       </p>
-      <Figure caption="The same neuron as at the top of the module, one line per cost. Both start by answering 0.982 and take the same step size; the cross-entropy line has no flat stretch at the beginning.">
+      <Figure caption="The same neuron as at the top of the chapter, one line per cost. Both start by answering 0.982 and take the same step size; the cross-entropy line has no flat stretch at the beginning.">
         <SlowNeuron showCrossEntropy />
       </Figure>
       <p>
@@ -501,7 +501,7 @@ export function Module7() {
         One consequence: the step size has to change with the yardstick. The
         old land never rose faster than 0.148 per unit of evidence and the new
         one approaches 1, so at their steepest the new slopes are about seven
-        times the old ones (1 divided by 0.148 is 6.8). Module 5 trained at{" "}
+        times the old ones (1 divided by 0.148 is 6.8). Chapter 5 trained at{" "}
         <M tex="\eta = 3.0" />, found by trying; the runs below use{" "}
         <M tex="\eta = 0.5" />, found the same way. Trying landed on a factor
         of six between the two step sizes, close to the factor of seven between
@@ -512,11 +512,11 @@ export function Module7() {
       <ExerciseCard exercise={crossEntropyExercise} />
       <p>
         The panel below trains the digit reader three times from the same
-        starting parameters, the same ones Module 5 used: 5,000 images, 8
+        starting parameters, the same ones Chapter 5 used: 5,000 images, 8
         epochs, mini-batches of 10, your sgd doing the walking. Two runs share
         a step size of 0.5 and differ only in the output blame. The third is
-        the quadratic cost again at Module 5's step size of 3.0, which is that
-        module's own run cut short at 8 epochs.
+        the quadratic cost again at Chapter 5's step size of 3.0, which is that
+        chapter's own run cut short at 8 epochs.
       </p>
       <Figure caption="Three runs, one chart. Everything is held fixed except the output blame and the step size: the same wiring, the same starting numbers, the same shuffle, the same sgd. Each run takes a few seconds per epoch, and Stop ends it.">
         <CostSwapPanel />
@@ -533,14 +533,14 @@ export function Module7() {
         epoch rather than climbing out of the slowdown first.
       </p>
       <p>
-        That leaves the accuracy roughly where Module 5 left it, and it leaves
-        the step size found the way Module 5 found it, by trying whole runs.
+        That leaves the accuracy roughly where Chapter 5 left it, and it leaves
+        the step size found the way Chapter 5 found it, by trying whole runs.
         The flat hidden layer is the complaint that moves the accuracy.
       </p>
 
-      <SectionHeader id="m7-birth" title="Saturated at birth" />
+      <SectionHeader id="c7-birth" title="Saturated at birth" />
       <p>
-        Go back to Module 5's network as it stood before its first training
+        Go back to Chapter 5's network as it stood before its first training
         step: weights and biases freshly drawn at random, nothing learned yet.
         Feed one image in and each of the thirty hidden neurons computes
         its own evidence, thirty numbers. Do it for all 5,000 training images
@@ -583,7 +583,7 @@ export function Module7() {
         accident of how the weights were drawn.
       </p>
       <p>
-        Where did those weights come from? Module 5 never said: the course
+        Where did those weights come from? Chapter 5 never said: the course
         built that starting network for you, every weight an independent
         random number, made the
         way the exercise below has you make them (<code>rng.standard_normal</code>,
@@ -661,7 +661,7 @@ export function Module7() {
         carry the names of the authors who proposed them: <b>Xavier</b> (also called Glorot)
         initialization, which is the divisor above, and <b>He</b> initialization,
         which uses <M tex="\sqrt{2 / n_{\text{in}}}" /> instead and is the one
-        paired with the activation function Module 8 introduces. A framework calls
+        paired with the activation function Chapter 8 introduces. A framework calls
         this once per layer and never mentions it again, which is why a network that
         trains badly for want of it is hard to diagnose from the outside. Your{" "}
         <code>init_network</code> is Xavier initialization, written out.
@@ -688,7 +688,7 @@ export function Module7() {
         divides the drawn weights by the square root of the input count, the
         divided start, which is what your init_network builds. The other
         leaves the draw as it comes, the undivided start, which is exactly
-        the start Module 5 trained from.
+        the start Chapter 5 trained from.
       </p>
       <Figure caption="Two starting points, fifteen epochs each. The table above the chart is the hidden layer measured before either run takes a step; the chart is test accuracy per epoch afterwards. The dashed line is the undivided start, the solid line the divided one.">
         <InitStartPanel />
@@ -696,22 +696,22 @@ export function Module7() {
       <p>
         The divided start reads 85.3 percent of the held-out digits after one
         epoch, which is more than the undivided start reaches in its first four,
-        and 92.1 percent after fifteen against 87.8. Module 5's own run, the quadratic
+        and 92.1 percent after fifteen against 87.8. Chapter 5's own run, the quadratic
         cost at a step size of 3.0, reached 89.2 percent over the same fifteen
         epochs, so the network has gained about three points on where this
-        module started, and this change is where they came from.
+        chapter started, and this change is where they came from.
       </p>
       <p>
         One footnote on the two fixes together. Each cost can be given a step
         size that suits it, and at their best columns in the grid at the end of
-        this module the two land close: 89.9 percent for the quadratic cost
+        this chapter the two land close: 89.9 percent for the quadratic cost
         against 89.3 for cross-entropy, both from the undivided start. The
         cross-entropy cost reliably removes the slowdown, which is why it needs
         no cranked step size, and the division reliably removes a flat start.
         They are not competing.
       </p>
 
-      <SectionHeader id="m7-overfit" title="Learning the training set" />
+      <SectionHeader id="c7-overfit" title="Learning the training set" />
       <p>
         The third complaint needs a smaller dataset to become visible, so take
         the first 1,000 of the 5,000 training images and train on those alone.
@@ -766,9 +766,9 @@ export function Module7() {
         Two things follow. The first is a habit rather than a technique: hold
         data out, score on it, and read more than one number off it. The 1,000
         held-out digits in this course have never been trained on, in any
-        module. Without them, the training cost falling to 0.0093 would look
+        chapter. Without them, the training cost falling to 0.0093 would look
         like success. Without the second number, the flat held-out accuracy
-        here would hide the held-out cost rising beside it, the way Module 5's
+        here would hide the held-out cost rising beside it, the way Chapter 5's
         89 percent hid a 1 coming back at 122 of 126 and an 8 at only 68 of
         89.
       </p>
@@ -780,7 +780,7 @@ export function Module7() {
         getting part of the way.
       </p>
 
-      <SectionHeader id="m7-l2" title="Shrink every weight" />
+      <SectionHeader id="c7-l2" title="Shrink every weight" />
       <p>
         Track one more number through that run: the total of every weight
         squared, which is a plain measure of how big the weights have become.
@@ -809,7 +809,7 @@ export function Module7() {
       />
       <p>
         Descent needs the new term's slope for one weight, which means the
-        slope of <M tex="w^2" />. Nudge it by hand, the Module 3 way: move{" "}
+        slope of <M tex="w^2" />. Nudge it by hand, the Chapter 3 way: move{" "}
         <M tex="w" /> by a small amount <M tex="h" /> and read what the square
         does.
       </p>
@@ -827,23 +827,23 @@ export function Module7() {
       />
       <Aside>
         <p>
-          The same trick has been under the course since Module 3. Its cost is{" "}
+          The same trick has been under the course since Chapter 3. Its cost is{" "}
           <M tex="\tfrac12 (a - y)^2" />, and the half was never explained: it
           is there so that the 2 from squaring cancels on the way to the slope,
-          which is what Module 4 cashed in when the output layer's slope came
+          which is what Chapter 4 cashed in when the output layer's slope came
           out as the plain gap with no stray 2. Halving a squared quantity
           makes its slope the quantity itself.
         </p>
       </Aside>
       <p>
         A weight's whole slope is now the old one plus{" "}
-        <M tex="\lambda w / n" />. Put that into Module 3's update rule, and
+        <M tex="\lambda w / n" />. Put that into Chapter 3's update rule, and
         the two pieces that both contain <M tex="w" /> collect into one
         factor:
       </p>
       <Eq
-        tex="\begin{aligned} w &\leftarrow w - \eta \, \frac{\partial C}{\partial w} && \text{(Module 3's update)} \\[0.5em] w &\leftarrow w - \eta \frac{\lambda}{n} w - \eta \, \frac{\partial C}{\partial w} && \text{(the new slope joins)} \\[0.5em] w &\leftarrow \Big( 1 - \frac{\eta \lambda}{n} \Big) w - \eta \, \frac{\partial C}{\partial w} && \text{(collected)} \end{aligned}"
-        gloss="Top: the rule as it has been since Module 3, one weight stepped against its slope. Middle: the cost gained a term, so the slope gained one. Bottom: the same line with the two pieces that contain w collected into one factor. Everything after the factor is the top line again, so the whole change is that the weight is first multiplied by a number slightly below 1. That factor is the technique, and its name says what it does: weight decay. Biases keep the top line exactly, since the new term does not mention them."
+        tex="\begin{aligned} w &\leftarrow w - \eta \, \frac{\partial C}{\partial w} && \text{(Chapter 3's update)} \\[0.5em] w &\leftarrow w - \eta \frac{\lambda}{n} w - \eta \, \frac{\partial C}{\partial w} && \text{(the new slope joins)} \\[0.5em] w &\leftarrow \Big( 1 - \frac{\eta \lambda}{n} \Big) w - \eta \, \frac{\partial C}{\partial w} && \text{(collected)} \end{aligned}"
+        gloss="Top: the rule as it has been since Chapter 3, one weight stepped against its slope. Middle: the cost gained a term, so the slope gained one. Bottom: the same line with the two pieces that contain w collected into one factor. Everything after the factor is the top line again, so the whole change is that the weight is first multiplied by a number slightly below 1. That factor is the technique, and its name says what it does: weight decay. Biases keep the top line exactly, since the new term does not mention them."
       />
       <p>
         Adding a term to the cost to keep the parameters small is{" "}
@@ -872,7 +872,7 @@ export function Module7() {
       <ExerciseCard exercise={l2Exercise} />
       <p>
         The panel below runs the whole experiment in one press: both starting
-        points, each at <M tex="\lambda = 0" /> (your Module 3 update
+        points, each at <M tex="\lambda = 0" /> (your Chapter 3 update
         exactly), <M tex="\lambda = 1" /> and <M tex="\lambda = 5" />. Six
         runs, every one through your l2_step, same 1,000 images, same eighty
         epochs, same shuffle. The starting point is in the experiment because
@@ -917,9 +917,9 @@ export function Module7() {
         down hard enough that the network reads fewer digits.
       </p>
 
-      <SectionHeader id="m7-more" title="The rest of the toolbox" />
+      <SectionHeader id="c7-more" title="The rest of the toolbox" />
       <p>
-        Everything in this module was a constant chosen by trying: the step
+        Everything in this chapter was a constant chosen by trying: the step
         size, lambda, thirty hidden neurons, mini-batches of ten, fifteen
         epochs. Those choices are called hyperparameters, to separate them from
         the parameters descent finds on its own, and there is no equation for
@@ -1028,7 +1028,7 @@ export function Module7() {
         different formula, the starting weights are divided by a square root,
         and the update carries one extra factor. Your forward pass, your
         backward sweep with its four equations, your mini-batch shuffle and
-        your descent are exactly the code you wrote in Modules 2, 3 and 5. Module 8 asks
+        your descent are exactly the code you wrote in Chapters 2, 3 and 5. Chapter 8 asks
         what happens to those four equations when the network gets deep, and
         the answer is already visible in BP2.
       </p>
@@ -1039,9 +1039,9 @@ export function Module7() {
           "The first link is the neuron's own machinery and is not open to change; the second is the yardstick, and it is. The quadratic yardstick has a ceiling of 0.5 per output, so its rate can never grow enough to cover for a slack first link. The cross-entropy cost charges -ln of the confidence in the right answer, which rises without limit, at a rate of exactly the gap divided by the squash's slope. The two multiply out to the gap everywhere, so BP1 becomes delta = a - y with nothing struck out. BP2 keeps its own sigma-prime, which is a hidden neuron's own first link and out of the yardstick's reach.",
           "A hundred standard-bell weights pile up to about the square root of a hundred, so a hidden neuron's evidence starts 7 or more from zero on a typical image, leaving 62 percent of the readings flatter than 0.01 before training starts. Dividing each layer's weights by the square root of its input count puts the typical evidence within 1 of zero, with no reading flatter than 0.01, and is worth 4.3 points of accuracy against the same cost started undivided.",
           "Training on 1,000 images reaches 100 percent on those images while the held-out accuracy stops improving and the held-out cost turns around and rises: the network is buying confidence, not recognition. Weight decay multiplies every weight by a factor just under 1 each step, which reliably holds the weights and the held-out cost down, and buys accuracy only where something else left the weights too large.",
-          "Every constant here was found by trying, and the grid shows the step size mattering more than the cost. Module 8 takes the four equations into deep networks and finds a limit that no choice of cost fixes.",
+          "Every constant here was found by trying, and the grid shows the step size mattering more than the cost. Chapter 8 takes the four equations into deep networks and finds a limit that no choice of cost fixes.",
         ]}
-        chapter="Chapter 3 (improving the way neural networks learn)"
+        deeper="Chapter 3 (improving the way neural networks learn)"
         href="http://neuralnetworksanddeeplearning.com/chap3.html"
       />
     </article>

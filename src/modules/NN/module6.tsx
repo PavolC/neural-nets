@@ -7,10 +7,10 @@ import { scale, sigmoid } from "./interactives/utils";
 export function Module6() {
   return (
     <article className="module">
-      <h2>Module 6: Universality (an interlude)</h2>
+      <h2>Chapter 6: Universality (an interlude)</h2>
       <AfterThis
         items={[
-          "Say which of the three candidates for your digit reader's 89 percent this module rules out, and which two it leaves standing.",
+          "Say which of the three candidates for your digit reader's 89 percent this chapter rules out, and which two it leaves standing.",
           "Build a bump out of two neurons, and place it anywhere on an input's range by choosing two biases.",
           "Fit any curve you can draw with a hidden layer of bumps, and price the accuracy in neurons.",
         ]}
@@ -18,7 +18,7 @@ export function Module6() {
       <ModuleToc />
 
       <p>
-        Module 5 left your digit reader at about 89 percent, where Nielsen's
+        Chapter 5 left your digit reader at about 89 percent, where Nielsen's
         Chapter 1 reports about 95 on the same 784-30-10 shape with ten times
         the data. Three things could be capping it. The data: 5,000 training
         images instead of 50,000. The training: one learning rate, 15 epochs,
@@ -34,7 +34,7 @@ export function Module6() {
         enough hidden layer can express a function that gets every training
         image right, which leaves the data and the training to explain the 89
         percent. The data is fixed here so the run fits in a browser tab. That
-        leaves the training, and the training is Module 7.
+        leaves the training, and the training is Chapter 7.
       </p>
       <p>
         The network below has one input, one output, and weights placed by hand
@@ -42,13 +42,13 @@ export function Module6() {
         picture. There is no code and no exercise here.
       </p>
 
-      <SectionHeader id="m6-ask" title="One dial, one answer" />
+      <SectionHeader id="c6-ask" title="One dial, one answer" />
       <p>
         Give a network this job. One number in, one number out: hand it the
         forecast, and it answers how much you want to go to the concert, from 0
-        to 10. Module 1's weather input was a switch, 1 for good and 0 for bad.
+        to 10. Chapter 1's weather input was a switch, 1 for good and 0 for bad.
         This one is a dial, 0 at freezing and 1 at scorching, which is the kind
-        of input your digit reader has had all along: Module 2 fed it ink levels,
+        of input your digit reader has had all along: Chapter 2 fed it ink levels,
         0 for blank paper and 1 for full ink.
       </p>
       <p>Your own answers, temperature by temperature, are the job.</p>
@@ -70,7 +70,7 @@ export function Module6() {
         around, so the far side of the hump stays out of reach.
       </p>
       <p>
-        Module 1 hit this kind of wall before, when no single straight line could
+        Chapter 1 hit this kind of wall before, when no single straight line could
         separate the four concert dots under the rule go when exactly one of the
         two things is good. The fix there was a hidden layer, and it is the fix
         here too, except that this one gets built by hand instead of trained.
@@ -81,7 +81,7 @@ export function Module6() {
         here is out of reach there.
       </p>
 
-      <SectionHeader id="m6-steps" title="Turn the steepness up" />
+      <SectionHeader id="c6-steps" title="Turn the steepness up" />
       <p>
         That curve sits at 9 in the middle and near 1 at both ends, so whatever
         builds it has to act on one stretch of the dial and leave the rest
@@ -95,7 +95,7 @@ export function Module6() {
         Two numbers describe each panel, and both read off the neuron directly.
         The switchover sits where the evidence is exactly zero: solve{" "}
         <M tex="wx + b = 0" /> and it is at <M tex="x = -b/w" />, minus the bias
-        over the weight. Module 1 solved the same equation with two inputs,{" "}
+        over the weight. Chapter 1 solved the same equation with two inputs,{" "}
         <M tex="w_1 x_1 + w_2 x_2 + b = 0" />, and got a straight line across the
         concert plane, the frontier with go on one side and stay on the other.
         With one input that frontier has nowhere to run, so it shrinks to the one
@@ -121,7 +121,7 @@ export function Module6() {
       </p>
       <Aside>
         <p>
-          Module 1 argued for the sigmoid over the perceptron's hard step,
+          Chapter 1 argued for the sigmoid over the perceptron's hard step,
           because a step's slope is zero everywhere and leaves learning nothing
           to work with, and that argument still holds. Nothing on this page gets
           trained, so flat parts cost nothing here, and a large weight only
@@ -129,7 +129,7 @@ export function Module6() {
         </p>
       </Aside>
 
-      <SectionHeader id="m6-bump" title="Two steps make a bump" />
+      <SectionHeader id="c6-bump" title="Two steps make a bump" />
       <p>
         A step still acts on everything to its right: past 0.40 it reports 1
         forever, including out at the scorching end where the rating belongs
@@ -192,7 +192,7 @@ export function Module6() {
         gloss="Six numbers per bump, set by three decisions: where it starts, where it ends, how tall it is. Both weights in are the shared steepness, both biases come from the edges, and the two weights out are one height with opposite signs. The output neuron's own bias stays 0 all through this page, so it is not one of the six."
       />
       <p>
-        You have built this network before. Module 1's rule, go when exactly one
+        You have built this network before. Chapter 1's rule, go when exactly one
         of the two things is good, came out as two hidden neurons with weights 6
         and 6 and biases <M tex="-3" /> and <M tex="-9" />, feeding an output
         through wires carrying <M tex="+8" /> and <M tex="-8" /> with a bias of{" "}
@@ -225,17 +225,17 @@ export function Module6() {
         because a weight of 6 makes each switchover <M tex="6/6 = 1" /> wide
         while the two steps sit 1 apart. The switchovers overlap, so the corners
         come out round instead of square. Lower the steepness in the playground
-        above and you are looking at Module 1's version of this bump.
+        above and you are looking at Chapter 1's version of this bump.
       </p>
       <p>
-        Module 1 then squashed that total, and the bias <M tex="-4" /> acted as a
+        Chapter 1 then squashed that total, and the bias <M tex="-4" /> acted as a
         threshold, turning inside the bump into a yes. This page leaves the
         squash off, so the height is the answer instead of a verdict.
       </p>
       <Aside>
         <p>
           One departure from the anatomy the course has used so far. In every
-          earlier module the last neuron squashed its total with{" "}
+          earlier chapter the last neuron squashed its total with{" "}
           <M tex="\sigma" />, because the answer was a confidence between 0 and
           1. Here the answer is a rating out of 10, so the last neuron reports
           its total unsquashed, which is how networks that predict a quantity
@@ -245,7 +245,7 @@ export function Module6() {
         </p>
       </Aside>
 
-      <SectionHeader id="m6-sculpt" title="Sculpt any curve" />
+      <SectionHeader id="c6-sculpt" title="Sculpt any curve" />
       <p>
         A bump is a bar. Slice the dial into equal pieces, give each piece its
         own bump, and set each height to where the target runs over that piece:
@@ -254,7 +254,7 @@ export function Module6() {
         network you trained, which is 15 bars' worth.
       </p>
       <p>
-        The weights now hold a lookup table. Module 1's truth table had four
+        The weights now hold a lookup table. Chapter 1's truth table had four
         rows, one per situation, with the answer written beside it. This one has
         a row per slice of the dial, each row's answer is that bar's height, and
         the network answers by looking up whichever slice the dial is in.
@@ -268,12 +268,12 @@ export function Module6() {
         <CurveSculptor />
       </Figure>
 
-      <SectionHeader id="m6-price" title="What accuracy costs" />
+      <SectionHeader id="c6-price" title="What accuracy costs" />
       <p>
         Here is what Fit it for me scores on the first curve, at the sharpness
         the playground starts with. The dial is one unit wide, so the area
         between the curves is also the average miss in rating points: the same
-        kind of number as Module 3's cost, one score for the whole fit, though it
+        kind of number as Chapter 3's cost, one score for the whole fit, though it
         averages the plain gap rather than the squared one.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
@@ -332,9 +332,9 @@ export function Module6() {
         whose accuracy is easy to argue about, not the best these neurons can do.
       </p>
 
-      <SectionHeader id="m6-inputs" title="More than one input" />
+      <SectionHeader id="c6-inputs" title="More than one input" />
       <p>
-        One dial gave a curve. Two dials give a surface: Module 1's concert
+        One dial gave a curve. Two dials give a surface: Chapter 1's concert
         plane with both inputs turned continuous, the forecast across and how
         keen your friend is up, and a rating at every point of the square. The
         four dots become every point of it, and the tinted region where one
@@ -383,7 +383,7 @@ export function Module6() {
         </p>
       </Aside>
 
-      <SectionHeader id="m6-digits" title="Back to the digit reader" />
+      <SectionHeader id="c6-digits" title="Back to the digit reader" />
       <p>
         Your digit reader has 784 inputs, and towers work there too: two neurons
         fence a band along each input, one more thresholds the sum, and the
@@ -419,13 +419,13 @@ export function Module6() {
         express a function that fits every training image, and can approximate
         any pixels-to-digit rule you could write down. The argument does not say
         how to find such a function by descent, and it gives no reason for the
-        one you do find to work on images it has not seen. Module 7 takes on both
+        one you do find to work on images it has not seen. Chapter 7 takes on both
         of those. The argument also leaves one thing genuinely open: whether 30
         hidden neurons in particular are enough, since universality is about the
         family of these networks rather than one size of one of them.
       </p>
 
-      <SectionHeader id="m6-limits" title="What universality does not say" />
+      <SectionHeader id="c6-limits" title="What universality does not say" />
       <p>Four limits, because the claim is easy to over-read.</p>
       <p>
         A target that jumps is out of reach. Sums of sigmoids always move a
@@ -444,18 +444,18 @@ export function Module6() {
       <p>
         Existing and being findable are different things. Every number on this
         page was placed by hand, and descent would not produce weights like
-        these. Module 2's pretrained network had weights that looked like blurry
+        these. Chapter 2's pretrained network had weights that looked like blurry
         strokes of ink, nothing like bar edges, and no training run would land on
         the box network.
       </p>
       <p>
         The construction also wastes neurons: two per slice, and 7.8 million of
-        them for the box network. Module 2 called a hidden neuron a little
+        them for the box network. Chapter 2 called a hidden neuron a little
         pattern-detector, and each of your trained network's 30 detectors helps
         describe every image it sees. The box network's detectors each know one
         image and share nothing, which is where the 260,000-fold difference in
         size comes from. Deeper networks reuse their detectors across the input
-        instead of tiling it, which is Module 8's subject.
+        instead of tiling it, which is Chapter 8's subject.
       </p>
       <p>
         So universality is not a technique you apply. It removes one explanation
@@ -468,10 +468,10 @@ export function Module6() {
           "One neuron on one input can only climb and flatten, or fall and flatten. A hump needs at least two: two large-weight neurons in one hidden layer, their outgoing wires carrying opposite weights, make a bump whose edges are the two biases and whose height is those two weights.",
           "A neuron's switchover sits at minus its bias over its weight, and is 6/w of the input range wide, so a large weight turns a sigmoid into a step.",
           "Slice the input, give each slice a bump, and the network traces the target as a bar chart. Doubling the bars roughly halves the area between the curves, at two neurons and six numbers per bar. Two inputs replace bars with towers, built by thresholding a pair of crossed bumps.",
-          "Universality settles one of the three candidates for your digit reader's 89 percent: not the architecture. A wide enough hidden layer can express a function that fits every training image, so the shortfall is in the data and the training, and Module 7 goes after the training.",
+          "Universality settles one of the three candidates for your digit reader's 89 percent: not the architecture. A wide enough hidden layer can express a function that fits every training image, so the shortfall is in the data and the training, and Chapter 7 goes after the training.",
           "What it does not say: that descent finds those weights, that they are efficient (7.8 million hidden neurons for the box network against your 30), or that a function fitting the training images reads new ones.",
         ]}
-        chapter="Chapter 4 (a visual proof that neural nets can compute any function)"
+        deeper="Chapter 4 (a visual proof that neural nets can compute any function)"
         href="http://neuralnetworksanddeeplearning.com/chap4.html"
       />
     </article>
@@ -728,11 +728,11 @@ function StepSharpnessFigure() {
   );
 }
 
-// Static wiring diagram of the 1-2-1 bump network, drawn to Module 1's
+// Static wiring diagram of the 1-2-1 bump network, drawn to Chapter 1's
 // TinyNetDiagram conventions (same node radius, same column captions, same
 // natural-scale 490 viewBox) so the reader recognizes it as the same kind of
 // picture. Weights sit on the wires and biases inside the neurons, which is
-// the anatomy Modules 1, 2 and 4 use; the numbers are the ones the prose and
+// the anatomy Chapters 1, 2 and 4 use; the numbers are the ones the prose and
 // the playground below both carry.
 function BumpNetDiagram() {
   const R = 22;

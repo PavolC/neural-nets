@@ -170,6 +170,64 @@ export function ensureLibrary(force = false): MigrationReport {
 	return { ran: true, adopted, droppedImports };
 }
 
+/** Rewrite marker lines whose text has drifted from the section table.
+ *
+ * A marker carries the course's word for its own units ("# ---- [section:
+ * backprop] Chapter 5, Backpropagation ----"), so a document saved before the
+ * chapters rename still says Module while the picker above it says Chapter.
+ * Only the marker line is rewritten: every body is preserved byte for byte, so
+ * no work is touched and no pass is lost (a pass hashes the body, not the
+ * marker). Gated on a clean parse, the same gate the splices use, because a
+ * document whose markers are already mangled is one to leave alone. A document
+ * that never gets this still runs: the parse keys on the section id, and the
+ * rest of the marker line is free text.
+ */
+export function refreshMarkers(): boolean {
+	const text = get(DOC_KEY);
+	if (text === null) return false;
+	const doc = parseDocument(text);
+	if (!doc.clean) return false;
+
+	let out = text;
+	let changed = false;
+	// Backwards, so an earlier section's offsets stay valid as later ones move.
+	for (let i = doc.sections.length - 1; i >= 0; i--) {
+		const section = doc.sections[i];
+		const def = SECTION_BY_ID.get(section.id);
+		if (!def) continue;
+		const eol = out.indexOf("\n", section.from);
+		const end = eol === -1 ? out.length : eol;
+		if (out.slice(section.from, end) === def.marker) continue;
+		out = out.slice(0, section.from) + def.marker + out.slice(end);
+		changed = true;
+	}
+	// The prelude explains the format by showing a section line, indented so the
+	// anchored marker regex never reads it as one. It carries the same word, so
+	// it goes stale in the same way. Only a line that already has a marker's
+	// exact shape is touched, and it keeps its own indentation: the rest of the
+	// prelude is left alone, because a learner may have added to it and the
+	// clean gate above does not require it to match the course's copy.
+	const preludeEnd = doc.sections.length ? doc.sections[0].from : out.length;
+	const head = out.slice(0, preludeEnd).replace(
+		/^([ \t]+)#[ \t]*-{2,}[ \t]*\[section:([a-z0-9-]+)\][^\n]*$/gm,
+		(line, indent, id) => {
+			const def = SECTION_BY_ID.get(id);
+			return def ? indent + def.marker : line;
+		},
+	);
+	if (head !== out.slice(0, preludeEnd)) {
+		out = head + out.slice(preludeEnd);
+		changed = true;
+	}
+
+	if (!changed) return false;
+
+	set(DOC_KEY, out);
+	cached = null;
+	refreshProjections();
+	return true;
+}
+
 /** True while the pre-workbench copies are still recoverable. */
 export function hasBackup(): boolean {
 	return get("at", BACKUP) !== null;

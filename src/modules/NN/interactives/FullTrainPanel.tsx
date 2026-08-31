@@ -10,10 +10,10 @@ import { lockedBy, speakList } from "./lockedBy";
 import { EpochChart, type EpochSeries } from "./EpochChart";
 
 // The capstone run: the learner's own loop, on the digit reader, with their
-// Module 7 functions patched into `course` first so that everything the loop
+// Chapter 7 functions patched into `course` first so that everything the loop
 // reaches for is theirs. The one exception is backprop, which stays the
-// course's copy carrying their Module 5 algorithm with BP1 lifted into an
-// argument, exactly as Module 7 handed it back.
+// course's copy carrying their Chapter 5 algorithm with BP1 lifted into an
+// argument, exactly as Chapter 7 handed it back.
 //
 // Progress streams by wrapping their own accuracy function: train calls it
 // once per epoch by contract, so the wrapper is the per-epoch hook. A loop
@@ -153,7 +153,7 @@ export function FullTrainPanel() {
     const missing = speakList(
       lockedBy(
         [trainExercise.id, smartInitExercise.id, crossEntropyExercise.id, l2Exercise.id],
-        { [trainExercise.id]: "this module's exercise" },
+        { [trainExercise.id]: "this chapter's exercise" },
       ),
     );
     return (

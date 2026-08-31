@@ -7,9 +7,9 @@ import { trainExercise } from "../../../exercises/train";
 import { EpochChart, type EpochSeries } from "./EpochChart";
 import { lockedBy, speakList } from "./lockedBy";
 
-// Module 10's payoff: the learner's own preparation and their own training
+// Chapter 10's payoff: the learner's own preparation and their own training
 // loop, on a file that arrives the way data actually does. Two switches,
-// because the module's two claims are both comparisons: scaling against not,
+// because the chapter's two claims are both comparisons: scaling against not,
 // and four measurements against two.
 
 const EPOCHS = 30;
@@ -24,11 +24,11 @@ _a = json.loads(_args_json)
 
 # Their whole file, once. _prep and _prog are the same module: their
 # standardize, one_hot and split sit below their train in it, and train calls
-# the pieces above it. So "your train from Module 9 does the rest" is now
+# the pieces above it. So "your train from Chapter 9 does the rest" is now
 # literally what happens.
 #
 # The one_hot collision is harmless and worth naming: the worker's loader has
-# a one_hot(y, num_classes=10) for MNIST, and the learner's Module 10
+# a one_hot(y, num_classes=10) for MNIST, and the learner's Chapter 10
 # one_hot(values, levels) is a different function with the same name. They
 # never meet, because the file execs into its own module and this panel builds
 # Y itself. Do not inject the worker's globals into that namespace.
@@ -151,7 +151,7 @@ export function PenguinsPanel() {
 
   const run = () => {
     // One projection: the file through the preparation section holds their
-    // program too, since Module 9 comes before Module 10.
+    // program too, since Chapter 9 comes before Chapter 10.
     const code = loadCode(prepareExercise.id);
     if (!code) return;
     setRunning(true);
@@ -195,7 +195,7 @@ export function PenguinsPanel() {
   if (!unlocked) {
     const missing = speakList(
       lockedBy([prepareExercise.id, trainExercise.id], {
-        [prepareExercise.id]: "this module's exercise",
+        [prepareExercise.id]: "this chapter's exercise",
       }),
     );
     return (

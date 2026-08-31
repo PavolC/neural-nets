@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 
 /** True once the element has been near the viewport, and true forever after.
  *
- * Used to keep work off the first paint. Every module renders into one long
+ * Used to keep work off the first paint. Every chapter renders into one long
  * document, so anything that fetches or imports on mount would otherwise do it
  * while the reader is still on the first paragraph: the MNIST subset for
- * Module 2's interactives, and CodeMirror for the exercises. The margin starts
+ * Chapter 2's interactives, and CodeMirror for the exercises. The margin starts
  * the work before the element is actually visible, so arriving at it does not
  * mean waiting for it.
  *

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { scale } from "./utils";
 
-// Module 3 interactives (a): gradient descent you can steer. 1D shows the
+// Chapter 3 interactives (a): gradient descent you can steer. 1D shows the
 // step rule and learning-rate overshoot; 2D shows zigzag on an elongated
 // valley. Both are pure UI: the real thing gets implemented in the exercise.
 

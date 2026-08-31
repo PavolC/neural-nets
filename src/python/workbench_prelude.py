@@ -7,7 +7,7 @@ but NumPy to run.
 
 A line like
 
-    # ---- [section:backprop] Module 5, Backpropagation ----
+    # ---- [section:backprop] Chapter 5, Backpropagation ----
 
 is a section line. The course reads the name in the brackets to find where
 each piece starts, so it can run the right tests and tell me which piece a

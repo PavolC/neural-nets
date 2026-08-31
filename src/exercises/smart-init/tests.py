@@ -25,7 +25,7 @@ def test_shapes():
         f"expected bias shapes (4, 1) and (3, 1), got {biases[0].shape} and "
         f"{biases[1].shape}. Biases are column vectors, one entry per "
         "neuron in the receiving layer; a shape of (4,) is the flat array "
-        "the course has been avoiding since Module 1."
+        "the course has been avoiding since Chapter 1."
     )
 
 
@@ -89,7 +89,7 @@ def test_same_seed_same_network():
             "two calls with the same seed built different networks. Every "
             "draw has to come from the rng argument: np.random.standard_normal "
             "or np.random.randn read a global generator instead, which no "
-            "seed of yours controls, and then no training run in this module "
+            "seed of yours controls, and then no training run in this chapter "
             "can be compared with another."
         )
     third = init_network([6, 4, 3], np.random.default_rng(12))

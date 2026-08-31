@@ -14,7 +14,7 @@
  * copies still carry this exact path.
  *
  * Pick something the course itself draws. This course uses the sigmoid curve, which
- * is the first figure in Module 1 and the shape every neuron in the course is
+ * is the first figure in Chapter 1 and the shape every neuron in the course is
  * built from. A glyph that means nothing is worse than a letter.
  */
 export interface Glyph {
@@ -46,7 +46,7 @@ export const SERIES = {
 	 *  to its siblings, and it is a trap: shipping the fourth course would mean
 	 *  editing and redeploying four repositories, and any one of them forgotten
 	 *  shows a stale list forever. This is the same hand-maintained-list failure
-	 *  that once let the front page claim ten modules over a list of eight,
+	 *  that once let the front page claim ten chapters over a list of eight,
 	 *  multiplied by the number of courses. Linking up means shipping a course
 	 *  edits exactly one repository, and nothing anywhere else can go stale.
 	 *

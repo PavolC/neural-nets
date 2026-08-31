@@ -9,8 +9,8 @@ from submission import cross_entropy_cost, cross_entropy_delta
 
 
 def _fixture_net():
-    # The same 2-3-1 network as Module 5's tests, so its numbers can be
-    # compared with the ones that module printed.
+    # The same 2-3-1 network as Chapter 5's tests, so its numbers can be
+    # compared with the ones that chapter printed.
     w0 = np.array([[0.5, -0.3], [-0.8, 0.9], [0.1, 0.4]])
     b0 = np.array([[0.1], [-0.2], [0.3]])
     w1 = np.array([[0.7, -0.5, 0.2]])
@@ -100,7 +100,7 @@ def test_delta_values():
         "come out at size 0.98, the gap. If you got 0.0192, the "
         "sigmoid_prime factor is still there: that factor is exactly what "
         "this cost was chosen to cancel. If the signs are swapped, the "
-        "gap is output minus right answer, as it has been since Module 4."
+        "gap is output minus right answer, as it has been since Chapter 4."
     )
 
 
@@ -125,7 +125,7 @@ def test_cost_and_delta_agree():
     # a guarantee whose yardstick shares the code under test is not a
     # guarantee, and the code under test here is your delta.
     from course import backprop, numerical_gradient
-    # Module 5's gradient-check network, a 3-5-4-2 with two hidden layers.
+    # Chapter 5's gradient-check network, a 3-5-4-2 with two hidden layers.
     weights = [
         np.array([[-0.8, -1.32, -0.25],
                   [0.42, 1.14, 0.11],
@@ -187,15 +187,15 @@ def test_backprop_takes_the_blame_argument():
     backprop = getattr(submission, "backprop", None)
     assert backprop is not None, (
         "your file has no backprop yet. This exercise changes the one you "
-        "wrote in Module 5, so write that first."
+        "wrote in Chapter 5, so write that first."
     )
     params = list(inspect.signature(backprop).parameters)
     assert len(params) >= 5, (
         f"your backprop takes {len(params)} arguments, {params}, so there is "
-        "nowhere to hand it a different BP1. Module 7's prompt shows the "
+        "nowhere to hand it a different BP1. Chapter 7's prompt shows the "
         "two lines: add output_delta=None to the signature, and make the "
         "BP1 line use it when it is not None. Leave it out and your "
-        "function does exactly what it did in Module 5. Until you make "
+        "function does exactly what it did in Chapter 5. Until you make "
         "that edit, everything that swaps the cost has no way in."
     )
     last = params[4]

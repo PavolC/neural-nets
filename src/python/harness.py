@@ -197,9 +197,9 @@ def _crash_message(err, section, target_id=None):
         return (
             f"your code raised {err['message']}. The adapter written for "
             "you calls backprop with a fifth argument, the swapped-in BP1. "
-            "Your Backpropagation section from Module 5 has not been given "
+            "Your Backpropagation section from Chapter 5 has not been given "
             "room for it yet: add output_delta=None to its signature and "
-            "the two lines Module 7's prompt shows."
+            "the two lines Chapter 7's prompt shows."
         )
     return (
         f"your code raised {err['message']}{where}, which is inside your "
@@ -261,7 +261,7 @@ def run_document_scratch(document, scratch_code, spec_json):
         })
     if scratch_code.strip():
         # The bundled datasets, so a play snippet can open one. Never one_hot:
-        # the loader's one_hot(y, num_classes=10) and the learner's Module 10
+        # the loader's one_hot(y, num_classes=10) and the learner's Chapter 10
         # one_hot(values, levels) are different functions with the same name,
         # and this is the one place the two could meet.
         import course

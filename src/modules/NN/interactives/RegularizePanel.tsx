@@ -8,9 +8,9 @@ import { l2Exercise } from "../../../exercises/l2";
 import { EpochChart, type EpochSeries } from "./EpochChart";
 import { lockedBy, speakList } from "./lockedBy";
 
-// Module 7, third cycle: the 1,000-image slice, trained through the learner's
+// Chapter 7, third cycle: the 1,000-image slice, trained through the learner's
 // l2_step. One button runs the whole experiment: both starting points, each
-// at lambda 0 (which is exactly their Module 3 update), 1 and 5. The panel
+// at lambda 0 (which is exactly their Chapter 3 update), 1 and 5. The panel
 // used to offer the settings as chips and train one pair per press, and the
 // comparison the section makes (decay against none, from each start) lived in
 // the reader's memory; now every line and every row is on screen at once.
@@ -37,10 +37,10 @@ const lineCls = (r: { start: string; lmbda: number }) =>
   (r.lmbda === 1 ? " m7-line-dashed" : r.lmbda === 5 ? " m7-line-dotted" : "");
 
 // The loop is their sgd's loop written out, so its update line can be theirs
-// from this module's exercise. Shuffle order matches the sgd contract:
+// from this chapter's exercise. Shuffle order matches the sgd contract:
 // rng.permutation, then consecutive slices of batch_size. Each run draws its
 // start and its shuffle from fresh fixed seeds, so the six runs are the same
-// runs however they are grouped, and the module's quoted numbers hold.
+// runs however they are grouped, and the chapter's quoted numbers hold.
 const SNIPPET = `
 import json, time, types
 import numpy as np
@@ -49,7 +49,7 @@ _a = json.loads(_args_json)
 
 # The learner's file, once, up to and including their decaying step. The
 # epoch loop below stays written out here rather than calling their sgd,
-# deliberately: this panel varies lambda and the module quotes its numbers.
+# deliberately: this panel varies lambda and the chapter quotes its numbers.
 _lib = types.ModuleType("your_code")
 exec(compile(_a["code"], "your_code.py", "exec"), _lib.__dict__)
 feedforward = _lib.feedforward

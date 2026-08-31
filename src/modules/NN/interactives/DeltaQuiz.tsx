@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { START, cloneNet, compute, fmt } from "./backpropNet";
 
-// Module 4's exercise substitute: three predict-then-verify questions about
+// Chapter 4's exercise substitute: three predict-then-verify questions about
 // where blame flows. Every number in the explanations is computed live from
 // the same network definition the stepper uses, on its starting weights.
 
@@ -60,7 +60,7 @@ function buildQuestions(): Question[] {
         `the gap (now nearly −1, as large as it gets) by σ′(z³), and at z³ = ${fmt(q2.z3[0])} ` +
         `the sigmoid is flat: its slope is ${fmt(q2.a3[0] * (1 - q2.a3[0]), 4)}. A saturated ` +
         `neuron barely responds to nudges, so no nudge looks worth taking, so gradient descent ` +
-        `barely moves it: badly wrong and barely learning, at the same time. Module 7 ` +
+        `barely moves it: badly wrong and barely learning, at the same time. Chapter 7 ` +
         `starts from exactly this problem.`,
     },
     {

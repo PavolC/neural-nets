@@ -104,7 +104,7 @@ const VERDICTS = {
 				title: "feedforward's two-layer values",
 				passed: false,
 				section: "sigmoid-neuron",
-				message: "your code raised ValueError at line 118 of your file, which is inside your Module 1, A sigmoid neuron section. That section is where the error is, not this one.",
+				message: "your code raised ValueError at line 118 of your file, which is inside your Chapter 1, A sigmoid neuron section. That section is where the error is, not this one.",
 			},
 		],
 	},
@@ -234,8 +234,8 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
 			.locator(".wb-sections-label")
 			.textContent()
 			.then((s) => s.trim());
-	// Point the panel at Module 2 first, so clicking Module 1's marker has
-	// something to prove. The chip above already moved it to Module 1.
+	// Point the panel at Chapter 2 first, so clicking Chapter 1's marker has
+	// something to prove. The chip above already moved it to Chapter 1.
 	await p.locator(".wb-sections > summary").click();
 	await p.locator(".wb-section-item", { hasText: "Feedforward" }).click();
 	await p.waitForTimeout(400);
@@ -329,8 +329,8 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
 	await p.waitForFunction(() => localStorage.getItem("gn:v1:code:workbench")?.includes("[section:feedforward]"));
 	await p.locator(".wb-editor .cm-content").click();
 	await p.keyboard.press("Control+End");
-	await p.keyboard.type("\n# receiver-only Module 2 work");
-	await p.waitForFunction(() => localStorage.getItem("gn:v1:code:workbench")?.includes("receiver-only Module 2 work"));
+	await p.keyboard.type("\n# receiver-only Chapter 2 work");
+	await p.waitForFunction(() => localStorage.getItem("gn:v1:code:workbench")?.includes("receiver-only Chapter 2 work"));
 
 	console.log("\na current progress file merges without losing local sections");
 	const progress = {
@@ -352,8 +352,8 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
 		const undo = localStorage.getItem("gn:v1:code:undo-workbench") ?? "";
 		return {
 			module2: stored.includes("[section:feedforward]"),
-			localText: stored.includes("receiver-only Module 2 work"),
-			undo: undo.includes("receiver-only Module 2 work"),
+			localText: stored.includes("receiver-only Chapter 2 work"),
+			undo: undo.includes("receiver-only Chapter 2 work"),
 			imported: !stored.includes("changed after the passing run"),
 		};
 	});
@@ -361,7 +361,7 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
 	if (!merged.module2 || !merged.localText || !merged.undo || !merged.imported) failures++;
 
 	// Type once after the import. If CodeMirror kept its pre-import document,
-	// this write puts the changed Module 1 text back into storage.
+	// this write puts the changed Chapter 1 text back into storage.
 	await p.locator(".wb-editor .cm-content").click();
 	await p.keyboard.press("Control+End");
 	await p.keyboard.type("\n# after import");

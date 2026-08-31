@@ -7,19 +7,19 @@ export const sgdExercise: Exercise = {
   id: "sgd",
   title: "Stochastic gradient descent",
   prompt: [
-    "The module ended with one rule: new parameter = old parameter - " +
-      "eta * slope. eta is the learning rate, the η from the module's " +
+    "The chapter ended with one rule: new parameter = old parameter - " +
+      "eta * slope. eta is the learning rate, the η from the chapter's " +
       "sliders: the small number you choose that sets the step size. This " +
       "exercise is that rule as code, in the two functions waiting in the " +
       "editor.",
     "sgd_step(weights, biases, X, Y, eta) takes one step of descent on " +
       "one mini-batch: X holds that batch's inputs as columns and Y the " +
-      "right answers in matching columns, the packing the module just " +
+      "right answers in matching columns, the packing the chapter just " +
       "showed. Call gradient(weights, biases, X, Y), which is written for you " +
       "in the section just above yours, to get the " +
       "slopes: it takes the same inputs as quadratic_cost, and where " +
       "quadratic_cost returns the score, gradient returns (nabla_w, " +
-      "nabla_b). Those two names are the module's ∇C: nabla is how that " +
+      "nabla_b). Those two names are the chapter's ∇C: nabla is how that " +
       "upside-down delta is read, and the pair is the one list of slopes " +
       "split in two, the weights' slopes and the biases' slopes. There is " +
       "one slope array per parameter array, nabla_w[0] shaped like " +
@@ -35,7 +35,7 @@ export const sgdExercise: Exercise = {
       "the next call. Return the final (weights, biases). That is all " +
       "training is.",
     "The shuffling is prescribed, because the tests replay your run and " +
-      "compare to six decimal places. Later modules also put two runs of this " +
+      "compare to six decimal places. Later chapters also put two runs of this " +
       "same sgd side by side, and holding the shuffle fixed is what leaves the " +
       "pair differing only in the thing being compared. " +
       "Each epoch, idx = rng.permutation(n) " +
@@ -45,8 +45,8 @@ export const sgdExercise: Exercise = {
       "To pull those samples out, use one new piece of NumPy: an array of " +
       "indices works anywhere a single index does, so X[:, batch] is the " +
       "matrix of just those columns. Use the rng for nothing else.",
-    "A satisfying experiment once sgd_step works: let it repair Module 1's " +
-      "slider network from its starting position, the one the module scored " +
+    "A satisfying experiment once sgd_step works: let it repair Chapter 1's " +
+      "slider network from its starting position, the one the chapter scored " +
       "by hand at cost 0.0875. Send this to the scratch pad and run it:",
     {
       code:

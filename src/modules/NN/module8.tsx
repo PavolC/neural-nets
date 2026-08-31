@@ -7,26 +7,26 @@ import { sigmoid } from "./interactives/utils";
 export function Module8() {
   return (
     <article className="module">
-      <h2>Module 8: Why deep is hard (and what came next)</h2>
+      <h2>Chapter 8: Why deep is hard (and what came next)</h2>
       <AfterThis
         items={[
           "Measure how fast each layer of a network is learning, and read a deep network's first epochs off those numbers before it takes a step.",
-          "Take one backward hop apart into the two factors BP2 multiplies by, and say which one Module 7's division fixed and which one no choice of cost can.",
+          "Take one backward hop apart into the two factors BP2 multiplies by, and say which one Chapter 7's division fixed and which one no choice of cost can.",
           "Say what ReLU changes, what a convolutional layer shares, and where a network keeps the description it has learned.",
         ]}
       />
       <ModuleToc />
 
-      <SectionHeader id="m8-deeper" title="One more layer" />
+      <SectionHeader id="c8-deeper" title="One more layer" />
       <p>
-        Module 7 left the digit reader at 92.1 percent of a thousand held-out
+        Chapter 7 left the digit reader at 92.1 percent of a thousand held-out
         digits: 784 pixels in, one hidden layer of 30 neurons, ten outputs, the
         cross-entropy blame at the output, every weight divided by the square
         root of its layer's input count. The next thing to try is another hidden
         layer.
       </p>
       <p>
-        There is a reason to expect that to buy something, and Module 6 priced
+        There is a reason to expect that to buy something, and Chapter 6 priced
         the alternative. Its box network fenced every training image separately,
         two neurons per pixel per image, 7.8 million of them, and nothing in that
         construction was shared between one part of the input and another. A
@@ -100,7 +100,7 @@ export function Module8() {
         commonest and nothing else.
       </p>
       <p>
-        Module 7 closed by showing the step size mattering more than either of its
+        Chapter 7 closed by showing the step size mattering more than either of its
         fixes, so that is the first thing to rule out. Doubling it to 1.0 lifts the
         four-layer network's first epoch from 12.6 percent to 23.2 and drops its
         last five from 86.5 to 84.0. At 2.0 the pair is 24.2 and 74.4; at 3.0, 21.0
@@ -117,7 +117,7 @@ export function Module8() {
         measure to find out?
       </p>
 
-      <SectionHeader id="m8-speed" title="Which layer is learning" />
+      <SectionHeader id="c8-speed" title="Which layer is learning" />
       <p>
         Backprop already computes the number this needs. BP3 said a neuron's bias
         slope is its blame, so the gradient the update rule uses for a layer's
@@ -128,14 +128,14 @@ export function Module8() {
       </p>
       <p>
         The size of a column is what the double bars mean: square every entry,
-        add them up, take the square root. Module 3 put those bars inside the
+        add them up, take the square root. Chapter 3 put those bars inside the
         quadratic cost with a squared on them. The square cancelled the root, so
         the recipe there stopped at square and add. Applied to a layer's bias
         gradient, call it that layer's learning speed. The field's name for the size
         of a gradient measured this way is its <b>norm</b>, so a paper that reports
         "the gradient norm at layer l" is reporting the number in the table below.
         Here is one
-        four-hidden-layer network measured at Module 7's start, before it has
+        four-hidden-layer network measured at Chapter 7's start, before it has
         taken a single step (every speed here comes from the gradient averaged
         over 200 of the thousand held-out digits, the same batch the panel below
         uses). Layer 1 is the 784 pixels, which have no biases and nothing to
@@ -186,14 +186,14 @@ export function Module8() {
         4.8, 26.2, 117, 567 and 3,002 times.
       </p>
 
-      <SectionHeader id="m8-hop" title="One fifth per hop" />
+      <SectionHeader id="c8-hop" title="One fifth per hop" />
       <p>
-        That constant factor is BP2, and BP2 has not changed since Module 4. It
+        That constant factor is BP2, and BP2 has not changed since Chapter 4. It
         is the equation that carries blame one layer back:
       </p>
       <Eq
         tex="\delta^l = \underbrace{\big( (w^{l+1})^T \delta^{l+1} \big)}_{\text{back through the wire ledger}} \odot \underbrace{\sigma'(z^l)}_{\text{scale by the squash's slope}}"
-        gloss="Module 4's BP2. The blame column of the layer above goes back through that layer's weight matrix transposed, which regroups the wires by sender, and then every entry is multiplied by that neuron's own squash slope at its own evidence. The circled dot is the elementwise product, NumPy's plain star."
+        gloss="Chapter 4's BP2. The blame column of the layer above goes back through that layer's weight matrix transposed, which regroups the wires by sender, and then every entry is multiplied by that neuron's own squash slope at its own evidence. The circled dot is the elementwise product, NumPy's plain star."
       />
       <p>
         Two steps, in the order the code performs them, and each one changes the
@@ -264,10 +264,10 @@ export function Module8() {
       </p>
       <p>
         The ledger column is about 1, every time. That is not luck; it is what
-        Module 7 bought. Dividing every weight by the square root of its layer's
+        Chapter 7 bought. Dividing every weight by the square root of its layer's
         input count was chosen to keep a neuron's evidence near zero, and it has
         a second consequence: a ledger drawn that way sends a column back at
-        about its own length. Module 7's square-root rule is doing its work a
+        about its own length. Chapter 7's square-root rule is doing its work a
         second time here. Take one of the hops between two layers of 30. Every
         entry of the returned column adds up 30 terms, one
         per neuron in the layer above. Each term is a weight of size about 1
@@ -289,11 +289,11 @@ export function Module8() {
       </p>
       <p>
         The squash-slope column is about 0.21, every time, and it can never be more
-        than 0.25. Module 4 gave the squash's slope as{" "}
+        than 0.25. Chapter 4 gave the squash's slope as{" "}
         <M tex="a(1-a)" />, which is largest when the answer <M tex="a" /> is 0.5
         and equals 0.25 there, and shrinks toward zero at both ends. So the second
         factor is a fraction with a ceiling, and the divided start puts most
-        neurons near the top of it: Module 7 measured the median squash slope at that
+        neurons near the top of it: Chapter 7 measured the median squash slope at that
         start as 0.22.
       </p>
       <p>Multiply the two kinds together and the hop is settled:</p>
@@ -311,7 +311,7 @@ export function Module8() {
       />
       <p>
         Nothing in this is a bug. The four equations are right, the gradient check
-        in Module 5 said so, and the gradient really is that small: nudge one of
+        in Chapter 5 said so, and the gradient really is that small: nudge one of
         the first layer's biases and the cost really does barely move. The first
         hidden layer of a four-hidden-layer network is learning about 500 times
         slower than the last one, which is why its first epoch scored the share of
@@ -332,10 +332,10 @@ export function Module8() {
         </p>
       </Aside>
 
-      <SectionHeader id="m8-relu" title="A neuron with no ceiling" />
+      <SectionHeader id="c8-relu" title="A neuron with no ceiling" />
       <p>
         Of the hop's two factors, only one has a ceiling on it, and that ceiling
-        is a fact about the sigmoid rather than about neurons. Module 1 picked the
+        is a fact about the sigmoid rather than about neurons. Chapter 1 picked the
         sigmoid for a specific reason: a perceptron's hard step has slope zero
         everywhere, which leaves descent nothing to work with, and the sigmoid is
         the smooth version. Smooth was the requirement. Bounded was not.
@@ -417,7 +417,7 @@ export function Module8() {
         multiplying every entry by 0.21 does.
       </p>
       <p>
-        Leave the weight multiplier on the panel below at 1, which is Module 7's
+        Leave the weight multiplier on the panel below at 1, which is Chapter 7's
         divided draw exactly, and switch between the two squashes. A ReLU neuron's
         squash slope is 1 when it is live and 0 when it is not, so averaging it across
         a layer's neurons and images gives a share. The last column of the table
@@ -509,7 +509,7 @@ export function Module8() {
         layer and four, under each squash, all of it your own code. Your
         init_network builds every network, your sgd walks them, and for the
         sigmoid runs it is your backprop computing every gradient, reached
-        through the adapter written for you in Module 5. ReLU's cannot be,
+        through the adapter written for you in Chapter 5. ReLU's cannot be,
         because your BP2 has <code>sigmoid_prime</code> written into it. For
         the ReLU runs the gradient comes from a copy of your backprop with two
         lines swapped, written into the panel. Its forward
@@ -524,7 +524,7 @@ export function Module8() {
         <DepthTrainPanel />
       </Figure>
 
-      <SectionHeader id="m8-unstable" title="The hop is a product" />
+      <SectionHeader id="c8-unstable" title="The hop is a product" />
       <p>
         Does a hop have to be smaller than 1? BP2 does not say so: the hop is a
         product of two measured numbers, and the weight multiplier on the
@@ -594,7 +594,7 @@ export function Module8() {
         what a multiplier does. The squash-slope factor falls as it rises, because
         bigger weights put a neuron's evidence further from zero and a sigmoid out
         there is flatter. At a multiplier of 8 the average squash slope across the
-        hidden layers is 0.08, against 0.20 at Module 7's draw, and Module 7 spent
+        hidden layers is 0.08, against 0.20 at Chapter 7's draw, and Chapter 7 spent
         a section on why a start that flat cannot learn. So the two factors fight,
         the sigmoid wins, and the hop climbs toward 1 without reaching it however
         far the multiplier goes. A sigmoid network cannot be made to hand its early
@@ -665,7 +665,7 @@ export function Module8() {
       <p>
         Arranging it is most of what changed after 2010. Initialization schemes
         pick the drawn spread from the layer's input count so the ledger factor
-        starts at the right size, which is Module 7's division and its relatives
+        starts at the right size, which is Chapter 7's division and its relatives
         (the ReLU version multiplies by a further{" "}
         <M tex="\sqrt{2}" /> to pay for the dead half). ReLU and its variants take
         the ceiling off the squash-slope factor. Normalization layers rescale each
@@ -677,7 +677,7 @@ export function Module8() {
         The point of the list is that they all act on the same number.
       </p>
 
-      <SectionHeader id="m8-conv" title="Sharing the weights" />
+      <SectionHeader id="c8-conv" title="Sharing the weights" />
       <p>
         Depth is one of the two things that made image networks work. The other
         changes what a layer is allowed to look at, and it can be read straight
@@ -780,16 +780,16 @@ export function Module8() {
       </p>
       <p>
         Outside a demonstration nobody picks the weights. The 26 numbers start
-        random and Module 3's descent moves them like any others, so training
+        random and Chapter 3's descent moves them like any others, so training
         decides which question the window ends up asking. The sharing guarantees
         only the shape of the outcome: whatever the numbers become, they are one
         question, asked everywhere. And a trained window can be looked at. Draw
-        its 25 weights as a tiny image, the way Module 2 drew each hidden
+        its 25 weights as a tiny image, the way Chapter 2 drew each hidden
         neuron's 784 as a patch of excite and suppress, and the learned questions
         show up as short edges at various angles, small curves, dots.
       </p>
 
-      <SectionHeader id="m8-layer" title="A layer of twenty windows" />
+      <SectionHeader id="c8-layer" title="A layer of twenty windows" />
       <p>
         One window asks one question, so a useful layer runs many, side by side.
         Twenty is another designer's pick, sized to cover a spread of small
@@ -825,7 +825,7 @@ export function Module8() {
         far more neurons, far fewer numbers. The trade is not a memory trick;
         it is a claim about the world, that a detector worth having at one
         place is worth having at every place. Fewer numbers to learn is also
-        fewer numbers to overfit, which is Module 7's third complaint answered
+        fewer numbers to overfit, which is Chapter 7's third complaint answered
         by the architecture instead of by weight decay. The 520 is this layer's
         count, not the network's: the fully connected tail after the pooling
         still spends numbers the old way, and the saving lives where the
@@ -843,7 +843,7 @@ export function Module8() {
         the later layers see larger and larger parts of the image, described in
         terms of what the earlier ones found.
       </p>
-      <Figure caption="The whole network, four working layers. A window layer turns the image into twenty grids, one per window, 520 numbers in total. A pooling layer halves each grid to 12-by-12 and holds no numbers at all: keeping a block's largest needs nothing learned. The tail is the kind of network you trained in Module 5, a fully connected layer reading all twenty grids as one long column, then the 10 outputs.">
+      <Figure caption="The whole network, four working layers. A window layer turns the image into twenty grids, one per window, 520 numbers in total. A pooling layer halves each grid to 12-by-12 and holds no numbers at all: keeping a block's largest needs nothing learned. The tail is the kind of network you trained in Chapter 5, a fully connected layer reading all twenty grids as one long column, then the 10 outputs.">
         <ConvNetFigure />
       </Figure>
       <p>
@@ -856,14 +856,14 @@ export function Module8() {
         set, which nothing in his Chapters 1 to 3 reaches.
       </p>
 
-      <SectionHeader id="m8-embed" title="Where the network thinks" />
+      <SectionHeader id="c8-embed" title="Where the network thinks" />
       <p>
         Every network in this course turns the numbers it is handed into numbers
         of its own choosing, and that habit connects a 2015 digit reader to the
         models people use now.
       </p>
       <p>
-        Start with where data arrives. Module 1's concert had two inputs, weather
+        Start with where data arrives. Chapter 1's concert had two inputs, weather
         and friend, so every situation was a point on a plane with two axes, and
         the four situations were four dots. An MNIST digit is the same idea with
         more axes: 784 of them, one per pixel, and an image is one point in that
@@ -874,14 +874,14 @@ export function Module8() {
         In that space one rule defeats a single neuron: go when exactly one of the
         two things is good, which puts the two go dots on opposite corners of the
         square. One neuron cuts with one straight line, and no straight line puts
-        those two dots on one side and the two stay dots on the other. Module 1
+        those two dots on one side and the two stay dots on the other. Chapter 1
         fixed it with two hidden neurons, and the fix is worth looking at again in
         terms of spaces rather than lines. Each hidden neuron reports a number, so
         the pair of them reports two numbers, so every input lands somewhere on a
         second plane with axes <M tex="h_1" /> and{" "}
         <M tex="h_2" />.
       </p>
-      <Figure caption="Module 1's four concert situations, on the left as they arrive and on the right as the hidden layer reports them, using Module 1's solution (h1 asks whether at least one input is on, h2 whether both are). Green means go, gold means stay. On the left no straight line separates the colours. On the right the two green points have landed on top of each other at (0.95, 0.05), and the dashed line is the cut the output neuron makes.">
+      <Figure caption="Chapter 1's four concert situations, on the left as they arrive and on the right as the hidden layer reports them, using Chapter 1's solution (h1 asks whether at least one input is on, h2 whether both are). Green means go, gold means stay. On the left no straight line separates the colours. On the right the two green points have landed on top of each other at (0.95, 0.05), and the dashed line is the cut the output neuron makes.">
         <HiddenSpaceFigure />
       </Figure>
       <p>
@@ -889,7 +889,7 @@ export function Module8() {
         situations, and in that description the problem is easy. Nothing was added:
         the same four inputs, re-expressed as what two neurons said about them.
         That second plane is a learned space, in the strict sense that the numbers
-        which place a point in it are weights, and Module 3's descent is what finds
+        which place a point in it are weights, and Chapter 3's descent is what finds
         weights. Your digit reader does the same thing at a larger size: its hidden
         layer turns 784 pixel values into 30 numbers, and those 30 numbers are a
         description of the digit that the network chose, by training, because
@@ -925,7 +925,7 @@ export function Module8() {
         label is the word that actually came next, as a one-hot column, the
         same kind your digit reader trains against, and nobody writes those
         labels: cover the next word in any sentence ever printed, and the
-        sentence itself supplies the answer. From there the loop is Module 5's:
+        sentence itself supplies the answer. From there the loop is Chapter 5's:
         compare the output column to the label, take the slopes, step every
         number against them, the table's columns included.
       </p>
@@ -954,33 +954,33 @@ export function Module8() {
         reader, and the training run measured in months of many machines rather
         than seconds of one browser tab. One genuinely new ingredient sits in the middle of it, called
         attention, which lets each position in a sequence decide which other
-        positions to read from; this course does not cover it, and Module 9's
+        positions to read from; this course does not cover it, and Chapter 9's
         closing list is where to go for it.
       </p>
       <p>
         Input space is where the data arrives, and whoever collected it chose it.
         Embedding space is where the network chooses to think, and it learns that
-        choice by the descent you wrote in Module 3. Module 1's two hidden neurons
+        choice by the descent you wrote in Chapter 3. Chapter 1's two hidden neurons
         and a word's column in an embedding table are the same move at two sizes.
       </p>
       <p>
         One thing is still missing before any of that is usable, and it is not
         another idea. The functions this course had you write have never been
         assembled: every training run so far was started by a panel that did the
-        loading, the looping and the scoring around them. Module 9 is where you
+        loading, the looping and the scoring around them. Chapter 9 is where you
         write that loop, and where this course's words get translated into the ones
         everyone else uses.
       </p>
 
       <Recap
         items={[
-          "A layer's learning speed is the size of its bias gradient, which is how far its biases move in one step per unit of step size. At Module 7's start a 784-30-30-30-30-10 network measures 0.00254 at the first hidden layer against 1.439 at the output: 567 times slower, before a single step, and its first epoch on 5,000 images ends by answering the commonest digit for every image.",
+          "A layer's learning speed is the size of its bias gradient, which is how far its biases move in one step per unit of step size. At Chapter 7's start a 784-30-30-30-30-10 network measures 0.00254 at the first hidden layer against 1.439 at the output: 567 times slower, before a single step, and its first epoch on 5,000 images ends by answering the commonest digit for every image.",
           "That ratio is BP2 applied repeatedly. One hop multiplies the blame column by about 1 going back through the wire ledger, which is what dividing the weights by the square root of the input count buys, and by at most 0.25 for the squash's slope. The hop is about one fifth, so the gap is about five to the power of the depth: 5, 25, 125, 625, 3,125 against 4.8, 26.2, 117, 567, 3,002 measured.",
           "ReLU answers max(0, z), so its squash slope is 1 where the evidence is positive and 0 where it is not: a live neuron passes blame back untouched. The same network's hop rises to about 0.7, the gap falls from 567 to 4, four hidden layers average 90.9 percent over the last five epochs instead of 86.5, and the step size has to fall by a factor of ten to keep the flat half from killing neurons outright.",
           "The hop is a product with no reason to sit near 1. Multiplying every weight by 4 takes the sigmoid's hop to 0.62 and ReLU's to 2.99, where the first hidden layer moves ninety times as far as the output. Both failures are called unstable gradients, and careful initialization, ReLU, normalization layers and residual connections are all ways of holding that one number near 1.",
           "A convolutional layer uses one 5-by-5 window's 26 numbers at all 576 positions of the image, so twenty windows cost 520 numbers against 23,520 for one fully connected layer of 30. A hidden layer is a learned re-description of its input, which is what makes a word's column in an embedding table mean something, and what a language model is built out of at a scale of billions.",
         ]}
-        chapter="Chapter 5 (why deep neural networks are hard to train)"
+        deeper="Chapter 5 (why deep neural networks are hard to train)"
         href="http://neuralnetworksanddeeplearning.com/chap5.html"
       />
     </article>
@@ -1077,7 +1077,7 @@ function SharedWeightsFigure() {
 }
 
 // The whole small network, once: the image, a window layer of twenty grids,
-// a pooling layer, and the fully connected tail from Module 5. Plot family
+// a pooling layer, and the fully connected tail from Chapter 5. Plot family
 // (CLAUDE.md): natural scale, tight viewBox. Four grids stand in for the
 // twenty; the caption carries the count.
 function ConvNetFigure() {
@@ -1233,8 +1233,8 @@ function WindowFanFigure() {
   );
 }
 
-// Module 1's contrarian, twice: as the inputs arrive, and as the hidden layer
-// reports them. The hidden coordinates come from Module 1's own solution, so
+// Chapter 1's contrarian, twice: as the inputs arrive, and as the hidden layer
+// reports them. The hidden coordinates come from Chapter 1's own solution, so
 // the two pages cannot drift apart.
 function HiddenSpaceFigure() {
   const H1 = (x1: number, x2: number) => sigmoid(6 * x1 + 6 * x2 - 3);

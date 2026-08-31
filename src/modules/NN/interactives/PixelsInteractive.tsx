@@ -3,7 +3,7 @@ import { fetchMnistTest, type MnistTestSubset } from "../../../runtime/assets";
 import { drawMnistDigit } from "./utils";
 import { useInViewOnce } from "../../../components/useInViewOnce";
 
-// Module 2 interactive: an image is just numbers. One real MNIST test
+// Chapter 2 interactive: an image is just numbers. One real MNIST test
 // digit, blown up; pointing at any pixel shows its brightness value and
 // its position in the unrolled (784, 1) input column.
 

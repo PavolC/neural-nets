@@ -1,8 +1,8 @@
 # Neural Networks: the course map
 
-A beat sheet and syllabus for the whole course, assembled from a full read of all ten modules,
+A beat sheet and syllabus for the whole course, assembled from a full read of all ten chapters,
 the workbench section table, the front page, and the design doc. This is the picture to hold in
-your head: what story the course tells, in what order, and what each module hands the next.
+your head: what story the course tells, in what order, and what each chapter hands the next.
 
 Written 2026-08-30 by the course review session and committed the day after, alongside that
 review's findings report (`nn-course-review-findings.md`). The review's fixes landed in PR #21,
@@ -37,39 +37,39 @@ on real MNIST digits with pretrained weights. Cliffhanger: 11,935 knobs, far too
 
 **Act II. Make it learn (m3, m4, m5).**
 Descent (m3) works but the bill is 1.19 billion network trips per full step; even mini-batched,
-every step still pays two cost measurements per knob. Module 4 is the idea that deletes the bill
-(the chain rule, blame, the four equations, no code), Module 5 is the implementation, the gradient
+every step still pays two cost measurements per knob. Chapter 4 is the idea that deletes the bill
+(the chain rule, blame, the four equations, no code), Chapter 5 is the implementation, the gradient
 check, and the real training run. Cliffhanger resolved: 89 percent, in seconds instead of hours.
 This is the course's summit and the two-minute demo.
 
 **Act III. Understand it, then improve it (m6, m7, m8).**
-Three suspects for the missing points (data, training, shape). Module 6 acquits the shape
-(universality, an interlude, no code). Module 7 convicts the training and fixes it three times,
+Three suspects for the missing points (data, training, shape). Chapter 6 acquits the shape
+(universality, an interlude, no code). Chapter 7 convicts the training and fixes it three times,
 one line each: cross-entropy, the divided start, weight decay, worth about three points (92.1).
-Module 8 tries the obvious next move, another layer, watches it fail, explains the failure out of
+Chapter 8 tries the obvious next move, another layer, watches it fail, explains the failure out of
 BP2 itself (the hop, one fifth per layer), and uses the repair kit as the bridge to the field:
 ReLU, convolutions, embedding spaces, LLMs.
 
 **Act IV. Make it yours (m9, m10).**
-Module 9: the loop that was never yours. Assemble `train` and `accuracy` from your own parts (the
-course's only assembly test), read the call map where every line says "yours, Module N", translate
+Chapter 9: the loop that was never yours. Assemble `train` and `accuracy` from your own parts (the
+course's only assembly test), read the call map where every line says "yours, Chapter N", translate
 19 coined words into the field's vocabulary, name the four things the course did not teach.
-Module 10: a file, not a dataset. Palmer penguins, with words, holes, unequal classes and a
+Chapter 10: a file, not a dataset. Palmer penguins, with words, holes, unequal classes and a
 245-times scale gap; write `standardize`, `one_hot`, `split`, and watch the two lessons land:
 unscaled scores exactly the majority-class baseline, and 73.5 percent hides a class the network
 never answers.
 
 ## The number chain
 
-Each module ends by producing a number, and the next module opens by picking that number up. This
+Each chapter ends by producing a number, and the next chapter opens by picking that number up. This
 chain IS the plot; if you remember nothing else, remember this ladder.
 
 | # | The number it produces | What it does next |
 |---|---|---|
 | m1 | 9 knobs, hand-set to beat XOR, and it was fiddly | "Make the computer do the fiddling" = m3's promise |
 | m2 | 11,935 knobs; a pretrained net reads 86% | Too many to set by hand; and 86% is the score to beat |
-| m3 | 1.19B trips per full-batch step; mini-batch leaves 2 passes per knob per step; the toy panel's "360 times worse at real scale" | "That is why Module 5 exists" |
-| m4 | 2 passes instead of 23,870, about 12,000 times cheaper, and exact | Module 5 builds it |
+| m3 | 1.19B trips per full-batch step; mini-batch leaves 2 passes per knob per step; the toy panel's "360 times worse at real scale" | "That is why Chapter 5 exists" |
+| m4 | 2 passes instead of 23,870, about 12,000 times cheaper, and exact | Chapter 5 builds it |
 | m5 | **89%** on the held-out thousand, learner's code end to end; seconds vs hours | The gap to Nielsen's 95 is the next mystery |
 | m6 | A 7,840,000-neuron box net fits all 5,000 training images and reads nothing else | The shape is acquitted; the training is charged |
 | m7 | **92.1%** from three one-line fixes; a wrong step size costs more than all three earn | Obvious next move: go deeper |
@@ -99,14 +99,14 @@ chain IS the plot; if you remember nothing else, remember this ladder.
 
 ## Rhythm
 
-Code modules: m1, m2, m3, m5, m7, m9, m10 (nine exercises total). Idea modules, no exercise:
+Code chapters: m1, m2, m3, m5, m7, m9, m10 (nine exercises total). Idea chapters, no exercise:
 m4 (the algorithm's idea), m6 (expressiveness), m8 (depth and the field). Nielsen mapping:
 m1-m3 ch.1, m4-m5 ch.2, m7 ch.3, m6 ch.4, m8 ch.5 (ch.6 pointed at); m9 and m10 follow no
 chapter (added after the teaching review) and carry no Recap or Go deeper.
 
 ---
 
-## Module cards
+## Chapter cards
 
 ### m1 · From neurons to networks
 **Logline:** A neuron is a weighted decision, a weighted decision is a line, and three neurons
@@ -143,7 +143,7 @@ handwriting before any training theory.
 ### m3 · Learning as descent
 **Logline:** Score the network with one number, measure which way each knob tilts it, and walk
 downhill; then price what that costs at real scale.
-- Module 1's XOR net scored by hand: cost 0.0875. Learning = search over nine knobs.
+- Chapter 1's XOR net scored by hand: cost 0.0875. Learning = search over nine knobs.
 - One slope by nudging (-0.044); nine slopes = the gradient (nabla, named); the update rule
   w <- w - eta * nabla C; one step drops the cost. Jumping to each curve's bottom backfires
   (0.1665): a slope is a compass, not a map.
@@ -152,7 +152,7 @@ downhill; then price what that costs at real scale.
   averaging only: 238,700 at batch 10. The race: per example looked at, the wobble wins.
 - **Exercise:** `sgd_step`, `sgd` (the update rule + the shuffle/slice/step epoch loop).
 - **Payoff:** a 2-8-1 toy (33 knobs) trains live on the learner's own sgd; 66 passes per step;
-  "roughly 360 times that at digit-reader scale. That is why Module 5 exists."
+  "roughly 360 times that at digit-reader scale. That is why Chapter 5 exists."
 - **Hands forward:** the X/Y column packing, epoch and mini-batch vocabulary, the unremoved
   2-passes-per-knob factor (m4's opening), the mysterious half in the cost (paid off in m7).
 
@@ -197,9 +197,9 @@ trace any curve, proven with hand-placed weights, and the proof also shows why t
 - Three suspects for 89-vs-95: data (held fixed), training, shape. This page acquits the shape.
 - One dial in, a hump target out; a single neuron only climbs-and-flattens. Declared a sub-case,
   not a detour: hold 783 pixels still, turn one.
-- Crank the weight: the sigmoid becomes a step at -b/w (Module 1's boundary with nowhere to run),
+- Crank the weight: the sigmoid becomes a step at -b/w (Chapter 1's boundary with nowhere to run),
   width 6/w. Placement rule b = -ws.
-- Two steps make a bump; six numbers per bump; Module 1's XOR net was already a bump (re-read,
+- Two steps make a bump; six numbers per bump; Chapter 1's XOR net was already a bump (re-read,
   numbers restated).
 - Slice the dial, one bump per slice: a bar chart, a lookup table. Price table: doubling bars
   roughly halves the miss (2.311 down to 0.118), until bars are narrower than the switchover.
@@ -260,13 +260,13 @@ each repair for it is a doorway into the modern field.
 ### m9 · Assembling the program (closing chapter + capstone)
 **Logline:** The one piece that was always the course's, the loop itself, becomes yours; then the
 course translates its own vocabulary and names what it did not teach.
-- Opens by tallying what the learner owns, module by module, and naming the gap: every training
+- Opens by tallying what the learner owns, chapter by chapter, and naming the gap: every training
   run so far was a panel doing the loading, looping, scoring.
 - `accuracy` taught on a walked figure first: a (10, 3) confidence grid, argmax down columns,
   guesses [3, 0, 7] vs y [3, 0, 9], mean 0.666, the coin-flip 0.44-over-0.38 flagged.
 - **Exercise:** `accuracy` + `train` (draw, permute, slice, batch_gradient with cross-entropy
   blame, l2_step, score once per epoch, in a prescribed order the tests pin to exact weights).
-- The call map: every line labeled "yours, Module N" (only rng.permutation and the adapter are not).
+- The call map: every line labeled "yours, Chapter N" (only rng.permutation and the adapter are not).
 - **Payoff:** FullTrainPanel runs the learner's file: ~90.4% at eta 0.5; the gap to m7's 92.1
   explained honestly (decay on, one generator, a measured point of shuffle wobble). Step size
   from the inside: 0.1 starts slower but ends level; 3.0 zigzags (m3's overshoot at real scale).
@@ -303,7 +303,7 @@ having are: scale the inputs, and never believe one number.
 
 ## The exercise spine (the second telling of the same story, in code)
 
-| Order | Section | Module | You write | Requires | The concept the code teaches |
+| Order | Section | Chapter | You write | Requires | The concept the code teaches |
 |---|---|---|---|---|---|
 | 1 | sigmoid-neuron | m1 | `sigmoid`, `fire` | nothing | one neuron's whole computation; the course's contracts |
 | 2 | feedforward | m2 | `feedforward` | sigmoid-neuron | the layer rule repeated = the forward pass |
@@ -317,13 +317,13 @@ having are: scale the inputs, and never believe one number.
 | 10 | train | m9 | `accuracy`, `train` | five sections | assembly: the program is yours |
 | 11 | prepare | m10 | `standardize`, `one_hot`, `split` | nothing | preparation is part of the model |
 
-Structural notes worth knowing (from the section table, not visible in any one module):
+Structural notes worth knowing (from the section table, not visible in any one chapter):
 - The graph forks at sigmoid-neuron: the sgd branch (feedforward, given-cost, sgd) and the
   backprop branch rejoin at cross-entropy. **sgd is structurally a dead end**: nothing downstream
   requires it (deliberate: the numerical-gradient trainer exists to be priced out), though m9's
   `train` re-writes its loop shape with better parts.
 - Three exercises are doable cold (smart-init, l2, prepare); prepare is an island whose only
   consumer is m10's panel.
-- Modules 4, 6, 8 own no sections: the idea modules.
+- Chapters 4, 6, 8 own no sections: the idea chapters.
 - m9's train/accuracy is the course's only assembly assessment; everything earlier tests pieces
   (possibly with dependencies on loan).

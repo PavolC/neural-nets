@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Pretrain the Module 2 payoff network and write public/data/pretrained_weights.json.gz.
+"""Pretrain the Chapter 2 payoff network and write public/data/pretrained_weights.json.gz.
 
-Trains a 784-15-10 sigmoid network (15 hidden so the Module 2 diagram stays
+Trains a 784-15-10 sigmoid network (15 hidden so the Chapter 2 diagram stays
 compact, per the design doc) on the bundled MNIST subset with the reference
 implementation, then saves weights as gzipped JSON so both the JS
 visualizations (weight-image patches) and Python (running the learner's

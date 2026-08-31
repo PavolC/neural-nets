@@ -49,7 +49,7 @@ def load_penguins(buf):
 
     Returns (columns, rows): the column names, and one list per penguin in
     the file's own order, with None wherever a value is missing. Nothing is
-    scaled, encoded or split, because doing that is Module 10's exercise.
+    scaled, encoded or split, because doing that is Chapter 10's exercise.
 
     Data: Horst AM, Hill AP, Gorman KB (2020), palmerpenguins; collected by
     Dr Kristen Gorman, Palmer Station Antarctica LTER. Released CC0.

@@ -5,7 +5,7 @@
 # Contract:
 #
 # - standardize(X, mean=None, spread=None): X is (n_features, m), one row per
-#   feature and one column per example, the packing every module has used.
+#   feature and one column per example, the packing every chapter has used.
 #   Returns (X_scaled, mean, spread).
 #
 #   Each FEATURE (each row) is shifted and scaled on its own: subtract that

@@ -2,10 +2,10 @@
 # Nielsen's network.py (MIT license,
 # github.com/mnielsen/neural-networks-and-deep-learning).
 #
-# Module 3 needs two things you have not written: the cost of a batch, and
+# Chapter 3 needs two things you have not written: the cost of a batch, and
 # the slope of that cost for every parameter. Both are here so your sgd_step
 # below can call them. The slopes are measured the hand way, by nudging each
-# parameter and rescoring, which is correct and slow. Module 5 is where you
+# parameter and rescoring, which is correct and slow. Chapter 5 is where you
 # write the fast way.
 
 

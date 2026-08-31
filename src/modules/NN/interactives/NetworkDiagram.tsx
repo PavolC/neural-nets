@@ -12,7 +12,7 @@ import { divergingColor, drawMnistDigit } from "./utils";
 import { lockedBy, speakList } from "./lockedBy";
 import { useInViewOnce } from "../../../components/useInViewOnce";
 
-// Module 2 interactive: a 784-15-10 network, rendered compactly. Hovering a
+// Chapter 2 interactive: a 784-15-10 network, rendered compactly. Hovering a
 // hidden neuron shows its 784 incoming weights as a 28x28 image patch.
 // Once the learner's feedforward passes its tests, their code runs on real
 // test digits and its activations light up the diagram.
@@ -38,7 +38,7 @@ import json, types
 import numpy as np
 _a = json.loads(_args_json)
 # The learner's file, up to and including their feedforward, so the sigmoid
-# inside it is the one they wrote in Module 1 rather than the course's copy.
+# inside it is the one they wrote in Chapter 1 rather than the course's copy.
 _mod = types.ModuleType("your_code")
 exec(compile(_a["code"], "your_code.py", "exec"), _mod.__dict__)
 _W = [np.array(w) for w in _a["weights"]]

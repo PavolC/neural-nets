@@ -3,13 +3,13 @@ import { fetchMnistTest } from "../../../runtime/assets";
 import { useInViewOnce } from "../../../components/useInViewOnce";
 import { makeBatch, measure, type Activation, type Batch } from "./deepNet";
 
-// Module 8's centerpiece: how fast every layer of a freshly started network is
+// Chapter 8's centerpiece: how fast every layer of a freshly started network is
 // learning, before it takes a step. Two mounts of the same component. The
 // first (bars and hop factors only) carries the measurement; the second, with
 // `full`, opens the squash and the weight size and shows BP2's two factors,
 // which is what the sections after it read from.
 //
-// Everything here is Module 7's start: each weight a standard normal draw
+// Everything here is Chapter 7's start: each weight a standard normal draw
 // divided by the square root of its layer's input count, biases at spread 1,
 // cross-entropy blame at the output. The arithmetic lives in deepNet.ts.
 
@@ -39,7 +39,7 @@ function decadeLabel(exp: number): string {
 }
 
 // Four significant figures, with trailing zeros dropped, so a bar reads the
-// same as the same number in the module's tables.
+// same as the same number in the chapter's tables.
 /** A ratio, to one decimal below 100 and none above: 4.8, 26.2, 567. */
 function fmtRatio(v: number): string {
   return v < 100 ? v.toFixed(1) : v.toFixed(0);
@@ -151,7 +151,7 @@ export function LayerSpeedBars({ full = false }: { full?: boolean }) {
                 className={`chip ${weightScale === s ? "chip-active" : ""}`}
                 onClick={() => setWeightScale(s)}
               >
-                {s === 1 ? "1 (Module 7's draw)" : `${s}`}
+                {s === 1 ? "1 (Chapter 7's draw)" : `${s}`}
               </button>
             ))}
           </fieldset>

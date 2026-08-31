@@ -7,7 +7,7 @@ import { BackpropTrainPanel } from "./interactives/BackpropTrainPanel";
 export function Module5() {
   return (
     <article className="module">
-      <h2>Module 5: Backpropagation, for real</h2>
+      <h2>Chapter 5: Backpropagation, for real</h2>
       <AfterThis
         items={[
           "Implement backprop in NumPy: one forward pass that keeps receipts, one backward sweep, every slope exact.",
@@ -17,64 +17,64 @@ export function Module5() {
       />
       <ModuleToc />
 
-      <SectionHeader id="m5-plan" title="The deliverable" />
+      <SectionHeader id="c5-plan" title="The deliverable" />
       <p>
-        Module 4 worked out how to get every slope from one forward pass and one
+        Chapter 4 worked out how to get every slope from one forward pass and one
         backward sweep of blame, exact instead of estimated, and wrote the method
-        down as four equations. In this module you build it. Most of the machinery
-        already exists: your feedforward computes the forward pass (Module 2),
+        down as four equations. In this chapter you build it. Most of the machinery
+        already exists: your feedforward computes the forward pass (Chapter 2),
         and your sgd walks downhill along whatever slopes it is handed
-        (Module 3). The one slow part left is where those slopes come from: the
+        (Chapter 3). The one slow part left is where those slopes come from: the
         course's gradient function, which still measures each one by nudging its
         parameter twice and rescoring the batch. The deliverable here is a
         replacement for exactly that part: a function named{" "}
         <code>backprop</code>, small enough to fit on one screen. When it is
         written, the nudge method takes on the referee
-        job Module 4 described: the tests measure every slope of a small fixed
+        job Chapter 4 described: the tests measure every slope of a small fixed
         network the slow way and demand your answers match, number by number.
         And once they do, the panel at the bottom of this page plugs your
         backprop into your own sgd, unchanged, and trains the digit reader for
         real.
       </p>
-      <Figure caption="Where backprop goes. Your sgd from Module 3 asks one question per step and does not care who answers it; the answer is a slope for every knob. Two machines can answer. The dashed one is what you have been using: correct, and priced per knob, because each knob needs its own pair of rescores. The solid one is this module's exercise, priced per pass instead: every knob's slope falls out of one trip forward and one sweep back.">
+      <Figure caption="Where backprop goes. Your sgd from Chapter 3 asks one question per step and does not care who answers it; the answer is a slope for every knob. Two machines can answer. The dashed one is what you have been using: correct, and priced per knob, because each knob needs its own pair of rescores. The solid one is this chapter's exercise, priced per pass instead: every knob's slope falls out of one trip forward and one sweep back.">
         <PipelineDiagram />
       </Figure>
 
-      <SectionHeader id="m5-cost" title="One example at a time" />
+      <SectionHeader id="c5-cost" title="One example at a time" />
       <p>
         One design decision before the code, and what it buys: backprop handles
         a single training example per call, and mini-batches then come free.
-        For one example the cost keeps its shape from Module 3 but drops the
+        For one example the cost keeps its shape from Chapter 3 but drops the
         averaging:
       </p>
       <Eq
         tex="C = \tfrac12 \, \lVert a - y \rVert^2"
-        gloss="The double bars as in Module 3: take the gap in every output entry, square each, add them up. Nothing divides by a count, because this is one example's score. The half is the same bookkeeping half, there so the slope comes out as the bare gap."
+        gloss="The double bars as in Chapter 3: take the gap in every output entry, square each, add them up. Nothing divides by a count, because this is one example's score. The half is the same bookkeeping half, there so the slope comes out as the bare gap."
       />
       <p>
         With a private cost per example comes a private slope per example, and
         a batch's slope is just the average of them, because averages pass
         changes through: if each example's cost changes by some amount when a
         knob moves, the average cost changes by the average of those amounts.
-        Numbers you already have can check that. Take Module 3's starting
+        Numbers you already have can check that. Take Chapter 3's starting
         network and the knob it worked by hand, the output bias, and
         nudge-and-measure that bias four times, each time scoring a single
         corner alone:
       </p>
       <Eq
         tex="\frac{\underbrace{0.0460}_{(0,0)\text{, stay}} + \underbrace{(-0.1337)}_{(1,0)\text{, go}} + \underbrace{(-0.1337)}_{(0,1)\text{, go}} + \underbrace{0.0460}_{(1,1)\text{, stay}}}{4} = -0.04385"
-        gloss="Four private slopes, one per corner. A plus sign means the cost rises when the bias goes up, so the two stay corners pull the bias down and the two go corners pull it up harder. The average of the four is the -0.044 Module 3 measured on the full four-corner cost, one more digit shown."
+        gloss="Four private slopes, one per corner. A plus sign means the cost rises when the bias goes up, so the two stay corners pull the bias down and the two go corners pull it up harder. The average of the four is the -0.044 Chapter 3 measured on the full four-corner cost, one more digit shown."
       />
       <p>
         So a mini-batch's gradient is: run backprop on each example separately,
         average the returned slopes. Your sgd never notices the difference; it
         just receives slopes, as always. (The opposite pulls above are also
-        Module 3's wobble seen up close: each mini-batch's average is a
+        Chapter 3's wobble seen up close: each mini-batch's average is a
         different compromise between examples like these.)
       </p>
       <Aside>
         <p>
-          Module 2 banned Python loops over neurons, and averaging per-example
+          Chapter 2 banned Python loops over neurons, and averaging per-example
           slopes means looping over examples, so it is worth saying which loops
           that ban covers. The objection there was scale: a loop over the
           hundreds of neurons inside a layer spends hundreds of interpreter
@@ -105,17 +105,17 @@ export function Module5() {
         For a digit image, the right answer <M tex="y" /> is a column of ten
         numbers, 1.0 in the digit's slot and 0.0 everywhere else (the packing is
         called one-hot). Each entry grades one output neuron's yes-or-no question
-        from Module 2, so the ten gaps in the cost are the ten questions'
+        from Chapter 2, so the ten gaps in the cost are the ten questions'
         misses.
       </p>
 
-      <SectionHeader id="m5-lines" title="The equations as code" />
+      <SectionHeader id="c5-lines" title="The equations as code" />
       <p>
         Here are the four equations again, in the order the code meets them:
       </p>
       <Eq
         tex="\begin{aligned} \delta^L &= (a^L - y) \odot \sigma'(z^L) && \text{(BP1)} \\ \delta^l &= \big( (w^{l+1})^T \, \delta^{l+1} \big) \odot \sigma'(z^l) && \text{(BP2)} \\ \frac{\partial C}{\partial b^l} &= \delta^l && \text{(BP3)} \\ \frac{\partial C}{\partial w^l} &= \delta^l \, (a^{l-1})^T && \text{(BP4)} \end{aligned}"
-        gloss="Module 4's equations, with one upgrade: the layer letter l stands for each layer in turn (2 then 3 on this page; the tests also try a deeper network), which is exactly the loop you are about to write, and L names the last layer. Blame starts at the output as the gap times the squash's slope, flows backward through the transposed wires, and every slope reads off a blame; if any of the four feels foreign, the Module 4 stepper is the place to rebuild it."
+        gloss="Chapter 4's equations, with one upgrade: the layer letter l stands for each layer in turn (2 then 3 on this page; the tests also try a deeper network), which is exactly the loop you are about to write, and L names the last layer. Blame starts at the output as the gap times the squash's slope, flows backward through the transposed wires, and every slope reads off a blame; if any of the four feels foreign, the Chapter 4 stepper is the place to rebuild it."
       />
       <p>
         One index trap in BP2, worth settling before writing it. A weight
@@ -140,28 +140,28 @@ export function Module5() {
         finished.
       </p>
       <p>
-        The translation to NumPy is nearly mechanical, because Module 4 already
+        The translation to NumPy is nearly mechanical, because Chapter 4 already
         glossed every symbol: the circled dot is the elementwise <code>*</code>,
         the raised T is <code>.T</code>, and matrix products are <code>@</code>.
         Each equation becomes one NumPy statement.
       </p>
       <p>
         Shapes are what make those statements concrete, so here is the network
-        they are aimed at: the digit reader this module trains. 784 inputs, one
+        they are aimed at: the digit reader this chapter trains. 784 inputs, one
         per pixel of a 28-by-28 image; one hidden layer of 30 neurons; 10
-        outputs, one per digit. Module 2 drew this same three-layer shape with
+        outputs, one per digit. Chapter 2 drew this same three-layer shape with
         15 hidden neurons, few enough for its circles to fit in a diagram, and
         named 30 as the classic setup for reading digits. Either size is a free
         choice: more pattern-detectors against more parameters to train.
       </p>
       <p>
         The size fixes the two weight matrices: (30, 784) into the hidden layer,
-        (10, 30) into the output, receiving layer named first as in Module 2.
+        (10, 30) into the output, receiving layer named first as in Chapter 2.
         Choosing differently would change no symbol in the four equations, only
         these numbers. Two names in the table below are the ones your{" "}
         <code>sgd</code> already takes: <code>nabla_b</code> for the biases'
         slopes and <code>nabla_w</code> for the weights', the two halves of
-        Module 3's <M tex="\nabla C" />. Read the right-hand column for how
+        Chapter 3's <M tex="\nabla C" />. Read the right-hand column for how
         often each equation runs, because that differs across the four:
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
@@ -219,7 +219,7 @@ export function Module5() {
         number per knob.
       </p>
 
-      <SectionHeader id="m5-receipts" title="Keep receipts" />
+      <SectionHeader id="c5-receipts" title="Keep receipts" />
       <p>
         The one genuinely new implementation idea is bookkeeping: keep receipts.
         BP1 needs the output layer's <M tex="z" />, BP2 needs every earlier{" "}
@@ -229,7 +229,7 @@ export function Module5() {
         <M tex="z" /> appended to <code>zs</code>, every activation appended to{" "}
         <code>activations</code> (which starts as <code>[x]</code>, since the
         input doubles as layer 1's activations). The backward sweep then never
-        recomputes anything, which is the entire point: Module 4 put it as
+        recomputes anything, which is the entire point: Chapter 4 put it as
         arranging the multiplications so no factor is computed twice.
       </p>
       <p>
@@ -238,7 +238,7 @@ export function Module5() {
         <b>caching</b> it, so the field's phrase for what <code>zs</code> and{" "}
         <code>activations</code> hold is the <b>cached activations</b>, or the{" "}
         <b>cached forward pass</b>. Framework documentation says a layer "saves its
-        inputs for the backward pass", and it means these two lists. Module 9 comes
+        inputs for the backward pass", and it means these two lists. Chapter 9 comes
         back to them, because caching the forward pass is the one idea that lets a
         framework compute gradients for a network nobody wrote a backward pass for.
       </p>
@@ -270,23 +270,23 @@ export function Module5() {
         <BackwardWalkDiagram />
       </Figure>
 
-      <SectionHeader id="m5-exercise" title="Write backprop" />
+      <SectionHeader id="c5-exercise" title="Write backprop" />
       <p>
-        This goes into your file under Module 3's work, and one more written-for-you
+        This goes into your file under Chapter 3's work, and one more written-for-you
         section arrives with it: the adapter that calls backprop once per column of
-        a mini-batch and averages the slopes. Everything from here to Module 10 goes
+        a mini-batch and averages the slopes. Everything from here to Chapter 10 goes
         through it.
       </p>
       <ExerciseCard exercise={backpropExercise} />
 
-      <SectionHeader id="m5-train" title="The real training run" />
+      <SectionHeader id="c5-train" title="The real training run" />
       <p>
         The network is the digit reader the shapes table set up: 784 pixels in,
         30 hidden neurons, 10 digit outputs, and the 23,860 knobs counted with
-        its gradient above. That is almost exactly double Module 2's 11,935,
+        its gradient above. That is almost exactly double Chapter 2's 11,935,
         because doubling the hidden layer doubles everything except the ten
         output biases. At the nudge method's price of two rescores per knob, one step
-        of descent here would cost 47,720 passes over the mini-batch. (Module 4's
+        of descent here would cost 47,720 passes over the mini-batch. (Chapter 4's
         bill, 23,870, was this same arithmetic one network smaller: 11,935 knobs
         times two rescores, and passes rather than knobs.)
         Your backward sweep replaces all of them.
@@ -304,19 +304,19 @@ export function Module5() {
         The panel below hands your code the whole pipeline. It swaps the
         course's nudge-measured gradient for a small adapter that calls your
         backprop once per column of the mini-batch and averages the slopes,
-        then runs your Module 3 sgd, unchanged, with learning rate 3.0 and
-        mini-batches of 10 (both found by trying, like Module 3's 2.0) for 15
-        epochs (Module 3's word: one full pass through the training data, so
+        then runs your Chapter 3 sgd, unchanged, with learning rate 3.0 and
+        mini-batches of 10 (both found by trying, like Chapter 3's 2.0) for 15
+        epochs (Chapter 3's word: one full pass through the training data, so
         5,000 images in batches of 10 is 500 mini-batches per epoch). And
         before training starts, it prices one step of descent both ways, your
-        backprop against nudge-and-measure, on the same mini-batch: Module 3
+        backprop against nudge-and-measure, on the same mini-batch: Chapter 3
         priced that comparison by counting passes; here it is wall-clock, on
         your machine, with your own network.
       </p>
       <BackpropTrainPanel />
 
       <p>
-        Module 2's pretrained network, the one whose 11,935 numbers arrived in a
+        Chapter 2's pretrained network, the one whose 11,935 numbers arrived in a
         file, read 86 percent of the test digits. This run lands near 89, and
         nothing about it arrived in a file: the weights come out of your sgd
         walking downhill along slopes computed by your backprop through
@@ -346,7 +346,7 @@ export function Module5() {
       <p>
         Getting into the habit of looking is worth more than it seems. A score
         tells you whether to keep going; the mistakes tell you what to do next,
-        and Module 10 will make that a step of its own.
+        and Chapter 10 will make that a step of its own.
       </p>
 
       <Recap
@@ -355,9 +355,9 @@ export function Module5() {
           "It handles one example per call; a mini-batch's gradient is the average of its examples' slopes, so your sgd plugged in unchanged.",
           "The gradient check is the strongest guarantee in this course: two independent methods, your equations and nudge-and-measure, agreeing on every parameter of a network to within one part in ten million.",
           "The digit reader trains in seconds where nudge-measured gradients would need hours: same descent, same cost, same data, cheaper slopes.",
-          "You have now written a sigmoid neuron, a feedforward pass, stochastic gradient descent and backpropagation, and together they read handwritten digits. Module 6 steps away from training to ask what a network of sigmoid neurons can represent at all.",
+          "You have now written a sigmoid neuron, a feedforward pass, stochastic gradient descent and backpropagation, and together they read handwritten digits. Chapter 6 steps away from training to ask what a network of sigmoid neurons can represent at all.",
         ]}
-        chapter="Chapter 2 (how the backpropagation algorithm works)"
+        deeper="Chapter 2 (how the backpropagation algorithm works)"
         href="http://neuralnetworksanddeeplearning.com/chap2.html"
       />
     </article>
@@ -439,7 +439,7 @@ function PipelineDiagram() {
   const botMid = BOT_Y + IMPL.h / 2;
   return (
     <svg {...fig(15, -7, 781, 244)} className="chain-ripple" role="img"
-         aria-label="Your sgd from Module 3 asks which way is downhill and receives one slope per knob. Two implementations can answer: nudge-and-measure, the course's gradient function, priced per knob; or your backprop, priced per pass, one forward pass and one backward sweep for every knob at once.">
+         aria-label="Your sgd from Chapter 3 asks which way is downhill and receives one slope per knob. Two implementations can answer: nudge-and-measure, the course's gradient function, priced per knob; or your backprop, priced per pass, one forward pass and one backward sweep for every knob at once.">
       <defs>
         <marker id="pipe-head" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6"
                 markerHeight="6" orient="auto">
@@ -452,7 +452,7 @@ function PipelineDiagram() {
         your sgd
       </text>
       <text x={SGD.x + SGD.w / 2} y={SGD.y + 52} textAnchor="middle" className="ripple-value">
-        Module 3, unchanged
+        Chapter 3, unchanged
       </text>
       <text x={SGD.x + SGD.w / 2} y={SGD.y + 69} textAnchor="middle" className="ripple-value">
         one step per mini-batch
@@ -491,7 +491,7 @@ function PipelineDiagram() {
       </text>
 
       <text x={IMPL.x} y={BOT_Y - 8} className="ripple-change">
-        what you write in this module
+        what you write in this chapter
       </text>
       <rect x={IMPL.x} y={BOT_Y} width={IMPL.w} height={IMPL.h} rx={6} className="ripple-box" />
       <text x={IMPL.x + IMPL.w / 2} y={BOT_Y + 30} textAnchor="middle" className="ripple-title">

@@ -18,7 +18,7 @@ import { COLUMN_FLOOR, DOCK_MIN_VIEWPORT, dockBounds, type DockState } from "./W
 
 const WIDTH_KEY = "dock-w";
 
-/** The widest box diagram in the course, in its own units: Module 4's ripple
+/** The widest box diagram in the course, in its own units: Chapter 4's ripple
  * log. --fig-scale is what makes it exactly fill the column. */
 const WIDEST_FIGURE_UNITS = 817;
 
@@ -121,7 +121,7 @@ export function DockShell({ dockState, children }: { dockState: DockState; child
 			ref={shellRef}
 			// The sheet covers the page and locks its scroll, so the page behind it
 			// has to be genuinely out of reach: without this a screen reader swipes
-			// straight past the panel into the module underneath, and Tab walks the
+			// straight past the panel into the chapter underneath, and Tab walks the
 			// whole course. The dock is deliberately not inert, which is the point
 			// of a dock.
 			inert={dockState === "sheet" ? true : undefined}

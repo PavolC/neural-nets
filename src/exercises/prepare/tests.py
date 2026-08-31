@@ -167,7 +167,7 @@ def test_split_covers_everything_exactly_once():
         "the shuffled order, and the two held-back sets are cut off the END. "
         "Either end holds the same kind of rows after the shuffle, so which "
         "end you take is a convention, but it fixes which rows land in which "
-        "set, and the counts Module 10's panel reports come from this cut."
+        "set, and the counts Chapter 10's panel reports come from this cut."
     )
 
 

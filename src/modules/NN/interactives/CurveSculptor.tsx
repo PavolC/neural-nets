@@ -16,7 +16,7 @@ import {
   type PresetKind,
 } from "./bumpMath";
 
-// Module 6 interactive (b): the sculpting playground. The dial runs 0 to 1
+// Chapter 6 interactive (b): the sculpting playground. The dial runs 0 to 1
 // across the chart; the reader sets a height for each slice of it, and each
 // slice is one bump, i.e. one pair of hidden sigmoid neurons. The score is
 // the area between the target curve and the network's output, shaded so the

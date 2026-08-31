@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 
-// Shared building blocks for module pages (conventions in CLAUDE.md):
+// Shared building blocks for chapter pages (conventions in CLAUDE.md):
 // opener with "What you'll be able to do after this", figures with
 // captions, and a closing recap with a "Go deeper" link to Nielsen.
 
 /**
- * The module's opening promise. A disclosure rather than a plain card, open
+ * The chapter's opening promise. A disclosure rather than a plain card, open
  * everywhere except on a phone, where three items run to between 250 and 390px
- * and the lesson starts below the fold: on Module 8 at 390x844 the card alone
- * was 46 percent of the first screenful. Folded, the module still opens by
+ * and the lesson starts below the fold: on Chapter 8 at 390x844 the card alone
+ * was 46 percent of the first screenful. Folded, the chapter still opens by
  * naming what it will teach, and the items are one tap away.
  *
  * The state is read once at mount rather than watched, because a reader who has
@@ -31,9 +31,9 @@ export function AfterThis({ items }: { items: string[] }) {
   );
 }
 
-/** An anchored section heading inside a module; the floating table of
+/** An anchored section heading inside a chapter; the floating table of
  * contents discovers these and tracks which one the reader is in. Ids must
- * be unique across modules (prefix with the module: "m4-blame"). */
+ * be unique across chapters (prefix with the chapter: "c4-blame"). */
 export function SectionHeader({ id, title }: { id: string; title: string }) {
   return (
     <h3 id={id} className="module-section-title">
@@ -42,10 +42,10 @@ export function SectionHeader({ id, title }: { id: string; title: string }) {
   );
 }
 
-/** Floating on-this-page navigation. Render once per module, anywhere inside
- * the module's article: it discovers that article's SectionHeaders from the
+/** Floating on-this-page navigation. Render once per chapter, anywhere inside
+ * the chapter's article: it discovers that article's SectionHeaders from the
  * DOM, fixes itself to the right gutter on wide screens (hidden where there
- * is no gutter), and highlights the section currently in view. Modules stay
+ * is no gutter), and highlights the section currently in view. Chapters stay
  * mounted but hidden on tab switches, which also hides their toc. */
 export function ModuleToc() {
   const ref = useRef<HTMLElement>(null);
@@ -63,7 +63,7 @@ export function ModuleToc() {
     const measure = () => {
       let current: string | null = null;
       for (const h of headers) {
-        if (h.offsetParent === null) continue; // module hidden by tab switch
+        if (h.offsetParent === null) continue; // chapter hidden by tab switch
         if (h.getBoundingClientRect().top <= 140) current = h.id;
       }
       setActive(current);
@@ -77,11 +77,11 @@ export function ModuleToc() {
     // opener folds, a late web font re-wraps the tab strip. Every one of those
     // moves the headings below it with no scroll event to recompute on, and
     // until the reader happens to scroll again the toc names the section they
-    // have already left. Reported from a 1500px window on Module 7: one section
+    // have already left. Reported from a 1500px window on Chapter 7: one section
     // behind, with the next heading in view at the top of the screen.
     //
-    // The article covers what changes size inside the module, the body the
-    // chrome above it, which moves the module without changing its own height.
+    // The article covers what changes size inside the chapter, the body the
+    // chrome above it, which moves the chapter without changing its own height.
     // Both are cheap: a ResizeObserver delivers at most one callback per frame,
     // and it delivers it after layout, so these read settled positions. The
     // measurement itself is one rect read per section and a state update that
@@ -128,7 +128,7 @@ export function ModuleToc() {
 
   return (
     <>
-      {/* Narrow screens have no gutter for the floating toc, and the module
+      {/* Narrow screens have no gutter for the floating toc, and the chapter
           nav in the header has long scrolled away by the time it is wanted. */}
       <nav className="module-jump" aria-label="Jump to a section">
         <button
@@ -220,11 +220,14 @@ export function Figure({ children, caption }: { children: ReactNode; caption: st
 
 export function Recap({
   items,
-  chapter,
+  deeper,
   href,
 }: {
   items: string[];
-  chapter: string;
+  /** The go-deeper sentence's link text: "Chapter 1 (perceptrons and sigmoid
+   * neurons)". A chapter of Nielsen's book, which is a different thing from a
+   * chapter of this course, hence not named for either. */
+  deeper: string;
   href: string;
 }) {
   return (
@@ -236,7 +239,7 @@ export function Recap({
         ))}
       </ul>
       <p className="go-deeper">
-        Go deeper: this module follows <a href={href}>{chapter}</a> of Nielsen's{" "}
+        Go deeper: this chapter follows <a href={href}>{deeper}</a> of Nielsen's{" "}
         <em>Neural Networks and Deep Learning</em>, which covers the same ground with
         more depth and history.
       </p>

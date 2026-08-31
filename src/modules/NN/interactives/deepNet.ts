@@ -1,13 +1,13 @@
 import { mulberry32 } from "./utils";
 
-// Module 8's measurement: how fast each layer of a deep network is learning,
+// Chapter 8's measurement: how fast each layer of a deep network is learning,
 // at the moment training starts. One place, because the bars, the hop
 // factors and the prose numbers all have to come from the same arithmetic.
 //
 // Course conventions in JS: a layer's weight matrix has one row per receiving
-// neuron (shape (receiving, sending), Module 2), and a batch of m images is
+// neuron (shape (receiving, sending), Chapter 2), and a batch of m images is
 // the (n, m) matrix stored row-major, so entry (i, k) is at i * m + k.
-// Layers are numbered Module 4's way: layer 1 is the input, layer L the
+// Layers are numbered Chapter 4's way: layer 1 is the input, layer L the
 // output, so the first hidden layer of a 784-30-...-10 network is layer 2.
 
 export type Activation = "sigmoid" | "relu";
@@ -86,7 +86,7 @@ const squashSlope = {
 };
 
 export interface LayerSpeed {
-  /** Module 4's numbering: layer 1 is the input, so the first hidden layer is 2. */
+  /** Chapter 4's numbering: layer 1 is the input, so the first hidden layer is 2. */
   layer: number;
   size: number;
   isOutput: boolean;
@@ -136,14 +136,14 @@ export interface Options {
   hidden: number;
   hiddenSize: number;
   activation: Activation;
-  /** Multiplier on Module 7's divided draw: 1 is that draw exactly. */
+  /** Multiplier on Chapter 7's divided draw: 1 is that draw exactly. */
   weightScale: number;
   seed: number;
 }
 
 /**
  * Measure every layer's learning speed for a freshly initialized network,
- * before it takes a step. The start is Module 7's: each weight a standard
+ * before it takes a step. The start is Chapter 7's: each weight a standard
  * normal draw divided by the square root of its layer's input count, each
  * bias a standard normal draw. The output layer is always a sigmoid with the
  * cross-entropy blame a - y, so BP1 contributes nothing of its own to the
@@ -190,7 +190,7 @@ export function measure(batch: Batch, opts: Options): Measurement {
   const layers: LayerSpeed[] = [];
 
   // A layer's learning speed is the size of its bias gradient, dC/db: square
-  // every entry, add, take the square root (Module 3's double bars, used here
+  // every entry, add, take the square root (Chapter 3's double bars, used here
   // as a size rather than as a cost). The gradient is the batch average of
   // that layer's blame columns, so the factors below are measured on the
   // averaged column too. Averaging commutes with the wire ledger and not with

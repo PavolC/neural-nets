@@ -7,7 +7,7 @@ from submission import sigmoid_prime, backprop
 
 
 def _fixture_net():
-    # The same 2-3-1 network as the Module 3 sgd tests, with one example:
+    # The same 2-3-1 network as the Chapter 3 sgd tests, with one example:
     # the concert corner (1, 0), right answer 1.
     w0 = np.array([[0.5, -0.3], [-0.8, 0.9], [0.1, 0.4]])
     b0 = np.array([[0.1], [-0.2], [0.3]])
@@ -93,7 +93,7 @@ def test_backprop_output_layer():
         "sigmoid_prime(z), both at the output layer, multiplied "
         "elementwise. Common wrong answers here: -0.4165 means the "
         "squash-slope factor is missing; +0.1012 means you wrote y - a "
-        "(Module 4's flip: slopes use output minus right answer); "
+        "(Chapter 4's flip: slopes use output minus right answer); "
         "-0.0957 means you fed sigmoid_prime the activation a instead of "
         "the evidence z."
     )
@@ -128,7 +128,7 @@ def test_backprop_hidden_layer():
         "BP4 at the hidden layer: delta @ activations[-3].T, and "
         "activations[-3] here is the input column x itself. The whole "
         "second column must be exactly zero: those weights multiply "
-        "x2 = 0, Module 4's dead-nudge case (a knob whose input is zero "
+        "x2 = 0, Chapter 4's dead-nudge case (a knob whose input is zero "
         "changes nothing, so its slope is zero)."
     )
 
@@ -201,7 +201,7 @@ def test_gradient_check():
 def test_backprop_trains():
     """plugged into descent, your slopes retrain the XOR network"""
     from course import feedforward
-    # Module 1's slider network at its starting position (cost 0.0876),
+    # Chapter 1's slider network at its starting position (cost 0.0876),
     # trained by full-batch descent on the four corners: each step averages
     # your per-example slopes, exactly what the training panel below does.
     weights = [np.array([[2.0, 2.0], [2.0, 2.0]]), np.array([[4.0, -4.0]])]

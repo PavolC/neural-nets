@@ -6,7 +6,7 @@ import { DeltaQuiz } from "./interactives/DeltaQuiz";
 export function Module4() {
   return (
     <article className="module">
-      <h2>Module 4: Backpropagation, the idea</h2>
+      <h2>Chapter 4: Backpropagation, the idea</h2>
       <AfterThis
         items={[
           "Trace a nudge through a network by hand and get the exact slope by multiplying local factors.",
@@ -17,7 +17,7 @@ export function Module4() {
       <ModuleToc />
 
       <p>
-        Module 3 ended with a bill and a factor it could not remove. Mini-batches
+        Chapter 3 ended with a bill and a factor it could not remove. Mini-batches
         shrank the crowd of examples, but every training step still pays 11,935
         times 2: each knob's slope needs the cost measured twice (the both-sides
         nudge), each measurement is a full pass over the mini-batch, and that is
@@ -26,12 +26,12 @@ export function Module4() {
         knob. Backpropagation removes the redundancy. One forward pass, plus one
         backward sweep of comparable price, produces every slope, all 11,935 of
         them, exact rather than nudge-and-divide estimates.
-        This module explains how; Module 5 is where you implement it. There is no
+        This chapter explains how; Chapter 5 is where you implement it. There is no
         code here, just a worked example, a visualization you can step through, the
         four equations, and a quiz.
       </p>
 
-      <SectionHeader id="m4-chain" title="The two-neuron chain" />
+      <SectionHeader id="c4-chain" title="The two-neuron chain" />
       <p>
         Numbers first, sized for by-hand. Take the smallest network that has
         something hidden inside it: a chain of two neurons, call them A and B.
@@ -41,40 +41,40 @@ export function Module4() {
         wire carries one weight, the multiplier applied to whatever travels it.
         Here is the whole thing, every knob in view:
       </p>
-      <Figure caption="The worked example, drawn like Module 1's diagrams: gray is the input (a number, not a neuron), each green circle is one sigmoid neuron. Four knobs in total: one weight on each of the two wires, one bias inside each neuron.">
+      <Figure caption="The worked example, drawn like Chapter 1's diagrams: gray is the input (a number, not a neuron), each green circle is one sigmoid neuron. Four knobs in total: one weight on each of the two wires, one bias inside each neuron.">
         <ChainNetDiagram />
       </Figure>
       <p>
-        Module 2 wrote a whole layer as <M tex="a' = \sigma(Wa + b)" />. Both of
+        Chapter 2 wrote a whole layer as <M tex="a' = \sigma(Wa + b)" />. Both of
         this chain's layers are one neuron wide, so each symbol shrinks from a
         column to a single number and keeps its usual name: a neuron totals its
-        evidence <M tex="z" /> (Module 1's multiply-and-add) and reports its
+        evidence <M tex="z" /> (Chapter 1's multiply-and-add) and reports its
         confidence <M tex="a = \sigma(z)" />. Subscripts number the position along
         the chain: neuron A turns the input <M tex="x" /> into <M tex="z_1" /> and{" "}
         <M tex="a_1" /> using its knobs <M tex="w_1" /> and <M tex="b_1" />, and
         neuron B turns <M tex="a_1" /> into <M tex="z_2" /> and <M tex="a_2" />{" "}
         using <M tex="w_2" /> and <M tex="b_2" />. One habit to unlearn: in
-        Module 1, <M tex="w_1" /> and <M tex="w_2" /> were two weights into the
+        Chapter 1, <M tex="w_1" /> and <M tex="w_2" /> were two weights into the
         same neuron, numbered by input; here each neuron has one weight, so the
         subscript numbers the neuron instead. The right answer for this example is{" "}
         <M tex="y = 1" />. Run it forward:
       </p>
       <Eq
         tex="\begin{aligned} z_1 &= 1.0 \times 1.0 - 0.5 = 0.5, & a_1 &= \sigma(0.5) = 0.6225, \\ z_2 &= 2.0 \times 0.6225 - 1.0 = 0.2449, & a_2 &= \sigma(0.2449) = 0.5609 \end{aligned}"
-        gloss="Neuron A first, then neuron B, which reads A's confidence 0.6225 as its only input. Your sigmoid from Module 1 can confirm every entry."
+        gloss="Neuron A first, then neuron B, which reads A's confidence 0.6225 as its only input. Your sigmoid from Chapter 1 can confirm every entry."
       />
       <p>
-        The answer should have been 1. Score it with Module 3's quadratic cost,
+        The answer should have been 1. Score it with Chapter 3's quadratic cost,
         which with a single example (<M tex="n = 1" />) reduces to{" "}
-        <M tex="C = \tfrac12 (1 - 0.5609)^2 = 0.0964" />. Now ask Module 3's
-        question about the farthest knob, <M tex="w_1" />, and answer it Module 3's
+        <M tex="C = \tfrac12 (1 - 0.5609)^2 = 0.0964" />. Now ask Chapter 3's
+        question about the farthest knob, <M tex="w_1" />, and answer it Chapter 3's
         way. Nudge <M tex="w_1" /> from 1.00 to 1.01 with the other three knobs
         held still, rerun everything, and the cost comes back lower: 0.0959. Slope: change over nudge,{" "}
         <M tex="(0.0959 - 0.0964) / 0.01 \approx -0.050" />. Two cost measurements,
         one slope, same as always.
       </p>
 
-      <SectionHeader id="m4-log" title="The ripple, logged" />
+      <SectionHeader id="c4-log" title="The ripple, logged" />
       <p>
         This time, though, do not just read off the final cost. Rerun the nudge and
         log every value in between, next to its old one. Only five numbers sit
@@ -95,7 +95,7 @@ export function Module4() {
         <ChainRippleDiagram />
       </Figure>
 
-      <SectionHeader id="m4-rates" title="Factors are posted rates" />
+      <SectionHeader id="c4-rates" title="Factors are posted rates" />
       <p>
         What a factor is, and why it costs nothing to know, is easiest to see
         far from any network for one beat.
@@ -122,7 +122,7 @@ export function Module4() {
         the nudge to <M tex="w_1" />; the far-end currency is the cost; each
         arrow's factor is that booth's rate; and the product of all five is the
         chain's through-rate, cost gained per unit of <M tex="w_1" />, which is
-        precisely the number Module 3 called the knob's slope and measured the
+        precisely the number Chapter 3 called the knob's slope and measured the
         expensive way. So everything turns on one question: are the network's
         rates posted like the booths' rates, readable with no transaction, or
         must they be discovered by actually running the nudge? Posted, all five.
@@ -159,12 +159,12 @@ export function Module4() {
       <RippleSlice arrows={[1, 3]} />
       <p>
         The green booths are the two sigmoids, and you met their kind in
-        Module 1's slider. How much a neuron's confidence moves when its evidence moves
+        Chapter 1's slider. How much a neuron's confidence moves when its evidence moves
         depends on where the neuron currently sits on the curve: eager on the
         steep middle, nearly deaf out on the flat ends. The booth's rate is the
         squash's slope at that exact spot. It has a shorthand,{" "}
         <M tex="\sigma'(z)" /> (the tick mark is read "prime" and means "the slope
-        of"). The same tick did a different job in Module 2, where{" "}
+        of"). The same tick did a different job in Chapter 2, where{" "}
         <M tex="a'" /> meant the next layer's activations; on a function's name it
         means that function's slope. The shorthand comes with a convenient
         formula:
@@ -194,7 +194,7 @@ export function Module4() {
         and <M tex="0.246 \times 0.00469 = 0.00115" /> (<M tex="z_2" />'s
         change), matching <M tex="a_2" />'s change up to the rounded last digit.
         If it is the formula itself you distrust, it too is checkable the
-        Module 3 way: wiggle <M tex="z" />, divide.
+        Chapter 3 way: wiggle <M tex="z" />, divide.
       </p>
       <RippleSlice arrows={[4]} />
       <p>
@@ -204,14 +204,14 @@ export function Module4() {
         same wiggle on a badly wrong output changes it a lot. So the rate is the
         gap itself, posted by the first run's output, and it arrives with a flip
         worth noticing:
-        Module 3 wrote gaps as right answer minus output, but the slope comes out
+        Chapter 3 wrote gaps as right answer minus output, but the slope comes out
         the other way around, output minus right answer,{" "}
         <M tex="a_2 - y = 0.5609 - 1 = -0.4391" />. The sign carries the
         direction: this output sits below its target, so raising it closes the
         miss and the cost falls, a negative factor. Squaring erases the sign, so
         the cost itself cannot tell the two directions apart, but slopes can, and
         output minus right answer is the convention every later formula uses.
-        (The half in Module 3's cost pays off here: squaring would put a factor
+        (The half in Chapter 3's cost pays off here: squaring would put a factor
         of 2 into this slope, and the half cancels it, leaving the gap alone.)
         Against the log: <M tex="-0.439 \times 0.00116 = -0.00051" />, the cost's
         change exactly.
@@ -224,14 +224,14 @@ export function Module4() {
       </p>
       <Eq
         tex="1.0 \times 0.2350 \times 2.0 \times 0.2463 \times (-0.4391) = -0.0508"
-        gloss="w1's slope, computed with no reruns at all: how much the cost moves per unit of nudge to w1, every other knob held still, exactly Module 3's per-knob question."
+        gloss="w1's slope, computed with no reruns at all: how much the cost moves per unit of nudge to w1, every other knob held still, exactly Chapter 3's per-knob question."
       />
       <p>
         The nudge measurement said <M tex="-0.050" />, and the product says{" "}
         <M tex="-0.0508" />. They agree, and only the measurement needed a second
         run. The product is also the exact one: the
         nudge method approximates, because it uses a small step where the true
-        slope wants a vanishingly small one (the smearing Module 3's aside
+        slope wants a vanishingly small one (the smearing Chapter 3's aside
         described). The multiply-the-local-slopes rule is
         called the chain rule, and it is the only piece of mathematics
         backpropagation needs.
@@ -241,13 +241,13 @@ export function Module4() {
         is a <b>local derivative</b>: local because it describes one
         step of the chain and nothing beyond it, derivative because it is a slope. A
         through-rate, the product of every factor along a path, is the partial
-        derivative Module 3 measured. Written in those words the chain rule says
+        derivative Chapter 3 measured. Written in those words the chain rule says
         that a partial derivative is the product of the local derivatives along the
         path, which is how other treatments state it, and it says exactly what the
         five booths above just did.
       </p>
 
-      <SectionHeader id="m4-blame" title="Blame: price the road once" />
+      <SectionHeader id="c4-blame" title="Blame: price the road once" />
       <p>
         That prices one knob, and notice how little of the price is the knob's
         own. Of the five factors, only the first, the entry, is about{" "}
@@ -355,10 +355,10 @@ export function Module4() {
         <ForkDiagram />
       </Figure>
 
-      <SectionHeader id="m4-stepper" title="Watch it run on a network" />
+      <SectionHeader id="c4-stepper" title="Watch it run on a network" />
       <p>
         Time to run the same story on a network instead of a chain. The one below
-        is Module 1's contrarian network grown by one hidden neuron, 2-3-1 instead
+        is Chapter 1's contrarian network grown by one hidden neuron, 2-3-1 instead
         of 2-2-1, so that no two layers have the same size and every shape stays
         honest. With whole layers in play, one piece of notation: number the
         layers 1, 2, 3 (inputs, hidden, output) and hang the layer number on each
@@ -372,7 +372,7 @@ export function Module4() {
       </p>
       <Eq
         tex="\underbrace{3 \times 2}_{\text{hidden } w} + \underbrace{3}_{\text{hidden } b} + \underbrace{1 \times 3}_{\text{output } w} + \underbrace{1}_{\text{output } b} = 6 + 3 + 3 + 1 = 13"
-        gloss="Thirteen knobs, so the backward pass must deliver thirteen slopes. The weights shown on the wires are a hand-picked starting point, not a trained network: training them is Module 5's job."
+        gloss="Thirteen knobs, so the backward pass must deliver thirteen slopes. The weights shown on the wires are a hand-picked starting point, not a trained network: training them is Chapter 5's job."
       />
       <Figure caption="The network with every symbol placed. Layer-2 symbols are whole columns, one entry per neuron: z² holds the three evidences, a² the three confidences, δ² the three blames. w² and w³ are the wire ledgers, one entry per wire, each row one receiving neuron's incoming wires. The target and cost sit outside the network, keeping score.">
         <NetworkAnatomyDiagram />
@@ -382,7 +382,7 @@ export function Module4() {
         friend, where the contrarian's answer is go (<M tex="y = 1" />). How to
         read the diagram: each circle is a neuron except the two gray ones, which
         are just the input numbers. Wire color is the weight's sign (red excites,
-        blue vetoes, the same code as Module 2's weight images), thickness is its
+        blue vetoes, the same code as Chapter 2's weight images), thickness is its
         size, and the number on the wire is the weight itself. A neuron's circle
         fills with green as its activation rises, its bias sits under it, and its
         blame <M tex="\delta" /> appears under that, in dark red, once the backward
@@ -399,14 +399,14 @@ export function Module4() {
         <BackpropStepper />
       </Figure>
 
-      <SectionHeader id="m4-equations" title="The four equations" />
+      <SectionHeader id="c4-equations" title="The four equations" />
       <p>
         Those six steps are the whole algorithm, and nothing new arrives now: the
         four equations below are facts you have already computed, written in
-        Module 2's matrix shorthand so that Module 5 can turn each one into a
+        Chapter 2's matrix shorthand so that Chapter 5 can turn each one into a
         single line of NumPy. The job here is recognition, not derivation. They
         are numbered BP1 to BP4 after Nielsen's Chapter 2, whose framing this
-        module adapts, and they map onto the stepper: BP1 ran at step 4, BP2 at
+        chapter adapts, and they map onto the stepper: BP1 ran at step 4, BP2 at
         step 5, BP3 and BP4 together at step 6. They are also written for the
         stepper's own layers, 2 hidden and 3 output, no abstract layer letters.
         Two bookkeeping notes: <M tex="\delta^2" /> is a whole column of blames,
@@ -421,11 +421,11 @@ export function Module4() {
       />
       <Eq
         tex="\delta^2 = \big( (w^3)^T \, \delta^3 \big) \odot \sigma'(z^2) \tag{BP2}"
-        gloss="Blame flows backward: each hidden neuron collects blame along its outgoing wires and adds, then scales by its own squash slope. The raised T (transpose) regroups Module 2's wire ledger by sender instead of receiver, so each row becomes one neuron's outgoing wires, exactly what collecting needs; the shapes agree by the inner-numbers-touch rule: (3, 1) times (1, 1) gives (3, 1), one collected blame per hidden neuron."
+        gloss="Blame flows backward: each hidden neuron collects blame along its outgoing wires and adds, then scales by its own squash slope. The raised T (transpose) regroups Chapter 2's wire ledger by sender instead of receiver, so each row becomes one neuron's outgoing wires, exactly what collecting needs; the shapes agree by the inner-numbers-touch rule: (3, 1) times (1, 1) gives (3, 1), one collected blame per hidden neuron."
       />
       <Eq
         tex="\frac{\partial C}{\partial b^2} = \delta^2, \qquad \frac{\partial C}{\partial b^3} = \delta^3 \tag{BP3}"
-        gloss="The curly-d expression is read as one name, 'the slope of C per nudge of b', the number Module 3 measured with nudge-and-divide. Every bias's slope is exactly its neuron's blame: a bias's ramp factor is 1."
+        gloss="The curly-d expression is read as one name, 'the slope of C per nudge of b', the number Chapter 3 measured with nudge-and-divide. Every bias's slope is exactly its neuron's blame: a bias's ramp factor is 1."
       />
       <Eq
         tex="\frac{\partial C}{\partial w^2} = \delta^2 \, (a^1)^T, \qquad \frac{\partial C}{\partial w^3} = \delta^3 \, (a^2)^T \tag{BP4}"
@@ -478,7 +478,7 @@ export function Module4() {
       </div>
       <p>
         Read the four as one machine. The forward pass computes and stores every{" "}
-        <M tex="z" /> and <M tex="a" /> (you built this in Module 2). BP1 turns the
+        <M tex="z" /> and <M tex="a" /> (you built this in Chapter 2). BP1 turns the
         final gap into the last layer's blame. BP2 walks the blame backward one
         layer at a time, reusing the same weight matrices the forward pass used.
         BP3 and BP4 then read every slope directly off the blames and the stored
@@ -486,21 +486,21 @@ export function Module4() {
         estimates anything.
       </p>
       <p>
-        Two reading habits, because Module 5's debugging leans on both.
+        Two reading habits, because Chapter 5's debugging leans on both.
         Direction: the equations run right to left along the network, BP1 once
         at the output, then BP2 once per remaining layer, each use producing the
         layer to its left. A deeper network just uses BP2 more times; Nielsen
         writes that repetition with a general layer letter where this page wrote
-        2 and 3, and in Module 5 it becomes a loop. Signs: a blame's sign is
+        2 and 3, and in Chapter 5 it becomes a loop. Signs: a blame's sign is
         advice, negative meaning raising this neuron's evidence would lower the
         cost; the gap's sign says which side of its target an output sits on;
         and a negative wire flips blame in transit, which you watched{" "}
         <M tex="h_2" />'s wire do in the stepper.
       </p>
 
-      <SectionHeader id="m4-quiz" title="Three predictions" />
+      <SectionHeader id="c4-quiz" title="Three predictions" />
       <p>
-        Module 5 is where you implement all four equations, and the implementation
+        Chapter 5 is where you implement all four equations, and the implementation
         goes better if you can already think in them. So before moving on, three
         predictions. Commit to an answer before you click, and verify each one
         afterward by actually doing it in the stepper above (the questions describe
@@ -509,7 +509,7 @@ export function Module4() {
       </p>
       <DeltaQuiz />
 
-      <SectionHeader id="m4-bill" title="The bill, closed" />
+      <SectionHeader id="c4-bill" title="The bill, closed" />
       <p>
         The bill, one last time, at the digit reader's scale. Nudge-measured
         gradients pay two cost measurements per knob per step: 23,870 passes over
@@ -518,7 +518,7 @@ export function Module4() {
         neuron and each weight about once, roughly the price of a second pass. Two
         passes against 23,870 of them: about twelve thousand times cheaper, and
         exact instead of estimated. That is why backpropagation, and not a faster computer, is
-        what made neural networks trainable. In Module 5 you implement BP1 through
+        what made neural networks trainable. In Chapter 5 you implement BP1 through
         BP4 in NumPy, and the nudge method takes on a new job: the course will
         nudge-and-measure every knob of a tiny network the slow way and compare
         your backward pass against it, number by number. When the two agree, your
@@ -530,9 +530,9 @@ export function Module4() {
           "Backprop answers 'which way should each knob move' with one forward pass and one backward sweep of blame, instead of two cost measurements per knob, and its answers are exact.",
           "A nudge's effect on the cost is the product of the local factors along its path (the chain rule); the forward pass posts every factor, and a neuron's blame delta is the downstream stretch priced once per neuron.",
           "The four equations: blame starts at the output as gap times sigma-prime (BP1), flows backward through the transposed wires (BP2), every bias's slope is its neuron's blame (BP3), and every weight's slope is blame times the activation its wire carried (BP4).",
-          "A saturated neuron has sigma-prime near zero and soaks up almost no blame even when badly wrong: quadratic cost's weakness at the output layer, and the problem Module 7's cross-entropy cost exists to solve.",
+          "A saturated neuron has sigma-prime near zero and soaks up almost no blame even when badly wrong: quadratic cost's weakness at the output layer, and the problem Chapter 7's cross-entropy cost exists to solve.",
         ]}
-        chapter="Chapter 2 (how the backpropagation algorithm works)"
+        deeper="Chapter 2 (how the backpropagation algorithm works)"
         href="http://neuralnetworksanddeeplearning.com/chap2.html"
       />
     </article>
@@ -849,7 +849,7 @@ function ForkDiagram() {
 }
 
 // Static wiring diagram of the two-neuron chain worked in the prose, in the
-// visual language of Module 1's TinyNetDiagram: gray input, green neurons,
+// visual language of Chapter 1's TinyNetDiagram: gray input, green neurons,
 // every knob labeled in place.
 function ChainNetDiagram() {
   const IN = { x: 70, y: 95 };

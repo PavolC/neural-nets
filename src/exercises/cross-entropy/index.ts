@@ -14,7 +14,7 @@ export const crossEntropyExercise: Exercise = {
       "as well.",
     "The cost, precisely: cross_entropy_cost(weights, biases, X, Y) returns " +
       "one float. X is (n_in, m) and Y is (n_out, m), samples as columns, " +
-      "the same pair your sgd has taken since Module 3. Run the network on " +
+      "the same pair your sgd has taken since Chapter 3. Run the network on " +
       "X with the course's feedforward, then charge every entry " +
       "-(y * ln(a) + (1 - y) * ln(1 - a)), add the charges up inside each " +
       "column, and average over the m columns. Two notation points: in " +
@@ -38,12 +38,12 @@ export const crossEntropyExercise: Exercise = {
       "over a batch, the cost when the network is perfectly confident " +
       "(where the nan lives), the delta's values, the delta's " +
       "independence from z, and last a gradient check that ties the two " +
-      "functions together. That check nudges all 54 parameters of Module " +
+      "functions together. That check nudges all 54 parameters of Chapter " +
       "5's 3-5-4-2 network, rescores with YOUR cost, and compares against " +
       "the slopes YOUR delta produces through backprop. Passing it means " +
       "the delta you wrote really is the slope of the cost you wrote.",
     "Once the tests pass, put the old blame and the new one side by side on " +
-      "Module 5's own fixture network. Send this to the scratch pad and run it:",
+      "Chapter 5's own fixture network. Send this to the scratch pad and run it:",
     {
       code:
         "from course import quadratic_cost, quadratic_output_delta\n" +
@@ -94,6 +94,6 @@ export const crossEntropyExercise: Exercise = {
       "    cross_entropy_delta(a, y, z):\n" +
       "        return <the gap>\n\n" +
       "    The gap is output minus right answer, the order the course has\n" +
-      "    used since Module 4. Nothing multiplies it.",
+      "    used since Chapter 4. Nothing multiplies it.",
   ],
 };

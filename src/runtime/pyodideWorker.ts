@@ -43,8 +43,8 @@ interface Pyodide {
  *
  * Several panels swap a name on it (course.gradient, course.backprop) so the
  * learner's own function is what their earlier code calls. The worker outlives
- * every request, so those assignments used to persist: running Module 5's
- * panel and then scrolling up to Module 3's made the deliberately slow SGD
+ * every request, so those assignments used to persist: running Chapter 5's
+ * panel and then scrolling up to Chapter 3's made the deliberately slow SGD
  * panel finish fast while still printing its sentence about 360 forward
  * passes. A snapshot at boot, restored before every request, ends that.
  */
@@ -96,7 +96,7 @@ _course = sys.modules["course"]
 # through the scratch pad cannot see them. Hang them on \`course\` as well, so
 # a scratch run can open the bundled data the way a play snippet says it can.
 # Never one_hot: the loader's one_hot(y, num_classes=10) and the learner's
-# Module 10 one_hot(values, levels) are different functions with one name, and
+# Chapter 10 one_hot(values, levels) are different functions with one name, and
 # this is the only place the two could meet.
 _course.load_mnist_subset = load_mnist_subset
 _course.load_penguins = load_penguins

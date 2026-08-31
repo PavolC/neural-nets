@@ -7,7 +7,7 @@ import { PenguinsPanel } from "./interactives/PenguinsPanel";
 export function Module10() {
   return (
     <article className="module">
-      <h2>Module 10: Your own problem</h2>
+      <h2>Chapter 10: Your own problem</h2>
       <AfterThis
         items={[
           "Turn a file of mixed numbers, categories and holes into the matrix your network expects, and say why each step was needed.",
@@ -19,16 +19,16 @@ export function Module10() {
 
       <p>
         Your program reads about 90 percent of the held-out digits. Point the same
-        program, unchanged, at the file this module uses, and it reads 42.6 percent
+        program, unchanged, at the file this chapter uses, and it reads 42.6 percent
         of the penguins held back from it, which is exactly what answering Adelie
         for every one of them would have scored. Nothing is wrong with your code,
         and nothing about the problem is hard: three species, four measurements,
-        344 birds. One preparation step is missing. This module is about which one,
+        344 birds. One preparation step is missing. This chapter is about which one,
         and about everything else that had already been done to the digits before
         you saw them.
       </p>
 
-      <SectionHeader id="m10-file" title="A file, not a dataset" />
+      <SectionHeader id="c10-file" title="A file, not a dataset" />
       <p>
         Every number your network has seen so far arrived ready. MNIST's pixels
         were already numeric, already between 0 and 1, already complete, already
@@ -42,7 +42,7 @@ export function Module10() {
         network sees a number.
       </p>
       <p>
-        Here is the file this module uses. It is a real survey of penguins from
+        Here is the file this chapter uses. It is a real survey of penguins from
         the Palmer Archipelago in Antarctica: three species, and for each bird a
         few measurements, the island it was found on, and its sex.
       </p>
@@ -110,15 +110,15 @@ export function Module10() {
         averages 17.15, which is a factor of 245.
       </p>
 
-      <SectionHeader id="m10-shape" title="What your network expects" />
+      <SectionHeader id="c10-shape" title="What your network expects" />
       <p>
-        The target is the packing every module since Module 3 has used. One
+        The target is the packing every chapter since Chapter 3 has used. One
         column per example, one row per input number, and a matching column of
         right answers:
       </p>
       <Eq
         tex="X \;\text{is}\; (\text{inputs},\, m), \qquad Y \;\text{is}\; (\text{outputs},\, m)"
-        gloss="Example k is column k of X, and its right answer is column k of Y. A row of X is one input across every example: one pixel in Module 2, one measurement here. Everyone outside this course calls one such row a feature, and this module uses that word from here on, since the file it prepares arrives with some of its features written as words."
+        gloss="Example k is column k of X, and its right answer is column k of Y. A row of X is one input across every example: one pixel in Chapter 2, one measurement here. Everyone outside this course calls one such row a feature, and this chapter uses that word from here on, since the file it prepares arrives with some of its features written as words."
       />
       <p>
         The outputs, and the cost that scores them, follow from what you are
@@ -143,7 +143,7 @@ export function Module10() {
               <td>a single 0 or 1</td>
             </tr>
             <tr>
-              <td>which one of several (this module)</td>
+              <td>which one of several (this chapter)</td>
               <td>one sigmoid per class, or softmax</td>
               <td>cross-entropy</td>
               <td>a one-hot column</td>
@@ -160,13 +160,13 @@ export function Module10() {
       <p>
         The first two rows are your digit reader with a different number of
         outputs. The third is the one departure the course has already shown you:
-        Module 6's rating over a dial ended in a neuron that reported its total
+        Chapter 6's rating over a dial ended in a neuron that reported its total
         with no squash, because an answer between 0 and 1 is the wrong shape for
         a quantity. Predicting a house price or a temperature is that row, and
-        the quadratic cost from Module 3 is what scores it.
+        the quadratic cost from Chapter 3 is what scores it.
       </p>
 
-      <SectionHeader id="m10-scale" title="The step that decides everything" />
+      <SectionHeader id="c10-scale" title="The step that decides everything" />
       <p>
         Now the measurements. A hidden neuron computes{" "}
         <M tex="w \cdot x + b" />, so every weight meets whatever numbers its own
@@ -175,7 +175,7 @@ export function Module10() {
         bill depths near 17.
       </p>
       <p>
-        Module 7 already worked out what that does. Its whole argument for
+        Chapter 7 already worked out what that does. Its whole argument for
         dividing the starting weights by <M tex="\sqrt{n}" /> counted about a
         hundred lit pixels, each contributing a value near 1, and concluded that
         the evidence piles up to about the square root of the squared input
@@ -184,7 +184,7 @@ export function Module10() {
       </p>
       <Eq
         tex="\sqrt{\underbrace{4200^2}_{\text{mass}} + \underbrace{200^2}_{\text{flipper}} + \underbrace{44^2}_{\text{bill length}} + \underbrace{17^2}_{\text{bill depth}}} = \sqrt{17{,}682{,}225} \approx 4{,}200"
-        gloss="The four averages from the file, squared and added, then square-rooted: that is the spread of a hidden neuron's evidence when its weights are drawn at spread 1. The two word columns become five more rows of 0 and 1, so the network reads nine input rows in all, and a row that holds at most a 1 cannot move a sum of 17,682,225. Module 7's draw divides those weights by the square root of the input count, which is 3 for nine rows. Dividing 4,200 by 3 still leaves the evidence near 1,400, where the same division landed MNIST's at 0.33."
+        gloss="The four averages from the file, squared and added, then square-rooted: that is the spread of a hidden neuron's evidence when its weights are drawn at spread 1. The two word columns become five more rows of 0 and 1, so the network reads nine input rows in all, and a row that holds at most a 1 cannot move a sum of 17,682,225. Chapter 7's draw divides those weights by the square root of the input count, which is 3 for nine rows. Dividing 4,200 by 3 still leaves the evidence near 1,400, where the same division landed MNIST's at 0.33."
       />
       <p>
         Every hidden neuron is saturated flat before training starts, and the
@@ -194,14 +194,14 @@ export function Module10() {
       </p>
       <Eq
         tex="x' = \frac{x - \text{mean}}{\text{spread}}"
-        gloss="For each feature separately: subtract that feature's average across the training examples, then divide by the spread of what that leaves, Module 7's spread taken over the centred values rather than the raw ones. Every feature comes out centred on 0 and about 1 wide, whatever it was measured in. The name for it is standardizing."
+        gloss="For each feature separately: subtract that feature's average across the training examples, then divide by the spread of what that leaves, Chapter 7's spread taken over the centred values rather than the raw ones. Every feature comes out centred on 0 and about 1 wide, whatever it was measured in. The name for it is standardizing."
       />
       <p>
         One detail in that formula decides whether your final number means
         anything. The mean and the spread must be measured on the training
         examples alone and then applied unchanged to everything else. Measure
         them over the whole file and the validation and test rows have quietly
-        contributed to how the training rows were scaled, which is Module 7's
+        contributed to how the training rows were scaled, which is Chapter 7's
         lesson about optimizing against a number you also report, wearing a
         different hat.
       </p>
@@ -219,13 +219,13 @@ export function Module10() {
         </p>
       </Aside>
 
-      <SectionHeader id="m10-categories" title="Words, holes and splits" />
+      <SectionHeader id="c10-categories" title="Words, holes and splits" />
       <p>
         The island column holds one of three words. A network cannot multiply a
         word, and numbering them 1, 2, 3 would be worse than useless: it would
         tell the network that Torgersen is three times Biscoe and that Dream sits
         between them. The honest encoding is the one your labels have used since
-        Module 5. Give each level its own input row, and put a 1 in the row that
+        Chapter 5. Give each level its own input row, and put a 1 in the row that
         applies:
       </p>
       <Eq
@@ -291,23 +291,23 @@ export function Module10() {
       </p>
       <Aside>
         <p>
-          Three splits, not two, for the reason Module 7 gave. The validation
+          Three splits, not two, for the reason Chapter 7 gave. The validation
           rows are the ones you may look at as often as you like, because
           choosing the step size or the layer size against them is what they are
           for. The test rows are spent once, at the end, to report. In this
-          module the panel scores validation after every epoch and touches the
+          chapter the panel scores validation after every epoch and touches the
           test rows exactly once, when the run is over.
         </p>
       </Aside>
 
       <ExerciseCard exercise={prepareExercise} />
 
-      <SectionHeader id="m10-run" title="What the preparation was worth" />
+      <SectionHeader id="c10-run" title="What the preparation was worth" />
       <p>
         The panel below runs the whole pipeline out of one file: your{" "}
         <code>standardize</code>, <code>one_hot</code> and <code>split</code> turn
-        the file into a matrix, and your <code>train</code> from Module 9 does the
-        rest, down to the sigmoid you wrote in Module 1. Nothing in the training
+        the file into a matrix, and your <code>train</code> from Chapter 9 does the
+        rest, down to the sigmoid you wrote in Chapter 1. Nothing in the training
         is the course's except the mini-batch adapter. The score at the end is
         read through the course's own feedforward, so the number reported does
         not come from the accuracy function that drew the curve.
@@ -333,7 +333,7 @@ export function Module10() {
         layer hands the output layer the same column whichever penguin arrived.
         The output layer is reading a constant, and the best a constant answer
         can do is name the commonest species. The network cannot climb out of it
-        either, for the reason Module 7 gave for dividing the starting weights: a
+        either, for the reason Chapter 7 gave for dividing the starting weights: a
         flat neuron's squash slope is near zero, and BP2 multiplies its blame by
         that slope, so the wires feeding it barely move.
       </p>
@@ -349,7 +349,7 @@ export function Module10() {
         shuffled split were guarding against.
       </p>
 
-      <SectionHeader id="m10-errors" title="One number hides the failure" />
+      <SectionHeader id="c10-errors" title="One number hides the failure" />
       <p>
         Now switch the features to bill depth and body mass alone, keeping the
         scaling on, and the score falls to 73.5 percent. Against a 42.6 percent
@@ -397,15 +397,15 @@ export function Module10() {
         they catch most of the ways a model can be quietly wrong.
       </p>
 
-      <SectionHeader id="m10-first" title="Picking a first network" />
+      <SectionHeader id="c10-first" title="Picking a first network" />
       <p>
         Nothing so far said how big the network should be. There is no equation
         for it, the way there was none for the step size, so here is a procedure
         that works.
       </p>
       <p>
-        Start with one hidden layer. Module 8 measured what depth costs when you
-        add it without needing it, and Module 6 showed that a single hidden
+        Start with one hidden layer. Chapter 8 measured what depth costs when you
+        add it without needing it, and Chapter 6 showed that a single hidden
         layer, made wide enough, can already express whatever relationship you
         are asking the network for. That argument was about such weights existing
         rather than about descent finding them, so treat one layer as the
@@ -416,7 +416,7 @@ export function Module10() {
       </p>
       <Eq
         tex="\underbrace{8 \times 9}_{\text{hidden } W} + \underbrace{8}_{\text{hidden } b} + \underbrace{3 \times 8}_{\text{output } W} + \underbrace{3}_{\text{output } b} = 72 + 8 + 24 + 3 = 107"
-        gloss="Counting the penguin network's knobs, by the same two products as Module 2's count: one weight per wire into a layer, one bias per neuron in it. The nine inputs are the four measurements plus one row per island and one per sex. The 784-30-10 digit reader you trained came to 23,860 knobs by this counting, and the whole penguin network comes to 107."
+        gloss="Counting the penguin network's knobs, by the same two products as Chapter 2's count: one weight per wire into a layer, one bias per neuron in it. The nine inputs are the four measurements plus one row per island and one per sex. The 784-30-10 digit reader you trained came to 23,860 knobs by this counting, and the whole penguin network comes to 107."
       />
       <p>
         Then prove the machinery works before you worry about accuracy: take
@@ -424,13 +424,13 @@ export function Module10() {
         100 percent on those twenty. A network that cannot memorize twenty
         examples has a bug, a step size that is wrong, or inputs that were never
         scaled, and no amount of extra data will help until that is fixed. Once
-        it can, put the data back and read the two curves Module 7 taught: if
+        it can, put the data back and read the two curves Chapter 7 taught: if
         training and held-out are both poor, the network is too small or has not
         trained long enough; if training is good and held-out is not, you are
         overfitting and want more data, weight decay, or a smaller network.
       </p>
 
-      <SectionHeader id="m10-diagnose" title="When it does not train" />
+      <SectionHeader id="c10-diagnose" title="When it does not train" />
       <p>
         The failures in this course are the common ones, and they are
         distinguishable by symptom. The rows below run in the order worth
@@ -450,37 +450,37 @@ export function Module10() {
             <tr>
               <td>the cost does not move at all</td>
               <td>inputs never scaled, or the step size far too small</td>
-              <td>this module, and Module 3</td>
+              <td>this chapter, and Chapter 3</td>
             </tr>
             <tr>
               <td>the cost jumps around or grows</td>
               <td>the step size is too large</td>
-              <td>Module 3's bowl</td>
+              <td>Chapter 3's bowl</td>
             </tr>
             <tr>
               <td>NaN appears and stays</td>
               <td>a logarithm of zero, or a step size that overflowed</td>
-              <td>the clip in Module 7's exercise</td>
+              <td>the clip in Chapter 7's exercise</td>
             </tr>
             <tr>
               <td>the score equals the commonest class</td>
               <td>it has learned the baseline and nothing else</td>
-              <td>this module, and Module 8</td>
+              <td>this chapter, and Chapter 8</td>
             </tr>
             <tr>
               <td>training keeps improving, held-out stops</td>
               <td>overfitting</td>
-              <td>Module 7</td>
+              <td>Chapter 7</td>
             </tr>
             <tr>
               <td>both stop, well short of good</td>
               <td>too few neurons, or features that cannot separate the classes</td>
-              <td>this module's Chinstraps</td>
+              <td>this chapter's Chinstraps</td>
             </tr>
             <tr>
               <td>the first layers barely move</td>
               <td>too deep for sigmoids</td>
-              <td>Module 8</td>
+              <td>Chapter 8</td>
             </tr>
           </tbody>
         </table>
@@ -488,9 +488,9 @@ export function Module10() {
       <p>
         Two checks are worth running before any of that, because they are the
         ones that separate a wrong network from wrong code. The first is the
-        gradient check Module 5's tests ran against your backprop: nudge every
+        gradient check Chapter 5's tests ran against your backprop: nudge every
         parameter, rescore, and compare with the slopes your equations produced.
-        The course wrote that one, but the recipe is Module 3's
+        The course wrote that one, but the recipe is Chapter 3's
         nudge-and-measure, so you can write it again for a network of your own.
         The check works on any network and any cost, and it is the only way to be
         sure the slopes you are stepping against are the slopes of the thing you
@@ -507,7 +507,7 @@ export function Module10() {
         before you compare your number with someone else's.)
       </p>
 
-      <SectionHeader id="m10-torch" title="How this is done in practice" />
+      <SectionHeader id="c10-torch" title="How this is done in practice" />
       <p>
         One honest note to end on. Everything you have written is what a
         framework does for you, and in a real project you would use the
@@ -540,7 +540,7 @@ for epoch in range(15):                    # your train
         implemented.{" "}
         <code>nn.Linear</code> holds a weight matrix and a bias column and
         computes <M tex="Wa + b" />. <code>loss.backward()</code> is the backward
-        sweep, worked out by the automatic differentiation Module 9 named, from
+        sweep, worked out by the automatic differentiation Chapter 9 named, from
         a record of the forward pass rather than from equations you wrote.{" "}
         <code>opt.step()</code> is your update rule, and swapping{" "}
         <code>SGD</code> for <code>Adam</code> on that line is what changes the
@@ -565,7 +565,7 @@ for epoch in range(15):                    # your train
         millisecond. That is the difference between using a tool and operating
         one, and it is the whole reason this course made you write the parts.
       </p>
-      <SectionHeader id="m10-next" title="Where to go next" />
+      <SectionHeader id="c10-next" title="Where to go next" />
       <p>
         In rough order of how far each one is from where you now stand.
       </p>
@@ -576,7 +576,7 @@ for epoch in range(15):                    # your train
           </a>{" "}
           and{" "}
           <a href="http://neuralnetworksanddeeplearning.com/chap6.html">Chapter 6</a>.
-          The two chapters Module 8 summarized, at full length: the unstable
+          The two Nielsen chapters that Chapter 8 summarized, at full length: the unstable
           gradient argument with the algebra written out, then convolutional
           networks built up to above 99 percent on MNIST. The book this course is
           adapted from, and the smallest step from here.
@@ -587,7 +587,7 @@ for epoch in range(15):                    # your train
           </a>
           . A video series that builds automatic differentiation from scratch, then
           a language model, in the same implement-it-yourself spirit. It starts with
-          the first of the two jobs Module 9 named, and ends where attention begins,
+          the first of the two jobs Chapter 9 named, and ends where attention begins,
           which is exactly the gap this course leaves.
         </li>
         <li>
@@ -595,7 +595,7 @@ for epoch in range(15):                    # your train
             The PyTorch tutorials
           </a>
           . The thirteen lines above, at length, and everything around them: data
-          loaders, devices, checkpoints, and the optimizers Module 9 named.
+          loaders, devices, checkpoints, and the optimizers Chapter 9 named.
         </li>
         <li>
           <a href="https://jalammar.github.io/illustrated-transformer/">
@@ -603,7 +603,7 @@ for epoch in range(15):                    # your train
           </a>
           , and then the paper it explains,{" "}
           <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a>.
-          The one ingredient Module 8 named and did not cover.
+          The one ingredient Chapter 8 named and did not cover.
         </li>
         <li>
           <a href="https://www.deeplearningbook.org/">

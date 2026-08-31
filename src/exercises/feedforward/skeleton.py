@@ -3,7 +3,7 @@
 # A network has several layers, so you receive one weight matrix and one bias
 # column PER LAYER, packed in two parallel lists. weights[l] and biases[l]
 # describe the same layer: the matrix has one row per neuron, the column has
-# that layer's one bias per neuron. Concretely, a call with Module 1's XOR
+# that layer's one bias per neuron. Concretely, a call with Chapter 1's XOR
 # network looks like this:
 #
 #     weights = [np.array([[6., 6.],        # hidden layer: 2 neurons,
@@ -20,12 +20,12 @@
 # Each layer turns the running activation a into sigmoid(w @ a + b). Return
 # the final activation, shape (n_out, 1).
 #
-# Every module from 3 on calls this same function on a whole batch X of
+# Every chapter from 3 on calls this same function on a whole batch X of
 # shape (n, m), one example per column. There is nothing extra to write:
 # w @ a + b computes every column at once, as long as the loop never
 # reshapes a or picks out a single column. The tests check a batch too.
 #
-# sigmoid is the one you wrote in Module 1, higher up this same file. Call it
+# sigmoid is the one you wrote in Chapter 1, higher up this same file. Call it
 # by name; there is nothing to import.
 
 

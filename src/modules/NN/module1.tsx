@@ -10,7 +10,7 @@ import { scale } from "./interactives/utils";
 export function Module1() {
   return (
     <article className="module">
-      <h2>Module 1: From neurons to networks</h2>
+      <h2>Chapter 1: From neurons to networks</h2>
       <AfterThis
         items={[
           "Explain what it means for a machine to learn from examples instead of following rules.",
@@ -28,12 +28,12 @@ export function Module1() {
         bury you. Neural networks flip the approach: instead of writing rules, you
         show the machine thousands of labeled examples, and it adjusts itself until
         its answers match. That self-adjustment is what "learning" means here, nothing
-        more mystical than that. By Module 5 you will have built, with your own code,
-        a program that learns to read handwritten digits. This module builds its
+        more mystical than that. By Chapter 5 you will have built, with your own code,
+        a program that learns to read handwritten digits. This chapter builds its
         smallest part.
       </p>
 
-      <SectionHeader id="m1-neuron" title="A neuron is a weighted decision" />
+      <SectionHeader id="c1-neuron" title="A neuron is a weighted decision" />
       <p>
         That smallest part is a neuron, and it is just a weighted decision. Suppose
         you are deciding whether to go to an outdoor concert, and three yes-or-no
@@ -67,7 +67,7 @@ export function Module1() {
         computes, and this course uses them beside its own word from here on.
       </p>
 
-      <SectionHeader id="m1-line" title="A neuron is a line" />
+      <SectionHeader id="c1-line" title="A neuron is a line" />
       <p>
         Now a picture, and it comes straight out of numbers you can compute by hand.
         Stay with the concert, but keep only two facts so we can draw them: the
@@ -108,7 +108,7 @@ export function Module1() {
         saying line while there are two inputs and a picture to point at.
       </p>
 
-      <SectionHeader id="m1-learning" title="Learning: place the line" />
+      <SectionHeader id="c1-learning" title="Learning: place the line" />
       <p>
         So far you picked the weights and read off the verdicts. Learning runs the
         other way around: you are handed situations whose correct answers are
@@ -154,12 +154,12 @@ export function Module1() {
           real inputs are usually continuous, so the plane holds endless
           possible points and a dataset is a scattering of labeled dots across
           it. And only two inputs fit on paper at all. Every network has an
-          input space like this one (Module 2's has 784 axes, one per pixel);
+          input space like this one (Chapter 2's has 784 axes, one per pixel);
           the geometry survives, the drawing does not.
         </p>
       </Aside>
 
-      <SectionHeader id="m1-xor" title="XOR, the wall" />
+      <SectionHeader id="c1-xor" title="XOR, the wall" />
       <p>
         The third dataset belongs to the contrarian. They go out exactly when one
         thing is good but not both: good weather alone, sure; friend in bad weather,
@@ -196,7 +196,7 @@ export function Module1() {
         a stack of them is harder than training one.
       </p>
 
-      <SectionHeader id="m1-sigmoid" title="The sigmoid upgrade" />
+      <SectionHeader id="c1-sigmoid" title="The sigmoid upgrade" />
       <p>
         Before stacking them, one upgrade to the neuron itself. Learning, remember,
         will mean nudging weights a little and checking whether the answers improve.
@@ -228,7 +228,7 @@ export function Module1() {
       <p>
         Two more names, since both are unavoidable. The squashing step, the part
         that takes <M tex="z" /> and bends it into an answer, is an{" "}
-        <b>activation function</b>, and sigmoid is one choice of it: Module 8 swaps
+        <b>activation function</b>, and sigmoid is one choice of it: Chapter 8 swaps
         in a different one. A neuron's answer is its <b>activation</b>, which is
         why the same word names both the function and its output. This course says
         the squash and a confidence when it wants you to picture what is happening,
@@ -236,7 +236,7 @@ export function Module1() {
         read everywhere else.
       </p>
 
-      <SectionHeader id="m1-network" title="Three neurons beat XOR" />
+      <SectionHeader id="c1-network" title="Three neurons beat XOR" />
       <p>
         Now the stacking. If one neuron is one line, use three neurons. Wire them
         like this:
@@ -304,14 +304,14 @@ export function Module1() {
         the table's numbers) and watch phase 2: the two green dots, unseparable
         in phase 1, get parked almost on top of each other, and one straight cut
         finishes the job. Break the solution one slider at a time, then rebuild
-        it. Getting all four dots right by hand is fiddly; Module 3 is about
+        it. Getting all four dots right by hand is fiddly; Chapter 3 is about
         making the computer do the fiddling.
       </p>
       <Figure caption="The 2-2-1 network in three phases: the hidden layer's cuts and report-tints in input space, with its six sliders; hidden space, where reports are coordinates and the output neuron cuts once, with its three; and the combined verdict, which is phase 2 looked up for every input.">
         <XorNetwork />
       </Figure>
 
-      <SectionHeader id="m1-code" title="Build it in code" />
+      <SectionHeader id="c1-code" title="Build it in code" />
       <p>
         Time to build the neuron in code, using NumPy, the Python library for
         arrays of numbers. Everything in this exercise uses five ideas:
@@ -346,7 +346,7 @@ np.exp(-2.0)    # e^(-2); given an array, it does every entry at once`}</pre>
           "With two inputs, a neuron is a straight line on graph paper, its decision boundary: that is why XOR, whose classes sit on crossing diagonals, defeats any single neuron.",
           "Hidden neurons turn each input into a pair of reports, and one straight cut among the reports can look bent back in the input picture.",
         ]}
-        chapter="Chapter 1 (perceptrons and sigmoid neurons)"
+        deeper="Chapter 1 (perceptrons and sigmoid neurons)"
         href="http://neuralnetworksanddeeplearning.com/chap1.html"
       />
     </article>

@@ -31,7 +31,7 @@ import sys
 GROUND = "#fdfdfb"
 ON_ACCENT = "#ffffff"
 
-# The seed: Module 1's green, which every other hue in the family is this
+# The seed: Chapter 1's green, which every other hue in the family is this
 # colour with the hue turned and nothing else changed.
 SEED = "#0b6e4f"
 

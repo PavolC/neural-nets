@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { scale, sigmoid } from "./utils";
 
-// Module 7's opening demo: one neuron, one input pinned at 1, right answer 0.
+// Chapter 7's opening demo: one neuron, one input pinned at 1, right answer 0.
 // Descent under the two costs, side by side. Everything here is arithmetic on
 // two numbers, so the whole trajectory is computed at once and the button only
 // animates how much of it is on screen.

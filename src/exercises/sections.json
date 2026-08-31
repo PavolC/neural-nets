@@ -2,9 +2,9 @@
   {
     "id": "sigmoid-neuron",
     "kind": "exercise",
-    "module": "m1",
-    "label": "Module 1, A sigmoid neuron",
-    "marker": "# ---- [section:sigmoid-neuron] Module 1, A sigmoid neuron ----",
+    "module": "c1",
+    "label": "Chapter 1, A sigmoid neuron",
+    "marker": "# ---- [section:sigmoid-neuron] Chapter 1, A sigmoid neuron ----",
     "provides": [
       "sigmoid",
       "fire"
@@ -16,9 +16,9 @@
   {
     "id": "feedforward",
     "kind": "exercise",
-    "module": "m2",
-    "label": "Module 2, Feedforward",
-    "marker": "# ---- [section:feedforward] Module 2, Feedforward ----",
+    "module": "c2",
+    "label": "Chapter 2, Feedforward",
+    "marker": "# ---- [section:feedforward] Chapter 2, Feedforward ----",
     "provides": [
       "feedforward"
     ],
@@ -31,9 +31,9 @@
   {
     "id": "given-cost",
     "kind": "given",
-    "module": "m3",
-    "label": "Module 3, written for you",
-    "marker": "# ---- [section:given-cost] Module 3, written for you ----",
+    "module": "c3",
+    "label": "Chapter 3, written for you",
+    "marker": "# ---- [section:given-cost] Chapter 3, written for you ----",
     "provides": [
       "quadratic_cost",
       "numerical_gradient",
@@ -50,9 +50,9 @@
   {
     "id": "sgd",
     "kind": "exercise",
-    "module": "m3",
-    "label": "Module 3, Stochastic gradient descent",
-    "marker": "# ---- [section:sgd] Module 3, Stochastic gradient descent ----",
+    "module": "c3",
+    "label": "Chapter 3, Stochastic gradient descent",
+    "marker": "# ---- [section:sgd] Chapter 3, Stochastic gradient descent ----",
     "provides": [
       "sgd_step",
       "sgd"
@@ -66,9 +66,9 @@
   {
     "id": "backprop",
     "kind": "exercise",
-    "module": "m5",
-    "label": "Module 5, Backpropagation",
-    "marker": "# ---- [section:backprop] Module 5, Backpropagation ----",
+    "module": "c5",
+    "label": "Chapter 5, Backpropagation",
+    "marker": "# ---- [section:backprop] Chapter 5, Backpropagation ----",
     "provides": [
       "sigmoid_prime",
       "backprop"
@@ -82,9 +82,9 @@
   {
     "id": "given-batch",
     "kind": "given",
-    "module": "m5",
-    "label": "Module 5, written for you",
-    "marker": "# ---- [section:given-batch] Module 5, written for you ----",
+    "module": "c5",
+    "label": "Chapter 5, written for you",
+    "marker": "# ---- [section:given-batch] Chapter 5, written for you ----",
     "provides": [
       "batch_gradient"
     ],
@@ -99,9 +99,9 @@
   {
     "id": "cross-entropy",
     "kind": "exercise",
-    "module": "m7",
-    "label": "Module 7, The cross-entropy cost",
-    "marker": "# ---- [section:cross-entropy] Module 7, The cross-entropy cost ----",
+    "module": "c7",
+    "label": "Chapter 7, The cross-entropy cost",
+    "marker": "# ---- [section:cross-entropy] Chapter 7, The cross-entropy cost ----",
     "provides": [
       "cross_entropy_cost",
       "cross_entropy_delta"
@@ -118,9 +118,9 @@
   {
     "id": "smart-init",
     "kind": "exercise",
-    "module": "m7",
-    "label": "Module 7, A better starting point",
-    "marker": "# ---- [section:smart-init] Module 7, A better starting point ----",
+    "module": "c7",
+    "label": "Chapter 7, A better starting point",
+    "marker": "# ---- [section:smart-init] Chapter 7, A better starting point ----",
     "provides": [
       "init_network"
     ],
@@ -131,9 +131,9 @@
   {
     "id": "l2",
     "kind": "exercise",
-    "module": "m7",
-    "label": "Module 7, The decaying update step",
-    "marker": "# ---- [section:l2] Module 7, The decaying update step ----",
+    "module": "c7",
+    "label": "Chapter 7, The decaying update step",
+    "marker": "# ---- [section:l2] Chapter 7, The decaying update step ----",
     "provides": [
       "l2_step"
     ],
@@ -144,9 +144,9 @@
   {
     "id": "train",
     "kind": "exercise",
-    "module": "m9",
-    "label": "Module 9, The whole program",
-    "marker": "# ---- [section:train] Module 9, The whole program ----",
+    "module": "c9",
+    "label": "Chapter 9, The whole program",
+    "marker": "# ---- [section:train] Chapter 9, The whole program ----",
     "provides": [
       "accuracy",
       "train"
@@ -164,9 +164,9 @@
   {
     "id": "prepare",
     "kind": "exercise",
-    "module": "m10",
-    "label": "Module 10, Getting your own data ready",
-    "marker": "# ---- [section:prepare] Module 10, Getting your own data ready ----",
+    "module": "c10",
+    "label": "Chapter 10, Getting your own data ready",
+    "marker": "# ---- [section:prepare] Chapter 10, Getting your own data ready ----",
     "provides": [
       "standardize",
       "one_hot",

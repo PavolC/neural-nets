@@ -29,7 +29,7 @@ Assertions, each with its own failure message:
   H  lending is exact and cannot make an unwritten exercise pass
   I  markers round-trip: split and rejoin is byte-identical
   J  the marker regex in workbenchDoc.ts agrees with the markers in the table
-  K  Module 7's seam edit keeps every Module 5 test green
+  K  Chapter 7's seam edit keeps every Chapter 5 test green
   L  the written-for-you sections agree with course_helpers.py
 
 Needs NumPy (Pyodide's only package beyond the standard library):
@@ -65,7 +65,7 @@ EXERCISE_IDS = [s["id"] for s in wb.SECTIONS if s["kind"] == "exercise"]
 # short and keep the reason with it: it is an exemption from assertion E's
 # teaching-message rule, not a place to park a test that crashes.
 EXPECTED_SKELETON_FAILURES = {
-    # Module 7 asks the learner to open their Module 5 backprop to a
+    # Chapter 7 asks the learner to open their Chapter 5 backprop to a
     # swapped-in BP1. On an untouched file backprop is a stub with four
     # arguments, and "add output_delta=None" is the right thing to say.
     "test_backprop_takes_the_blame_argument": "add output_delta",
@@ -73,7 +73,7 @@ EXPECTED_SKELETON_FAILURES = {
 
 # Tests that check work done in a DIFFERENT section, so they can pass while
 # the section they are filed under is still a stub. Only one exists, and it
-# is the point of Module 7's first beat: the edit to Module 5's backprop is a
+# is the point of Chapter 7's first beat: the edit to Chapter 5's backprop is a
 # separate deliverable from the two functions below it, and a learner who has
 # made that edit should be told so rather than shown a blanket zero.
 CROSS_SECTION_TESTS = {"test_backprop_takes_the_blame_argument"}
@@ -131,13 +131,13 @@ def prefix_ids(k):
 # ---------------------------------------------------------------- assertions
 
 def check_order(problems):
-    """A. Course order is derived from the registry and the module list."""
+    """A. Course order is derived from the registry and the chapter list."""
     registry = (EX / "registry.ts").read_text()
-    modules = (ROOT / "src" / "modules" / "NN" / "index.ts").read_text()
+    chapters = (ROOT / "src" / "modules" / "NN" / "index.ts").read_text()
 
     listed = re.findall(r'\bid: "([a-z0-9-]+)"', registry)
     module_of = dict(zip(listed, re.findall(r'\bmodule: "([a-z0-9]+)"', registry)))
-    module_ids = re.findall(r'\bid: "([a-z0-9]+)"', modules)
+    chapter_ids = re.findall(r'\bid: "([a-z0-9]+)"', chapters)
 
     for ex_id in listed:
         index = EX / ex_id / "index.ts"
@@ -145,9 +145,9 @@ def check_order(problems):
             problems.append(f"A: registry lists {ex_id}, which has no folder in src/exercises")
         elif f'id: "{ex_id}"' not in index.read_text():
             problems.append(f"A: registry's id {ex_id} does not match the id in its own index.ts")
-        if module_of.get(ex_id) not in set(module_ids):
+        if module_of.get(ex_id) not in set(chapter_ids):
             problems.append(
-                f"A: registry files {ex_id} under module {module_of.get(ex_id)!r}, "
+                f"A: registry files {ex_id} under chapter {module_of.get(ex_id)!r}, "
                 "which src/modules/NN/index.ts does not define")
 
     for d in sorted(EX.iterdir()):
@@ -157,13 +157,13 @@ def check_order(problems):
                 "so it is invisible on the front page")
 
     # The registry's own order is the order the workbench assembles in, so a
-    # registry that lists two exercises out of module order would build a
+    # registry that lists two exercises out of chapter order would build a
     # file whose sections run backwards against the course.
-    rank = {m: i for i, m in enumerate(module_ids)}
+    rank = {m: i for i, m in enumerate(chapter_ids)}
     seen = [rank.get(module_of[i], -1) for i in listed if i in module_of]
     if seen != sorted(seen):
         problems.append(
-            "A: the registry lists exercises out of module order, so the workbench "
+            "A: the registry lists exercises out of chapter order, so the workbench "
             "would assemble sections in an order the reader never meets them in")
 
     if listed != EXERCISE_IDS:
@@ -299,7 +299,7 @@ def check_regex(problems):
 
 
 def check_seam(problems, h, course_names):
-    """K. Module 7's edit keeps every Module 5 test green and changes one thing."""
+    """K. Chapter 7's edit keeps every Chapter 5 test green and changes one thing."""
     plain = wb.body("backprop", "solution")
     seamed = wb.body("backprop", "seam")
     plain_defs = {n.name for n in ast.parse(plain).body if isinstance(n, ast.FunctionDef)}
@@ -307,7 +307,7 @@ def check_seam(problems, h, course_names):
     if plain_defs != seamed_defs:
         problems.append(
             f"K: seam.py defines {seamed_defs} but solution.py defines {plain_defs}; "
-            "Module 7's edit is meant to change one signature and one line")
+            "Chapter 7's edit is meant to change one signature and one line")
     for tree, want in ((ast.parse(plain), 4), (ast.parse(seamed), 5)):
         fn = next(n for n in tree.body
                   if isinstance(n, ast.FunctionDef) and n.name == "backprop")
@@ -316,14 +316,14 @@ def check_seam(problems, h, course_names):
             problems.append(f"K: backprop takes {got} arguments where {want} was expected")
 
     ids = wb.with_givens(["backprop"])
-    for kind, label in (("solution", "before Module 7's edit"), ("seam", "after it")):
+    for kind, label in (("solution", "before Chapter 7's edit"), ("seam", "after it")):
         doc = wb.assemble(ids, "solution", {"backprop": kind})
         got = run(h, doc, "backprop", ids, ids, course_names)
         if not got["passed"]:
             failed = [t["name"] for t in got["tests"] if not t["passed"]]
             problems.append(
-                f"K: the backprop suite fails {failed} {label}; the edit Module 7 "
-                "asks for has to leave Module 5 exactly as it was")
+                f"K: the backprop suite fails {failed} {label}; the edit Chapter 7 "
+                "asks for has to leave Chapter 5 exactly as it was")
 
 
 def check_given_sections(problems):
@@ -370,7 +370,7 @@ def check_lending(problems, h, course_names):
                 f"H: the lend list for {target} contains {sorted(owned & set(lent))}, "
                 "which the exercise itself is meant to write")
         # Only the names downstream code actually calls need a copy to lend.
-        # A section's other functions (Module 1's fire, Module 7's
+        # A section's other functions (Chapter 1's fire, Chapter 7's
         # cross_entropy_cost) are the learner's alone and nothing above them
         # reads them, so course_helpers.py carrying a copy would be dead code.
         used = set()
@@ -391,7 +391,7 @@ def check_lending(problems, h, course_names):
                         "course_helpers.py has no copy to lend while that section "
                         "is still unwritten")
 
-    # A learner who opens Module 9 first gets a run, not a NameError.
+    # A learner who opens Chapter 9 first gets a run, not a NameError.
     for target in EXERCISE_IDS:
         ids = wb.with_givens([target])
         kinds = {"backprop": "seam"} if wb.needs_seam(ids) else {}
@@ -407,13 +407,13 @@ def check_lending(problems, h, course_names):
         else:
             # A cross-section test is allowed to fail here, and should: it asks
             # about a section this document does not contain, and saying so is
-            # the right answer for a reader who opened this module first.
+            # the right answer for a reader who opened this chapter first.
             failed = [t["name"] for t in got["tests"]
                       if not t["passed"] and t["name"] not in CROSS_SECTION_TESTS]
             if failed:
                 problems.append(
                     f"H: {target} alone in a file, with the course lending the rest, "
-                    f"fails {failed}; a reader who opens that module first sees this")
+                    f"fails {failed}; a reader who opens that chapter first sees this")
 
 
 def check_solved(problems, h, course_names, verbose):
@@ -603,7 +603,7 @@ def main():
         print(f"{' ':16} mutation check: every consumer notices a broken provider")
 
     print(f"{' ':16} registry: {len(EXERCISE_IDS)} exercises, "
-          f"{len(wb.SECTIONS)} sections, ids and module ids match")
+          f"{len(wb.SECTIONS)} sections, ids and chapter ids match")
     print()
     if problems:
         print(f"{len(problems)} problem(s):")

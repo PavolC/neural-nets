@@ -2,8 +2,8 @@
 
 Nine panels train, score or draw with the code the learner wrote, and until
 this script nothing checked that any of them ran. They are the course's payoff
-and several modules quote their exact numbers in prose, so a panel that raises
-`AttributeError: module has no attribute 'gradient'` is a broken module, not a
+and several chapters quote their exact numbers in prose, so a panel that raises
+`AttributeError: module has no attribute 'gradient'` is a broken chapter, not a
 broken panel.
 
 Each panel keeps its Python in a template literal in its .tsx. This script

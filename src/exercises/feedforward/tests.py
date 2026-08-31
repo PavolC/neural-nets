@@ -74,7 +74,7 @@ def test_two_layer_values():
 
 def test_batch_of_columns():
     """a whole batch: many columns in, that many answers out"""
-    # From Module 3 on, every caller hands feedforward a whole batch at once:
+    # From Chapter 3 on, every caller hands feedforward a whole batch at once:
     # X of shape (n, m), one example per column. The layer rule
     # sigmoid(w @ a + b) already computes every column together, so this
     # passes unless something in the loop reshapes a, indexes one column, or
@@ -93,7 +93,7 @@ def test_batch_of_columns():
     out = feedforward([w1, w2], [b1, b2], X)
     assert np.shape(out) == (2, 3), (
         f"expected shape (2, 3) for a batch of 3 columns, got {np.shape(out)}. "
-        "Later modules call feedforward on whole batches: X is (n, m), one "
+        "Later chapters call feedforward on whole batches: X is (n, m), one "
         "example per column, and the answer keeps that layout. The layer rule "
         "a = sigmoid(w @ a + b) already handles this, so check that nothing "
         "in your loop reshapes a, picks out a single column, or wraps the "
@@ -148,7 +148,7 @@ def test_input_not_modified():
     feedforward([w], [b], x)
     assert np.array_equal(x, x_copy) and np.array_equal(w, w_copy), (
         "feedforward changed its input arrays. Avoid in-place operations "
-        "(like += or x[...] = ...) on the arguments: later modules reuse "
+        "(like += or x[...] = ...) on the arguments: later chapters reuse "
         "the same weights across many calls and silent mutation will "
         "corrupt training."
     )

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { scale, sigmoid } from "./utils";
 
-// Module 1 interactive: why sigmoid. The perceptron's hard threshold and
+// Chapter 1 interactive: why sigmoid. The perceptron's hard threshold and
 // the sigmoid drawn over the same evidence axis; a slider moves z and both
 // outputs respond, one in jumps, one smoothly.
 

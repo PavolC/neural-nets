@@ -2,7 +2,7 @@
 //
 // When a run fails, the panel checks whether the cause is a section further
 // up the file, by running that section's own suite. Those suites live in
-// exercise modules that belong to other module chunks, so they are imported
+// exercise modules that belong to other chapter chunks, so they are imported
 // on demand: the happy path never loads any of this, and a blame pass loads
 // only the sections it actually reaches.
 

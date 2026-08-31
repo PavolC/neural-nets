@@ -14,6 +14,7 @@ import {
 	clearBackup,
 	demote,
 	ensureLibrary,
+	refreshMarkers,
 	loadDocument,
 	parsed,
 	projectionFor,
@@ -59,7 +60,7 @@ export function saveCompleted(exerciseId: string): void {
 
 // Completion unlocks the payoff panels that run the learner's own code (and
 // the start page's progress list), so interested components can subscribe to
-// changes. It has never gated navigation: every module is reachable always.
+// changes. It has never gated navigation: every chapter is reachable always.
 const PROGRESS_EVENT = "gn:progress";
 
 export function emitProgress(): void {
@@ -91,7 +92,7 @@ function sectionReady(id: string): boolean {
  * it runs on.
  *
  * The test harness lends the course's copy of any section the learner has
- * not written, so a pass can be earned out of order: open Module 3 first and
+ * not written, so a pass can be earned out of order: open Chapter 3 first and
  * sgd goes green with feedforward on loan. The payoff panels have no lending;
  * they exec the projection as it stands, so that same learner's file would
  * die on the missing name. codeReady therefore walks the requires closure
@@ -300,4 +301,4 @@ function extractBody(stored: string, id: string): string | null {
 	return demote(stored);
 }
 
-export { ensureLibrary, loadDocument, saveDocument };
+export { ensureLibrary, refreshMarkers, loadDocument, saveDocument };

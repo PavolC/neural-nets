@@ -7,7 +7,7 @@
  *
  * It stopped being right when the goal became reach. A course nobody can
  * measure is a course whose author cannot tell the difference between "two
- * hundred people read Module 1 and stopped" and "nobody arrived", and those
+ * hundred people read Chapter 1 and stopped" and "nobody arrived", and those
  * two failures have opposite fixes. The method this course was built with runs
  * on knowing where a reader stops; that instrument existed for one reader and
  * for nobody else.

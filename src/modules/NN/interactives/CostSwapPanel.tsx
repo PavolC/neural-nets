@@ -7,15 +7,15 @@ import { sgdExercise } from "../../../exercises/sgd";
 import { EpochChart, type EpochSeries } from "./EpochChart";
 import { lockedBy, speakList } from "./lockedBy";
 
-// Module 7, first cycle: the digit reader from Module 5, trained three ways
+// Chapter 7, first cycle: the digit reader from Chapter 5, trained three ways
 // from the same starting parameters. Two costs at the same step size, and
-// then the quadratic cost again at the step size Module 5 tuned for it.
+// then the quadratic cost again at the step size Chapter 5 tuned for it.
 // Everything except the output blame and eta is held fixed.
 
 const EPOCHS = 8;
 
-// Same seeds as Module 5's training panel (init 8, sgd 2, mini-batches of
-// 10), so run C reproduces that module's first eight epochs exactly.
+// Same seeds as Chapter 5's training panel (init 8, sgd 2, mini-batches of
+// 10), so run C reproduces that chapter's first eight epochs exactly.
 const SNIPPET = `
 import json, time, types
 import numpy as np
@@ -24,7 +24,7 @@ from course import quadratic_output_delta
 _a = json.loads(_args_json)
 
 # The learner's file, once, up to and including their cross-entropy work.
-# It carries their sgd from Module 3 and the adapter from Module 5 too, so
+# It carries their sgd from Chapter 3 and the adapter from Chapter 5 too, so
 # every name below except the old BP1 is theirs.
 _lib = types.ModuleType("your_code")
 exec(compile(_a["code"], "your_code.py", "exec"), _lib.__dict__)
@@ -89,7 +89,7 @@ interface Summary {
 const LINES: Record<string, { label: string; cls: string; dashed?: boolean }> = {
   "quad-matched": { label: "the quadratic cost, step size 0.5", cls: "m7-line-a" },
   cross: { label: "your cross-entropy cost, step size 0.5", cls: "m7-line-b" },
-  "quad-tuned": { label: "the quadratic cost, step size 3.0 (Module 5's run)", cls: "m7-line-a", dashed: true },
+  "quad-tuned": { label: "the quadratic cost, step size 3.0 (Chapter 5's run)", cls: "m7-line-a", dashed: true },
 };
 
 const needed = () =>
@@ -107,7 +107,7 @@ export function CostSwapPanel() {
 
   const run = () => {
     // One projection: the file through the cross-entropy section already
-    // holds their Module 3 sgd and Module 5 backprop.
+    // holds their Chapter 3 sgd and Chapter 5 backprop.
     const code = loadCode(crossEntropyExercise.id);
     if (!code) return;
     setRunning(true);

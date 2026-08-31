@@ -1,8 +1,8 @@
-# The backprop section as it stands after Module 7's edit: BP1 lifted into an
+# The backprop section as it stands after Chapter 7's edit: BP1 lifted into an
 # argument. This file is the course's copy of that end state, used to check
-# that the edit Module 7 asks for keeps every Module 5 test green and leaves
+# that the edit Chapter 7 asks for keeps every Chapter 5 test green and leaves
 # the default behaviour identical. It is not shown to the learner as a
-# solution; Module 7's prompt ships the two changed lines.
+# solution; Chapter 7's prompt ships the two changed lines.
 #
 # Reference solution, adapted from Michael Nielsen's network.py (MIT license,
 # github.com/mnielsen/neural-networks-and-deep-learning).
@@ -29,7 +29,7 @@ def backprop(weights, biases, x, y, output_delta=None):
     nabla_w = [np.zeros_like(w) for w in weights]
     nabla_b = [np.zeros_like(b) for b in biases]
 
-    # BP1: the output layer's blame. Module 7 swaps this one line out.
+    # BP1: the output layer's blame. Chapter 7 swaps this one line out.
     if output_delta is None:
         delta = (activations[-1] - y) * sigmoid_prime(zs[-1])
     else:

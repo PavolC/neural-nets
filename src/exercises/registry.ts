@@ -5,14 +5,14 @@
  * would put every line of course Python in the first chunk the reader
  * downloads. This is the list, and nothing else. The ids are the localStorage
  * keys, so they must match the `id` in each exercise's index.ts, and the
- * module ids must match src/modules/NN/index.ts. Neither can be checked here
+ * chapter ids must match src/modules/NN/index.ts. Neither can be checked here
  * without importing the thing this file exists to avoid importing, so
  * tools/check_exercises.py checks both from outside the bundle.
  */
 export interface ExerciseRef {
   id: string;
   title: string;
-  /** Module id from MODULES, for linking. */
+  /** Chapter id from MODULES, for linking. */
   module: string;
   /** What the learner ends up with, in one line. */
   builds: string;
@@ -22,55 +22,55 @@ export const EXERCISES: ExerciseRef[] = [
   {
     id: "sigmoid-neuron",
     title: "A sigmoid neuron",
-    module: "m1",
+    module: "c1",
     builds: "sigmoid and fire: the squash, and one neuron's weighted sum plus bias",
   },
   {
     id: "feedforward",
     title: "Feedforward",
-    module: "m2",
+    module: "c2",
     builds: "feedforward: a whole network, one matrix multiplication per layer",
   },
   {
     id: "sgd",
     title: "Stochastic gradient descent",
-    module: "m3",
+    module: "c3",
     builds: "sgd_step and sgd: descent with mini-batches and a shuffle",
   },
   {
     id: "backprop",
     title: "Backpropagation",
-    module: "m5",
+    module: "c5",
     builds: "backprop: BP1 to BP4, checked against numerically measured gradients",
   },
   {
     id: "cross-entropy",
     title: "The cross-entropy cost",
-    module: "m7",
+    module: "c7",
     builds: "cross_entropy_cost and cross_entropy_delta: a cost whose blame is the gap",
   },
   {
     id: "smart-init",
     title: "A better starting point",
-    module: "m7",
+    module: "c7",
     builds: "init_network: weights divided by the square root of their input count",
   },
   {
     id: "l2",
     title: "The decaying update step",
-    module: "m7",
+    module: "c7",
     builds: "l2_step: the update rule with weight decay",
   },
   {
     id: "train",
     title: "The whole program",
-    module: "m9",
+    module: "c9",
     builds: "train and accuracy: the loop over every part, and the score",
   },
   {
     id: "prepare",
     title: "Getting your own data ready",
-    module: "m10",
+    module: "c10",
     builds: "standardize, one_hot and split: a file turned into a matrix",
   },
 ];
