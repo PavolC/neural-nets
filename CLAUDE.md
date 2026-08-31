@@ -58,14 +58,15 @@ editor contents never sent; see `src/analytics.ts`).
   `vite.config.ts` emits `LICENSE.txt` into `dist/` and the footer links it. A build that
   ships the code without the notice is a licence defect, not a formatting one.
 - **No em dashes in any user-facing prose.** Use commas, colons, or parentheses.
-- **`src/brand/` is shared with every other course in the series.** Four of its five
-  files are copied unchanged between courses. The portable copy lives in the series
-  repository's kit, not here, so no check in this repo can compare the two: what catches
-  drift now is that both sides measure the same OKLCH arithmetic, `brand_palette.py
-  --check` here and the series' own copy of it there. A change that belongs to this
-  course belongs in `src/styles.css`, which loads after the brand layer and can override
-  any of it. Two things a course does own inside the layer: `brand.ts` and the one
-  `--accent` line.
+- **`src/brand/` is this course's copy of a layer that is now upstream.** The canonical
+  copy is the kit's, in the series repository; this folder is downstream of it. So a change
+  to the four shared files starts there and flows down, rather than being made here and
+  mirrored: made here it is a fork, and nothing in either repository can see it, because
+  the byte-equality guard went with the kit. What still catches a drifted palette is that
+  both sides measure the same OKLCH arithmetic, `brand_palette.py --check` here and the
+  series' own copy of it there. A change that belongs to this course alone belongs in
+  `src/styles.css`, which loads after the brand layer and can override any of it. Two
+  things a course does own inside the layer: `brand.ts` and the one `--accent` line.
 
 ## Global shape conventions (all Python must comply)
 
@@ -214,9 +215,10 @@ editor contents never sent; see `src/analytics.ts`).
   roles, and the masthead, tab strip, link and footer chrome. A sibling course copies four
   of the five files unchanged and edits `brand.ts` plus one `--accent` line. The
   alternative was leaving each course to style itself, which is what makes a set of pages
-  look unrelated; the cost is that a change to the shared files has to reach the series
-  kit's copy too, and since the kit moved out of this repository nothing here can enforce
-  that. See "Visual identity" below, and `course-kit/BRAND.md` in the series repository.
+  look unrelated; the cost is that the shared files have two copies in two repositories,
+  with the kit's upstream and this one downstream of it, and nothing in either can prove
+  they still agree. See "Visual identity" below, and `course-kit/BRAND.md` in the series
+  repository.
 - **The method is extracted rather than described** (same change), **and it has since
   moved out of this repository.** The kit is this file with the neural networks taken out,
   plus the process that produced it (`METHOD.md`), the fifteen learner failures behind its
