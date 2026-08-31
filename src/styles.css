@@ -216,7 +216,9 @@ button:disabled {
 }
 
 .play-snippet {
-	margin: 0.8rem 0;
+	/* auto: the reading-measure rule caps this box, and a margin shorthand
+	   with a 0 here would silently reset the centring it needs. */
+	margin: 0.8rem auto;
 }
 
 .play-snippet pre {
@@ -411,12 +413,18 @@ button:disabled {
 
 /* ---------- the reading measure ---------- */
 
-/* Two widths, and only two. Everything read as text takes --measure: prose,
-   headings, captions, the cards, and the equations. Everything that is an
-   illustration keeps the whole column: figures, tables, interactive panels,
-   the editor, and the blocks that hold code. A third width in between is what
-   the equations used to have, and three widths on one page read as an accident
-   rather than as a rule.
+/* Two widths, and only two, and the rule is about the ink, not the boxes.
+   The eye judges alignment by ragged left text edges, so everything that has
+   one puts it on the prose axis at --measure: prose, headings, captions, the
+   cards, the equations, the blocks that hold code, and the start page's rows
+   of buttons. The full column belongs only to ink that centres or to boxes
+   that show their own extent: figures, tables, interactive panels, the
+   editor. A centred figure reads as a picture sized to its content however
+   wide it is; code and buttons cannot centre their ink, so at full column
+   they started it at the column edge, 100 to 113px left of every paragraph,
+   which is the lopsidedness this rule exists to prevent. A third width in
+   between is what the equations used to have, and three widths on one page
+   read as an accident rather than as a rule.
 
    The selectors are all direct-child, which is what makes this safe in a
    stylesheet with twenty-five interactives in it: a paragraph inside a panel
@@ -438,12 +446,17 @@ button:disabled {
 .module > .eq,
 .module-section-title,
 .start-page > h3,
+.start-cta,
+.start-storage,
 .exercise > p,
 .exercise > .eq,
 .exercise-title,
 .after-this,
 .recap,
 .module-aside,
+.notation,
+.play-snippet,
+.module > .hint-pre,
 .next-module {
 	max-width: var(--measure);
 	margin-inline: auto;
@@ -460,6 +473,32 @@ button:disabled {
 .recap,
 .module-aside {
 	max-width: calc(var(--measure) + 2.2rem + 2px);
+}
+
+/* The notation lookup and the code blocks carry the measure the same way the
+   cards do: box = measure + own padding + own borders, so the first character
+   inside lands on the axis. The paddings differ per box, which is why these
+   are not one rule: the notation card pads 1rem inside 1px borders, the play
+   snippet's pre 0.7rem inside 1px, Module 1's five-ideas block 0.7rem with no
+   border.
+
+   A block whose code cannot wrap gets width: max-content over that floor: the
+   box grows to its longest line (up to the column) before anything scrolls,
+   so a 72-character print is not clipped by two characters to honour a
+   69-character measure. Short snippets sit exactly on the axis; a longer one
+   widens symmetrically, and its border still encloses the last character. */
+.notation {
+	max-width: calc(var(--measure) + 2rem + 2px);
+}
+
+.play-snippet {
+	width: max-content;
+	min-width: min(calc(var(--measure) + 1.4rem + 2px), 100%);
+	max-width: 100%;
+}
+
+.module > .hint-pre {
+	max-width: calc(var(--measure) + 1.4rem);
 }
 
 /* ---------- module pages ---------- */
@@ -2874,7 +2913,9 @@ button:disabled {
 	flex-wrap: wrap;
 	align-items: center;
 	gap: 0.9rem;
-	margin: 1.4rem 0 2rem;
+	/* In the reading-measure set: a row of buttons is left-ragged ink, and at
+	   full column the Begin button sat 113px left of every paragraph. */
+	margin: 1.4rem auto 2rem;
 }
 
 .start-cta-note {
@@ -3008,7 +3049,9 @@ button:disabled {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 0.6rem;
-	margin: 1.2rem 0 0.4rem;
+	/* In the reading-measure set, same as .start-cta: buttons are left-ragged
+	   ink and belong on the prose axis. */
+	margin: 1.2rem auto 0.4rem;
 }
 
 .start-storage-note {
@@ -3030,18 +3073,25 @@ button:disabled {
 	font-size: 0.85rem;
 }
 
-/* Module 10's PyTorch listing: the one code block in the course that is for
-   reading rather than running, so it is set like the test viewer's code
-   rather than like an editor. */
+/* Module 10's PyTorch listing and Module 9's two program logs: code blocks
+   for reading rather than running, so they are set like the test viewer's
+   code rather than like an editor. The box hugs its content (max-content, so
+   the border always encloses the last character, even where the .scroll-x
+   wrapper is what scrolls) and never shrinks below the card width, which is
+   what lands a short listing's first character on the prose axis; a listing
+   with longer lines grows past it symmetrically. */
 .torch-listing {
 	background: var(--surface-sunken);
 	border: 1px solid var(--rule);
 	border-radius: var(--radius);
 	padding: 0.8rem 1rem;
-	margin: 0;
+	margin: 0 auto;
 	font-size: 0.82rem;
 	line-height: 1.55;
-	min-width: 520px;
+	width: max-content;
+	/* The 100% arm keeps the floor from exceeding the wrapper on a phone,
+	   where it would add empty width to the scroll. */
+	min-width: min(calc(var(--measure) + 2rem + 2px), 100%);
 }
 
 .m10-credit {
@@ -3060,7 +3110,12 @@ button:disabled {
 	border-radius: var(--radius);
 	background: var(--surface-card);
 	padding: 0.7rem 1rem;
-	margin: 1.2rem 0 2rem;
+	/* A card, so it takes the card width (set with the reading measure) rather
+	   than the column: folded, which is its resting state, it is one line of
+	   text, and it was the one card in the course 227px wider than its family.
+	   The table inside is wider than the measure and scrolls in the .scroll-x
+	   wrapper it already has. */
+	margin: 1.2rem auto 2rem;
 }
 
 .notation summary {
@@ -3078,8 +3133,13 @@ button:disabled {
 	white-space: nowrap;
 }
 
+/* A floor, not a width: the meaning column wraps to what the card leaves it
+   (the widest symbol is 303px of nowrap code), and 12rem is where wrapped
+   meanings stay readable. It was 22rem when the card was full column; inside
+   the card that forced a permanent scroll that cut the meaning column itself
+   to half, and a lookup whose meanings hide behind a pan is not a lookup. */
 .notation .truth-table td:nth-child(2) {
-	min-width: 22rem;
+	min-width: 12rem;
 }
 
 /* Module 5's error analysis: the digits the network was most confident about
