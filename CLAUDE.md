@@ -891,8 +891,14 @@ the footer. Rules that follow from it:
   gradient check nudges 54 parameters twice), so making every print-a-value
   experiment pay for them would be a real regression. A cell owning its own run
   button is the notebook habit worth copying. Sending a snippet from a prompt
-  opens the scratch pad and scrolls to it, because code sent somewhere the
-  reader cannot see was not sent.
+  opens the scratch pad, puts the appended text into the editor and scrolls to
+  it, because code sent somewhere the reader cannot see was not sent. All three,
+  and the middle one is the one that gets forgotten: the editor takes its
+  document once, at mount, so a send that only writes localStorage arrives on
+  the first press of a session (which is what mounts the editor) and nowhere
+  after that, and the reader's next keystroke writes the editor's stale copy
+  back over the snippet. `tools/check_run_path.mjs` presses the button twice and
+  then types.
   **What the run is saying gets a line of its own**, under the head rather than
   in it. In the head it was the sixth thing across the row and about 50px wide,
   so "Running tests..." rendered as "R...". The strip is 31px and is there only
@@ -1062,10 +1068,12 @@ tokens from the start.
   has one, driven in a real browser against a stub Pyodide (the worker needs
   exactly four methods from it). Covers the message protocol, the run state,
   every shape of result, the borrowed-names line, the output stream, all three
-  ways to start a run, and that a selection in the editor is visible on every
-  ground the theme paints. Not in `npm run check` and not in CI: it wants a
-  browser and a dev server, which is the bargain `make_og_image.sh` already
-  makes.
+  ways to start a run, that a selection in the editor is visible on every
+  ground the theme paints, and that Send to the scratch pad reaches the editor
+  the reader is looking at, scrolled to, and survives the next keystroke, in the
+  dock and the phone sheet both. Not in `npm run check` and not in CI: it wants
+  a browser and a dev server, which is the bargain `make_og_image.sh` already
+  makes. Add a case whenever a control writes into the workbench.
 - `python3 tools/make_penguins.py`: regenerate `public/data/penguins.json.gz`
   (Chapter 10's dataset; stdlib only, downloads from the palmerpenguins repo,
   deterministic output, written RAW because preparing it is the exercise).

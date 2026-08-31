@@ -408,6 +408,123 @@ for (const [label, verdict] of Object.entries(VERDICTS)) {
 	await b.close();
 }
 
+// Send to the scratch pad, the one control that writes into an editor the
+// reader is already looking at. CodeMirror takes its document once, at mount,
+// so a send that only writes localStorage is invisible: the first send of a
+// session arrived because it was the thing that mounted the editor, every send
+// after it stopped at storage, and the reader's next keystroke wrote the
+// editor's stale copy back over the snippet, taking it out of Run the scratch
+// pad as well as out of view. The pad is 180px, about six lines, so sending
+// also has to scroll.
+//
+// Chapter 2 carries two snippets on one page, which is what makes a second
+// send testable. In both layouts, because the panel is a dock beside the prose
+// above 1360px and a modal sheet over it below.
+for (const [layout, viewport] of [
+	["the dock", { width: 1600, height: 950 }],
+	["the phone sheet", { width: 390, height: 844 }],
+]) {
+	const b = await chromium.launch(LAUNCH);
+	const ctx = await b.newContext({ viewport });
+	await ctx.route("**/pyodide/**/pyodide.mjs", (route) => route.fulfill({ status: 200, contentType: "text/javascript", body: fakeModule(VERDICTS["everything passes"]) }));
+	const p = await ctx.newPage();
+	const errors = [];
+	p.on("pageerror", (e) => errors.push("PAGEERROR: " + e.message));
+
+	// Filler in the pad, so "did it scroll to the new snippet" has an
+	// unambiguous answer: no filler line may be on screen afterwards.
+	const filler = Array.from({ length: 60 }, (_, i) => `# filler ${String(i).padStart(3, "0")}`).join("\n");
+	await p.goto(ORIGIN + "/#m2", { waitUntil: "networkidle" });
+	await p.evaluate((text) => localStorage.setItem("gn:v1:code:scratch", text), filler);
+	await p.reload({ waitUntil: "networkidle" });
+	await p.waitForSelector(".play-snippet", { timeout: 20000 });
+
+	// The snippets' own first lines, read off the page rather than written out
+	// here, so editing a prompt cannot leave this check asserting the old text.
+	const firstLines = await p.$$eval("main > div:not([hidden]) .play-snippet pre", (pres) =>
+		pres.map((pre) => pre.textContent.split("\n").find((line) => line.trim()) ?? ""),
+	);
+	const view = () =>
+		p.evaluate(() => {
+			const sc = document.querySelector(".wb-scratch-editor .cm-scroller");
+			const stored = localStorage.getItem("gn:v1:code:scratch") ?? "";
+			if (!sc) return { stored, mounted: false };
+			const box = sc.getBoundingClientRect();
+			return {
+				stored,
+				mounted: true,
+				open: !!document.querySelector(".wb-scratch")?.open,
+				scrollTop: Math.round(sc.scrollTop),
+				visible: [...sc.querySelectorAll(".cm-line")]
+					.filter((line) => {
+						const b = line.getBoundingClientRect();
+						return b.bottom > box.top + 1 && b.top < box.bottom - 1;
+					})
+					.map((line) => line.textContent),
+			};
+		});
+	// The sheet is modal, so a reader on a phone closes the panel to reach the
+	// next prompt. The dock is not, and is left open on purpose: a send into a
+	// pad that is already on screen is the case that was broken.
+	const send = async (i) => {
+		if (await p.locator('.wb[data-dock="sheet"]').count()) {
+			await p.locator(".wb-close").click();
+			await p.waitForTimeout(300);
+		}
+		const button = p.locator("main > div:not([hidden]) .play-snippet").nth(i).locator("button").nth(1);
+		await button.scrollIntoViewIfNeeded();
+		await button.click();
+		await p.waitForTimeout(900);
+	};
+	const shows = (v, line) => v.visible.some((l) => l.trim() === line.trim());
+	const noFiller = (v) => !v.visible.some((l) => l.includes("# filler"));
+
+	console.log(`\nthe first send lands the snippet in view, in ${layout}`);
+	await send(0);
+	const first = await view();
+	console.log(`  pad open: ${first.open}, scrolled to ${first.scrollTop}, top line: ${JSON.stringify(first.visible[1] ?? first.visible[0])}`);
+	if (!first.open || !first.scrollTop || !noFiller(first) || !shows(first, firstLines[0])) failures++;
+
+	console.log("\nand so does the second, into a pad that is already open");
+	await send(1);
+	const second = await view();
+	console.log(`  scrolled ${first.scrollTop} -> ${second.scrollTop}, top line: ${JSON.stringify(second.visible[1] ?? second.visible[0])}`);
+	if (second.scrollTop <= first.scrollTop || !noFiller(second) || !shows(second, firstLines[1])) failures++;
+
+	// One keystroke, typed where the caret already is. No mouse: a click inside
+	// a scrolling contenteditable can leave a selection behind, and then the
+	// keystroke replaces it, which fails this check for a reason that is the
+	// harness rather than the app.
+	console.log("\nthe next keystroke keeps every snippet");
+	await p.locator(".wb-scratch-editor .cm-content").focus();
+	await p.keyboard.type("#");
+	await p.waitForTimeout(400);
+	const typed = await view();
+	const kept = typed.stored.length === second.stored.length + 1 && firstLines.every((line) => typed.stored.includes(line));
+	console.log(`  ${second.stored.length} -> ${typed.stored.length} chars, both snippets still there: ${kept}`);
+	if (!kept) failures++;
+
+	// Collapsed by hand, then sent to: the editor unmounts with the pad, so
+	// this is the mount path, on a pad that already holds two snippets.
+	console.log("\na send into a collapsed pad reopens it, scrolled to the snippet");
+	await p.locator(".wb-scratch > summary").click();
+	await p.waitForTimeout(300);
+	if ((await view()).mounted) {
+		failures++;
+		console.log("  the pad did not collapse");
+	}
+	await send(0);
+	const reopened = await view();
+	console.log(`  pad open: ${reopened.open}, scrolled to ${reopened.scrollTop}, top line: ${JSON.stringify(reopened.visible[1] ?? reopened.visible[0])}`);
+	if (!reopened.open || !reopened.scrollTop || !noFiller(reopened) || !shows(reopened, firstLines[0])) failures++;
+
+	if (errors.length) {
+		failures++;
+		console.log("  ERRORS:", errors.slice(0, 3));
+	}
+	await b.close();
+}
+
 if (failures) {
 	console.log(`\n${failures} case(s) failed.`);
 	process.exit(1);
