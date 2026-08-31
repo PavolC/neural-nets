@@ -58,12 +58,18 @@ network deeper and measures what breaks: four hidden layers of 30 score 12.6% af
 full epoch, which is exactly the share of the held-out digits that are 1s.
 
 Module 9 is the capstone: the training loop itself, which the course's panels had been
-running around the learner's functions until then, plus a glossary translating this
-course's vocabulary into the field's and an honest list of what it did not teach.
-Module 10 turns the whole thing on data that arrives the way data does: a second
-bundled dataset with words, holes, unequal classes and measurements on scales 245 times
-apart, where leaving out one preprocessing step drops the network to the majority-class
-baseline and a 73.5% score turns out to contain a species it never once predicts.
+running around the learner's functions until then, and what the file becomes once that
+loop is in it, which is a program that trains a network from a Python prompt with NumPy
+as its only import. Module 10 turns the whole thing on data that arrives the way data
+does: a second bundled dataset with words, holes, unequal classes and measurements on
+scales 245 times apart, where leaving out one preprocessing step drops the network to the
+majority-class baseline and a 73.5% score turns out to contain a species it never once
+predicts. It is the last page, so it carries the where-to-go-next list.
+
+Every module names the field's word for its own ideas as it goes, in a short naming note
+at the first use: the squash is an activation function, a knob is a parameter, blame is
+the error. There is no glossary at the end, because a vocabulary handed over twenty rows
+at a time on the last page is a memorization task rather than a translation.
 
 Nothing is locked. Every module is reachable at any time; what an exercise gates is the
 panel that trains with your own code. Later modules genuinely run on earlier ones: Module

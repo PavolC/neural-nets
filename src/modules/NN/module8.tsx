@@ -131,7 +131,10 @@ export function Module8() {
         add them up, take the square root. Module 3 put those bars inside the
         quadratic cost with a squared on them. The square cancelled the root, so
         the recipe there stopped at square and add. Applied to a layer's bias
-        gradient, call it that layer's learning speed. Here is one
+        gradient, call it that layer's learning speed. The field's name for the size
+        of a gradient measured this way is its <b>norm</b>, so a paper that reports
+        "the gradient norm at layer l" is reporting the number in the table below.
+        Here is one
         four-hidden-layer network measured at Module 7's start, before it has
         taken a single step (every speed here comes from the gradient averaged
         over 200 of the thousand held-out digits, the same batch the panel below
@@ -638,8 +641,12 @@ export function Module8() {
         output on every step; at 4, ninety times as far. That is the other
         failure, and it breaks a run in a different way: a layer taking enormous
         steps does not creep toward an answer, it jumps past it and comes back on
-        the far side, further out. The two failures share one name, unstable
-        gradients, and the table above shows why one name covers both. The hop is
+        the far side, further out. Each failure has a name of its own, and they are
+        the two you meet first anywhere else: a hop well under 1 makes the early
+        layers' gradients <b>vanish</b>, which is the <b>vanishing gradient
+        problem</b>, and a hop above 1 makes them <b>explode</b>. Together they
+        share one name, unstable gradients, and the table above shows why one name
+        covers both. The hop is
         a single number that has to sit near 1, and the multiplier walks it from
         0.63 through 1.46 to 2.99 with nothing in the network objecting.
       </p>

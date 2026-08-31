@@ -182,10 +182,16 @@ Milestones 0 through 5 are complete. Departures from the plan above, all deliber
 - **A ninth module was added** (not in the design doc), after a teaching review of
   the finished course found that the learner owned seven functions but had never
   assembled them: every training run was started by a course-written panel. Module 9
-  is the loop, plus the glossary from this course's words to the field's and the
-  where-to-go-next list moved out of Module 8. The review also added the validation
-  split to Module 7, which had been tuning hyperparameters against the same held-out
-  thousand it reported.
+  is the loop. The review also added the validation split to Module 7, which had been
+  tuning hyperparameters against the same held-out thousand it reported.
+- **The vocabulary handover was distributed, and the reading list moved to the end**
+  (later still, on the primary learner's report that he skimmed Modules 9 and 10 and
+  that the field's terms arrived as one dump to swap in his head). Module 9's
+  twenty-row translation table became a naming note in each of Modules 1 to 8, at the
+  first use of the thing named, and the where-to-go-next list moved from Module 9 to
+  Module 10, which is the last page. Module 9 had been closing with a reading list one
+  page before the end of the course. CLAUDE.md carries the rule and the three tiers
+  that decide how much prose a handover changes.
 - **A start page was added** (not in the design doc): what the course is, how the machinery works, every module, the training demo that used to sit on a tab of its own, and the stored progress with save, load and reset. It is where a bare link lands.
 - **Gating stayed softer than section 3 proposed.** Nothing locks a module; what an exercise gates is the panel that runs the learner's code, since there is nothing to run until the code exists.
 - **Three of section 4's names and numbers were never what shipped**, and are recorded here rather than edited above. Module 7's exercises are `l2_step` and `init_network`, not `l2_update` and `smart_init`: both were renamed for what they do to the learner's own network rather than to the update rule in the abstract, and `course_helpers.py` carries the shipped names. Module 8's depth slider runs 1 to 5 hidden layers rather than 2 to 6, because one hidden layer is the network the learner already owns from Module 5 and is the only honest baseline for the comparison. And the pretrained weights ship as `pretrained_weights.json.gz` rather than an npz, for the reason CLAUDE.md records: Module 2's diagram reads the same file in JS, which has no npz parser.

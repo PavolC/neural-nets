@@ -233,6 +233,16 @@ export function Module5() {
         arranging the multiplications so no factor is computed twice.
       </p>
       <p>
+        Keeping a value from the forward pass because the backward pass will need
+        it is called{" "}
+        <b>caching</b> it, so the field's phrase for what <code>zs</code> and{" "}
+        <code>activations</code> hold is the <b>cached activations</b>, or the{" "}
+        <b>cached forward pass</b>. Framework documentation says a layer "saves its
+        inputs for the backward pass", and it means these two lists. Module 9 comes
+        back to them, because caching the forward pass is the one idea that lets a
+        framework compute gradients for a network nobody wrote a backward pass for.
+      </p>
+      <p>
         The natural way to read those lists is from the end, and Python has
         notation for that worth learning here: a negative index counts from the
         back. <code>activations[-1]</code> is the last entry (the network's
@@ -341,7 +351,7 @@ export function Module5() {
 
       <Recap
         items={[
-          "Backprop is a forward pass that keeps receipts (every z, every activation) plus a backward sweep that turns them into every slope: BP1 once at the output, then BP2, BP3, BP4 walking toward the input.",
+          "Backprop is a forward pass that keeps receipts, or caches them: every z, every activation, plus a backward sweep that turns them into every slope. BP1 once at the output, then BP2, BP3, BP4 walking toward the input.",
           "It handles one example per call; a mini-batch's gradient is the average of its examples' slopes, so your sgd plugged in unchanged.",
           "The gradient check is the strongest guarantee in this course: two independent methods, your equations and nudge-and-measure, agreeing on every parameter of a network to within one part in ten million.",
           "The digit reader trains in seconds where nudge-measured gradients would need hours: same descent, same cost, same data, cheaper slopes.",

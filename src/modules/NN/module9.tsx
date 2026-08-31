@@ -11,22 +11,39 @@ export function Module9() {
       <AfterThis
         items={[
           "Write the loop that ties every function you have built into one program, and run it on the digit reader.",
-          "Say what each of this course's words is called everywhere else, so that the next thing you read is readable.",
-          "Name what this course did not teach you, and pick what to read next.",
+          "Say what your file holds once that loop is in it, and what it takes to run the whole thing outside this page.",
+          "Name the two jobs every framework does that you did by hand here, and say what each one automates.",
         ]}
       />
       <ModuleToc />
 
+      <p>
+        Open the workbench and press Download my nn.py. What lands is fifteen
+        functions in the order you met them, eleven of them written by you:{" "}
+        <code>sigmoid</code>, <code>feedforward</code>, <code>sgd_step</code>,{" "}
+        <code>sgd</code>, <code>sigmoid_prime</code>, <code>backprop</code>,{" "}
+        <code>cross_entropy_delta</code>, <code>init_network</code>,{" "}
+        <code>l2_step</code>, and the four the course wrote for you. Run that file
+        with <code>python3 nn.py</code> and nothing happens. Nothing is broken
+        either: every line in it is a definition, and no line calls one.
+      </p>
+      <p>
+        Nothing has called them on this page either. Every training run you have
+        watched since Module 5 was started by a panel, and the panel did the
+        loading, the epoch loop and the scoring around your code. This module is
+        that loop, and it is one function long.
+      </p>
+
       <SectionHeader id="m9-loop" title="The loop that was never yours" />
       <p>
-        Count what you have written: a squash and one neuron (Module 1), a whole
-        network's forward pass as one matrix multiplication per layer (Module 2),
-        a descent step and the loop around it (Module 3), the four equations that
-        turn one forward pass into every knob's slope (Module 5), and a cost, a
-        starting draw and an update rule (Module 7). Every training run in this
-        course has been made of those functions. The loop around them, loading the
-        images, walking the epochs, scoring each pass against the held-out
-        thousand, was always the course's.
+        Count what those fifteen give you: a squash and one neuron (Module 1), a
+        whole network's forward pass as one matrix multiplication per layer
+        (Module 2), a descent step and the loop around it (Module 3), the four
+        equations that turn one forward pass into every parameter's partial
+        derivative (Module 5), and a cost, a starting draw and an update rule
+        (Module 7). Every training run in this course has been made of those
+        functions. The loop around them, loading the images, walking the epochs,
+        scoring each pass against the held-out thousand, was always the course's.
       </p>
       <p>
         Module 3's <code>sgd</code> came closest: the right loop, shuffle, cut,
@@ -157,132 +174,33 @@ guesses == y                      ->  array([True, True, False])
         </p>
       </Aside>
 
-      <SectionHeader id="m9-words" title="The same ideas, in everyone else's words" />
+      <SectionHeader id="m9-program" title="A file that runs anywhere" />
       <p>
-        This course chose plain words on purpose. Blame, the squash's slope, evidence, the
-        wire ledger, the bill: each was picked so that a sentence could be read
-        without a glossary. Almost nobody else uses those words, and that becomes a
-        problem on the first page of the next thing you open. The table below gives
-        every one of them its field name, and the module where you first met it.
+        Press Download my nn.py again. The file is the same fifteen functions plus
+        the two you just wrote, and running it still prints nothing, because it is
+        still all definitions. What changed is what those definitions add up to.
+        Three lines at a Python prompt now train a network:
       </p>
-      <div className="table-scroll scroll-x" tabIndex={0}>
-        <table className="truth-table">
-          <thead>
-            <tr>
-              <th>in this course</th>
-              <th>everywhere else</th>
-              <th>first met</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>evidence, <M tex="z" /></td>
-              <td>the weighted input, or the pre-activation</td>
-              <td>Module 1</td>
-            </tr>
-            <tr>
-              <td>the squash</td>
-              <td>the activation function</td>
-              <td>Module 1</td>
-            </tr>
-            <tr>
-              <td>a neuron's confidence, <M tex="a" /></td>
-              <td>its activation, or its output</td>
-              <td>Module 1</td>
-            </tr>
-            <tr>
-              <td>the line a neuron cuts</td>
-              <td>
-                its decision boundary, or a hyperplane once there are more than two
-                inputs
-              </td>
-              <td>Module 1</td>
-            </tr>
-            <tr>
-              <td>the wire ledger, <M tex="W" /></td>
-              <td>the weight matrix</td>
-              <td>Module 2</td>
-            </tr>
-            <tr>
-              <td>a knob</td>
-              <td>a parameter</td>
-              <td>Module 3</td>
-            </tr>
-            <tr>
-              <td>the score, the cost</td>
-              <td>the loss, or the objective function</td>
-              <td>Module 3</td>
-            </tr>
-            <tr>
-              <td>one knob's slope</td>
-              <td>a partial derivative, <M tex="\partial C / \partial w" /></td>
-              <td>Module 3</td>
-            </tr>
-            <tr>
-              <td>nudge-and-measure</td>
-              <td>finite differences, a numerical gradient</td>
-              <td>Module 3</td>
-            </tr>
-            <tr>
-              <td>the squash's slope, <M tex="\sigma'(z)" /></td>
-              <td>the activation function's derivative</td>
-              <td>Module 4</td>
-            </tr>
-            <tr>
-              <td>a posted rate, a factor</td>
-              <td>a local derivative</td>
-              <td>Module 4</td>
-            </tr>
-            <tr>
-              <td>a neuron's blame, <M tex="\delta" /></td>
-              <td>its error, or the error signal at that layer</td>
-              <td>Module 4</td>
-            </tr>
-            <tr>
-              <td>the four equations</td>
-              <td>backpropagation, or just backprop</td>
-              <td>Module 4</td>
-            </tr>
-            <tr>
-              <td>receipts</td>
-              <td>the cached forward pass</td>
-              <td>Module 5</td>
-            </tr>
-            <tr>
-              <td>the bill</td>
-              <td>computational cost, usually counted in operations</td>
-              <td>Modules 3 and 4</td>
-            </tr>
-            <tr>
-              <td>the divided start</td>
-              <td>scaled initialization (the Xavier and He schemes)</td>
-              <td>Module 7</td>
-            </tr>
-            <tr>
-              <td>the decay factor</td>
-              <td>L2 regularization, or weight decay</td>
-              <td>Module 7</td>
-            </tr>
-            <tr>
-              <td>a layer's learning speed</td>
-              <td>the norm of its gradient</td>
-              <td>Module 8</td>
-            </tr>
-            <tr>
-              <td>a hop well under 1</td>
-              <td>the vanishing gradient problem</td>
-              <td>Module 8</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <Figure caption="Your downloaded file, driven from outside this page. The import needs NumPy installed; X, Y, X_test and y_test are whatever data you put in the packing Module 2 fixed, and Module 10 is about producing them from a file nobody prepared.">
+        <div className="table-scroll scroll-x" tabIndex={0}>
+          <pre className="torch-listing">{`>>> import numpy as np
+>>> from nn import train, accuracy
+>>> w, b, history = train([784, 30, 10], X, Y, X_test, y_test,
+...                       epochs=15, eta=0.5, lmbda=1.0,
+...                       batch_size=10, rng=np.random.default_rng(1))
+>>> history[-1]
+0.904`}</pre>
+        </div>
+      </Figure>
       <p>
-        Two of those rows are worth a sentence each. A partial derivative is the
-        thing you have been computing since Module 3: the slope of the cost for one
-        knob, with every other knob held still. The course measured them by nudging,
-        then computed them exactly with the chain rule, and never used the word.
-        And "loss" is simply the commoner name for the cost; this course said cost
-        throughout because a bill is easier to picture than a loss.
+        Two things that were true a moment ago are not true now. Before{" "}
+        <code>train</code> existed, nothing in the file called anything else in it,
+        so the only way to run any of it was a panel on this page holding the loop.
+        And the browser was doing the arithmetic: Pyodide, CPython compiled to
+        WebAssembly, which is why a run of the digit reader takes a few seconds an
+        epoch here. The same file on a machine with ordinary NumPy is the same code
+        at ordinary speed. Nothing about the download is a demo version: it is about
+        250 lines of Python with one import in it, and the import is NumPy.
       </p>
 
       <SectionHeader id="m9-built" title="What you built" />
@@ -326,10 +244,92 @@ guesses == y                      ->  array([True, True, False])
         real one, and now it is a program rather than a collection of parts.
       </p>
 
-      <SectionHeader id="m9-missing" title="What this course did not teach you" />
+      <SectionHeader id="m9-words" title="Which words were only ours" />
       <p>
-        Four things, named plainly, because each one is waiting in the next thing
-        you read, and none of the eight modules behind you made you do it yourself.
+        Each module named the field's word for its own ideas as it went. The squash
+        is an activation function and the line a neuron cuts is its decision
+        boundary (Module 1); a knob is a parameter, the cost is the loss, and one
+        knob's slope is a partial derivative (Module 3); a factor is a local
+        derivative and blame is the error (Module 4); receipts are the cached
+        forward pass (Module 5); the divided start is Xavier initialization and the
+        decay factor is L2 regularization (Module 7); a layer's learning speed is
+        its gradient norm, and a hop well under 1 is the vanishing gradient problem
+        (Module 8). The whole lookup, both ways round, is folded into the start page
+        under "Notation and NumPy reference".
+      </p>
+      <p>
+        What is worth listing instead is the other set: the words this course made
+        up, which have no counterpart anywhere. Nobody else uses these, so there is
+        nothing to search for and nothing to translate. They were carriers, and
+        they can be put down here.
+      </p>
+      <div className="table-scroll scroll-x" tabIndex={0}>
+        <table className="truth-table">
+          <thead>
+            <tr>
+              <th>ours only</th>
+              <th>what it was carrying</th>
+              <th>from</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>the concert, the contrarian, the easygoing and picky voters</td>
+              <td>
+                one dataset carried through nine modules, so that a new idea never
+                arrived with a new world attached
+              </td>
+              <td>Module 1</td>
+            </tr>
+            <tr>
+              <td>booths, posted rates, the through-rate</td>
+              <td>
+                the chain rule, as a thing you could already do: two currency
+                booths and a raise
+              </td>
+              <td>Module 4</td>
+            </tr>
+            <tr>
+              <td>the road and its on-ramps</td>
+              <td>
+                why every parameter at one neuron shares a price, which is the
+                whole reason <M tex="\delta" /> is worth computing
+              </td>
+              <td>Module 4</td>
+            </tr>
+            <tr>
+              <td>the dial, and slicing it</td>
+              <td>
+                one input moving while 783 are held still, which is what makes
+                universality drawable
+              </td>
+              <td>Module 6</td>
+            </tr>
+            <tr>
+              <td>bars, towers, boxes</td>
+              <td>
+                sigmoid pairs assembled by hand into a lookup table, one dimension
+                at a time
+              </td>
+              <td>Module 6</td>
+            </tr>
+            <tr>
+              <td>the hop</td>
+              <td>
+                one backward step of BP2 as a single number, so that depth becomes
+                that number raised to a power
+              </td>
+              <td>Module 8</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <SectionHeader id="m9-missing" title="The two jobs you did by hand" />
+      <p>
+        Two things in your file are things nobody writes any more. Both are worth
+        naming here, because both are waiting in the first framework you open, and
+        in both cases what the framework replaced is code you have now written.
       </p>
       <p>
         <b>Nobody writes backprop by hand.</b> Every framework computes gradients by
@@ -337,8 +337,9 @@ guesses == y                      ->  array([True, True, False])
         applying the chain rule to that record, mechanically, whatever the network
         turns out to be. The name for it is automatic differentiation, and what it
         automates is exactly what you did in Module 5: your <code>zs</code> and{" "}
-        <code>activations</code> lists are a hand-built version of that record. This
-        is why a modern network can have a shape nobody wrote a backward pass for.
+        <code>activations</code> lists are a hand-built version of that record, and
+        Module 5 called them the cached forward pass for this reason. This is why a
+        modern network can have a shape nobody wrote a backward pass for.
       </p>
       <p>
         <b>Nobody uses plain descent either.</b> The update you wrote steps against
@@ -351,90 +352,22 @@ guesses == y                      ->  array([True, True, False])
         with two extra running totals beside it.
       </p>
       <p>
-        <b>The data arrived prepared.</b> Pixels were already between 0 and 1,
-        labels already one-hot, the split into training and held-out already made.
-        Module 10 is the one item on this list that the course goes on to teach. It
-        points the functions you just assembled at a file with words in two of its
-        columns, holes in another, and two measurements 245 times apart in scale. A
-        real problem asks for that work again every time, in whatever shape the file
-        happens to arrive in. One part of that job is load-bearing for what you
-        learned here: Module 7's argument for
-        dividing the weights by <M tex="\sqrt{n}" /> counted about a hundred lit
-        pixels each contributing a value near 1. Inputs that run to the thousands
-        would break that argument, and the usual fix is to scale the inputs rather
-        than the weights.
+        Two more things are missing, and both are the next page rather than this
+        list. Every number your network has seen arrived prepared: pixels already
+        between 0 and 1, labels already one-hot, the split already made, every
+        example complete. And your run above misreads about a hundred of the
+        thousand held-out digits, which this course has broken apart exactly once,
+        in Module 5's panel. Looking once is a demonstration rather than a habit.
       </p>
       <p>
-        <b>Accuracy is one number.</b> Your run above misreads about a hundred of
-        the thousand held-out digits, and this course has broken a score like that
-        apart exactly once: Module 5's panel put a per-digit row and the eight
-        mistakes the network was most confident about under its chart. Looking once
-        is a demonstration rather than a habit. Which digits it confuses, whether it
-        is confidently wrong or barely wrong, and what the misread images have in
-        common are all answerable with the code you have, and looking is what
-        improves a real model fastest. Module 10 makes it a step of its own, on a
-        smaller problem where a 73.5 percent score turns out to hide a class the
-        network never once answers.
-      </p>
-
-      <SectionHeader id="m9-next" title="Where to go next" />
-      <p>
-        Module 10 is still ahead of you, and it is the shortest step of anything on
-        this list: the same program you just ran, pointed at a file that nobody
-        prepared for you. After that, in rough order of how far each one is from
-        where you now stand:
-      </p>
-      <ul className="m9-next-list">
-        <li>
-          <a href="http://neuralnetworksanddeeplearning.com/chap5.html">
-            Nielsen, Chapter 5
-          </a>{" "}
-          and{" "}
-          <a href="http://neuralnetworksanddeeplearning.com/chap6.html">Chapter 6</a>.
-          The two chapters Module 8 summarized, at full length: the unstable
-          gradient argument with the algebra written out, then convolutional
-          networks built up to above 99 percent on MNIST. The book this course is
-          adapted from, and the smallest step from here.
-        </li>
-        <li>
-          <a href="https://karpathy.ai/zero-to-hero.html">
-            Andrej Karpathy, Neural Networks: Zero to Hero
-          </a>
-          . A video series that builds automatic differentiation from scratch, then
-          a language model, in the same implement-it-yourself spirit. It starts with
-          the first item in the list above this one, and ends where attention
-          begins, which is exactly the gap this course leaves.
-        </li>
-        <li>
-          <a href="https://pytorch.org/tutorials/beginner/basics/intro.html">
-            The PyTorch tutorials
-          </a>
-          . What all of this looks like when the backward pass and the optimizer are
-          written for you. Worth doing once you can say what they are doing on your
-          behalf, which you now can.
-        </li>
-        <li>
-          <a href="https://jalammar.github.io/illustrated-transformer/">
-            Jay Alammar, The Illustrated Transformer
-          </a>
-          , and then the paper it explains,{" "}
-          <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a>.
-          The one ingredient Module 8 named and did not cover.
-        </li>
-        <li>
-          <a href="https://www.deeplearningbook.org/">
-            Goodfellow, Bengio and Courville, Deep Learning
-          </a>
-          . The reference textbook, free online. Heavier on mathematics than
-          anything here, and the place to look up a technique properly.
-        </li>
-      </ul>
-      <p>
-        Whichever you open, the arithmetic will be the arithmetic in the table
-        above. A column of numbers goes in, a matrix multiplies it, a squash bends
-        it, a cost scores the answer, a chain of factors says which way each number
-        should move, and a small step is taken. You have written all of it, and the
-        rest of this field is that machine, built larger and arranged better.
+        Module 10 points the program you just assembled at a file with none of the
+        preparation done, and makes reading a score apart a step of its own, on a
+        problem where 73.5 percent turns out to hide a class the network never once
+        answers. One part of that job is load-bearing for what you learned here:
+        Module 7's argument for dividing the weights by <M tex="\sqrt{n}" /> counted
+        about a hundred lit pixels each contributing a value near 1, so inputs that
+        run to the thousands break that argument, and the usual fix is to scale the
+        inputs rather than the weights.
       </p>
     </article>
   );

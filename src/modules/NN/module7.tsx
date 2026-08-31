@@ -655,6 +655,17 @@ export function Module7() {
         0.2203, close to the sigmoid's maximum of 0.25. Nothing is flatter than
         0.01 any more.
       </p>
+      <p>
+        Choosing the size of the starting draw from the number of wires feeding a
+        layer is called <b>scaled initialization</b>, and the two schemes in use
+        carry the names of the authors who proposed them: <b>Xavier</b> (also called Glorot)
+        initialization, which is the divisor above, and <b>He</b> initialization,
+        which uses <M tex="\sqrt{2 / n_{\text{in}}}" /> instead and is the one
+        paired with the activation function Module 8 introduces. A framework calls
+        this once per layer and never mentions it again, which is why a network that
+        trains badly for want of it is hard to diagnose from the outside. Your{" "}
+        <code>init_network</code> is Xavier initialization, written out.
+      </p>
       <Aside>
         <p>
           The biases keep their full-size draw from the standard bell, and after
@@ -834,6 +845,17 @@ export function Module7() {
         tex="\begin{aligned} w &\leftarrow w - \eta \, \frac{\partial C}{\partial w} && \text{(Module 3's update)} \\[0.5em] w &\leftarrow w - \eta \frac{\lambda}{n} w - \eta \, \frac{\partial C}{\partial w} && \text{(the new slope joins)} \\[0.5em] w &\leftarrow \Big( 1 - \frac{\eta \lambda}{n} \Big) w - \eta \, \frac{\partial C}{\partial w} && \text{(collected)} \end{aligned}"
         gloss="Top: the rule as it has been since Module 3, one weight stepped against its slope. Middle: the cost gained a term, so the slope gained one. Bottom: the same line with the two pieces that contain w collected into one factor. Everything after the factor is the top line again, so the whole change is that the weight is first multiplied by a number slightly below 1. That factor is the technique, and its name says what it does: weight decay. Biases keep the top line exactly, since the new term does not mention them."
       />
+      <p>
+        Adding a term to the cost to keep the parameters small is{" "}
+        <b>regularization</b>, and because the term added above
+        is a sum of squared weights it is <b>L2 regularization</b> specifically, also
+        written as an L2 penalty. <b>Weight decay</b> is the same technique named
+        after the multiply-by-slightly-under-1 the algebra just produced, and a
+        framework offers it as an argument called <code>weight_decay</code> on the
+        optimizer. Your <M tex="\lambda" /> is that argument. There is an L1 version
+        that adds the sum of absolute values instead, which drives some weights to
+        exactly zero rather than shrinking all of them.
+      </p>
       <p>
         Put numbers in it. The run below uses <M tex="\eta = 0.5" />,{" "}
         <M tex="n = 1000" /> and <M tex="\lambda = 1" />, so the factor is{" "}
