@@ -43,11 +43,11 @@ editor contents never sent; see `src/analytics.ts`).
   project inherits CC BY-NC, which is broader than the facts and broader than the licence
   requires. CC BY-NC 3.0 has no ShareAlike clause, so matching it is a choice about the
   adapted content rather than an obligation that spreads; and the exercise harness, the
-  Pyodide worker, the brand layer, `tools/` and `course-kit/` contain none of Nielsen's
+  Pyodide worker, the brand layer and `tools/` contain none of Nielsen's
   material, so nothing reaches them. Saying otherwise gives away rights over the one
   asset that transfers to every future course in the series.
   The split is now made rather than pending: the software is **MIT**
-  (`LICENSE-MIT`), the kit's documents are **CC BY 4.0**, the course content stays
+  (`LICENSE-MIT`), the course content stays
   CC BY-NC 3.0, and the series name and glyph are granted by neither. Chosen over
   Apache-2.0 because the repository already carries MIT code and all seven dependencies
   are MIT, so one licence covers every line and there is no compatibility surface; the
@@ -59,10 +59,13 @@ editor contents never sent; see `src/analytics.ts`).
   ships the code without the notice is a licence defect, not a formatting one.
 - **No em dashes in any user-facing prose.** Use commas, colons, or parentheses.
 - **`src/brand/` is shared with every other course in the series.** Four of its five
-  files are copied unchanged between courses, and `tools/check_brand.py` asserts that
-  `course-kit/brand/` still matches them. A change that belongs to this course belongs in
-  `src/styles.css`, which loads after the brand layer and can override any of it. Two
-  things a course does own inside the layer: `brand.ts` and the one `--accent` line.
+  files are copied unchanged between courses. The portable copy lives in the series
+  repository's kit, not here, so no check in this repo can compare the two: what catches
+  drift now is that both sides measure the same OKLCH arithmetic, `brand_palette.py
+  --check` here and the series' own copy of it there. A change that belongs to this
+  course belongs in `src/styles.css`, which loads after the brand layer and can override
+  any of it. Two things a course does own inside the layer: `brand.ts` and the one
+  `--accent` line.
 
 ## Global shape conventions (all Python must comply)
 
@@ -211,16 +214,25 @@ editor contents never sent; see `src/analytics.ts`).
   roles, and the masthead, tab strip, link and footer chrome. A sibling course copies four
   of the five files unchanged and edits `brand.ts` plus one `--accent` line. The
   alternative was leaving each course to style itself, which is what makes a set of pages
-  look unrelated; the cost is that a change to the shared files has to be made in
-  `course-kit/brand/` too, which `tools/check_brand.py` enforces. See "Visual identity"
-  below and `course-kit/BRAND.md`.
-- **The method is extracted rather than described** (same change). `course-kit/` is this
-  file with the neural networks taken out, plus the process that produced it
-  (`METHOD.md`), the fifteen learner failures behind its rules (`CASEBOOK.md`), the design
-  doc template, the brand, and six slash commands. It is meant to be dropped into an empty
-  repo. Rejected: a second generic application scaffold, which would be a guess about a
-  topic that does not exist yet. What the kit says instead is which of this repo's ~2,900
-  topic-free lines to crib, and from where.
+  look unrelated; the cost is that a change to the shared files has to reach the series
+  kit's copy too, and since the kit moved out of this repository nothing here can enforce
+  that. See "Visual identity" below, and `course-kit/BRAND.md` in the series repository.
+- **The method is extracted rather than described** (same change), **and it has since
+  moved out of this repository.** The kit is this file with the neural networks taken out,
+  plus the process that produced it (`METHOD.md`), the fifteen learner failures behind its
+  rules (`CASEBOOK.md`), the design doc template, the brand, and six slash commands. It is
+  meant to be dropped into an empty repo. Rejected: a second generic application scaffold,
+  which would be a guess about a topic that does not exist yet. What the kit says instead
+  is which of this repo's ~2,900 topic-free lines to crib, and from where.
+  It lived here while it was still being refined by building this course, because every
+  refinement was discovered by writing a module rather than by thinking about the kit, and
+  moving it out earlier would have turned each of those into a pair of cross-repository
+  changes. With a second course starting it belongs above both, so it is now at
+  `course-kit/` in the series repository (`PavolC/moving-parts`), with its own licence
+  travelling inside it. Two things this repo lost in the move and should not pretend to
+  still have: the byte-equality guard on the brand files, and a local copy to edit when a
+  module teaches the kit something new. The second one is now a pull request against the
+  series.
 - **The front page's module outline is rendered from the module registry, not from its own
   list** (same change). Modules 9 and 10 were added after the outline was written and were
   missing from it, under a heading that said ten, so the only page showing the whole course
@@ -606,7 +618,7 @@ own storytelling. Concretely:
 
 ## Visual identity
 
-The series brand layer (`src/brand/`, documented in `course-kit/BRAND.md`) owns the accent
+The series brand layer (`src/brand/`, documented in the series kit's `BRAND.md`) owns the accent
 family, the four type roles, the label idiom, the masthead, the tab strip, the links and
 the footer. Rules that follow from it:
 
@@ -928,7 +940,6 @@ tokens from the start.
 /src/m0/             Milestone 0 training demo UI
 /public/data/        mnist_subset.bin.gz, pretrained_weights.json.gz, penguins.json.gz
 /tools/              build-time scripts (MNIST preprocessing, weight pretraining)
-/course-kit/         this course's method with the neural networks taken out
 ```
 
 ## Commands

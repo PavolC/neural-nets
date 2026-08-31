@@ -8,10 +8,11 @@ both marks, since it is a screenshot and reaches neither component. The
 browser chrome colour is another literal in a meta tag. Those copies are the
 ones that go stale.
 
-The course kit carries its own copy of the shared brand files, so somebody can
-drop them into an empty repo and start a sibling course. A kit that has
-drifted from the course it was extracted from is worse than no kit, so the
-shared files are compared byte for byte.
+The kit that carries the portable copy of these files now lives in the series
+repository rather than here, so this script no longer compares the two. The
+guard that replaces it is arithmetic rather than equality: brand_palette.py
+--check measures this repo's palette against the OKLCH derivation, and the
+series runs the same check on its own copy.
 
     python3 tools/check_brand.py
 
@@ -26,12 +27,15 @@ import urllib.parse
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 BRAND = ROOT / "src" / "brand"
-KIT = ROOT / "course-kit" / "brand"
 
-# The files a sibling course copies without editing. brand.ts is deliberately
-# not here: it is the file a course does edit, so the kit's copy is a template
-# with different values and comparing them would always fail.
-SHARED = ["brand.css", "Masthead.tsx", "Monogram.tsx", "SeriesFooter.tsx"]
+# There used to be a byte-equality check here between src/brand/ and the kit's
+# copy of it, because the kit lived in this repository. The kit is now in the
+# series repository (PavolC/moving-parts), so the two copies are no longer in
+# one working tree and nothing here can compare them. What replaces it is that
+# both sides check the same arithmetic independently: brand_palette.py --check
+# measures this repo's brand.css against the OKLCH derivation, and the series
+# runs its own copy of that script against the kit's brand.css and its index.
+# A hue cannot drift on one side without one of the two going red.
 SERIES_MARK = ["hue-green", "hue-blue", "hue-plum"]
 
 
@@ -252,26 +256,6 @@ def main() -> int:
             fail(problems, f"the social card's series mark is {', '.join(card_bands) or '(none)'}, "
                            f"but Monogram.tsx draws {', '.join(want_bands)}")
 
-    if not KIT.exists():
-        fail(problems, f"{KIT.relative_to(ROOT)} does not exist, so the kit carries no brand")
-    else:
-        for name in SHARED:
-            here, there = BRAND / name, KIT / name
-            if not there.exists():
-                fail(problems, f"course-kit/brand/{name} is missing")
-            elif here.read_bytes() != there.read_bytes():
-                fail(problems, f"course-kit/brand/{name} has drifted from src/brand/{name}")
-        kit_ts = KIT / "brand.ts"
-        if not kit_ts.exists():
-            fail(problems, "course-kit/brand/brand.ts is missing")
-        else:
-            exports = set(re.findall(r"export (?:const|interface) (\w+)", ts))
-            kit_exports = set(re.findall(r"export (?:const|interface) (\w+)", kit_ts.read_text()))
-            if exports != kit_exports:
-                missing = ", ".join(sorted(exports - kit_exports)) or "none"
-                extra = ", ".join(sorted(kit_exports - exports)) or "none"
-                fail(problems, f"the kit's brand.ts exports differ: missing {missing}, extra {extra}")
-
     if problems:
         print(f"{len(problems)} problem(s):\n", file=sys.stderr)
         for p in problems:
@@ -280,7 +264,7 @@ def main() -> int:
 
     print(f"Brand agrees: accent --hue-{hue_name} ({accent}), series mark in the "
           "masthead, the footer and the social card, course glyph in the favicon "
-          "and the card, the title in 4 places, kit in step.")
+          "and the card, and the title in 4 places.")
     return 0
 
 

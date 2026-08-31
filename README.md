@@ -102,14 +102,15 @@ a one-time manual step for the reason the workflow file records.
 /src/m0/             the training demo shown on the start page
 /public/data/        mnist_subset.bin.gz, pretrained_weights.json.gz, penguins.json.gz
 /tools/              build-time scripts, the benches, and the consistency checkers
-/course-kit/         the portable version of all of this, for a course on another topic
 ```
 
 `CLAUDE.md` holds the working conventions: shape conventions all Python obeys, the
 exercise and test contract, the module authoring playbook, and the voice rules.
-`nn-course-design-doc.md` is the original design. `course-kit/` is the transferable part,
-extracted after this course was finished: the rules with the neural networks taken out, the
-process that produced them, the incidents behind them, and the shared visual identity, for
+`nn-course-design-doc.md` is the original design. The transferable part of all of this was
+extracted after the course was finished and now lives in the series repository, at
+[course-kit/](https://github.com/PavolC/moving-parts/tree/main/course-kit): the rules with
+the neural networks taken out, the process that produced them, the incidents behind them,
+and the shared visual identity, for
 building a course like this one on a different topic.
 
 ## Regenerating the data and checking the numbers
@@ -188,10 +189,11 @@ figures under `src/modules/`) follows its source: **CC BY-NC 3.0, so it may not 
 commercially.**
 
 The **application around it** is a separate matter. The exercise harness, the Pyodide
-worker, the brand layer, `tools/` and `course-kit/brand/` are original work containing
-none of Nielsen's material, so the CC BY-NC grant does not reach them. They are **MIT**
-([LICENSE-MIT](LICENSE-MIT)). The method kit's documents are **CC BY 4.0**. Take the
-harness, take the worker, take the brand layer, and build something else with them.
+worker, the brand layer and `tools/` are original work containing none of Nielsen's
+material, so the CC BY-NC grant does not reach them. They are **MIT**
+([LICENSE-MIT](LICENSE-MIT)). The method kit has moved to the series repository and carries
+its own licence. Take the harness, take the worker, take the brand layer, and build
+something else with them.
 
 Not granted by either: the name _Moving Parts_, its three-band mark, and the sigmoid
 glyph that marks this course. The MIT licence covers the code that draws them, not the
