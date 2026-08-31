@@ -127,14 +127,16 @@ export function Module8() {
         travels in one step, per unit of step size.
       </p>
       <p>
-        The size of a column is the quantity Module 3 wrote with double bars
-        inside the quadratic cost: square every entry, add them up, take the
-        square root. Applied to a layer's bias gradient, call it that layer's
-        learning speed. Here is one four-hidden-layer network measured at Module
-        7's start, before it has taken a single step (every speed here comes from
-        the gradient averaged over 200 of the thousand held-out digits, the same
-        batch the panel below uses). Layer 1 is the 784 pixels,
-        which have no biases and nothing to learn, so the count starts at 2.
+        The size of a column is what the double bars mean: square every entry,
+        add them up, take the square root. Module 3 put those bars inside the
+        quadratic cost with a squared on them. The square cancelled the root, so
+        the recipe there stopped at square and add. Applied to a layer's bias
+        gradient, call it that layer's learning speed. Here is one
+        four-hidden-layer network measured at Module 7's start, before it has
+        taken a single step (every speed here comes from the gradient averaged
+        over 200 of the thousand held-out digits, the same batch the panel below
+        uses). Layer 1 is the 784 pixels, which have no biases and nothing to
+        learn, so the count starts at 2.
       </p>
       <div className="table-scroll scroll-x" tabIndex={0}>
         <table className="truth-table">
@@ -263,15 +265,24 @@ export function Module8() {
         input count was chosen to keep a neuron's evidence near zero, and it has
         a second consequence: a ledger drawn that way sends a column back at
         about its own length. Module 7's square-root rule is doing its work a
-        second time here. Every entry of the returned column adds up 30 terms, one
-        per neuron in the layer above, each one a weight of size about 1 divided by
-        the square root of 30, times a blame entry of the size that arrived. Thirty
+        second time here. Take one of the hops between two layers of 30. Every
+        entry of the returned column adds up 30 terms, one
+        per neuron in the layer above. Each term is a weight of size about 1
+        divided by the square root of 30, times a blame entry of the size that
+        arrived. Thirty
         random pushes that small pile up to the square root of 30 times one of
         them, and the two square roots cancel, so the entries come back the size
-        they went in. Averaged over 200 draws of a 30-by-30 ledger the
+        they went in. The first hop is the one exception, because the layer above
+        it is the output layer with 10 neurons. Ten pushes pile up to the square
+        root of 10 times one of them, and the weights are still divided by the
+        square root of 30. Each entry there comes back at about 0.58 of the size
+        that arrived. The returned column carries 30 of those entries against the
+        10 that arrived, and 30 entries at 0.58 come to the same length as 10 at
+        full size. Averaged over 200 draws of a 30-by-30 ledger the
         length comes back at 0.99 of what went in, with the middle 90 percent of
-        those draws between 0.80 and 1.19. The four values above, 0.878 to 1.159,
-        are ordinary members of that spread.
+        those draws between 0.80 and 1.19. The three 30-to-30 values above, 0.906
+        to 1.159, are ordinary members of that spread, and the first row's 0.878
+        lands with them.
       </p>
       <p>
         The squash-slope column is about 0.21, every time, and it can never be more
@@ -1043,7 +1054,7 @@ function SharedWeightsFigure() {
         the image, 28 × 28
       </text>
       <text x={ox + OUT / 2} y={30} textAnchor="middle" className="tiny-net-caption">
-        one feature map, 24 × 24
+        one grid, 24 × 24
       </text>
       <text x={20 + IMG / 2} y={40 + IMG + 18} textAnchor="middle" className="tiny-net-caption">
         576 window positions

@@ -172,8 +172,8 @@ def test_gradient_check():
 
     num_w, num_b = numerical_gradient(cost_fn, weights, biases, eps=1e-4)
 
-    names = ["weights layer 1", "weights layer 2", "weights layer 3",
-             "biases layer 1", "biases layer 2", "biases layer 3"]
+    names = ["nabla_w[0]", "nabla_w[1]", "nabla_w[2]",
+             "nabla_b[0]", "nabla_b[1]", "nabla_b[2]"]
     worst = 0.0
     worst_report = ""
     for name, yours, measured in zip(names, nabla_w + nabla_b, num_w + num_b):
@@ -190,8 +190,9 @@ def test_gradient_check():
         f"the gradient check failed: {worst_report} (relative discrepancy "
         f"{worst:.2e}; the bar is 1e-7, and a correct backprop lands near "
         "1e-9). Both methods measure the same slopes, so a gap this size "
-        "is a formula bug, not rounding. If only layers 1 and 2 disagree "
-        "while layer 3 matches, your backward loop is off by one: check "
+        "is a formula bug, not rounding. If nabla_w[0] and nabla_w[1] "
+        "disagree while nabla_w[2], the last matrix, matches, your "
+        "backward loop is off by one: check "
         "that BP2 transposes the NEXT layer's weights and that "
         "sigmoid_prime gets THIS layer's stored z."
     )

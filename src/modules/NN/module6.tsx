@@ -264,7 +264,7 @@ export function Module6() {
         costs two neurons, still has an edge at each end, and still has one height
         to set. The slices just get narrower.
       </p>
-      <Figure caption="Sculpting a curve out of bumps. Press Fit it for me to put every bar at the target's average height across its own slice, then move the bar count and watch the shaded area between the curves: 4 bars score 1.030 and 8 score 0.445. The second curve is a friend's, with an extra peak at the cold end for the crisp winter shows; the third setting lets you draw your own and fit that.">
+      <Figure caption="Sculpting a curve out of bumps. Press Fit it for me to put every bar at the target's average height across its own slice, then move the bar count and press Fit it for me again at each new count, watching the shaded area between the curves: 4 bars score 1.030 and 8 score 0.445. The second curve is a friend's, with an extra peak at the cold end for the crisp winter shows; the third setting lets you draw your own and fit that.">
         <CurveSculptor />
       </Figure>
 
@@ -342,10 +342,13 @@ export function Module6() {
         band. Added, the square reads 0 outside both bands, 6 in either band
         alone, and 12 where they cross. Then one more neuron, thresholding a sum
         of hidden reports the way the XOR network's output neuron did with its
-        bias of <M tex="-4" />: give this one a large weight and a bias of{" "}
-        <M tex="-9" />. Nine sits between 6 and 12, so only the crossing clears
-        it, and that neuron reports 1 on a small rectangle
-        and 0 everywhere else.
+        bias of <M tex="-4" />: the four wires into this one already carry{" "}
+        <M tex="+6" /> and <M tex="-6" />, and its bias is <M tex="-9" />. Nine
+        sits between 6 and 12, so the evidence is <M tex="-9" /> outside both
+        bands, <M tex="-3" /> in either band alone, and <M tex="+3" /> where
+        they cross. The neuron reports about 0.00, 0.05 and 0.95 at those three
+        levels, so a small rectangle stands high and the rest of the square
+        stays low. The figure above rounds that to 1 and 0.
       </p>
       <p>
         That rectangle is a tower, the two-input version of the bar. Everything

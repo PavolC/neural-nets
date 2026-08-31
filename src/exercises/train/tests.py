@@ -74,14 +74,17 @@ def test_accuracy_at_both_ends():
     """accuracy is 1.0 when every column is right and 0.0 when none is"""
     weights, biases = _reader_net()
     X = np.array([[1.0, -1.0]])
-    assert accuracy(weights, biases, X, np.array([0, 2])) == 1.0, (
-        "this network answers 0 for a positive input and 2 for a negative one, "
-        "and both right answers were given, so accuracy must be exactly 1.0."
+    all_right = accuracy(weights, biases, X, np.array([0, 2]))
+    assert all_right == 1.0, (
+        f"expected 1.0, got {all_right}. This network answers 0 for a positive "
+        "input and 2 for a negative one, and both right answers were given, so "
+        "accuracy must be exactly 1.0."
     )
-    assert accuracy(weights, biases, X, np.array([2, 0])) == 0.0, (
-        "with both answers wrong, accuracy must be exactly 0.0. If you got 1.0, "
-        "check that you compare the network's answer with y rather than "
-        "comparing y with itself."
+    none_right = accuracy(weights, biases, X, np.array([2, 0]))
+    assert none_right == 0.0, (
+        f"expected 0.0, got {none_right}. With both answers wrong, accuracy "
+        "must be exactly 0.0. If you got 1.0, check that you compare the "
+        "network's answer with y rather than comparing y with itself."
     )
 
 
@@ -193,5 +196,10 @@ def test_train_passes_lmbda_through():
     assert tight_size < loose_size, (
         f"with lmbda = 8 the weights total {tight_size:.4f} squared, against "
         f"{loose_size:.4f} with lmbda = 0; decay should have made them smaller. "
-        "Pass lmbda through to l2_step rather than leaving it out of the call."
+        "If the two totals are equal, lmbda never reached l2_step: pass it "
+        "through rather than leaving it out of the call. If the lmbda = 8 total "
+        "is the larger one, the decay factor came out negative and flipped the "
+        "sign of every weight on every step: l2_step wants the size of the whole "
+        "training set as n, which is 12 here, and passing the batch size instead "
+        "gives 1 - 1.0 * 8.0 / 3, or -1.667."
     )

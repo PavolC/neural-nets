@@ -121,6 +121,9 @@ def test_delta_ignores_z():
 
 def test_cost_and_delta_agree():
     """the gradient check: your delta really is your cost's slope, all 54"""
+    # The course's backprop and the course's nudge-and-measure, deliberately:
+    # a guarantee whose yardstick shares the code under test is not a
+    # guarantee, and the code under test here is your delta.
     from course import backprop, numerical_gradient
     # Module 5's gradient-check network, a 3-5-4-2 with two hidden layers.
     weights = [
@@ -151,8 +154,8 @@ def test_cost_and_delta_agree():
 
     num_w, num_b = numerical_gradient(cost_fn, weights, biases, eps=1e-4)
 
-    names = ["weights layer 1", "weights layer 2", "weights layer 3",
-             "biases layer 1", "biases layer 2", "biases layer 3"]
+    names = ["nabla_w[0]", "nabla_w[1]", "nabla_w[2]",
+             "nabla_b[0]", "nabla_b[1]", "nabla_b[2]"]
     worst = 0.0
     report = ""
     for name, yours, measured in zip(names, nabla_w + nabla_b, num_w + num_b):
@@ -179,7 +182,7 @@ def test_cost_and_delta_agree():
 
 
 def test_backprop_takes_the_blame_argument():
-    """your backprop accepts a swapped-in BP1"""
+    """your backprop accepts a swapped-in BP1 and uses it"""
     import submission
     backprop = getattr(submission, "backprop", None)
     assert backprop is not None, (
@@ -214,3 +217,43 @@ def test_backprop_takes_the_blame_argument():
             "same thing: no replacement was supplied, so use the BP1 you "
             "already had."
         )
+
+    # The yardstick is the course's nudge-and-measure against YOUR cost, not
+    # another copy of BP1, for the same reason as the gradient check above:
+    # a signature can carry output_delta while the BP1 line ignores it, and
+    # nothing that shares that line can tell the two apart.
+    from course import numerical_gradient
+    swapped_w, swapped_b = backprop(weights, biases, x, y, cross_entropy_delta)
+
+    def cost_fn(ws, bs):
+        return cross_entropy_cost(ws, bs, x, y)
+
+    num_w, num_b = numerical_gradient(cost_fn, weights, biases, eps=1e-4)
+    names = ["nabla_w[0]", "nabla_w[1]",
+             "nabla_b[0]", "nabla_b[1]"]
+    worst = 0.0
+    report = ""
+    for name, yours, measured in zip(names, swapped_w + swapped_b,
+                                     num_w + num_b):
+        rel = np.abs(yours - measured) / np.maximum(
+            np.abs(yours) + np.abs(measured), 1e-8)
+        i = np.unravel_index(int(np.argmax(rel)), rel.shape)
+        if rel[i] > worst:
+            worst = float(rel[i])
+            report = (
+                f"worst disagreement: {name}, entry "
+                f"{tuple(int(k) for k in i)}: nudging your cost says "
+                f"{measured[i]:.10f}, your backprop handed "
+                f"cross_entropy_delta says {yours[i]:.10f}"
+            )
+    assert worst < 1e-7, (
+        f"the replacement BP1 is not reaching your slopes: {report} "
+        f"(relative discrepancy {worst:.2e}; the bar is 1e-7, and a "
+        "matching pair lands near 1e-9). The likely cause: the signature "
+        "now carries output_delta and the BP1 line still computes the "
+        "quadratic blame, the gap times the squash slope. When "
+        "output_delta is not None the blame IS "
+        "output_delta(activations[-1], y, zs[-1]), with nothing multiplied "
+        "onto it, because cancelling that squash slope is what this cost "
+        "is for."
+    )

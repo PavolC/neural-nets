@@ -137,7 +137,7 @@ def test_one_hot_says_none_of_these_for_an_unknown_level():
 
 
 def test_split_covers_everything_exactly_once():
-    """the three sets partition 0..n-1 and have the asked-for sizes"""
+    """the three sets partition 0..n-1, at the asked-for sizes, cut off the end"""
     train, val, test = split(100, np.random.default_rng(0), 0.2, 0.2)
     assert len(val) == 20 and len(test) == 20 and len(train) == 60, (
         f"expected 60 training, 20 validation and 20 test out of 100, got "
@@ -154,6 +154,20 @@ def test_split_covers_everything_exactly_once():
         "the training indices came back in their original order, so nothing was "
         "shuffled. Data often arrives sorted by class, and cutting it unshuffled "
         "can hand training one species and test another."
+    )
+    order = np.random.default_rng(0).permutation(100)
+    assert (
+        np.array_equal(train, order[:60])
+        and np.array_equal(val, order[60:80])
+        and np.array_equal(test, order[80:])
+    ), (
+        "expected validation to be order[60:80], where order is one "
+        f"rng.permutation(100): it should begin {order[60:63].tolist()} and it "
+        f"begins {np.asarray(val)[:3].tolist()}. Training takes the front of "
+        "the shuffled order, and the two held-back sets are cut off the END. "
+        "Either end holds the same kind of rows after the shuffle, so which "
+        "end you take is a convention, but it fixes which rows land in which "
+        "set, and the counts Module 10's panel reports come from this cut."
     )
 
 

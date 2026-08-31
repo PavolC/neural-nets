@@ -7,9 +7,11 @@ export const crossEntropyExercise: Exercise = {
   id: "cross-entropy",
   title: "The cross-entropy cost",
   prompt: [
-    "Two functions, both short. cross_entropy_cost scores a batch, so the " +
-      "panels below have something to chart. cross_entropy_delta is the " +
-      "replacement for BP1, and it is the whole fix: one subtraction.",
+    "Two functions, both short. cross_entropy_delta is the replacement for " +
+      "BP1, and it is the whole fix: one subtraction. cross_entropy_cost " +
+      "scores a batch, and the gradient check uses it to prove that the " +
+      "subtraction really is that cost's slope; the panels below chart it " +
+      "as well.",
     "The cost, precisely: cross_entropy_cost(weights, biases, X, Y) returns " +
       "one float. X is (n_in, m) and Y is (n_out, m), samples as columns, " +
       "the same pair your sgd has taken since Module 3. Run the network on " +

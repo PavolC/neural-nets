@@ -244,7 +244,11 @@ export function Module3() {
         and 0 of X together with columns 3 and 0 of Y and you hold a batch of two
         examples. With that, the exercise: you write the update step and the loop
         that feeds it: shuffle the column order, walk it in mini-batches, repeat
-        (one full pass through the dataset is called an epoch). The gradient
+        (one full pass through the dataset is called an epoch). The shuffling is
+        done by rng, the last argument your loop takes: a NumPy random number
+        generator, made by np.random.default_rng(0), where the 0 is the seed. Two
+        generators made from the same seed deal the same order, so the same
+        training run repeats exactly. The gradient
         arrives written for you, in its own section of your file just above the one
         you are about to write, measured by nudging every parameter to both sides
         and rescoring, as described earlier. A section line that says "written for

@@ -8,10 +8,10 @@ export const trainExercise: Exercise = {
   title: "The whole program",
   prompt: [
     "Every training run so far has been started for you. The panels loaded the " +
-      "data, built the network, ran the epochs, cut the mini-batches, called " +
-      "your gradient, applied your update and scored the result. Your functions " +
-      "did the work inside that loop; the loop itself was the course's. This " +
-      "exercise is the loop.",
+      "data, built the network, ran the epochs, called your gradient, applied " +
+      "your update and scored the result. Your Module 3 sgd shuffled and cut " +
+      "the mini-batches inside that, one epoch per call, and the loop around it " +
+      "was the course's. This exercise is that loop.",
     "The contract, in two functions. accuracy(weights, biases, X, y) returns " +
       "the share of X's columns the network reads correctly, as a float " +
       "between 0 and 1. It is the three-image walk above, in code: feedforward " +
@@ -25,7 +25,7 @@ export const trainExercise: Exercise = {
       "from earlier modules, sitting above this section in your file: " +
       "init_network draws the network, batch_gradient runs your backprop once " +
       "per column of a mini-batch and averages the slopes, cross_entropy_delta " +
-      "is the blame it hands to BP1, and l2_step is the update.",
+      "is the BP1 it hands to your backprop, and l2_step is the update.",
     "The order is prescribed, because the tests check the exact numbers the " +
       "loop produces: draw the network first, then per epoch take one " +
       "rng.permutation(n), walk it in slices of batch_size front to back, take " +
@@ -39,18 +39,21 @@ export const trainExercise: Exercise = {
       "by hand, to the shapes and the length of the history, to whether the " +
       "thing actually learns, to the exact weights after four epochs.",
     "Once they pass, run the program on a problem of your own before pointing " +
-      "it at the digits. This is the same three-band problem the tests use, " +
-      "trained for longer. Send it to the scratch pad and run it:",
+      "it at the digits. This is the same three-class problem the tests use, " +
+      "trained for longer: twelve points spread along a line, each labelled 0, " +
+      "1 or 2 by which third of the range its first input falls in. The second " +
+      "input carries nothing, so the network has to learn to ignore it. Send it " +
+      "to the scratch pad and run it:",
     {
       code:
-        "x1 = np.linspace(-2.75, 2.75, 12)\n" +
-        "X = np.vstack([x1, np.array([0.2, 0.8] * 6)])\n" +
-        "label = lambda v: 0 if v < -1.0 else (1 if v < 1.0 else 2)\n" +
-        "y = np.array([label(v) for v in x1])\n" +
-        "Y = np.zeros((3, 12))\n" +
-        "Y[y, np.arange(12)] = 1.0\n" +
+        "x1 = np.linspace(-2.75, 2.75, 12)          # twelve points along a line\n" +
+        "X = np.vstack([x1, np.array([0.2, 0.8] * 6)])   # row 2 carries nothing\n" +
+        "label = lambda v: 0 if v < -1.0 else (1 if v < 1.0 else 2)   # which third\n" +
+        "y = np.array([label(v) for v in x1])       # class ids, for scoring\n" +
+        "Y = np.zeros((3, 12))                      # one-hot answers, one column each\n" +
+        "Y[y, np.arange(12)] = 1.0                  # put the 1 in each column's own row\n" +
         "\n" +
-        "t1 = np.linspace(-2.45, 2.45, 6)\n" +
+        "t1 = np.linspace(-2.45, 2.45, 6)           # six held-out points, offset\n" +
         "X_test = np.vstack([t1, np.full(6, 0.5)])\n" +
         "y_test = np.array([label(v) for v in t1])\n" +
         "\n" +

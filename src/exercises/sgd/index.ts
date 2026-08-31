@@ -35,7 +35,10 @@ export const sgdExercise: Exercise = {
       "the next call. Return the final (weights, biases). That is all " +
       "training is.",
     "The shuffling is prescribed, because the tests replay your run and " +
-      "compare to six decimal places. Each epoch, idx = rng.permutation(n) " +
+      "compare to six decimal places. Later modules also put two runs of this " +
+      "same sgd side by side, and holding the shuffle fixed is what leaves the " +
+      "pair differing only in the thing being compared. " +
+      "Each epoch, idx = rng.permutation(n) " +
       "deals the sample numbers 0 to n-1 into a random order (n = 6 might " +
       "give [3, 0, 5, 1, 4, 2]); the mini-batches are the consecutive " +
       "slices idx[0:batch_size], idx[batch_size:2*batch_size], and so on. " +
