@@ -703,14 +703,23 @@ the footer. Rules that follow from it:
   equation at 707px; it is 2 now. When touching this rule, re-run the difference test
   rather than eyeballing a screenshot: a downscaled composite invents lines that are not
   in the file, and this session chased two of them.
-- **Two widths on a page, and only two.** Everything read as text takes `--measure`:
-  prose, headings, captions, the cards, the exercise's h4, and the display equations.
-  Everything that is an illustration keeps the whole column: figures, tables, interactive
-  panels, the editor, and the blocks that hold code (the play snippets, the test-code
-  disclosure, the hints). Equations used to have a third width in between,
+- **Two widths on a page, and only two, and the rule is about the ink, not the boxes.**
+  The eye judges alignment by ragged left text edges, so everything that has one puts
+  that edge on the prose axis at `--measure`: prose, headings, captions, the cards, the
+  exercise's h4, the display equations, the blocks that hold code (the play snippets,
+  the torch listings, Module 1's five-ideas block), and the start page's rows of
+  buttons. The full column belongs only to ink that centres or to boxes that show their
+  own extent: figures, tables, interactive panels, the editor. A centred figure reads as
+  a picture sized to its content however wide it is; code and buttons cannot centre
+  their ink, so classed as illustrations they started it at the column edge, 100 to
+  113px left of every paragraph, which is the lopsidedness the centred axis was chosen
+  to prevent. The boxes all obeyed the two widths while that was true, which is why the
+  rule is stated in ink: a wide box whose ink cannot centre is misfiled however correct
+  its container measures. Equations used to have a third width in between,
   `--measure-wide` at 42rem, and three widths read as an accident rather than as a rule.
   A card's box is `--measure` plus its padding AND its borders, the 3px accent rule
-  included, so the lines inside it land on the axis at the measure like every other line.
+  included, so the lines inside it land on the axis at the measure like every other
+  line; the notation lookup and the code blocks carry their own paddings the same way.
 - **An equation that does not fit at the measure is split, not widened.** 45 of the
   course's 51 already fit; the seven that did not (`m2`'s 11,935 tally, `m3`'s cost and
   gradient, `m4`'s deltas and its new-z2 difference, `m7`'s blame chain and its
